@@ -1,4 +1,3 @@
-## VoteChain - A Decentralized Voting System using Blockchain and NodeJS
+## DGA VoteChain - Demo
 
-
-Watch video @ https://youtu.be/9aimIS2vP98
+Not blockchain included

@@ -7,11 +7,11 @@ const schema = {
     }
 }
 
-export const getSchema = () => {
+module.exports.getSchema = () => {
     return schema;
 }
 
-export const adminSchema = (app, mongoose) => {
+module.exports.adminSchema = (app, mongoose) => {
     const _schema = schema;
 
     var AdminSchema = new mongoose.Schema(_schema);

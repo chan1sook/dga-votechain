@@ -27,13 +27,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const uripath = window.location.href; // returns the full URL
 
   if (/register/.test(uripath)) {
-    $('#register').addClass('active');
+    document.getElementById('register').classList.add('active');
   } else if (/vote/.test(uripath)) {
-    $('#vote').addClass('active');
+    document.getElementById('vote').classList.add('active');
   } else if (/results/.test(uripath)) {
-    $('#results').addClass('active');
+    document.getElementById('results').classList.add('active');
   } else if (/admin/.test(uripath)) {
-    $('#admin').addClass('active');
+    document.getElementById('admin').classList.add('active');
   }
 
   initAdminTable();
@@ -73,26 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initVoteTopicPage();
   initResultPage();
 })
-
-var select_snapshot = function () {
-  $(".item").removeClass("selected");
-  var snapshot = $(this).addClass("selected").data("snapshot");
-  snapshot.show();
-};
-
-var add_snapshot = function (element) {
-  $(element).data("snapshot", this).addClass("item");
-
-  var $container = $("#snapshots").append(element);
-  var $camera = $("#camera");
-  var camera_ratio = $camera.innerWidth() / $camera.innerHeight();
-
-  var height = $container.height()
-  element.style.height = "" + height + "px";
-  element.style.width = "" + Math.round(camera_ratio * height) + "px";
-
-  var scroll = $container[0].scrollWidth - $container.innerWidth();
-};
 
 function addImageBlob() {
   const canvas = document.getElementById("snapshots");
@@ -182,120 +162,129 @@ function initRegisterPage() {
 }
 
 function initAdminTable() {
-  let topicChoices = [];
-  let table_view_btn_flag = false;
+  const voterTable = document.getElementById("voter_table");
 
-  function toggleTableView() {
-    if (table_view_btn_flag) {
-      $('#voter_table').hide();
-      $('#topic_table').show();
-      $('#topic_add_form').hide();
-      table_view_btn_flag = false;
-    } else {
-      $('#voter_table').show();
-      $('#topic_table').hide();
-      $('#topic_add_form').hide();
-      table_view_btn_flag = true
-    }
-  }
-  $('#table_view_btn').click(toggleTableView);
-  toggleTableView();
+  if(voterTable) {
+    let topicChoices = [];
+    let table_view_btn_flag = false;
 
-  const topicModalBtn = document.getElementById("topicModalBtn");
-  if(topicModalBtn) {
-    const nameInput = document.getElementById("name");
-    const expiredDateInput = document.getElementById("expired-date");
-    const expiredTimeInput = document.getElementById("expired-time");
-    const choiceInput = document.getElementById("choice");
+    const topicTable = document.getElementById("topic_table");
     const topicAddForm = document.getElementById("topic_add_form");
-    const topicChoicesEdit = document.getElementById("topic_choices_edit");
-    const topicChoiceAddBtn = document.getElementById("topic_choice_add");
+    const tableToggleBtn = document.getElementById("table_view_btn");
 
-    topicModalBtn.addEventListener("click", () => {
-      $('#topic_table').hide();
-      topicChoices = [];
-      updateTopicModalUi();
-      $(topicAddForm).show();
-    })
-
-    function getExpiredTime() {
-      const date = expiredDateInput.value;
-      const time = expiredTimeInput.value;
-      const value = new Date(`${date}T${time}`);
-
-      return isNaN(value.valueOf()) ? null : value;
-    }
-
-    function validateTopicChoices() {
-      if(topicChoices.length < 2) {
-        return false;
-      }
-
-      const expired = getExpiredTime();
-
-      return nameInput.value !== "" && expired && expired.valueOf() > Date.now();
-    }
-
-    function updateTopicModalUi() {
-      const isValid = validateTopicChoices();
-      document.getElementById("topic_add_btn").disabled = !isValid;
-      topicChoiceAddBtn.disabled = choiceInput.value == "" || topicChoices.includes(choiceInput.value);
-
-      topicChoicesEdit.innerHTML = ""; 
-      for(const choice of topicChoices) {
-        const dom = document.createElement("div");
-        dom.classList.add("d-flex", "flex-wrap", "my-2");
-        dom.innerHTML = `<div class="mr-auto">${choice}</div>`;
-        
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.innerHTML = `Remove`;
-        btn.classList.add("btn", "btn-danger");
-        btn.addEventListener("click", () => {
-          topicChoices = topicChoices.filter((ele) => ele !== choice);
-          updateTopicModalUi();
-        }, {once: true});
-
-        dom.append(btn);
-
-        topicChoicesEdit.append(dom);
+    function toggleTableView() {
+      if (table_view_btn_flag) {
+        voterTable.style.display = "none";
+        topicTable.style.display = "block";
+        topicAddForm.style.display = "none";
+        table_view_btn_flag = false;
+      } else {
+        voterTable.style.display = "block";
+        topicTable.style.display = "none";
+        topicAddForm.style.display = "none";
+        table_view_btn_flag = true
       }
     }
     
-    nameInput.addEventListener("input", updateTopicModalUi);
-    expiredDateInput.addEventListener("change", updateTopicModalUi);
-    expiredTimeInput.addEventListener("change", updateTopicModalUi);
-    choiceInput.addEventListener("input", updateTopicModalUi);
+    tableToggleBtn.addEventListener("click", toggleTableView);
+    toggleTableView();
 
-    topicAddForm.addEventListener("submit", async (ev) => {
-      ev.preventDefault();
+    const topicModalBtn = document.getElementById("topicModalBtn");
+    if(topicModalBtn) {
+      const nameInput = document.getElementById("name");
+      const expiredDateInput = document.getElementById("expired-date");
+      const expiredTimeInput = document.getElementById("expired-time");
+      const choiceInput = document.getElementById("choice");
+      const topicAddForm = document.getElementById("topic_add_form");
+      const topicChoicesEdit = document.getElementById("topic_choices_edit");
+      const topicChoiceAddBtn = document.getElementById("topic_choice_add");
 
-      if(!validateTopicChoices()) {
-        return;
+      topicModalBtn.addEventListener("click", () => {
+        topicTable.style.display = "none";
+        topicChoices = [];
+        updateTopicModalUi();
+        topicAddForm.style.display = "block";
+      })
+
+      function getExpiredTime() {
+        const date = expiredDateInput.value;
+        const time = expiredTimeInput.value;
+        const value = new Date(`${date}T${time}`);
+
+        return isNaN(value.valueOf()) ? null : value;
       }
 
-      const formData = new FormData(topicAddForm);
-      formData.append("choices", JSON.stringify(topicChoices));
-      formData.append("expired", getExpiredTime().valueOf());
+      function validateTopicChoices() {
+        if(topicChoices.length < 2) {
+          return false;
+        }
 
-      try {
-        await fetch("/admin/addtopic", {
-          method: "POST",
-          body: formData,
-        });
+        const expired = getExpiredTime();
 
-        location.reload();
-      } catch(err) {
-        console.error(err);
-        alert(err.message);
+        return nameInput.value !== "" && expired && expired.valueOf() > Date.now();
       }
-    });
 
-    topicChoiceAddBtn.addEventListener("click", () => {
-      if(choiceInput.value == "" || topicChoices.includes(choiceInput.value)) { return; }
-      topicChoices.push(choiceInput.value);
-      updateTopicModalUi();
-    })
+      function updateTopicModalUi() {
+        const isValid = validateTopicChoices();
+        document.getElementById("topic_add_btn").disabled = !isValid;
+        topicChoiceAddBtn.disabled = choiceInput.value == "" || topicChoices.includes(choiceInput.value);
+
+        topicChoicesEdit.innerHTML = ""; 
+        for(const choice of topicChoices) {
+          const dom = document.createElement("div");
+          dom.classList.add("d-flex", "flex-wrap", "my-2");
+          dom.innerHTML = `<div class="mr-auto">${choice}</div>`;
+          
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.innerHTML = `Remove`;
+          btn.classList.add("btn", "btn-danger");
+          btn.addEventListener("click", () => {
+            topicChoices = topicChoices.filter((ele) => ele !== choice);
+            updateTopicModalUi();
+          }, {once: true});
+
+          dom.append(btn);
+
+          topicChoicesEdit.append(dom);
+        }
+      }
+      
+      nameInput.addEventListener("input", updateTopicModalUi);
+      expiredDateInput.addEventListener("change", updateTopicModalUi);
+      expiredTimeInput.addEventListener("change", updateTopicModalUi);
+      choiceInput.addEventListener("input", updateTopicModalUi);
+
+      topicAddForm.addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+
+        if(!validateTopicChoices()) {
+          return;
+        }
+
+        const formData = new FormData(topicAddForm);
+        formData.append("choices", JSON.stringify(topicChoices));
+        formData.append("expired", getExpiredTime().valueOf());
+
+        try {
+          await fetch("/admin/addtopic", {
+            method: "POST",
+            body: formData,
+          });
+
+          location.reload();
+        } catch(err) {
+          console.error(err);
+          alert(err.message);
+        }
+      });
+
+      topicChoiceAddBtn.addEventListener("click", () => {
+        if(choiceInput.value == "" || topicChoices.includes(choiceInput.value)) { return; }
+        topicChoices.push(choiceInput.value);
+        updateTopicModalUi();
+      })
+    }
   }
 }
 
@@ -314,7 +303,7 @@ async function initVotePage() {
     const cameraDOM = document.getElementById("camera");
 
     try {
-      const res = await fetch("/fetchtopics");
+      const res = await fetch("/fetchtopics?expired=nonexpired");
       const json = await res.json();
       
       if(!Array.isArray(json.topics) || json.topics.length === 0) {
@@ -340,7 +329,7 @@ async function initVotePage() {
       uploadQrBtn.addEventListener("change", (event) => {
         spinner.style.display = "none";
         
-        var reader = new FileReader();
+        const reader = new FileReader();
         reader.onload = function () {
           qrImg.src = reader.result;
           uploadQrBtn.style.display = "none";
@@ -564,7 +553,7 @@ async function initResultPage() {
     }
 
     try {
-      const res = await fetch("/fetchtopics");
+      const res = await fetch("/fetchtopics?expired=all");
       const json = await res.json();
 
       if(!Array.isArray(json.topics) || json.topics.length === 0) {

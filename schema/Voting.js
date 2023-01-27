@@ -6,11 +6,11 @@ const schema = {
     choice: Number,
 }
 
-export const getSchema = () => {
+module.exports.getSchema = () => {
     return schema;
 }
 
-export const votingSchema = (app, mongoose) => {
+module.exports.votingSchema = (app, mongoose) => {
     const _schema = schema;
 
     var VotingSchema = new mongoose.Schema(_schema);

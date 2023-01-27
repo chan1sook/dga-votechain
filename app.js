@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const index = require('./routes/index');
 const admin = require('./routes/admin');
 const jwt = require('jsonwebtoken');
-const keyConfig = require('./config').default;
+const keyConfig = require('./config');
 
 const app = express();
 
@@ -65,7 +65,7 @@ app.db.once('open', function () {
   console.log("Connected to ", mongoURI);
 });
 
-import { models } from './model';
+const { models } = require('./model');
 models(app, mongoose);
 
 /**************************************MongoDB Database***************************************/

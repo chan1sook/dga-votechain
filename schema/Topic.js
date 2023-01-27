@@ -15,11 +15,11 @@ const schema = {
     }
 }
 
-export const getSchema = () => {
+module.exports.getSchema = () => {
     return schema;
 }
 
-export const topicSchema = (app, mongoose) => {
+module.exports.topicSchema = (app, mongoose) => {
     const _schema = schema;
 
     var TopicSchema = new mongoose.Schema(_schema);

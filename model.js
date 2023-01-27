@@ -1,19 +1,11 @@
-import {
-    voterSchema
-} from './schema/Voter';
-import {
-    adminSchema
-} from './schema/Admin';
-import {
-    topicSchema
-} from './schema/Topic'
-import {
-    votingSchema
-} from './schema/Voting'
+const { voterSchema } = require('./schema/Voter');
+const { adminSchema } = require('./schema/Admin');
+const { topicSchema } = require('./schema/Topic');
+const { votingSchema } = require('./schema/Voting');
 
-export const models = (app, mongoose) => {
-    voterSchema(app, mongoose);
-    adminSchema(app, mongoose);
-    topicSchema(app, mongoose);
-    votingSchema(app, mongoose);
+module.exports.models = (app, mongoose) => {
+  voterSchema(app, mongoose);
+  adminSchema(app, mongoose);
+  topicSchema(app, mongoose);
+  votingSchema(app, mongoose);
 }

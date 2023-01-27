@@ -75,12 +75,11 @@ router.get('/logout', function (req, res, next) {
 
 router.post('/login', function (req, res, next) {
   if(req.body.login_id === process.env.ADMIN_USERNAME && req.body.password === process.env.ADMIN_PASSWORD) {
-    var payload = {
+    const payload = {
       userType: 'admin',
       firstName: 'Admin'
     };
-    var token = req.app.jwt.sign(payload, req.app.jwtSecret);
-    // add token to cookie
+    const token = req.app.jwt.sign(payload, req.app.jwtSecret);
 
     res.cookie('token', token);
     res.redirect('/admin');

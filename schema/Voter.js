@@ -9,11 +9,11 @@ const schema = {
     }
 }
 
-export const getSchema = () => {
+module.exports.getSchema = () => {
     return schema;
 }
 
-export const voterSchema = (app, mongoose) => {
+module.exports.voterSchema = (app, mongoose) => {
     const _schema = schema;
 
     var VoterSchema = new mongoose.Schema(_schema);
