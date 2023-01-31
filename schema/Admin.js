@@ -1,6 +1,7 @@
 const schema = {
-    login_id: String,
-    password: String,
+    username: String,
+    hashpw: String,
+    role: String,
     created: {
         type: Date,
         default: Date.now

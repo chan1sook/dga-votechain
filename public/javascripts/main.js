@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
   } else if (/results/.test(uripath)) {
     document.getElementById('results').classList.add('active');
   } else if (/admin/.test(uripath)) {
-    document.getElementById('admin').classList.add('active');
+    const adminDOM = document.getElementById('admin');
+    if(adminDOM) {
+      adminDOM.classList.add('active');
+    }
   }
 
   initAdminTable();
@@ -476,16 +479,6 @@ function initVoteTopicPage() {
 
         location.href = "/vote";
       }
-
-    
-      // if (voteflag == true) {
-      //   contractInstance.voteForCandidate(candidateName, {
-      //     from: web3.eth.accounts[0]
-      //   }, function () {
-      //     console.log(contractInstance.totalVotesFor.call(candidateName).toString());
-      //     window.location = "/voteadded/" + id;
-      //   });
-      // }
     }, { once: true })
   }
 }

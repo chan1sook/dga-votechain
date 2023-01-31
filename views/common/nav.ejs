@@ -12,7 +12,7 @@
       <li class="nav-item" id="results">
         <a class="nav-link" href="/results">Results</a>
       </li>
-      <% if(JWTData !== undefined && JWTData.userType === "admin") { %>
+      <% if(isAdmin === true) { %>
         <li class="nav-item" id="admin">
           <a class="nav-link" href="/admin">Admin Panel</a>
         </li>

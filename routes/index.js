@@ -1,13 +1,13 @@
-var express = require('express');
-var router = express.Router();
-var multer = require('multer');
-var QRCode = require('qrcode');
-var QrCode = require('qrcode-reader');
-var Jimp = require("jimp");
+const express = require('express');
+const router = express.Router();
+const multer = require('multer');
+const qrCode = require('qrcode');
+const qrReader = require('qrcode-reader');
+const Jimp = require("jimp");
 const crypto = require("crypto");
 const path = require("path");
-const fs = require("fs");
 const mongoose = require("mongoose");
+const { isAdminRole } = require('../helper');
 
 
 const upload = multer({
@@ -29,18 +29,16 @@ const uploadMemory = multer({
 
 router.get('/', function (req, res, next) {
 	res.render('index', {
-		JWTData: req.JWTData
+    isAdmin: isAdminRole(req.session.userData),
 	});
 });
 
 router.get('/voteTopic', function (req, res, next) {
-	if (!req.cookies.votePayload) {
+	if (!req.session.votePayload) {
 		return res.redirect('/vote');
 	}
   
-  const { topic, id, name, nationid } = req.cookies.votePayload;
-  
-	// res.clearCookie('votePayload');
+  const { topic, id, name, nationid } = req.session.votePayload;
 
   Promise.all([
     req.app.db.models.Voter.findById(id),
@@ -54,7 +52,7 @@ router.get('/voteTopic', function (req, res, next) {
       return res.redirect('/vote');
     }
 		res.render('votetopic', {
-			JWTData: req.JWTData,
+      isAdmin: isAdminRole(req.session.userData),
 			id: id,
 			name: name,
 			nationid: nationid,
@@ -68,19 +66,19 @@ router.get('/voteTopic', function (req, res, next) {
 
 router.get('/vote', function (req, res, next) {
 	res.render('vote', {
-		JWTData: req.JWTData
+    isAdmin: isAdminRole(req.session.userData),
 	});
 });
 
 router.get('/register', function (req, res, next) {
 	res.render('register', {
-		JWTData: req.JWTData
+    isAdmin: isAdminRole(req.session.userData),
 	});
 });
 
 router.get('/results', function (req, res, next) {
 	res.render('results', {
-		JWTData: req.JWTData
+    isAdmin: isAdminRole(req.session.userData),
 	});
 });
 
@@ -101,7 +99,7 @@ router.post('/register', upload.single('avatar'), function (req, res, next) {
 
 		const voterID = JSON.stringify(data._id);
 
-		QRCode.toDataURL(voterID, function (err, url) {
+		qrCode.toDataURL(voterID, function (err, url) {
 			var im = url.split(",")[1];
 			var img = Buffer.from(im, 'base64');
 
@@ -117,7 +115,7 @@ router.post('/register', upload.single('avatar'), function (req, res, next) {
 
 const verifyUploadFields = [{ name: 'avatar', maxCount: 1 }, { name: 'qr', maxCount: 1 }];
 router.post('/verifyvoter', uploadMemory.fields(verifyUploadFields), function (req, res, next) {
-  const qr = new QrCode();
+  const qr = new qrReader();
 	const qrBuffer = req.files.qr[0].buffer;
 
   Jimp.read(qrBuffer, function (err, image) {
@@ -157,7 +155,7 @@ router.post('/verifyvoter', uploadMemory.fields(verifyUploadFields), function (r
             name: voter.name,
           }
           // const avatarImg = fs.readFileSync(`uploads/${voter.imagePath}`);
-          res.cookie('votePayload', votePayload);
+          req.session.votePayload = votePayload;
 
           // auth face
           
@@ -200,6 +198,8 @@ router.post('/votetopic', multer().none(), function (req, res, next) {
           console.log(err);
           return next(err);
         }
+
+        delete req.session.votePayload;
     
         return res.status(200).json({
           message: "Voted!",
@@ -237,8 +237,6 @@ router.get('/fetchtopics', function (req, res, next) {
       console.log(err);
       return next(err);
     }
-    
-    console.log(query)
 
     res.status(200).json(
       {

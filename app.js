@@ -1,31 +1,37 @@
 const express = require('express');
 const path = require('path');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
+const morganLogger = require('morgan');
 const mongoose = require('mongoose');
-const index = require('./routes/index');
-const admin = require('./routes/admin');
-const jwt = require('jsonwebtoken');
+const session = require('express-session');
+const redis = require("redis")
+const RedisStore = require("connect-redis")(session);
 const keyConfig = require('./config');
 
-const app = express();
+const index = require('./routes/index');
+const admin = require('./routes/admin');
+const { initAdmins, isAdminRole } = require("./helper");
 
-app.jwt = jwt;
-app.jwtSecret = 'dga-vote-chain';
+const redisClient = redis.createClient({ legacyMode: true });
+redisClient.connect().catch(console.error);
+
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false
+app.use(morganLogger('dev'));
+app.use(session({
+  store: new RedisStore({ client: redisClient }),
+  saveUninitialized: false,
+  resave: true,
+  rolling: true,
+  secret: process.env.SESSION_SECRET,
+  maxAge: 2 * 24 * 60 * 60 * 1000,
 }));
-app.use(cookieParser());
-app.use(require(__dirname + '/middleware.js').makeAuthHappen().unless({
-  path: ['/404']
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: false
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -33,14 +39,14 @@ app.use('/', index);
 app.use('/admin', admin);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   console.error(err);
   
   // set locals, only providing error in development
@@ -50,7 +56,7 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error', {
-		JWTData: req.JWTData
+    isAdmin: isAdminRole(req.session.userData),
 	});
 });
 
@@ -63,13 +69,14 @@ app.db.on('error', console.error.bind(console, 'mongoose connection error: '));
 
 app.db.once('open', function () {
   console.log("Connected to ", mongoURI);
+
+  initAdmins(app.db).catch(console.error);
 });
 
 const { models } = require('./model');
 models(app, mongoose);
 
 /**************************************MongoDB Database***************************************/
-
 
 const debug = require('debug')('dga-votechain-node:server');
 const http = require('http');

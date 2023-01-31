@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-  <% include common/header.ejs %>
+  <%- include('common/header', {}); %>
   <body>
-    <% include common/nav.ejs %>
+    <%- include('common/nav', {isAdmin,isAdmin}); %>
     <script src="dist/2.7.2/Chart.bundle.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
     <style>
