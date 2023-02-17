@@ -82,11 +82,10 @@ router.get('/results', function (req, res, next) {
 	});
 });
 
-router.post('/register', upload.single('avatar'), function (req, res, next) {
+router.post('/register', multer().none(), function (req, res, next) {
 	const voterDetails = {
 		name: req.body.name,
 		nationid: req.body.nationid,
-		imagePath: path.basename(req.file.path),
 		hasVoted: false,
 		isValid: true,
 	}
@@ -113,7 +112,7 @@ router.post('/register', upload.single('avatar'), function (req, res, next) {
 	});
 });
 
-const verifyUploadFields = [{ name: 'avatar', maxCount: 1 }, { name: 'qr', maxCount: 1 }];
+const verifyUploadFields = [{ name: 'qr', maxCount: 1 }];
 router.post('/verifyvoter', uploadMemory.fields(verifyUploadFields), function (req, res, next) {
   const qr = new qrReader();
 	const qrBuffer = req.files.qr[0].buffer;
@@ -154,10 +153,7 @@ router.post('/verifyvoter', uploadMemory.fields(verifyUploadFields), function (r
             nationid: voter.nationid,
             name: voter.name,
           }
-          // const avatarImg = fs.readFileSync(`uploads/${voter.imagePath}`);
           req.session.votePayload = votePayload;
-
-          // auth face
           
           return res.status(200).json({
             message: 'Verify allow!'

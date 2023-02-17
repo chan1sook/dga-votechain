@@ -4,13 +4,8 @@
   <body>
     <%- include('common/nav', {isAdmin,isAdmin}); %>
     <div class="container">
-        <div class="row" id="register_row">
-            <div class="col-md-6" id="cam_col">
-                <video autoplay id="camera"></video>
-                <button id="take_snapshots" class="btn btn-secondary btn-lg btn-block" hidden>Capture</button>
-                <canvas id='snapshots'></canvas>
-            </div>
-            <div class="col-md-6" id="reg_col">
+        <div class="row justify-content-center" id="register_row">
+            <div class="col-md-9" id="reg_col">
                 <div class="jumbotron jumbotron-fluid">
                     <div class="container">
                         <h1 class="display-4">Register</h1>

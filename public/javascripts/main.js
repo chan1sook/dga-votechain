@@ -1,38 +1,15 @@
-let imageCapture;
-let avatarBlob;
 let qrBlob;
 
-function drawCanvas(canvas, img) {
-  canvas.width = getComputedStyle(canvas).width.split('px')[0];
-  canvas.height = getComputedStyle(canvas).height.split('px')[0];
-  let ratio  = Math.min(canvas.width / img.width, canvas.height / img.height);
-  let x = (canvas.width - img.width * ratio) / 2;
-  let y = (canvas.height - img.height * ratio) / 2;
-  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-  canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height,
-      x, y, img.width * ratio, img.height * ratio);
-}
-
-async function takeSnapshots() {
-  try {
-    imageBitmap = await imageCapture.grabFrame();
-    const canvas = document.getElementById('snapshots');
-    drawCanvas(canvas, imageBitmap);
-  } catch(err) {
-    console.log(err)
-  }
-};
-
 document.addEventListener("DOMContentLoaded", () => {
-  const uripath = window.location.href; // returns the full URL
+  const pathname = window.location.pathname;
 
-  if (/register/.test(uripath)) {
+  if (/^\/register/.test(pathname)) {
     document.getElementById('register').classList.add('active');
-  } else if (/vote/.test(uripath)) {
+  } else if (/^\/vote/.test(pathname)) {
     document.getElementById('vote').classList.add('active');
-  } else if (/results/.test(uripath)) {
+  } else if (/^\/results/.test(pathname)) {
     document.getElementById('results').classList.add('active');
-  } else if (/admin/.test(uripath)) {
+  } else if (/^\/admin/.test(pathname)) {
     const adminDOM = document.getElementById('admin');
     if(adminDOM) {
       adminDOM.classList.add('active');
@@ -40,63 +17,36 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   initAdminTable();
-
-  const takeSnapshotBtn = document.getElementById("take_snapshots");
-  const registerBtn = document.getElementById("register_btn");
-  if(takeSnapshotBtn) {
-    // only use when has has take snapshot
-    navigator.mediaDevices.getUserMedia({video: true})
-    .then(mediaStream => {
-      document.querySelector('video').srcObject = mediaStream;
-
-      const track = mediaStream.getVideoTracks()[0];
-      imageCapture = new ImageCapture(track);
-      takeSnapshotBtn.removeAttribute("hidden");
-    })
-    .catch(error => console.log(error));
-    takeSnapshotBtn.addEventListener("click", async () => {
-      await takeSnapshots();
-      document.getElementById("camera").style.display = "none";
-      document.getElementById("take_snapshots").style.display = "none";
-      document.getElementById("snapshots").style.display = "block";
-      
-      registerBtn.disabled = false;
-      addImageBlob();
-    
-      const mediaStream = document.querySelector('video').srcObject;
-      const tracks = mediaStream.getTracks();
-      for(const track of tracks) {
-        track.stop();
-      }
-    })
-  }
-
   initRegisterPage();
   initVotePage();
   initVoteTopicPage();
   initResultPage();
 })
 
-function addImageBlob() {
-  const canvas = document.getElementById("snapshots");
-  canvas.toBlob((imageData) => {
-    avatarBlob = imageData;
-  });
-};
-
 function initRegisterPage() {
   const registerForm = document.getElementById("register_form");
   if(registerForm) {
+    const inputs = registerForm.querySelectorAll("input");
+    const regBtn = document.getElementById("register_btn");
+
+    function canReg() {
+      for(const input of inputs) {
+        if(!input.value) { return false; }
+      }
+      return true;
+    }
+
+    for(const input of inputs) {
+      input.addEventListener("input", () => {
+        regBtn.disabled = !canReg();
+      })
+    }
+    regBtn.disabled = !canReg();
+
     registerForm.addEventListener("submit", async (ev) => {
       ev.preventDefault();
 
-      if(!avatarBlob) {
-        return;
-      }
-
       const formData = new FormData(document.getElementById("register_form"));
-      formData.set("avatar", avatarBlob);
-
       const regNow = document.getElementById("register_row");
       regNow.innerHTML = `<div class="col-md-12">
         <div class="jumbotron jumbotron-fluid">
@@ -302,8 +252,6 @@ async function initVotePage() {
     const topicSelectBtn = document.getElementById("select_topic_btn");
     const uploadQrBtn = document.getElementById("upload_qr");
     const submitQrBtn = document.getElementById("submit_qr");
-    const captureImgBtn = document.getElementById("capture_img");
-    const cameraDOM = document.getElementById("camera");
 
     try {
       const res = await fetch("/fetchtopics?expired=nonexpired");
@@ -343,53 +291,17 @@ async function initVotePage() {
         reader.readAsDataURL(event.target.files[0]);
       });
 
-      submitQrBtn.addEventListener("click", () => {
+      submitQrBtn.addEventListener("click", async () => {
         qrImg.style.display = "none";
-        txtMsg.innerHTML = "Capture your face to verify your identity";
-        submitQrBtn.style.display = "none";
 
-        // show camera
-        navigator.mediaDevices.getUserMedia({video: true})
-          .then(mediaStream => {
-            document.querySelector('video').srcObject = mediaStream;
-      
-            const track = mediaStream.getVideoTracks()[0];
-            imageCapture = new ImageCapture(track);
-      
-            cameraDOM.style.display = "block";
-            captureImgBtn.style.display = "block";
-          });
-      })
-
-      captureImgBtn.addEventListener("click", async () => {
-        const snapshotDOM =  document.getElementById("snapshots");
-        const verifyBtn =  document.getElementById("verify_btn");
-
-        await takeSnapshots();
-        cameraDOM.style.display = "none";
-        captureImgBtn.style.display = "none";
-        snapshotDOM.style.display = "block";
-        verifyBtn.style.display = "block";
-
-        addImageBlob();
-      
-        const mediaStream = document.querySelector('video').srcObject;
-        const tracks = mediaStream.getTracks();
-        for(const track of tracks) {
-          track.stop();
-        }
-
-        verifyBtn.addEventListener("click", async () => {
-          if(!avatarBlob || !qrBlob) { return; }
+        if(!qrBlob) { return; }
           
           const formData = new FormData(document.getElementById("verify_form"));
-          formData.set("avatar", avatarBlob);
           formData.set("qr", qrBlob);
           formData.set("topic", topicSelect.value);
-          
-          snapshotDOM.style.display = "none";
-          verifyBtn.style.display = "none";
-      
+
+          submitQrBtn.style.display = "none";
+
           try {
             const res = await fetch("/verifyvoter", {
               method: 'POST',
@@ -408,7 +320,6 @@ async function initVotePage() {
             console.error(err);
             txtMsg.innerHTML = "Validation Failed";
           }
-        });
       })
     } catch(error) {
       console.error(error);
