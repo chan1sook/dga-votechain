@@ -1,6 +1,8 @@
-import UserModel from "~~/src/models/user"
-import RequestPermissionsModel from "~~/src/models/reqpermission"
+import UserModel from "~~/server/models/user"
+import RequestPermissionsModel from "~~/server/models/reqpermission"
+import NotificationModel from "~~/server/models/notification";
 import { checkPermissionNeeds, checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
+import { getNtpTime } from "~~/server/ntp";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -48,11 +50,43 @@ export default defineEventHandler(async (event) => {
   if(status === "approved") {
     userDoc.permissions = combinePermissions(userData.permissions, ...reqData.permissions);
   }
+  
+  const today = await getNtpTime();
 
-  await Promise.all([
-    status === "approved" ? userDoc.save() : () => {},
-    reqData.save()
-  ])
+  if(status === "approved") {
+    await Promise.all([
+      userDoc.save(),
+      reqData.save(),
+      new NotificationModel(
+        {
+          from: "system",
+          target: [{ citizenId: userData.digitalIdUserInfo.citizen_id }],
+          title: `Request Permission #${reqData.id} approved`,
+          content: `Request Permission #${reqData.id} approved`,
+          notifyAt: today,
+          createdAt: today,
+          updatedAt: today,
+          tags: [`request-${reqData._id}-approved`],
+        }
+      ).save()
+    ]);
+  } else {
+    await Promise.all([
+      reqData.save(),
+      new NotificationModel(
+        {
+          from: "system",
+          target: [{ citizenId: userData.digitalIdUserInfo.citizen_id }],
+          title: `Request Permission #${reqData.id} rejected`,
+          content: `Request Permission #${reqData.id} rejected`,
+          notifyAt: today,
+          createdAt: today,
+          updatedAt: today,
+          tags: [`request-${reqData._id}-rejected`],
+        }
+      ).save()
+    ]);
+  }
 
   if(userData.userid === userDoc.userid) {
     userData.permissions = userDoc.permissions;
@@ -65,6 +99,7 @@ export default defineEventHandler(async (event) => {
     permissions: reqData.permissions,
     newPermissions: userDoc.permissions,
     note: reqData.note,
+    preset: reqData.preset,
   }
   return {
     requestPermissions,

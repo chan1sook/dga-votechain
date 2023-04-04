@@ -1,8 +1,10 @@
 import dayjs from "dayjs"
 import { isTopicExpired } from "~~/src/utils/topic";
 
-import TopicModel from "~~/src/models/topic"
-import VoteModel from "~~/src/models/vote"
+import TopicModel from "~~/server/models/topic"
+import VoteModel from "~~/server/models/vote"
+import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import { getNtpNow } from "~~/server/ntp";
 
 export default defineEventHandler(async (event) => {  
   const topicDoc = await TopicModel.findById(event.context.params?.id);
@@ -13,7 +15,18 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if(topicDoc.status !== "approved" || !isTopicExpired(topicDoc)) {
+  if(!topicDoc.publicVote) {
+    const userData = event.context.userData;
+    
+    if(!userData || !checkPermissionNeeds(userData.permissions, "access-pages:user")) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+  }
+
+  if(topicDoc.status !== "approved" || !isTopicExpired(topicDoc, await getNtpNow())) {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not expired or not approved",
@@ -34,10 +47,9 @@ export default defineEventHandler(async (event) => {
   allVotes.reduce((prev, current) => {
     return prev;
   }, voteRecords);
-  
+
   const voteResult : TopicVoteCountResponse = {
     _id: `${topicDoc._id}`,
-    status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
     choices: topicDoc.choices,
@@ -45,8 +57,40 @@ export default defineEventHandler(async (event) => {
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toString(),
     createdAt: dayjs(topicDoc.createdAt).toString(),
     updatedAt: dayjs(topicDoc.updatedAt).toString(),
-    votes: voteRecords,
+    winners: [],
   }
+
+  if(topicDoc.showVotersScore) {
+    if(topicDoc.showVotersChoicesPublic) {
+      voteResult.votes = allVotes.map((ele) => {
+        return {
+          userid: ele.userid,
+          createdAt: dayjs(ele.createdAt).toISOString(),
+          choice: ele.choice,
+          citizenId: ele.citizenId,
+        };
+      })
+    }
+    voteResult.scores = voteRecords;
+  }
+  const voteRecords2 = voteRecords.slice();
+  const winners = [];
+  voteRecords2.sort((a, b) => b.count - a.count);
+  for(const vote of voteRecords2) {
+    if(winners.length === 0) {
+      winners.push(vote);
+      continue;
+    }
+
+    if(vote.count === winners[0].count) {
+      winners.push(vote);
+    } else {
+      break;
+    }
+  }
+
+  voteResult.winners = winners.map((ele) => ele.choice);
+
   return {
     voteResult,
   }

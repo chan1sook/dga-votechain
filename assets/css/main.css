@@ -8,11 +8,15 @@
   html {
     font-family: "Mitr", system-ui, sans-serif;
   }
+
+  body {
+    @apply text-dga-blue;
+  }
 }
 
 @layer components {
-  .dga-evote-btn {
-    @apply transition duration-200 select-none py-2 px-4 bg-slate-500 text-white font-semibold rounded-full shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75 disabled:bg-slate-200 disabled:focus:ring-0 disabled:cursor-default disabled:text-slate-500;
+  .dga-container {
+    @apply p-8 min-h-[calc(100vh-5rem)]
   }
 
   .dga-evote-input {

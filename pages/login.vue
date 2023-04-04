@@ -1,29 +1,26 @@
 <template>
-  <div class="p-4 w-full max-w-3xl mx-auto">
-    <div class="border-2 border-gray-200 rounded-lg shadow p-4">
-      <h1 class="text-3xl font-bold text-center mb-4">
-        {{ webAppName }}
-      </h1>
-      <h2 class="text-2xl font-bold text-center mb-4">
-        Login
-      </h2>
-      <div class="my-2 text-center">
-        <a href="/api/login">
-          <button type="button" class="dga-evote-btn w-full max-w-sm inline-flex gap-2 items-center justify-center" title="Login with Digital ID">
-            <MaterialIcon icon="fingerprint"/>
-            <span class="truncate">Login with Digital ID</span>
-          </button>
-        </a>
-      </div>
-      <div class="my-2 text-center">
-        <NuxtLink :to="registerUrl">
-          <button type="button" class="dga-evote-btn w-full max-w-sm inline-flex gap-2 items-center justify-center" title="Register">
-            <MaterialIcon icon="how_to_reg"/>
-            <span class="truncate">Register</span>
-          </button>
-        </NuxtLink>
-      </div>
-    </div>
+  <div>
+    <h2 class="text-2xl font-bold text-center mb-4">
+      Login
+    </h2>
+    <DgaButtonGroup larger class="mt-6">
+      <a href="/api/login">
+        <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
+          color="dga-orange" title="Login with Digital ID"
+        >
+          <MaterialIcon icon="fingerprint"/>
+          <span class="truncate">Login with Digital ID</span>
+        </DgaButton>
+      </a>
+    </DgaButtonGroup>
+    <DgaButtonGroup larger class="mt-2">
+      <NuxtLink :to="registerUrl">
+        <DgaButton theme="hollow" class="w-full flex flex-row gap-x-2 items-center justify-center truncate" title="Register">
+          <MaterialIcon icon="how_to_reg"/>
+          <span class="truncate">Register</span>
+        </DgaButton>
+      </NuxtLink>
+    </DgaButtonGroup>
   </div>
 </template>
 
@@ -39,5 +36,4 @@ useHead({
 
 const { DID_API_URL } = useRuntimeConfig();
 const registerUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
-
 </script>

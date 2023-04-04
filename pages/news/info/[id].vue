@@ -1,54 +1,47 @@
 <template>
-  <div class="p-4 w-full mx-auto">
-    <div v-if="news" class="border-2 border-gray-200 rounded-lg shadow p-4">
-      <h1 class="text-3xl font-bold text-center mb-4">
-        {{ webAppName }}
-      </h1>
-      <h2 class="text-2xl font-bold text-center mb-0">
-        {{ news.title }}
-      </h2>
-      <div class="text-sm text-center text-gray-700 mb-4">#{{ newsid }}</div>
-      <div class="my-2">
-        <BasicListItem header-class="w-24">
-          <template #header>Author</template>
-          <template v-if="news.author">{{ news.author }}</template>
+  <div v-if="news">
+    <DgaHead>News</DgaHead>
+    <h2 class="text-2xl font-bold text-center mb-0">
+      {{ news.title }}
+    </h2>
+    <div class="text-sm text-center text-gray-700 mb-4">#{{ newsid }}</div>
+    <DgaListGroup :items="newToLists(news)" no-animation>
+      <template #header="{item}">
+        {{ item.key }}
+      </template>
+      <template #content="{item}">
+        <template v-if="item.key === 'Author'">
+          <span v-if="item.value.author">{{ item.value.author }}</span>
           <span v-else class="italic">Anonymous</span>
-        </BasicListItem>
-        <BasicListItem header-class="w-24">
-          <template #header>Publish At</template>
-          {{ formatDateTime(news.newsPublishAt) }}
-        </BasicListItem>
-      </div>
-      <hr />
-      <div class="my-4">
-        <p v-for="content of news.content.split('\n')" class="empty:my-4 peer-empty:my-0">{{ content }}</p>
-      </div>
-      <hr />
-      <div class="my-2">
-        <BasicListItem header-class="w-32">
-          <template #header>References</template>
-          <template v-if="news.references">{{ news.references }}</template>
+        </template>
+        <template v-else-if="item.key === 'Published At'">
+          {{ formatDateTime(item.value.newsPublishAt) }}
+        </template>
+        <template v-else-if="item.key === 'Content'">
+          <SimpleContentFormatter :content="item.value.content"></SimpleContentFormatter>
+        </template>
+        <template v-else-if="item.key === 'References'">
+          <template v-if="item.value.references">{{ item.value.references }}</template>
           <span v-else class="italic">None</span>
-        </BasicListItem>
-      </div>
-      <div class="my-2 flex flex-col sm:flex-row sm:justify-center flex-wrap gap-2">
-        <NuxtLink v-if="isAdminRole" :to="`/news/edit/${newsid}`" class="w-full sm:w-64 block">
-          <button type="button" class="dga-evote-btn w-full inline-flex gap-2 items-center justify-center" title="Edit News">
-            <MaterialIcon icon="edit" />
-            <span class="truncate">Edit News</span>
-          </button>
-        </NuxtLink>
-        <button type="button" class="dga-evote-btn w-full sm:w-48 inline-flex gap-2 items-center justify-center" title="Back" @click="goBack">
-          <span class="truncate">Back</span>
-        </button>
-      </div>
-    </div>
+        </template>
+      </template>
+    </DgaListGroup>
+    <DgaButtonGroup class="mt-12">
+      <NuxtLink v-if="isAdminRole" :to="`/news/edit/${newsid}`" >
+        <DgaButton class="!flex flex-row gap-x-2 mx-auto items-center justify-center truncate"
+          color="dga-orange"  title="Edit News"
+        >
+        <MaterialIcon icon="edit" />
+          <span class="truncate">Edit News</span>
+        </DgaButton>
+      </NuxtLink>
+    </DgaButtonGroup>
   </div>
 </template>
   
 <script setup lang="ts">
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { formatDateTime, goBack, webAppName } from "~~/src/utils/utils"
+import { webAppName } from "~~/src/utils/utils"
+import { formatDateTime } from '~~/src/utils/datetime';
 
 definePageMeta({
   middleware: ["auth-voter"]
@@ -62,7 +55,7 @@ useHead({
 });
 
 const isAdminRole = computed(() => {
-  return checkPermissionNeeds(usePermissions().value, "access-pages:admin");
+  return useSessionData().value.roleMode === "admin";
 })
 
 const { data } = await useFetch(`/api/news/info/${newsid}`);
@@ -74,6 +67,15 @@ if (!data.value) {
 } else {
   const { news: _news } = data.value;
   news.value = _news;
+}
+
+function newToLists(news: NewsResponseData) : Array<BasicListableItem<string, NewsResponseData>> {
+  return [
+    { key: "Author", value: news },
+    { key: "Published At", value: news},
+    { key: "Content", value: news},
+    { key: "References", value: news },
+  ];
 }
 
 </script>

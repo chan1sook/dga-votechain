@@ -1,10 +1,8 @@
 import dayjs from "dayjs"
 import { nanoid } from "nanoid"
 import { Storage, prefixStorage } from "unstorage"
-import { SessionHandler } from "~~/src/session-handler";
-import { getUserInfoDigitalID } from "~~/src/utils/digitalid-protocol";
-
-import UserModel from "~~/src/models/user"
+import { getNtpTime } from "~~/server/ntp";
+import { SessionHandler, getSessionData } from "~~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
   // Handle cookie & Storage
@@ -12,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const storage : Storage = useStorage();
   const sessionStorage = prefixStorage(storage, "session");
-  const sessionExpired =  dayjs().add(30, "minute").toDate();
+  const sessionExpired =  dayjs(await getNtpTime()).add(60, "minute").toDate();
 
   if(!sid) {
     sid = nanoid(32);
@@ -30,35 +28,8 @@ export default defineEventHandler(async (event) => {
   
   event.context.session = new SessionHandler(sid, sessionStorage);
 
-  // Handle userdata
-  const userData = await event.context.session.get<UserSessionStorageData | undefined>("userData");
-
-  const { public: { DID_API_URL } } = useRuntimeConfig();
-
+  const userData = await getSessionData(sid);
   if(userData) {
-    try {
-      const [{ permissions, createdAt, updatedAt }, digitalIdUserInfo ] = await Promise.all([
-        UserModel.ensureUserData(userData.userid),
-        await getUserInfoDigitalID(userData.accessToken, { DID_API_URL }),
-      ]);
-
-      if(digitalIdUserInfo.user_id !== userData.userid) {
-        throw new Error("Mismatch userid");
-      }
-
-      event.context.userData = {
-        userid: userData.userid,
-        accessToken: userData.accessToken,
-        idToken: userData.idToken,
-        digitalIdUserInfo,
-        permissions,
-        createdAt,
-        updatedAt,
-      };
-    } catch(err) {
-      await event.context.session.unset("userData");
-    }
+    event.context.userData = userData;
   }
- 
-  // console.log(event.context.userData);
 })

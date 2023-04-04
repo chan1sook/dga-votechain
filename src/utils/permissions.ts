@@ -3,7 +3,7 @@ import { isAdminRole, isDeveloperRole, isVoterRole } from "./role";
 export function legacyRoleToPermissionsExcludes(role: UserRole) : Array<EVotePermission> {
   switch(role) {
     case "voter":
-      return ["access-pages:user", "request-permissions", "vote-topic", "request-topic"];
+      return ["access-pages:user", "request-permissions", "access-notifications", "vote-topic", "request-topic"];
     case "admin":
       return [
         "access-pages:admin", "create-topic", "change-topic", "create-news", "change-news", "change-permissions:basic", 
@@ -53,7 +53,7 @@ export function getRequestablePermissions() : Array<EVotePermission> {
 
 export function getPresetPermissions(value?: string) : Array<EVotePermission> {
   switch(value) {
-    case "admin":
+    case "moderator":
       return legacyRoleToPermissionsExcludes("admin");
     case "developer":
       return combinePermissions(
@@ -106,6 +106,7 @@ const permissionMap: Record<EVotePermission, string> = {
   "access-pages:admin": "Access Admin Pages",
   "access-pages:developer": "Access Developer Pages",
   "request-permissions": "Request More Permissions",
+  "access-notifications": "Access Notifications",
   "banned": "Mark Banned User",
   "vote-topic": "Vote Topics",
   "request-topic": "Request New Topics",

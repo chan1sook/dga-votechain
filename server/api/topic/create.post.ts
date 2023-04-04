@@ -1,13 +1,16 @@
 import dayjs from "dayjs";
 
-import TopicModel from "~~/src/models/topic"
+import TopicModel from "~~/server/models/topic"
+import NotificationModel from "~~/server/models/notification"
 import { isTopicFormValid } from "~~/src/utils/topic";
-import { checkPermissionNeeds, checkPermissionSelections } from "~~/src/utils/permissions";
+import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import { getDigitalIdName } from "~~/src/utils/digitalid-protocol";
+import { getNtpTime } from "~~/server/ntp";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-
-  if(!userData || !checkPermissionSelections(userData.permissions, "create-topic", "request-topic")) {
+  
+  if(!userData || !checkPermissionNeeds(userData.permissions, "create-topic")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -22,22 +25,49 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const canBypassCreate = checkPermissionNeeds(userData.permissions, "create-topic");
-
+  const today = await getNtpTime();
   const newTopicData: TopicData = {
     name: topicFormData.name,
     description: topicFormData.description,
     choices: topicFormData.choices,
-    status: canBypassCreate && !topicFormData.forcePending ? "approved" : "pending",
+    status: "approved",
     createdBy: userData.userid,
+    createdByName: getDigitalIdName(userData.digitalIdUserInfo),
     updatedBy: userData.userid,
-    createdAt: new Date(),
-    updatedAt:  new Date(),
+    updatedByName: getDigitalIdName(userData.digitalIdUserInfo),
+    createdAt: today,
+    updatedAt: today,
     voteStartAt: dayjs(topicFormData.voteStartAt).toDate(),
     voteExpiredAt: dayjs(topicFormData.voteExpiredAt).toDate(),
+    pauseDuration: 0,
+    publicVote: topicFormData.publicVote,
+    showVotersScore: topicFormData.showVotersScore,
+    showVotersChoicesPublic: topicFormData.showVotersChoicesPublic,
+    notifyVoter: topicFormData.notifyVoter,
+    voterAllows: topicFormData.voterAllows.map((ele) => {
+      return {
+        ...ele,
+        remainVotes: ele.totalVotes,
+      }
+    }),
   };
 
   const topicData = await new TopicModel(newTopicData).save();
+  if(topicData.notifyVoter) {
+    const today = await getNtpTime();
+    await new NotificationModel(
+      {
+        from: "system",
+        target: topicData.voterAllows.map((ele) => ({citizenId: ele.citizenId})),
+        title: `Topic "${topicData.name}" Avaliable`,
+        content: `Topic "${topicData.name}"  Avaliable`,
+        notifyAt: topicData.voteStartAt,
+        createdAt: today,
+        updatedAt: today,
+        tags: [`topic-${topicData._id}-avaiable`],
+      }
+    ).save();
+  }
   
   const topic : TopicResponseData = {
     _id: topicData._id.toString(),
@@ -47,8 +77,16 @@ export default defineEventHandler(async (event) => {
     choices: topicData.choices,
     voteStartAt: dayjs(topicData.voteStartAt).toISOString(),
     voteExpiredAt: dayjs(topicData.voteExpiredAt).toISOString(),
+    pauseDuration: topicData.pauseDuration,
     createdAt: dayjs(topicData.createdAt).toISOString(),
+    createdByName: topicData.createdByName,
     updatedAt: dayjs(topicData.updatedAt).toISOString(),
+    updatedByName: topicData.updatedByName,
+    publicVote: topicData.publicVote,
+    showVotersScore: topicData.showVotersScore,
+    showVotersChoicesPublic: topicData.showVotersChoicesPublic,
+    notifyVoter: topicData.notifyVoter,
+    voterAllows: topicData.voterAllows,
   };
 
   return {

@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 
-import VoteModel from "~~/src/models/vote"
+import VoteModel from "~~/server/models/vote"
 
 export default defineEventHandler(async (event) => {
   const { keyword, pagesize, startid } : TxChainQueryParams = getQuery(event);
@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
       _id: `${tx._id}`,
       userid: tx.userid,
       topicid: `${tx.topicid}`,
+      citizenId: tx.citizenId,
       choice: tx.choice,
       createdAt: dayjs(tx.createdAt).toString(),
     }

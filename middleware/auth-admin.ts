@@ -1,20 +1,30 @@
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const { data } = await useFetch("/api/session");
+  const { data } = await useFetch("/api/session/get");
 
   if(data.value) {
-    useUserId().value = data.value.userid;
-    usePermissions().value = data.value.permissions;
+    useSessionData().value = {
+      sid: data.value.sid,
+      userid: data.value.userid,
+      permissions: data.value.permissions,
+      roleMode: data.value.roleMode,
+      digitalIdUserInfo: data.value.digitalIdUserInfo,
+    };
   } else {
-    useUserId().value = undefined;
-    usePermissions().value = [];
+    useSessionData().value = {
+      sid: undefined,
+      userid: undefined,
+      permissions: [],
+      roleMode: undefined,
+      digitalIdUserInfo: undefined,
+    };
   }
 
-  const isAdminPermissions = checkPermissionNeeds(usePermissions().value, "access-pages:admin");
+  const isAdminPermissions = checkPermissionNeeds(useSessionData().value.permissions, "access-pages:admin");
   
   if(!isAdminPermissions) {
-    const isUserPermissions = checkPermissionNeeds(usePermissions().value, "access-pages:user");
+    const isUserPermissions = checkPermissionNeeds(useSessionData().value.permissions, "access-pages:user");
     
     if(!isUserPermissions) {
       return navigateTo('/login')

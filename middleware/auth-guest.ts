@@ -1,17 +1,27 @@
 import { checkPermissionSelections } from "~~/src/utils/permissions";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const { data } = await useFetch("/api/session");
+  const { data } = await useFetch("/api/session/get");
 
   if(data.value) {
-    useUserId().value = data.value.userid;
-    usePermissions().value = data.value.permissions;
+    useSessionData().value = {
+      sid: data.value.sid,
+      userid: data.value.userid,
+      permissions: data.value.permissions,
+      roleMode: data.value.roleMode,
+      digitalIdUserInfo: data.value.digitalIdUserInfo,
+    };
   } else {
-    useUserId().value = undefined;
-    usePermissions().value = [];
+    useSessionData().value = {
+      sid: undefined,
+      userid: undefined,
+      permissions: [],
+      roleMode: undefined,
+      digitalIdUserInfo: undefined,
+    };
   }
 
-  if(checkPermissionSelections(usePermissions().value, "access-pages:user", "access-pages:admin", "access-pages:developer")) {
+  if(checkPermissionSelections(useSessionData().value.permissions, "access-pages:user", "access-pages:admin", "access-pages:developer")) {
     return navigateTo('/')
   }
 })

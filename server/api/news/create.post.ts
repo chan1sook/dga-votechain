@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
-import NewsModel from "~~/src/models/news"
+import NewsModel from "~~/server/models/news"
+import { getNtpTime } from "~~/server/ntp";
 import { isNewsFormValid } from "~~/src/utils/news";
 import { checkPermissionSelections } from "~~/src/utils/permissions";
 
@@ -16,6 +17,7 @@ export default defineEventHandler(async (event) => {
   
   const newsFormData: NewsFormBodyData = await readBody(event);
 
+  const today = await getNtpTime();
   const newNewsData: NewsData = {
     visibility: newsFormData.visibility,
     title: newsFormData.title,
@@ -24,8 +26,8 @@ export default defineEventHandler(async (event) => {
     references: newsFormData.references,
     createdBy: userData.userid,
     updatedBy: userData.userid,
-    createdAt: new Date(),
-    updatedAt:  new Date(),
+    createdAt: today,
+    updatedAt: today,
     newsPublishAt: dayjs(newsFormData.newsPublishAt).toDate(),
     newsExpiredAt: newsFormData.newsExpiredAt ? dayjs(newsFormData.newsPublishAt).toDate() : null,
   };

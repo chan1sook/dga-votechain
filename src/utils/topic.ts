@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import { isThaiCitizenId } from "./utils";
 
 export function useWatchVoteDateTimes(
   topicData: Ref<TopicFormData> | Ref<TopicFormEditData>,
@@ -33,6 +34,26 @@ export function useWatchVoteDateTimes(
   });
 }
 
+export function useWatchVoteDateTimes2(
+  voteStart: Ref<{
+    dateStr: string,
+    timeStr: string,
+  }>,
+  voteEnd: Ref<{
+    dateStr: string,
+    timeStr: string,
+  }>,
+) {
+  watch(voteStart, (newValue) => {
+    const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:MM").toDate();
+    const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
+  
+    voteEnd.value.dateStr = dayjs(voteExpiredAt).format("YYYY-MM-DD");
+    voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:MM");
+  }, { deep: true });
+}
+
+
 export function getPresetChoices(value?: string) {
   switch(value) {
     case "custom":
@@ -45,7 +66,6 @@ export function getPresetChoices(value?: string) {
         customable: false
       };
     case "yesno":
-    default:
       return {
         choices: [
           { name: "Yes" },
@@ -53,20 +73,66 @@ export function getPresetChoices(value?: string) {
         ],
         customable: false
       };
+    default:
+      return {
+        choices: [],
+        customable: false
+      };
   }
 }
 
+export function choiceCounts(choices: ChoicesData, choice: string) {
+  return choices.choices.reduce((prev, current) => {
+    if(current.name === choice) {
+      return prev + 1;
+    }
+    return prev;
+  }, 0);
+}
+
+export function voterCounts(voterAllows: Array<Omit<VoteAllowData, "remainVotes">>, citizenId: string) {
+  return voterAllows.reduce((prev, current) => {
+    if(current.citizenId === citizenId) {
+      return prev + 1;
+    }
+    return prev;
+  }, 0);
+}
+
+function isVoteDateTimeValid(voteStartAt: Date | DateString, voteExpiredAt: Date | DateString) {
+  const startAt = dayjs(voteStartAt);
+  const expiredAt = dayjs(voteExpiredAt);
+  return startAt.isValid() && expiredAt.isValid() && startAt.valueOf() < expiredAt.valueOf();
+}
+function isChoicesValid(choices: Array<{name: string}>) {
+  return choices.length > 0 && choices.every(
+    (ele, i, arr) => ele.name !== "" && 
+      arr.findIndex((ele2) => ele2.name === ele.name) === i
+  );
+}
+
+function isVoteAllowsValid(voterAllows: Array<Omit<VoteAllowData, "remainVotes">>) {
+  return voterAllows.length > 0  && voterAllows.every(
+    (ele, i, arr) => isThaiCitizenId(ele.citizenId) && 
+      arr.findIndex((ele2) => ele2.citizenId === ele.citizenId) === i
+  );
+}
+
 export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
-  const voteStartAt = dayjs(topicData.voteStartAt);
-  const voteExpiredAt = dayjs(topicData.voteExpiredAt);
-  return topicData.name !== "" && topicData.description !== "" && topicData.choices.choices.every((ele) => ele.name) &&
-    voteStartAt.isValid() && voteExpiredAt.isValid() && voteStartAt.valueOf() < voteExpiredAt.valueOf();
+  return topicData.name !== "" && 
+    isVoteDateTimeValid(topicData.voteStartAt, topicData.voteExpiredAt) && 
+    isChoicesValid(topicData.choices.choices) &&
+    isVoteAllowsValid(topicData.voterAllows);
 }
 
-export function isTopicExpired(topic: TopicData | TopicResponseData) {
-  return Date.now() >= dayjs(topic.voteExpiredAt).valueOf();
+export function isTopicExpired(topic: TopicData | TopicResponseData, now = Date.now()) {
+  return now >= dayjs(topic.voteExpiredAt).valueOf();
 }
 
-export function isTopicVoteable(topic: TopicData | TopicResponseData) {
-  return topic.status === "approved" && !isTopicExpired(topic) && Date.now() >= dayjs(topic.voteStartAt).valueOf();
+export function isTopicVoteable(topic: TopicData | TopicResponseData, now = Date.now()) {
+  return topic.status === "approved" && !isTopicExpired(topic, now) && now >= dayjs(topic.voteStartAt).valueOf();
+}
+
+export function isTopicVoted(topic: TopicData | TopicResponseData, citizenId?: string) {
+  return isTopicVoteable(topic) && Array.isArray(topic.voterAllows) && topic.voterAllows.find((ele) => ele.citizenId === citizenId && ele.remainVotes === 0);
 }
