@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
-import NewsModel from "~~/src/models/news"
+import NewsModel from "~~/server/models/news"
+import { getNtpTime } from "~~/server/ntp";
 import { isNewsFormValid } from "~~/src/utils/news";
 import { checkPermissionSelections } from "~~/src/utils/permissions";
 
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     });
   }
   newsData.updatedBy = userData.userid;
-  newsData.updatedAt = new Date();
+  newsData.updatedAt = await getNtpTime();
 
   if(topicFormData.visibility !== undefined) {
     newsData.visibility = topicFormData.visibility;

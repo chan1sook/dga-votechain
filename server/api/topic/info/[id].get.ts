@@ -1,11 +1,12 @@
 import dayjs from "dayjs";
-import TopicModel from "~~/src/models/topic"
-import VoteModel from "~~/src/models/vote"
+import TopicModel from "~~/server/models/topic"
+import VoteModel from "~~/server/models/vote"
+import { getNtpNow } from "~~/server/ntp";
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 import { isTopicExpired } from "~~/src/utils/topic";
 
 export default defineEventHandler(async (event) => {
-  const { withVote } : { withVote?: string } = getQuery(event);
+  const { withVotes } : { withVotes?: string } = getQuery(event);
 
   const topicDoc = await TopicModel.findById(event.context.params?.id);
   if(!topicDoc) {
@@ -15,38 +16,53 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const topic: TopicResponseData = {
-    _id: `${topicDoc._id}`,
+  const topic : TopicResponseData = {
+    _id: topicDoc._id.toString(),
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
     choices: topicDoc.choices,
-    voteStartAt: dayjs(topicDoc.voteStartAt).toString(),
-    voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toString(),
-    createdAt: dayjs(topicDoc.createdAt).toString(),
-    updatedAt: dayjs(topicDoc.updatedAt).toString(),
-  }
+    voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
+    voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
+    pauseDuration: topicDoc.pauseDuration,
+    createdAt: dayjs(topicDoc.createdAt).toISOString(),
+    createdByName: topicDoc.createdByName,
+    updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
+    updatedByName: topicDoc.updatedByName,
+    publicVote: topicDoc.publicVote,
+    showVotersScore: topicDoc.showVotersScore,
+    showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
+    notifyVoter: topicDoc.notifyVoter,
+    voterAllows: topicDoc.voterAllows,
+  };
 
-  let yourVote : VoteResponseData | undefined;
+  let existsVotes : Array<VoteResponseData> | undefined;
+  let remainVotes : number | undefined;
 
-  if(withVote && !isTopicExpired(topicDoc)) {
+  if(withVotes && !isTopicExpired(topicDoc, await getNtpNow())) {
     const userData = event.context.userData;
     if(userData && checkPermissionNeeds(userData.permissions, "vote-topic")) {
-      const voteDoc = await VoteModel.findOne({ userid: userData.userid, topicid: topicDoc._id });
-      if(voteDoc) {
-        yourVote = {
-          _id: `${voteDoc._id}`,
-          userid: userData.userid,
-          topicid: `${topic._id}`,
-          choice: voteDoc.choice,
-          createdAt: dayjs(voteDoc.createdAt).toString()
-        };
+      const voteAllowData = topicDoc.voterAllows.find((ele) => ele.citizenId === userData.digitalIdUserInfo.citizen_id);
+      if(voteAllowData) {
+        const voteDocs = await VoteModel.find({ userid: userData.userid, topicid: topicDoc._id });
+        existsVotes = voteDocs.map((voteDoc) => {
+          return {
+            _id: `${voteDoc._id}`,
+            userid: userData.userid,
+            citizenId: voteDoc.citizenId,
+            topicid: `${topic._id}`,
+            choice: voteDoc.choice,
+            createdAt: dayjs(voteDoc.createdAt).toString()
+          }
+        });
+        remainVotes = voteAllowData?.remainVotes || 0;
       }
     }
   }
   
   return {
     topic,
-    yourVote,
+    existsVotes,
+    remainVotes,
   }
 })

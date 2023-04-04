@@ -1,62 +1,27 @@
-import { Types } from "mongoose";
 import dayjs from "dayjs";
 
-import TopicModel from "~~/src/models/topic"
-import VoteModel from "~~/src/models/vote"
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import TopicModel from "~~/server/models/topic"
+import { checkPermissionSelections } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {
-  const { type, pagesize, startid } : TopicQueryParams = getQuery(event);
+  const { type, filter } : TopicQueryParams = getQuery(event);
   
+  const userData = event.context.userData;
+
   let topicsData: Array<TopicData> = [];
-  let voteIds: Array<Types.ObjectId> = [];
-
-  if(type === "notvoted" || type === "voted") {
-    const userData = event.context.userData;
-
-    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic")) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-      });
-    }
-
-    const votes = await VoteModel.getLastestVotesByUserid(userData.userid, pagesize, startid);
-    voteIds = votes.reduce((prev, current) => {
-      if(current.topicid) {
-        prev.push(current.topicid);
-      }
-      return prev;
-    }, voteIds);
-  }
-  
+  const filter2 = JSON.parse(filter || "{}") as TopicFilterParams;
   switch(type) {
+    case "active":  
+      if(!userData || !checkPermissionSelections(userData.permissions, "vote-topic")) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+        });
+      }
+      topicsData = await TopicModel.getLastestActiveTopics(userData, filter2);
+      break;
     case "available":
-      topicsData = await TopicModel.getLastestAvalaibleTopics(pagesize, startid);
-      break;
-    case "waiting":
-      topicsData = await TopicModel.getLastestWaitingTopics(pagesize, startid);
-      break;
-    case "active":
-      topicsData = await TopicModel.getLastestActiveTopics(pagesize, startid);
-      break;
-    case "notvoted":
-      topicsData = await TopicModel.getLastestActiveTopics(pagesize, startid, voteIds);
-      break;
-    case "voted":
-      topicsData = await TopicModel.getSelectedTopics(voteIds);
-      break;
-    case "finished":
-      topicsData = await TopicModel.getLastestFinishedTopics(pagesize, startid);
-      break;
-    case "pending":
-      topicsData = await TopicModel.getLastestPendingTopics(pagesize, startid);
-      break;
-    case "all":
-      topicsData = await TopicModel.find(startid ? { _id: { $lt: startid }} : {}).limit(pagesize || 50).sort({_id: -1});
-      break;
-    default:
-      topicsData = await TopicModel.getLastestAvalaibleTopics(pagesize, startid);
+      topicsData = await TopicModel.getLastestAvailableTopics(filter2, userData && checkPermissionSelections(userData.permissions, "vote-topic") ? true : false);
       break;
   }
 
@@ -68,9 +33,17 @@ export default defineEventHandler(async (event) => {
       description: topicData.description,
       choices: topicData.choices,
       createdAt: dayjs(topicData.createdAt).toISOString(),
+      createdByName: topicData.createdByName,
       updatedAt: dayjs(topicData.updatedAt).toISOString(),
+      updatedByName: topicData.updatedByName,
       voteStartAt: dayjs(topicData.voteStartAt).toISOString(),
       voteExpiredAt: dayjs(topicData.voteExpiredAt).toISOString(),
+      pauseDuration: topicData.pauseDuration,
+      publicVote: topicData.publicVote,
+      showVotersScore: topicData.showVotersScore,
+      showVotersChoicesPublic: topicData.showVotersChoicesPublic,
+      notifyVoter: topicData.notifyVoter,
+      voterAllows: topicData.voterAllows,
     }
   })
   

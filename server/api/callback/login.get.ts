@@ -1,6 +1,6 @@
 import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~~/src/utils/digitalid-protocol";
 
-import UserModel from "~~/src/models/user"
+import UserModel from "~~/server/models/user"
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {
@@ -20,10 +20,16 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    let defaultRoleMode : UserRole = "voter";
+    if(checkPermissionNeeds(permissions, "access-pages:admin")) {
+      defaultRoleMode = "admin";
+    }
+
     event.context.userData = {
       userid: digitalIdUserInfo.user_id,
       idToken: id_token,
       accessToken: access_token,
+      roleMode: defaultRoleMode,
       digitalIdUserInfo,
       permissions,
       createdAt,
@@ -34,9 +40,10 @@ export default defineEventHandler(async (event) => {
       userid: digitalIdUserInfo.user_id,
       accessToken: access_token,
       idToken: id_token,
+      roleMode: defaultRoleMode,
     });
 
-    return sendRedirect(event, "/");
+    return sendRedirect(event, "/topics");
   }
 
   return sendRedirect(event, "/login");

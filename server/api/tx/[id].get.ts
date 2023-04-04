@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-import VoteModel from "~~/src/models/vote"
+import VoteModel from "~~/server/models/vote"
 
 export default defineEventHandler(async (event) => { 
   const voteDoc = await VoteModel.findById(event.context.params?.id);
@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
   const tx: TxResponseData =  {
     _id: `${voteDoc._id}`,
     userid: voteDoc.userid,
+    citizenId: voteDoc.citizenId,
     topicid: `${voteDoc.topicid}`,
     choice: voteDoc.choice,
     createdAt: dayjs(voteDoc.createdAt).toString()

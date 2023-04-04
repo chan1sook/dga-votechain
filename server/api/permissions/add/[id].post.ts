@@ -1,4 +1,4 @@
-import UserModel from "~~/src/models/user"
+import UserModel from "~~/server/models/user"
 import { checkPermissionNeeds, checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {

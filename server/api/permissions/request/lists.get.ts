@@ -1,4 +1,4 @@
-import RequestPermissionsModel from "~~/src/models/reqpermission"
+import RequestPermissionsModel from "~~/server/models/reqpermission"
 import { checkPermissionNeeds, checkPermissionSelections, isContainsAdvancePermissions } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {
@@ -10,19 +10,12 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Forbidden",
     });
   }
+  const { startid, pagesize } : PaginationParams = getQuery(event);
 
-  let permissionArr = await RequestPermissionsModel.find({
-    status: "pending",
-  });
+  const advanceMode = checkPermissionNeeds(userData.permissions, "change-permissions:advance");
+  const reqPermissionData = await RequestPermissionsModel.getPendingRequestPermissionsData(advanceMode, pagesize, startid);
 
-  if(!checkPermissionNeeds(userData.permissions, "change-permissions:advance")) {
-    permissionArr = permissionArr.filter((ele) => {
-      return !isContainsAdvancePermissions(...ele.permissions);
-    })
-  }
-
-
-  const requestPermissions : Array<RequestPermissionsListData> = permissionArr.map((doc) => {
+  const requestPermissions : Array<RequestPermissionsListData> = reqPermissionData.map((doc) => {
     return {
       _id: `${doc._id}`,
       status: doc.status,
@@ -30,6 +23,7 @@ export default defineEventHandler(async (event) => {
       permissions: doc.permissions,
       note: doc.note,
       digitalIdUserInfo: doc.digitalIdUserInfo,
+      preset: doc.preset,
     }
   });
 

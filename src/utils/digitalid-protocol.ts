@@ -28,7 +28,10 @@ export async function getUserInfoDigitalID(accessToken: string, { DID_API_URL } 
     },
   });
 
-  // console.log(data);
-
   return data as DigitalIDUserDataResponse;
+}
+
+export function getDigitalIdName(data: DigitalIDUserDataResponse) {
+  const { given_name } = data;
+  return `${given_name}`;
 }
