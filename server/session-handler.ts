@@ -1,6 +1,8 @@
 import { getUserInfoDigitalID } from "../src/utils/digitalid-protocol";
 import { Storage, prefixStorage } from "unstorage";
-import UserModel from "~~/server/models/user";
+import EVoteUserModel from "~~/server/models/user";
+
+export const USER_SESSION_KEY = "dgaUserData";
 
 export class SessionHandler {
   #sid: string;
@@ -55,38 +57,34 @@ export class SessionHandler {
   }
 }
 
-export async function getSessionData(sid: string) {  
+export async function getSessionData(sid: string) : Promise<UserSessionData | null> {  
   const storage : Storage = useStorage();
   const sessionStorage = prefixStorage(storage, "session");
-  const { public: { DID_API_URL } } = useRuntimeConfig();
-
+  
   const sessionHandler = new SessionHandler(sid, sessionStorage);
-  const userData = await sessionHandler.get<UserSessionStorageData | undefined>("userData");
+  const userSessionData = await sessionHandler.get<UserSessionSavedData | undefined>(USER_SESSION_KEY);
 
-  if(userData) {
+  if(userSessionData) {
     try {
-      const [{ permissions, createdAt, updatedAt }, digitalIdUserInfo ] = await Promise.all([
-        UserModel.ensureUserData(userData.userid),
-        await getUserInfoDigitalID(userData.accessToken, { DID_API_URL }),
-      ]);
-
-      if(digitalIdUserInfo.user_id !== userData.userid) {
-        throw new Error();
+      const userData = await EVoteUserModel.findById(userSessionData.userid);
+      if(userData) {
+        return {
+          _id: userData._id,
+          version: userData.version,
+          permissions: userData.permissions,
+          createdAt: userData.createdAt,
+          updatedAt: userData.updatedAt,
+          roleMode: userSessionData.roleMode,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          email: userData.email,
+          digitalUserIdToken: userSessionData.digitalUserIdToken,
+        };
       }
-
-      return {
-        userid: userData.userid,
-        accessToken: userData.accessToken,
-        idToken: userData.idToken,
-        roleMode: userData.roleMode,
-        digitalIdUserInfo,
-        permissions,
-        createdAt,
-        updatedAt,
-      };
+      return null;
     } catch(err) {
-      await sessionHandler.unset("userData");
+      await sessionHandler.unset(USER_SESSION_KEY);
     }
   }
-  return undefined;
+  return null;
 }

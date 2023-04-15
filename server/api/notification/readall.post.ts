@@ -1,53 +1,61 @@
-import dayjs from "dayjs";
+import mongoose from "mongoose";
 
 import NotificationModel from "~~/server/models/notification"
-import { getNtpTime } from "~~/server/ntp";
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import TopicNotificationModel from "~~/server/models/topic-notifications"
+import { clearNotifyData } from "~~/server/notify-storage";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || !checkPermissionNeeds(userData.permissions, "access-notifications")) {
+  if(!userData) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
   
-  const docs = await NotificationModel.find({
-    "target.read": { $exists: false },
-    "target.citizenId": userData.digitalIdUserInfo.citizen_id,
-  });
+  const dbSession = await mongoose.startSession();
+  dbSession.startTransaction();
 
-  const today = await getNtpTime();
+  const [notiDocs, topicNotiDocs] = await Promise.all([
+    NotificationModel.find({
+      "target.userid": userData._id,
+      "target.readAt": { $exists: false },
+    }),
+    TopicNotificationModel.find({
+      userid: userData._id,
+      readAt: { $exists: false },
+    }),
+  ]);
 
-  for(const doc of docs) {
+  const today = new Date();
+
+  for(const doc of notiDocs) {
     doc.target = doc.target.map((ele) => {
-      if(ele.citizenId === userData.digitalIdUserInfo.citizen_id) {
+      if(ele.userid.toString() === userData._id.toString()) {
         return {
           ...ele,
-          read: today,
+          readAt: today,
         }
       }
       return ele;
     })
+  }for(const doc of topicNotiDocs) {
+    doc.readAt = today;
   }
-  await NotificationModel.bulkSave(docs);
 
-  const notifications = docs.map<NotificationUserResponseData>((notification, i) => {
-    const target = notification.target.find((ele) => ele.citizenId === userData.digitalIdUserInfo.citizen_id);
-    return {
-      _id: `${notification._id}`,
-      from: notification.from,
-      title: notification.title,
-      content: notification.content,
-      createdAt: dayjs(notification.createdAt).toISOString(),
-      notifyAt: dayjs(notification.notifyAt).toISOString(),
-      read: target && target.read ? dayjs(target.read).toISOString() : undefined,
-      tags: notification.tags,
-    }
-  })
+  await Promise.all([
+    NotificationModel.bulkSave(notiDocs),
+    TopicNotificationModel.bulkSave(topicNotiDocs),
+  ]);
+
+  await dbSession.commitTransaction();
+  await dbSession.endSession();
+
+  clearNotifyData(userData._id.toString());
+
+  const counts = notiDocs.length + topicNotiDocs.length;
   
   return {
-    notifications,
+    counts,
   }
 })

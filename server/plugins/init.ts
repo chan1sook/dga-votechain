@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
-import UserModel from "~~/server/models/user"
+import EVoteUserModel from "~~/server/models/user"
+import OldUserModel from "~~/server/models/old-user"
 import { combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
 import io from "~~/server/socketio"
+import { beginNtpTime } from '../ntp';
 
 let migrationSeq = 0;
 
@@ -9,16 +11,80 @@ async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
   migrationSeq +=1 ;
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);
-  const result = await UserModel.bulkWrite(ids.map((userid) => {
+  
+  const userDocs = await EVoteUserModel.find({
+    authSources: { $elemMatch: 
+      {
+        authSource: "digitalId",
+        digitalIdUserId:  { $in: ids }
+      }
+    }
+  });
+
+  const userDocsToSave = [];
+
+  for(const id of ids) {
+    const targetDoc = userDocs.find((doc) => {
+      return doc.authSources.some((authSource) => authSource.digitalIdUserId === id);
+    });
+
+    if(targetDoc) {
+      targetDoc.permissions = combinePermissions(targetDoc.permissions, ...legacyRoleToPermissions("developer"));
+      userDocsToSave.push(targetDoc);
+    } else {
+      const userDoc = new EVoteUserModel({
+        permissions: legacyRoleToPermissions("developer"),
+        authSources: [
+          { authSource: "digitalId", digitalIdUserId: id }
+        ]
+      });
+      userDocsToSave.push(userDoc);
+    }
+  }
+
+  const result = await EVoteUserModel.bulkSave(userDocsToSave);
+  console.log(`[Migration] Add Predefined Dev Users (Inserted: ${result.insertedCount})`);
+}
+
+function containsOldPermissions(permissions: Array<EVotePermission>) : boolean {
+  const unusedPermissions: Array<EVotePermission> = ["access-pages:user", "access-notifications", "request-topic", "access-pages:admin", "change-permissions:basic", "access-pages:developer", "change-permissions:advance"];
+  return permissions.some((ele) => unusedPermissions.includes(ele))
+}
+
+function oldPermissionsToRole(permissions: Array<EVotePermission>) : UserRole {
+  if(permissions.includes("access-pages:developer")) {
+    return "developer";
+  }
+  if(permissions.includes("access-pages:admin")) {
+    return "admin";
+  }
+  return "voter";
+}
+
+async function migrateToNewUserFormat() {
+  migrationSeq +=1 ;
+
+  console.log(`[Migration] ${migrationSeq}. MigrateToNewUserFormat`);
+  const allUsers = await OldUserModel.find({});
+
+  const result = await EVoteUserModel.bulkWrite(allUsers.map((user) => {
     return {
       updateOne: {
-        filter: { userid },
+        filter: {
+          authSources: { $elemMatch: 
+            {
+              authSource: "digitalId",
+              digitalIdUserId:  { $in: user.userid }
+            }
+          }
+        },
         update: {
-          $set: {
-            permissions: legacyRoleToPermissions("developer"),
-          },
           $setOnInsert: {
-            userid,
+            permissions: containsOldPermissions(user.permissions) ? 
+              legacyRoleToPermissions(oldPermissionsToRole(user.permissions)) : user.permissions,
+            authSources: [
+              { authSource: "digitalId", digitalIdUserId: user.userid }
+            ],
           }
         },
         upsert: true,
@@ -26,44 +92,10 @@ async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
     }
   }))
 
-  console.log('[Migration] Add Predefined Dev Users', result);
-}
-
-async function migrateOldUserRole() {
-  migrationSeq +=1 ;
-
-  console.log(`[Migration] ${migrationSeq}. Legacy Role to Permissions`);
-  const allUsers = await UserModel.find({ role: { $exists: true }});
-
-  for(const user of allUsers) {
-    if(user.role) {
-      user.permissions = legacyRoleToPermissions(user.role);
-      user.role = undefined;
-    }
-  }
-  const { modifiedCount, matchedCount }= await UserModel.bulkSave(allUsers);
-  console.log(`[Migration] Match: ${matchedCount} / Updated: ${modifiedCount}`);
-  console.log('[Migration] Permissions Migration Completed');
-
-}
-
-async function migrateNewPermission() {
-  migrationSeq +=1 ;
-
-  console.log(`[Migration] ${migrationSeq}. Add New Permissions Start`);
-  const allUsers = await UserModel.find({});
-
-  for(const user of allUsers) {
-    user.permissions = combinePermissions(user.permissions, "access-notifications");
-  }
-  const { modifiedCount, matchedCount }= await UserModel.bulkSave(allUsers);
-  console.log(`[Migration] Match: ${matchedCount} / Updated: ${modifiedCount}`);
-  console.log('[Migration] Add Predefined Permissions Completed');
+  console.log(`[Migration] MigrateToNewUserFormat (Upserted: ${result.upsertedCount})`);
 }
 
 export default defineNitroPlugin(async (nitroApp) => {
-  io();
-  
   console.log("[Config] View Config");
   const { MONGODB_URI, DB_NAME, DID_LOGIN_CALLBACK, PREDEFINED_DEV_USERS, public: { DID_API_URL, SOCKETIO_URL } } = useRuntimeConfig();
 
@@ -74,11 +106,13 @@ export default defineNitroPlugin(async (nitroApp) => {
   console.log(`SOCKETIO_URL: ${SOCKETIO_URL}`);
 
   console.log("[MongoDB] Init");
-
+  
+  await beginNtpTime();
+  io();
+  
   await mongoose.connect(`${MONGODB_URI}/${DB_NAME}`);
   console.log('[MongoDB] Connected!');
 
   await setPredefinedDevs(PREDEFINED_DEV_USERS);
-  await migrateOldUserRole();
-  await migrateNewPermission();
+  await migrateToNewUserFormat();
 });

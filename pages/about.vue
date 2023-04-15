@@ -1,33 +1,19 @@
 <template>
   <div>
-    <DgaHead>เกี่ยวกับบริการ</DgaHead>
-    <SimpleContentFormatter :content="content"></SimpleContentFormatter>
+    <DgaHead>{{ $t("about.title") }}</DgaHead>
+    <p class="my-4 text-md indent-8">{{ $t('about.info') }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { webAppName } from "~~/src/utils/utils"
-import { LoremIpsum } from "lorem-ipsum";
+const i18n = useI18n()
 
 definePageMeta({
   middleware: ["auth"]
 })
 
-const lorem = new LoremIpsum({
-  sentencesPerParagraph: {
-    max: 8,
-    min: 4
-  },
-  wordsPerSentence: {
-    max: 16,
-    min: 4
-  }
-});
-
-const content = ref(lorem.generateParagraphs(2));
-
 useHead({
-  title: `${webAppName} - เกี่ยวกับบริการ`
+  title: `${i18n.t('appName')} - ${i18n.t('about.title')}`
 });
 
 </script>

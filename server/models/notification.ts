@@ -1,5 +1,5 @@
 import { FilterQuery, model, Schema, Types } from "mongoose";
-import { getNtpTime } from "~~/server/ntp";
+import { clearNotifyData } from "../notify-storage";
 
 const schema = new Schema<NotificationData, NotificationModel>({
   from: {
@@ -7,11 +7,11 @@ const schema = new Schema<NotificationData, NotificationModel>({
     default: "system",
   },
   target: [new Schema({
-    citizenId: {
-      type: String,
-      required: true,
+    userid: {
+      type: Schema.Types.ObjectId,
+      ref: "dga-user"
     },
-    read: {
+    readAt: {
       type: Date,
     }
   })],
@@ -23,15 +23,6 @@ const schema = new Schema<NotificationData, NotificationModel>({
     type: String,
     required: true,
   },
-  createdAt: {
-    type: Date,
-    required: true,
-    immutable: true,
-  },
-  updatedAt: {
-    type: Date,
-    required: true,
-  },
   notifyAt: {
     type: Date,
     required: true,
@@ -40,59 +31,61 @@ const schema = new Schema<NotificationData, NotificationModel>({
     type: [String],
     default: [],
   },
-});
+}, { timestamps: true });
 
-schema.pre('save', async function () {
-  const today = await getNtpTime();
-  if (!this.createdAt) {
-    this.createdAt = today;
+schema.post('save', async function (doc) {
+  const promises : Array<Promise<void>> = [];
+  for(const target of doc.target) {
+    promises.push(
+      clearNotifyData(target.userid.toString())
+    );
   }
-  this.updatedAt = today;
+  console.log("Reset Notify Data", promises.length);
+  await Promise.all(promises);
 });
 
-
-schema.static("getLastestUnreadNotifications", async function getLastestUnreadNotifications(citizenId: string, pagesize?: number, startid?: string) {
-  const today = await getNtpTime();
+schema.static("getLastestUnreadNotifications", function getLastestUnreadNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) {
+  const today = new Date();
   const query : FilterQuery<NotificationData> = {
     notifyAt: { $lt: today },
-    "target.citizenId": citizenId,
-    "target.read": { $exists: false }
+    "target.userid": userid,
+    "target.readAt": { $exists: false }
   };
 
   if(startid) {
     query._id = { $lt: new Types.ObjectId(startid) }
   }
   
-  return await this.find(query).limit(pagesize || 50).sort({_id: -1 });
+  return this.find(query).limit(pagesize || 50).sort({_id: -1});
 });
 
-schema.static("getLastestReadNotifications", async function getLastestReadNotifications(citizenId: string, pagesize?: number, startid?: string) {
-  const today = await getNtpTime();
-  const query : FilterQuery<TopicData> = {
+schema.static("getLastestReadNotifications", function getLastestReadNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) {
+  const today = new Date();
+  const query : FilterQuery<NotificationData> = {
     notifyAt: { $lt: today },
-    "target.citizenId": citizenId,
-    "target.read": { $exists: true }
+    "target.userid": userid,
+    "target.readAt": { $exists: true }
   };
 
   if(startid) {
     query._id = { $lt: new Types.ObjectId(startid) }
   }
   
-  return await this.find(query).limit(pagesize || 50).sort({_id: -1 });
+  return this.find(query).limit(pagesize || 50).sort({_id: -1 });
 });
 
-schema.static("getLastestAllNotifications", async function getLastestAllNotifications(citizenId: string, pagesize?: number, startid?: string) {
-  const today = await getNtpTime();
-  const query : FilterQuery<TopicData> = {
+schema.static("getLastestAllNotifications", async function getLastestAllNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) {
+  const today = new Date();
+  const query : FilterQuery<NotificationData> = {
     notifyAt: { $lt: today },
-    "target.citizenId": citizenId,
+    "target.userid": userid,
   };
 
   if(startid) {
     query._id = { $lt: new Types.ObjectId(startid) }
   }
   
-  return await this.find(query).limit(pagesize || 50).sort({_id: -1 });
+  return this.find(query).limit(pagesize || 50).sort({_id: -1 });
 });
 
 export default model<NotificationData, NotificationModel>('notification', schema);

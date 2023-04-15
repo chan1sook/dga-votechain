@@ -1,33 +1,32 @@
 <template>
   <div>
-    <DgaHead>วิธีการใช้งาน</DgaHead>
-    <SimpleContentFormatter :content="content"></SimpleContentFormatter>
+    <DgaHead>{{ $t('help.title') }}</DgaHead>
+    <hr class="my-2" />
+    <div class="flex flex-row gap-2 flex-wrap">
+      <a href="/pdf/help_0_0_2.pdf" class="my-2 underline">
+        {{ $t('help.pdf') }}
+      </a>
+      <NuxtLink href="https://docs.google.com/document/d/1tWb_Zx8VD83nTTnBEYG8AibKrdPAgrsoCEM1WlfdLOA/edit#" class="my-2 underline">
+        {{ $t('help.googleDocsVersion') }}
+      </NuxtLink>
+    </div>
+    <hr class="my-2"/>
+    <ClientOnly>
+      <VuePdfEmbed source="/pdf/help_0_0_2.pdf"/>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
-import { webAppName } from "~~/src/utils/utils"
-import { LoremIpsum } from "lorem-ipsum";
+import VuePdfEmbed from 'vue-pdf-embed'
+const i18n = useI18n()
 
 definePageMeta({
   middleware: ["auth"]
 })
 
-const lorem = new LoremIpsum({
-  sentencesPerParagraph: {
-    max: 8,
-    min: 4
-  },
-  wordsPerSentence: {
-    max: 16,
-    min: 4
-  }
-});
-
-const content = ref(lorem.generateParagraphs(2));
-
 useHead({
-  title: `${webAppName} - วิธีการใช้งาน`
+  title: `${i18n.t('appName')} - ${i18n.t('help.title')}`
 });
 
 </script>

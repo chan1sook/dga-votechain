@@ -1,147 +1,147 @@
 <template>
   <div>
-    <DgaHead>Create</DgaHead>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto my-4">
-      <div class="md:col-span-2 flex flex-col gap-2">
+    <DgaHead>{{ $t('topic.create.title')  }}</DgaHead>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto my-4">
+      <div class="md:col-span-2 flex flex-row gap-2 items-center">
+        <div>
+          {{ $t('topic.accessModifier') }}
+        </div>
         <DgaSelect v-model="topicData.publicVote" :options="votePublicOptions"></DgaSelect>
       </div>
       <div class="md:col-span-2 flex flex-col gap-2">
-        <h3 class="font-bold">Vote Duration</h3>
+        <h3 class="font-bold">{{ $t('topic.voteDuration.title')}}</h3>
         <div class="flex flex-row flex-wrap gap-2 items-center">
-          <div>Input Mode</div>
-          <DgaSelect v-model="durationMode" :options="durationModeOptions" class="flex-1"></DgaSelect>
+          <div>{{ $t('topic.voteDuration.inputMode')}}</div>
+          <DgaSelect v-model="durationMode" :options="durationModeOptions"></DgaSelect>
         </div>
-        <div class="flex flex-row items-center gap-2">
-          <label class="flex-none">Start Vote</label>
-          <DgaInput v-model="voteStart.dateStr" type="date" class="w-0 flex-1" placeholder="Start Date"></DgaInput>
-          <DgaInput v-model="voteStart.timeStr" type="time" class="w-0 flex-1" placeholder="Start Time"></DgaInput>
+        <div class="flex flex-row items-center gap-2 flex-wrap">
+          <label class="flex-none">{{ $t('topic.voteDuration.start') }}</label>
+          <DgaInput v-model="voteStart.dateStr" type="date" class="w-48" :placeholder="$t('topic.voteDuration.startDate')"></DgaInput>
+          <DgaInput v-model="voteStart.timeStr" type="time" class="w-48" :placeholder="$t('topic.voteDuration.startTime')"></DgaInput>
         </div>
-        <div v-if="durationMode === 'duration'" class="flex flex-row flex-wrap gap-2 items-center">
-          <label class="flex-none">Set Period Time</label>
-          <div class="flex-1 inline-flex flex-row items-center gap-2">
-            <DgaInput type="number" v-model.number="voteDuration.durationDays" placeholder="Days" min="0" class="w-24 flex-1"></DgaInput>
-            <div>D</div>
+        <div v-if="durationMode === 'startDuration'" class="flex flex-row flex-wrap gap-2 items-center">
+          <label class="flex-none">{{ $t('topic.voteDuration.duration')}}</label>
+          <div class="inline-flex flex-row items-center gap-2">
+            <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
+            <div>{{ $t('timePeriod.day', { count: 2 }) }}</div>
           </div>
-          <div class="flex-1 inline-flex flex-row items-center gap-2">
-            <DgaInput type="number" v-model.number="voteDuration.durationHours" placeholder="Hours" min="0" max="23" class="w-24 flex-1"></DgaInput>
-            <div>H</div>
+          <div class="inline-flex flex-row items-center gap-2">
+            <DgaInput type="number" v-model.number="voteDuration.durationHours" :placeholder="$t('timePeriod.hour', { count: 2})" min="0" max="23" class="w-20 flex-1"></DgaInput>
+            <div>{{ $t('timePeriod.hour', { count: 2 }) }}</div>
           </div>
-          <div class="flex-1 inline-flex flex-row items-center gap-2">
-            <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  placeholder="Minutes" min="0" max="59" class="w-24 flex-1"></DgaInput>
-            <div>M</div>
+          <div class="inline-flex flex-row items-center gap-2">
+            <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
+            <div>{{ $t('timePeriod.minute', { count: 2 }) }}</div>
           </div>
         </div>
         <template v-else>
           <div class="flex flex-row items-center gap-2">
-            <label class="flex-none">End Vote</label>
-            <DgaInput v-model="voteEnd.dateStr" type="date" class="w-0 flex-1" :min="startExpiredDateStr" placeholder="Expired Date"></DgaInput>
-            <DgaInput  v-model="voteEnd.timeStr" type="time" class="w-0 flex-1" placeholder="Expired Time"></DgaInput>
+            <label class="flex-none">{{ $t('topic.voteDuration.end')}}</label>
+            <DgaInput v-model="voteEnd.dateStr" type="date" class="w-48" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
+            <DgaInput  v-model="voteEnd.timeStr" type="time" class="w-48" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
           </div>
         </template>
       </div>
-      <div class="md:col-span-2 flex flex-row items-center gap-2">
-        <label class="flex-none">Topic Question</label>
+      <div class="md:col-span-2 flex flex-col gap-2">
+        <h3 class="font-bold">{{ $t('topic.topicQuestion')}}</h3>
         <DgaInput
           v-model="topicData.name" type="text" 
-          class="dga-evote-input w-0 flex-1" placeholder="Topic Question" 
+          class="dga-evote-input w-full" :placeholder="$t('topic.topicQuestion')" 
           required
         >
         </DgaInput>
-        <span class="text-red-500" title="Required">*</span>
       </div>
       <div class="md:col-span-2 flex flex-col gap-2">
         <template v-if="showDescription">
           <div class="flex flex-row items-start gap-2">
-            <label class="flex-none">Description</label>
-            <DgaTextArea v-model="topicData.description" class="flex-1 h-32" placeholder="Description"></DgaTextArea>
+            <label class="flex-none">{{ $t('topic.description.title')  }}</label>
+            <DgaTextArea v-model="topicData.description" class="flex-1 h-32" :placeholder="$t('topic.description.title')"></DgaTextArea>
           </div>
-          <button @click="showDescription = false" class="ml-auto">
-            Hide Description
+          <button @click="showDescription = false" :title="$t('topic.description.hide')" class="ml-auto">
+            {{ $t('topic.description.hide')}}
           </button>
         </template>
         <div v-else>
-          <button class="inline-flex flex-row gap-2 items-center" @click="showDescription = true">
-            <MaterialIcon icon="add"></MaterialIcon> Add Description
+          <button class="inline-flex flex-row gap-2 items-center" :title="$t('topic.description.add')" @click="showDescription = true">
+            <MaterialIcon icon="add"></MaterialIcon> {{ $t('topic.description.add') }}
           </button>
         </div>
       </div>
       <div class="md:col-span-2 flex flex-col gap-2">
         <h3 class="font-bold">
-          Add Choices
+          {{ $t('topic.addChoice.title') }}
         </h3>
-        <div v-for="choice of topicData.choices.choices" class="w-full max-w-md flex flex-row items-center">
-          <MaterialIcon :class="[isOldChoiceValid(choice.name) ? 'invisible' : '']" 
+        <div v-for="choice, i of topicData.choices.choices" class="w-full max-w-xl flex flex-row items-center justify-center mx-auto">
+          <MaterialIcon :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
             icon="priority_high" class="text-red-500"
             :title="getChoiceErrorReason(choice.name)"
           />
           <div class="flex-1 inline-flex flex-row">
             <DgaInput v-model="choice.name" type="text" class="flex-1"></DgaInput>
-            <button class="px-2 py-1 inline-flex items-center justify-center"
-              :title="`Remove Choice [${choice.name}]`"  @click="removeOption(choice.name)"
+            <button class="px-2 py-1 inline-flex items-center"
+              :title="`${$t('topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
             >
               <MaterialIcon icon="remove" />
             </button>
           </div>
         </div>
-        <div class="w-full max-w-md flex flex-row items-center">
-          <MaterialIcon v-if="isNewChoiceValid" icon="emergency" />
-          <MaterialIcon v-else :class="[newChoiceValue === '' ? 'invisible' : '']" icon="priority_high" class="text-red-500" :title="getChoiceErrorReason(newChoiceValue)"/>
-          <div class="flex-1 inline-flex flex-row">
-            <DgaInput v-model="newChoiceValue" type="text" class="flex-1" placeholder="New Choice"></DgaInput>
-            <button class="px-2 py-1 inline-flex items-center justify-center" 
-              title="Add Choice" :disabled="!isNewChoiceValid" @click="addOption"
-            >
-              <MaterialIcon icon="add" />
-            </button>
-          </div>
+        <div class="w-full flex flex-row justify-center items-center">
+          <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('topic.addChoice.add')" 
+            @click="addOption"
+          >
+            {{ $t('topic.addChoice.add') }} <MaterialIcon icon="add" />
+          </DgaButton>
         </div>
       </div>
       <div class="md:col-span-2 flex flex-col gap-2">
-        <h3 class="font-bold">Voter Lists</h3>
+        <h3 class="font-bold">{{ $t('topic.voterList.title') }}</h3>
+        <div class="flex flex-row gap-2 items-center">
+          <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
+          <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
+        </div>
         <table class="table mx-auto w-full max-w-[1600px] border-spacing-0 border-collapse">
           <tbody>
-            <tr>
+            <tr class="border-b-2 border-dga-blue">
               <th style="width: 30px"></th>
-              <th>Citezen ID</th>
-              <th>Available Votes</th>
+              <th style="width: 180px">{{ $t('topic.voterList.userId') }}</th>
+              <th>{{ $t('topic.voterList.name') }}</th>
+              <th>{{ $t('topic.voterList.email') }}</th>
+              <th v-if="topicData.multipleVotes">{{ $t('topic.voterList.totalVotes')}}</th>
               <th style="width: 30px"></th>
             </tr>
-            <tr v-for="voter of topicData.voterAllows">
+            <tr v-for="voter of voterAllowsWithHint" class="transition hover:bg-slate-200">
               <td>
                 <MaterialIcon
-                  :class="[isOldVoterValid(voter) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
+                  :class="[isVoterValid(voter) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
                   :title="getVoterErrorReason(voter)"
                 />
               </td>
               <td>
-                <DgaInput v-model="voter.citizenId" type="text" class="w-full !rounded-r-none" placeholder="Voter Citezen Id"></DgaInput>
+                {{ voter.userid }}
               </td>
               <td>
-                <DgaInput v-model.number="voter.totalVotes" type="number" class="w-full !border-l-0 !rounded-l-none" placeholder="Available Vote"></DgaInput>
+                {{ voter.firstName ? getVoterName(voter) : "-" }}
               </td>
               <td>
-                <button class="align-middle px-2 py-1 inline-flex items-center justify-center" :title="`Remove Voter [${voter.citizenId}]`"  @click="removeVoter(voter.citizenId)">
+                {{ voter.email || "-" }}
+              </td>
+              <td v-if="topicData.multipleVotes">
+                <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full !border-l-0 !rounded-l-none" :placeholder="$t('topic.voterList.totalVotes')"
+                ></DgaInput>
+              </td>
+              <td>
+                <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
+                  :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter.userid)"
+                >
                   <MaterialIcon icon="remove" />
                 </button>
               </td>
             </tr>
             <tr>
-              <td>
-                <MaterialIcon v-if="isNewVoterValid" icon="emergency" />
-                <MaterialIcon v-else :class="[newVoterCitizenId === '' ? 'invisible' : '']" icon="priority_high"  class="text-red-500"
-                  :title="getNewVoterErrorReason()"
-                />
-              </td>
-              <td>
-                <DgaInput v-model="newVoterCitizenId" type="text" class="w-full !rounded-r-none" placeholder="Voter Citezen Id"></DgaInput>
-              </td>
-              <td>
-                <DgaInput v-model.number="newVoteCount" type="number" min="1" class="w-full !border-l-0 !rounded-l-none" placeholder="Available Vote"></DgaInput>
-              </td>
-              <td>
-                <button class="align-middle px-2 py-1 inline-flex items-center justify-center" title="Add Voter" :disabled="!isNewVoterValid" @click="addVoter">
-                  <MaterialIcon :class="[ !isNewVoterValid ? 'invisible' : '']" icon="add" />
-                </button>
+              <td :colspan="topicData.multipleVotes ? 6 : 5">
+                <div class="flex flex-row gap-2 items-center my-1">
+                  <DgaUserSearch class="flex-1" :placeholder="$t('topic.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -149,23 +149,27 @@
       </div>
       <div class="md:col-span-2 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="topicData.notifyVoter"></DgaCheckbox> 
-        <label class="flex-none">Send notice to user</label>
+        <label class="flex-none"> {{ $t('topic.notifyUsers') }}</label>
       </div>
       <div class="md:col-span-2 flex flex-row items-center gap-2">
-        <DgaCheckbox v-model="topicData.showVotersScore"></DgaCheckbox> 
-        <label class="flex-none">Display result voting for public</label>
+        <DgaCheckbox v-model="topicData.showScores"></DgaCheckbox> 
+        <label class="flex-none"> {{ $t('topic.showScores') }}</label>
       </div>
       <div class="md:col-span-2 flex flex-row items-center gap-2">
-        <DgaCheckbox v-model="topicData.showVotersChoicesPublic" :disabled="!topicData.showVotersScore"></DgaCheckbox> 
-        <label class="flex-none">Display voter choice(s) for public</label>
+        <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
+        <label class="flex-none"> {{ $t('topic.skipBlockchain') }}</label>
+      </div>
+      <div class="md:col-span-2 flex flex-row items-center gap-2">
+        <DgaCheckbox v-model="topicData.showVotersChoicesPublic" :disabled="!topicData.showScores"></DgaCheckbox> 
+        <label class="flex-none">{{ $t('topic.voterScorePublic') }}</label>
       </div>
 
       <DgaButtonGroup class="md:col-span-2 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-          color="dga-orange" title="Create Topic" :disabled="!isFormValid" @click="showConfirmModal = true"
+          color="dga-orange" :title="$t('topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
         >
           <MaterialIcon icon="ballot" />
-          <span class="truncate">Create Topic</span>
+          <span class="truncate">{{ $t('topic.create.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
     </div>
@@ -174,7 +178,7 @@
       @close="showConfirmModal = false"
       @cancel="showConfirmModal = false"
     >
-      ยืนยันการสร้างคำถามการลงคะแนนนี้?
+      {{ $t('topic.create.confirm') }}
     </DgaModal>
     <DgaLoadingModal :show="waitCreate"></DgaLoadingModal>
   </div>
@@ -184,34 +188,45 @@
 import dayjs from "dayjs";
 import { getComputedServerTime as serverTime } from "~~/src/utils/datetime";
 import { getPresetChoices, isTopicFormValid, voterCounts, choiceCounts } from "~~/src/utils/topic";
-import { goBack, webAppName, isThaiCitizenId } from "~~/src/utils/utils"
+import { getVoterName } from "~~/src/utils/utils";
+
+const localePathOf = useLocalePath();
+const i18n = useI18n();
 
 definePageMeta({
   middleware: ["auth-admin"]
 })
 
 useHead({
-  title: `${webAppName} - Create Topic`
+  title: `${i18n.t('appName')} - ${i18n.t('topic.create.title')}`
 });
 
 const showDescription = ref(false);
-const durationMode = ref("duration");
+const durationMode = ref("startDuration");
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
-const votePublicOptions = [{ label: "Public", value: true }, { label: "Private", value: false }];
-const durationModeOptions = [{ label: "Duration", value: "duration" }, { label: "Start/End", value: "startend" }];
-const defaultTotalVote = ref(1);
-const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).toDate();
-const expiredDate = dayjs(serverTime()).add(1, "month").minute(0).second(0).millisecond(0).toDate();
+const votePublicOptions = ref([
+  { label: i18n.t('topic.publicVoteAccess'), value: true },
+  { label: i18n.t('topic.publicVoteAccess'), value: false }
+]);
+const durationModeOptions = ref(["startDuration", "startEnd"].map((mode) => {
+  return {
+    label: i18n.t(`topic.voteDuration.mode.${mode}`),
+    value: mode
+  }
+}));
+
+const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
+const expiredDate = dayjs(startDate).add(1, "month").minute(0).second(0).millisecond(0).toDate();
 
 const voteStart = ref({
   dateStr: dayjs(startDate).format("YYYY-MM-DD"),
-  timeStr: dayjs(startDate).format("HH:MM"),
+  timeStr: dayjs(startDate).format("HH:mm"),
 });
 const voteEnd = ref({
   dateStr: dayjs(expiredDate).format("YYYY-MM-DD"),
-  timeStr: dayjs(expiredDate).format("HH:MM"),
+  timeStr: dayjs(expiredDate).format("HH:mm"),
 });
 const voteDuration = ref({
   durationDays: dayjs(expiredDate).diff(startDate, "days"),
@@ -226,79 +241,82 @@ const topicData = ref<TopicFormData>({
   choices: getPresetChoices(),
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
+  multipleVotes: false,
   publicVote: true,
   notifyVoter: true,
   showVotersChoicesPublic: false,
-  showVotersScore: true,
+  showScores: true,
   voterAllows: [],
+  recoredToBlockchain: true,
 });
 
-function isOldChoiceValid(choice: string) {
-  return choiceCounts(topicData.value.choices, choice) === 1 && newChoiceValue.value !== choice;
+const voterAllowsWithHint : Ref<Array<TopicVoterAllowFormDataWithHint>> = ref([]);
+watch(voterAllowsWithHint, (value) => {
+  topicData.value.voterAllows = value.map((ele) => {
+    return {
+      userid: ele.userid,
+      totalVotes: ele.totalVotes,
+    }
+  })
+}, { immediate: true, deep: true })
+
+const skipBlockchain = ref(false);
+watch(skipBlockchain, (value) => {
+  topicData.value.recoredToBlockchain = !value
+}, { immediate: true })
+
+function isChoiceValid(choice: string) {
+  return choice !== "" && choiceCounts(topicData.value.choices, choice) === 1;
 }
 function getChoiceErrorReason(choice: string) {
   if(choice === '') {
-    return "Choice must not empty";
+    return i18n.t('topic.addChoice.error.empty');
   }
 
-  return "Choice Duplicated"
+  return i18n.t('topic.addChoice.error.duplicated');
 }
 
-const newChoiceValue = ref("");
-const isNewChoiceValid = computed(() => newChoiceValue.value !== "" && choiceCounts(topicData.value.choices, newChoiceValue.value) === 0);
-
-function isOldVoterValid(voter: Omit<VoteAllowData, "remainVotes">) {
-  return voterCounts(topicData.value.voterAllows, voter.citizenId) === 1 && newVoterCitizenId.value !== voter.citizenId && voter.totalVotes > 0;
+function isVoterValid(voter: TopicVoterAllowFormDataWithHint) {
+  return voterCounts(voterAllowsWithHint.value, voter.userid) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
 }
-function getVoterErrorReason(voter: Omit<VoteAllowData, "remainVotes">) {
-  if(!isThaiCitizenId(voter.citizenId)) {
-    return "Invalid Citizen ID";
-  }
-
-  return "Citizen ID Duplicated"
-}
-function getNewVoterErrorReason() {
-  return getVoterErrorReason({ citizenId: newVoterCitizenId.value, totalVotes: newVoteCount.value });
+function getVoterErrorReason(voter: TopicVoterAllowFormDataWithHint) {
+  return i18n.t('topic.voterList.error.duplicated');
 }
 
-const newVoterCitizenId = ref("");
-const newVoteCount = ref(defaultTotalVote.value);
-const isNewVoterValid = computed(() => {
-  return isThaiCitizenId(newVoterCitizenId.value) &&
-    voterCounts(topicData.value.voterAllows, newVoterCitizenId.value) === 0 &&
-    newVoteCount.value > 0;
-})
 const isFormValid = computed(() => isTopicFormValid(topicData.value))
 
 watch(voteStart, (newValue) => {
-  const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:MM").toDate();
+  const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
   const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
 
   voteEnd.value.dateStr = dayjs(voteExpiredAt).format("YYYY-MM-DD");
-  voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:MM");
+  voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:mm");
 }, { deep: true });
 
-function removeOption(option: string) {
-  topicData.value.choices.choices = topicData.value.choices.choices.filter((ele) => ele.name !== option);
+function removeOption(nth: number) {
+  topicData.value.choices.choices.splice(nth, 1)
 }
 
 function addOption() {
-  if(isNewChoiceValid.value) {
-    topicData.value.choices.choices.push({ name: newChoiceValue.value });
-    newChoiceValue.value = "";
-  }
+  topicData.value.choices.choices.push({ name: "" });
 }
 
-function removeVoter(citizenId: string) {
-  topicData.value.voterAllows = topicData.value.voterAllows.filter((ele) => ele.citizenId !== citizenId);
+function removeVoter(userid: string) {
+  voterAllowsWithHint.value = voterAllowsWithHint.value.filter((ele) => ele.userid !== userid);
 }
 
-function addVoter() {
-  if(isNewVoterValid.value) {
-    topicData.value.voterAllows.push({ citizenId: newVoterCitizenId.value, totalVotes: newVoteCount.value });
-    newVoterCitizenId.value = "";
-    newVoteCount.value = defaultTotalVote.value;
+function addVoter(user: UserSearchResponseData) {
+  if(voterAllowsWithHint.value.every((ele) => ele.userid !== user._id)) {
+    voterAllowsWithHint.value.push({
+      userid: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      totalVotes: 1,
+    });
   }
+
+  return true
 }
 
 async function createTopic() {
@@ -309,7 +327,7 @@ async function createTopic() {
   showConfirmModal.value = false;
   waitCreate.value = true;
 
-  topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:MM").toDate();
+  topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
     
   if(durationMode.value === "duration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -317,35 +335,45 @@ async function createTopic() {
       .add(voteDuration.value.durationHours, "hours")
       .add(voteDuration.value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:MM").toDate();
+    topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
   }
   
+  const voterAllows = topicData.value.voterAllows.map((ele) => {
+    return {
+      userid: ele.userid,
+      totalVotes: topicData.value.multipleVotes ? ele.totalVotes : 1,
+    }
+  });
+
   const { error } = await useFetch("/api/topic/create", {
     method: "POST",
-    body: topicData.value,
+    body: {
+      ...topicData.value,
+      voterAllows,
+    },
   });
 
   if(error.value) {
     useShowToast({
-      title: "Add Topic",
-      content: "Add Topic Failed",
+      title: i18n.t('topic.create.action'),
+      content: i18n.t('topic.create.failed'),
       autoCloseDelay: 5000,
     });
   
     waitCreate.value = false;
   } else {
     useShowToast({
-      title: "Add Topic",
-      content: "Add Topic Successful",
+      title: i18n.t('topic.create.action'),
+      content: i18n.t('topic.create.success') ,
       autoCloseDelay: 5000,
     });
-    goBack();
+    navigateTo(localePathOf("/topics"))
   }
 }
 </script>
 
 <style scoped>
 .table th, .table td {
-  padding: 0 0 6px;
+  @apply py-3 px-2;
 }
 </style>

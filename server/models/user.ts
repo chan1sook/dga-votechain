@@ -1,39 +1,41 @@
 import { model, Schema } from "mongoose";
-import { legacyRoleToPermissions } from "../../src/utils/permissions";
-import { getNtpTime } from "~~/server/ntp";
 
-const schema = new Schema<UserDatabaseData, UserModel>({
-  userid: {
-    type: String,
-    required: true,
+const schema = new Schema<UserData>({
+  version: {
+    type: Number,
+    default: 1,
   },
   permissions: [String],
-  createdAt: {
-    type: Date,
-    required: true,
-    immutable: true,
+  authSources: [new Schema({
+    authSource: {
+      type: String,
+      required: true,
+    },
+    digitalIdUserId: {
+      type: String
+    },
+  })],
+  firstName: {
+    type: String,
   },
-});
-
-schema.pre('save', async function () {
-  const today = await getNtpTime();
-  if (!this.createdAt) {
-    this.createdAt = today;
+  lastName: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  citizenId: {
+    type: String,
+  },
+}, {
+  timestamps: true,
+  query: {
+    byDigitalIdUserId(digitalIdUserId: DigitalIDUserId) {
+      return this.where("authSources")
+        .elemMatch("authSource").equals("digitalId")
+        .elemMatch("digitalIdUserId").equals(digitalIdUserId)
+    }
   }
 });
 
-schema.static("ensureUserData", function ensureUserData(userid : string) {
-  return this.findOneAndUpdate({
-    userid,
-  }, {
-    $setOnInsert: {
-      userid,
-      permissions: legacyRoleToPermissions("voter"),
-    },
-  }, {
-    new: true,
-    upsert: true,
-  });
-});
-
-export default model<UserDatabaseData, UserModel>('user', schema);
+export default model('dga-user', schema);

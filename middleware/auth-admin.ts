@@ -1,5 +1,3 @@
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { data } = await useFetch("/api/session/get");
 
@@ -9,7 +7,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       userid: data.value.userid,
       permissions: data.value.permissions,
       roleMode: data.value.roleMode,
-      digitalIdUserInfo: data.value.digitalIdUserInfo,
+      firstName: data.value.firstName,
+      lastName: data.value.lastName,
+      email: data.value.email,
     };
   } else {
     useSessionData().value = {
@@ -17,19 +17,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       userid: undefined,
       permissions: [],
       roleMode: undefined,
-      digitalIdUserInfo: undefined,
+      firstName: undefined,
+      lastName: undefined,
+      email: undefined,
     };
   }
 
-  const isAdminPermissions = checkPermissionNeeds(useSessionData().value.permissions, "access-pages:admin");
-  
-  if(!isAdminPermissions) {
-    const isUserPermissions = checkPermissionNeeds(useSessionData().value.permissions, "access-pages:user");
-    
-    if(!isUserPermissions) {
-      return navigateTo('/login')
-    } else {
-      return showError({ statusCode: 404, statusMessage: "Page Not Found" });
-    }
+  if(useSessionData().value.roleMode !== "admin" && useSessionData().value.roleMode !== "developer") {
+    return showError({ statusCode: 404, statusMessage: "Page Not Found" });
   }
 })

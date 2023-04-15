@@ -6,10 +6,6 @@ export function toFirstCapitalState(state: string) {
   return leader + sub;
 }
 
-export function goBack() {
-  useRouter().go(-1);
-}
-
 export function escapeRegExp(str: string) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -27,4 +23,18 @@ export function isThaiCitizenId(str: string) {
   const checkshum = parseInt(str.charAt(12), 10);
   
   return sumDigitValue === checkshum;
+}
+
+export function getVoterName(voter: TopicVoterAllowFormDataWithHint) {
+  if(voter.firstName) {
+    return voter.lastName ? `${voter.firstName} ${voter.lastName}` : voter.firstName;
+  }
+  return voter.userid
+}
+
+export function getFullUserName(user: UserSessionData) {
+  if(user.firstName) {
+    return user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName;
+  }
+  return user._id.toString()
 }

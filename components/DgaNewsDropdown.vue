@@ -1,28 +1,35 @@
 <template>
-  <div class="relative">
-    <button type="button" @click="toggleShowOption" title="News">
-      <MaterialIcon icon="mail"></MaterialIcon>
+  <div class="relative" @click.stop>
+    <button type="button" @click="toggleShowOption" :title="$t('navbar.news.title')">
+      <MaterialIcon icon="ballot"></MaterialIcon>
     </button>
     <Teleport to="body">
-      <div v-if="showOption" class="z-[400] bg-white border rounded-md rounded-b-3xl shadow fixed right-0 top-20 w-72 h-64 max-h-96 overflow-y-auto">
+      <div v-if="showOption" class="z-[400] bg-white border rounded-md rounded-b-3xl shadow fixed right-0 top-20 w-72 h-64 max-h-96 overflow-y-auto" @click.stop>
         <div class="flex-1 flex flex-col gap-2 px-4 py-2">
-          <DgaHead>News</DgaHead>
-          <NuxtLink v-for="newsData of loadedNews" :href="`/news/info/${newsData._id}`" @click="useVisibleMenu().value = undefined">
+          <DgaHead>{{ $t('navbar.news.title') }}</DgaHead>
+          <div v-if="roleMode === 'admin' || roleMode === 'developer'" class="absolute right-0 top-2">
+            <NuxtLink :href="localePathOf('/news/create')" :title="$t('navbar.news.add')" @click="useVisibleMenuGroup().value = undefined">
+              <MaterialIcon icon="add"></MaterialIcon>
+            </NuxtLink>
+          </div>
+          <NuxtLink v-for="newsData of loadedNews" :href="localePathOf(`/news/info/${newsData._id}`)" @click="useVisibleMenuGroup().value = undefined">
             <h3 class="font-bold">{{ newsData.title }}</h3>
             <div class="text-xs">
-              {{ formatDateTime(newsData.createdAt) }} - <b>{{ newsData.author }}</b>
+              {{ prettyDateTime(newsData.createdAt) }} - <b>{{ newsData.author }}</b>
             </div>
           </NuxtLink>
           <template v-if="isLoadMoreNews">
             <div class="text-center text-xl italic">
-              Loading...
+              {{ $t('navbar.news.loadingNews') }}
             </div>
           </template>
           <template v-else>
             <div v-if="loadedNews.length === 0 && !hasMoreNews" class="text-center text-xl italic">
-              No more news
+              {{ $t('navbar.news.noMoreNews') }}
             </div>
-            <DgaButton v-if="hasMoreNews && isLoadMoreNews" color="dga-orange" class="mx-auto" @click="loadMoreNews">Load more news</DgaButton>
+            <DgaButton v-if="hasMoreNews && isLoadMoreNews" :title="$t('navbar.news.loadMoreNews')" color="dga-orange" class="mx-auto" @click="loadMoreNews">
+              {{ $t('navbar.news.loadMoreNews') }}
+            </DgaButton>
           </template>
         </div>
       </div>
@@ -31,9 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import { formatDateTime } from '~~/src/utils/datetime';
+import dayjs from 'dayjs';
+const i18t = useI18n();
+const localePathOf = useLocalePath();
 
-const showOption = computed(() => useVisibleMenu().value === 'news');
+const showOption = computed(() => useVisibleMenuGroup().value === 'news');
 const loadedNews : Ref<Array<NewsResponseData>> = ref([]);
 
 const pagesize = ref(50);
@@ -43,13 +52,18 @@ const startid = computed(() => {
 const hasMoreNews = ref(false);
 const isLoadMoreNews = ref(false);
 
+const roleMode = computed(() => useSessionData().value.roleMode);
+
+function prettyDateTime(date: any) {
+  return i18t.d(dayjs(date).toDate(), "short");
+}
 function toggleShowOption() {
   if(!showOption.value) {
-    useVisibleMenu().value = 'news';
+    useVisibleMenuGroup().value = 'news';
     loadedNews.value = [];
     loadMoreNews();
   } else {
-    useVisibleMenu().value = undefined;
+    useVisibleMenuGroup().value = undefined;
   }
 }
 
@@ -63,7 +77,6 @@ async function fetchNews(pagesize: number, startid?: string) {
   const [ notifications ] = fetchResult.map((ele) => ele.data.value);
   return notifications;
 }
-
 
 async function loadMoreNews() {
   isLoadMoreNews.value = true;

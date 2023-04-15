@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  modules: [
+    '@nuxtjs/i18n',
+  ],
   runtimeConfig: {
     MONGODB_URI: "mongodb://127.0.0.1:27017",
     DB_NAME: "dga_evote_test",
@@ -7,9 +10,10 @@ export default defineNuxtConfig({
     DID_CLIENT_SECRET: "MCqudBiP8EX",
     DID_VERIFY_CODE: "3e2727957a1bd9f47b11ff347fca362b6060941decb4",
     DID_LOGIN_CALLBACK: "https://e-vote.sensesiot.net/api/callback/login",
+    DID_LOGOUT_CALLBACK: "https://e-vote.sensesiot.net/api/callback/logout",
     public: {
       DID_API_URL: "https://connect.dga.or.th",
-      SOCKETIO_URL: "https://e-vote.sensesiot.net:3059",
+      SOCKETIO_URL: "https://e-vote.sensesiot.net/sio",
       SYNCTIME_THERSOLD: 60 * 1000,
     },
     SOCKETIO_ORIGIN_URL: "https://e-vote.sensesiot.net",
@@ -25,10 +29,21 @@ export default defineNuxtConfig({
         connectionString: "mongodb://127.0.0.1:27017/",
         databaseName: "dga_evote_test",
         collectionName: "_session",
+      },
+      notify: {
+        driver: "mongodb",
+        connectionString: "mongodb://127.0.0.1:27017/",
+        databaseName: "dga_evote_test",
+        collectionName: "_notify",
       }
     },
     storage: {
       session: {
+        driver: "redis",
+        url: "redis://localhost:6379/",
+      },
+      notify: {
+        base: "notify",
         driver: "redis",
         url: "redis://localhost:6379/",
       }
@@ -41,4 +56,34 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  i18n: {
+    vueI18n: {
+      fallbackLocale: 'th',
+      datetimeFormats: {
+        th: {
+          long: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' },
+          short: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
+        },
+        en: {
+          long: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' },
+          short: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
+        }
+      }
+    },
+    lazy: true,
+    langDir: 'lang',
+    defaultLocale: 'th',
+    locales: [
+      {
+        code: 'en',
+        name: "English",
+        file: 'en-US.js'
+      },
+      {
+        code: 'th',
+        name: "ภาษาไทย",
+        file: 'th-TH.js'
+      }
+    ],
+  }
 });

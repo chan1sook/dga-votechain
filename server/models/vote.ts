@@ -1,10 +1,9 @@
 import { FilterQuery, model, Schema, Types } from "mongoose";
-import { getNtpTime } from "~~/server/ntp";
 
 const schema = new Schema<VoteData, VoteModel>({
   userid: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "dga-user"
   },
   topicid: {
     type: Schema.Types.ObjectId,
@@ -14,19 +13,7 @@ const schema = new Schema<VoteData, VoteModel>({
   choice: {
     type: String,
   },
-  createdAt: {
-    type: Date,
-    required: true,
-    immutable: true,
-  },
-});
-
-schema.pre('save', async function () {
-  const today = await getNtpTime();
-  if (!this.createdAt) {
-    this.createdAt = today;
-  }
-});
+}, { timestamps: true });
 
 schema.static("getLastestVotes", function getLastestVotes(pagesize?: number, startid?: string, filterKeyword?: string) {
   const query : FilterQuery<VoteData> = {

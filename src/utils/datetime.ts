@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
 export function formatDateTime(datetimeString: DateString) {
-  return dayjs(datetimeString).format("YYYY-MM-DD HH:MM");
+  return dayjs(datetimeString).format("YYYY-MM-DD HH:mm");
 }
 
 export function perttyDurationDHM(duration: number, withDecimal?: boolean) {
@@ -61,6 +61,6 @@ export function getComputedServerTime() {
 export function isServerTimeSync(SYNCTIME_THERSOLD = 60000) {
   const syncTimeData = useSyncTimeData().value;
   const diff = Date.now() - syncTimeData.lastestSyncLocal.getTime();
-  return syncTimeData.synced && diff >= 0 && diff <= SYNCTIME_THERSOLD;
+  return syncTimeData.synced && Math.abs(diff) <= SYNCTIME_THERSOLD;
 }
   

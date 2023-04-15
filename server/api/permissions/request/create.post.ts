@@ -1,7 +1,6 @@
-import RequestPermissionsModel from "~~/server/models/reqpermission"
+import RequestPermissionsModel from "~~/server/models/request-permission"
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 import NotificationModel from "~~/server/models/notification";
-import { getNtpTime } from "~~/server/ntp";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -13,7 +12,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const existsRequests = await RequestPermissionsModel.getExistsRequestPermissionsData(userData.userid);
+  const existsRequests = await RequestPermissionsModel.getExistsRequestPermissionsData(userData._id);
   if(existsRequests.length > 0) {
     throw createError({
       statusCode: 400,
@@ -23,11 +22,10 @@ export default defineEventHandler(async (event) => {
 
   const reqPermissionsData : RequestPermissionsFormData = await readBody(event);
 
-  const today = await getNtpTime();
+  const today = new Date();
   const reqPermissions: RequestPermissionsData = {
-    userid: userData.userid,
+    userid: userData._id.toString(),
     status: "pending",
-    digitalIdUserInfo: userData.digitalIdUserInfo,
     permissions: reqPermissionsData.permissions,
     note: reqPermissionsData.note,
     preset: reqPermissionsData.preset,
@@ -36,12 +34,13 @@ export default defineEventHandler(async (event) => {
   }
   const reqPermissionsDoc = await new RequestPermissionsModel(reqPermissions).save();
   
+  const content = `{{notification.requestPermission.title}} #${reqPermissionsDoc.id} {{otification.requestPermission.inProgress}}`
   await new NotificationModel(
     {
       from: "system",
-      target: [{ citizenId: userData.digitalIdUserInfo.citizen_id }],
-      title: `Request Permission #${reqPermissionsDoc.id} in progress`,
-      content: `Request Permission #${reqPermissionsDoc.id} in progress`,
+      target: [{ userid: userData._id }],
+      title: content,
+      content: content,
       notifyAt: today,
       createdAt: today,
       updatedAt: today,

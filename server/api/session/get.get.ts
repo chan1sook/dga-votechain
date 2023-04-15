@@ -1,6 +1,7 @@
 
 export default defineEventHandler<UserResponseData>(async (event) => {
   const userData = event.context.userData;
+  
   if(!userData) {
     return {
       sid: event.context.session.sid,
@@ -9,10 +10,12 @@ export default defineEventHandler<UserResponseData>(async (event) => {
   } else {
     return {
       sid: event.context.session.sid,
-      userid: userData.userid,
+      userid: userData._id.toString(),
       roleMode: userData.roleMode,
-      digitalIdUserInfo: userData.digitalIdUserInfo,
       permissions: userData.permissions,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      email: userData.email,
     }
   }
 });

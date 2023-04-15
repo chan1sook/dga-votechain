@@ -1,10 +1,9 @@
 import dayjs from "dayjs"
-import { isTopicExpired } from "~~/src/utils/topic";
 
 import TopicModel from "~~/server/models/topic"
+import TopicPauseModel from "~~/server/models/topic-pause"
+import TopicVoterAllowModel from "~~/server/models/topic-voters-allow"
 import VoteModel from "~~/server/models/vote"
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { getNtpNow } from "~~/server/ntp";
 
 export default defineEventHandler(async (event) => {  
   const topicDoc = await TopicModel.findById(event.context.params?.id);
@@ -14,11 +13,39 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Topic not found",
     });
   }
+  
+  const topicPauseData = await TopicPauseModel.findOne({
+    topicid: topicDoc._id, resumeAt: { $exists: false }
+  })
+
+  if(topicDoc.status !== "approved") {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Topic not approved",
+    });
+  } else if(topicPauseData || topicDoc.voteExpiredAt.getTime() >= Date.now()) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Topic not expired",
+    });
+  }
 
   if(!topicDoc.publicVote) {
     const userData = event.context.userData;
     
-    if(!userData || !checkPermissionNeeds(userData.permissions, "access-pages:user")) {
+    if(!userData) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+
+    const topicAllowDoc = await TopicVoterAllowModel.findOne({
+      userid: userData._id,
+      topicid: topicDoc._id
+    })
+
+    if(!topicAllowDoc) {
       throw createError({
         statusCode: 403,
         statusMessage: "Forbidden",
@@ -26,14 +53,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  if(topicDoc.status !== "approved" || !isTopicExpired(topicDoc, await getNtpNow())) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "Topic not expired or not approved",
-    });
-  }
-
-  const allVotes = await VoteModel.find({ topicid: topicDoc._id });
+  const allVotes : Array<VoteDataWithPopulated> = await VoteModel.find({ topicid: topicDoc._id }).populate("userid");
   const voteRecords : Array<TopicVoteCountRecord> = [];
 
   for(const vote of allVotes) {
@@ -47,6 +67,7 @@ export default defineEventHandler(async (event) => {
   allVotes.reduce((prev, current) => {
     return prev;
   }, voteRecords);
+  voteRecords.sort((a, b) => b.count - a.count);
 
   const voteResult : TopicVoteCountResponse = {
     _id: `${topicDoc._id}`,
@@ -60,36 +81,38 @@ export default defineEventHandler(async (event) => {
     winners: [],
   }
 
-  if(topicDoc.showVotersScore) {
+  if(topicDoc.showScores) {
     if(topicDoc.showVotersChoicesPublic) {
       voteResult.votes = allVotes.map((ele) => {
         return {
-          userid: ele.userid,
+          userid: {
+            _id: ele.userid._id.toString(),
+            firstName: ele.userid.firstName,
+            lastName: ele.userid.lastName,
+            email: ele.userid.email,
+          },
           createdAt: dayjs(ele.createdAt).toISOString(),
           choice: ele.choice,
-          citizenId: ele.citizenId,
         };
       })
     }
     voteResult.scores = voteRecords;
   }
-  const voteRecords2 = voteRecords.slice();
-  const winners = [];
-  voteRecords2.sort((a, b) => b.count - a.count);
-  for(const vote of voteRecords2) {
-    if(winners.length === 0) {
-      winners.push(vote);
-      continue;
-    }
 
-    if(vote.count === winners[0].count) {
-      winners.push(vote);
-    } else {
-      break;
+  voteResult.winners = voteRecords.map((ele, i, arr) => {
+    let rank = i + 1;
+    for(let j = i - 1; j >= 0; j--) {
+      if(arr[j].count === ele.count) {
+        rank -= 1;
+      } else {
+        break;
+      }
     }
-  }
-
-  voteResult.winners = winners.map((ele) => ele.choice);
+    return {
+      choice: ele.choice,
+      rank: i + 1
+    }
+  });
 
   return {
     voteResult,

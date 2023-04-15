@@ -5,12 +5,11 @@ import { getNtpTime } from "~~/server/ntp";
 import { SessionHandler, getSessionData } from "~~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
-  // Handle cookie & Storage
   let sid = getCookie(event, "sid");
 
   const storage : Storage = useStorage();
   const sessionStorage = prefixStorage(storage, "session");
-  const sessionExpired =  dayjs(await getNtpTime()).add(60, "minute").toDate();
+  const sessionExpired =  dayjs(getNtpTime()).add(60, "minute").toDate();
 
   if(!sid) {
     sid = nanoid(32);
@@ -27,7 +26,7 @@ export default defineEventHandler(async (event) => {
   })
   
   event.context.session = new SessionHandler(sid, sessionStorage);
-
+  
   const userData = await getSessionData(sid);
   if(userData) {
     event.context.userData = userData;

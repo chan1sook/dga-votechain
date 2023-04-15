@@ -7,7 +7,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       userid: data.value.userid,
       permissions: data.value.permissions,
       roleMode: data.value.roleMode,
-      digitalIdUserInfo: data.value.digitalIdUserInfo,
+      firstName: data.value.firstName,
+      lastName: data.value.lastName,
+      email: data.value.email,
     };
   } else {
     useSessionData().value = {
@@ -15,7 +17,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       userid: undefined,
       permissions: [],
       roleMode: undefined,
-      digitalIdUserInfo: undefined,
+      firstName: undefined,
+      lastName: undefined,
+      email: undefined,
     };
   }
 })

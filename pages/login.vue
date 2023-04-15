@@ -1,23 +1,29 @@
 <template>
   <div>
     <h2 class="text-2xl font-bold text-center mb-4">
-      Login
+      {{  $t("login.title") }}
     </h2>
     <DgaButtonGroup larger class="mt-6">
-      <a href="/api/login">
+      <a href="/api/login?source=dga">
         <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
-          color="dga-orange" title="Login with Digital ID"
+          color="dga-orange" :title="$t('login.loginDigitalId')"
         >
           <MaterialIcon icon="fingerprint"/>
-          <span class="truncate">Login with Digital ID</span>
+          <span class="truncate">
+            {{ $t("login.loginDigitalId") }}
+          </span>
         </DgaButton>
       </a>
     </DgaButtonGroup>
     <DgaButtonGroup larger class="mt-2">
-      <NuxtLink :to="registerUrl">
-        <DgaButton theme="hollow" class="w-full flex flex-row gap-x-2 items-center justify-center truncate" title="Register">
+      <NuxtLink :to="registerDigitalIdUrl">
+        <DgaButton theme="hollow" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
+          :title="$t('login.registerDigitalId')"
+        >
           <MaterialIcon icon="how_to_reg"/>
-          <span class="truncate">Register</span>
+          <span class="truncate">
+            {{ $t("login.registerDigitalId") }}
+          </span>
         </DgaButton>
       </NuxtLink>
     </DgaButtonGroup>
@@ -25,15 +31,15 @@
 </template>
 
 <script setup lang="ts">
-import { webAppName } from "~~/src/utils/utils"
+const i18n = useI18n();
 
 definePageMeta({
   middleware: ["auth-guest"]
 })
 useHead({
-  title: `${webAppName} - Login`
+  title: `${i18n.t('login.appName')} - ${i18n.t('login.title')}`
 });
 
 const { DID_API_URL } = useRuntimeConfig();
-const registerUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
+const registerDigitalIdUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
 </script>

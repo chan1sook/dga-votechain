@@ -1,38 +1,34 @@
 <template>
   <div v-if="news">
-    <DgaHead>News</DgaHead>
+    <DgaHead>{{ $t("news.title")}}</DgaHead>
     <h2 class="text-2xl font-bold text-center mb-0">
       {{ news.title }}
     </h2>
-    <div class="text-sm text-center text-gray-700 mb-4">#{{ newsid }}</div>
-    <DgaListGroup :items="newToLists(news)" no-animation>
-      <template #header="{item}">
-        {{ item.key }}
-      </template>
-      <template #content="{item}">
-        <template v-if="item.key === 'Author'">
-          <span v-if="item.value.author">{{ item.value.author }}</span>
-          <span v-else class="italic">Anonymous</span>
-        </template>
-        <template v-else-if="item.key === 'Published At'">
-          {{ formatDateTime(item.value.newsPublishAt) }}
-        </template>
-        <template v-else-if="item.key === 'Content'">
-          <SimpleContentFormatter :content="item.value.content"></SimpleContentFormatter>
-        </template>
-        <template v-else-if="item.key === 'References'">
-          <template v-if="item.value.references">{{ item.value.references }}</template>
-          <span v-else class="italic">None</span>
-        </template>
-      </template>
-    </DgaListGroup>
+    <div class="grid-2-news">
+      <div>{{ $t('news.id') }}</div>
+      <div>{{ news._id }}</div>
+      <div>{{ $t('news.author') }}</div>
+      <div>
+        <span v-if="news.author">{{ news.author }}</span>
+        <span v-else class="italic">{{ $t('news.anonymous') }}</span>
+      </div>
+      <div>{{ $t('news.publishAt') }}</div>
+      <div>{{ $d(dayjs(news.newsPublishAt).toDate(), "long") }}</div>
+      <div>{{ $t('news.content') }}</div>
+      <div><SimpleContentFormatter :content="news.content"></SimpleContentFormatter></div>
+      <div>{{ $t('news.references') }}</div>
+      <div>
+        <template v-if="news.references">{{ news.references }}</template>
+        <span v-else class="italic">{{  $t('news.noReference') }}</span>
+      </div>
+    </div>
     <DgaButtonGroup class="mt-12">
       <NuxtLink v-if="isAdminRole" :to="`/news/edit/${newsid}`" >
         <DgaButton class="!flex flex-row gap-x-2 mx-auto items-center justify-center truncate"
-          color="dga-orange"  title="Edit News"
+          color="dga-orange" :title="$t('news.edit.title')"
         >
         <MaterialIcon icon="edit" />
-          <span class="truncate">Edit News</span>
+          <span class="truncate">{{ $t('news.edit.title') }}</span>
         </DgaButton>
       </NuxtLink>
     </DgaButtonGroup>
@@ -40,18 +36,19 @@
 </template>
   
 <script setup lang="ts">
-import { webAppName } from "~~/src/utils/utils"
-import { formatDateTime } from '~~/src/utils/datetime';
+import dayjs from "dayjs";
 
 definePageMeta({
   middleware: ["auth-voter"]
 })
 
+const i18n = useI18n();
+
 const { id } = useRoute().params;
 let newsid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${webAppName} - News #${newsid}`
+  title: `${i18n.t('appName')} - ${i18n.t('news.title')} #${newsid}`
 });
 
 const isAdminRole = computed(() => {
@@ -79,3 +76,11 @@ function newToLists(news: NewsResponseData) : Array<BasicListableItem<string, Ne
 }
 
 </script>
+
+<style scoped>
+.grid-2-news {
+  @apply grid gap-x-4 gap-y-2;
+  grid-template-columns: max-content auto;
+}
+
+</style>

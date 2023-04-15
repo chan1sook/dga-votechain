@@ -1,15 +1,13 @@
 import { isAdminRole, isDeveloperRole, isVoterRole } from "./role";
-
+  
 export function legacyRoleToPermissionsExcludes(role: UserRole) : Array<EVotePermission> {
   switch(role) {
     case "voter":
-      return ["access-pages:user", "request-permissions", "access-notifications", "vote-topic", "request-topic"];
+      return ["request-permissions", "voter-mode", "vote-topic", "transfer-topic-controller"];
     case "admin":
-      return [
-        "access-pages:admin", "create-topic", "change-topic", "create-news", "change-news", "change-permissions:basic", 
-      ];
+      return ["admin-mode", "create-topic", "change-topic", "grant-topic-controller"];
     case "developer":
-      return ["access-pages:developer", "change-permissions:advance"];
+      return ["dev-mode", "change-others-permissions"];
     default:
       return [];
   }
@@ -99,25 +97,4 @@ export function removePermissions(target: Array<EVotePermission>, ...removed: Ar
     }
   }
   return result;
-}
-
-const permissionMap: Record<EVotePermission, string> = {
-  "access-pages:user": "Access User Pages",
-  "access-pages:admin": "Access Admin Pages",
-  "access-pages:developer": "Access Developer Pages",
-  "request-permissions": "Request More Permissions",
-  "access-notifications": "Access Notifications",
-  "banned": "Mark Banned User",
-  "vote-topic": "Vote Topics",
-  "request-topic": "Request New Topics",
-  "create-topic": "Create New Topics Directly",
-  "change-topic": "Change Topic Data",
-  "create-news": "Create News",
-  "change-news": "Change News Data",
-  "change-permissions:basic": "Allow Change Other User Basic Permissions",
-  "change-permissions:advance": "Allow Change Other User Advance Permissions"
-};
-
-export function getFullPermissionTitle(permission: EVotePermission) {
-  return permissionMap[permission] ? permissionMap[permission] : "";
 }

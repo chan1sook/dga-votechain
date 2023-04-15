@@ -1,17 +1,14 @@
 <template>
   <div>
-    <DgaHead>Request Permissions</DgaHead>
+    <DgaHead>{{ $t('requestPermissions.add.title') }}</DgaHead>
     <div v-if="allowInputForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto my-4">
       <div class="md:col-span-2 p-2 pb-0 flex flex-row items-start gap-2">
-        <label class="flex-none">Note for approver</label>
-        <textarea v-model="permissionsData.note" class="dga-evote-input w-0 flex-1 h-32" placeholder="Note"></textarea>
+        <label class="flex-none">{{ $t('requestPermissions.add.noteToApprover') }}</label>
+        <DgaTextArea v-model="permissionsData.note" :placeholder="$t('requestPermissions.note')" class="w-full"></DgaTextArea>
       </div>
       <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <label class="flex-none">Request to</label>
-        <select class="dga-evote-input w-0 flex-1" @change="setPermissionsPreset">
-          <option value="moderator">Moderator</option>
-          <option value="developer">Developer</option>
-        </select>
+        <label class="flex-none">{{ $t('requestPermissions.add.requestTo.title') }}</label>
+        <DgaSelect v-model="permissionsData.preset" :options="presetOptions"></DgaSelect>
       </div>
       <div v-if="permissionEditable" class="md:col-span-2 grid-2-content">
         <template v-for="permission of getRequestablePermissions()">
@@ -22,36 +19,48 @@
         </template>
       </div>
       <div class="md:col-span-2 my-2 text-center">
-        <DgaCheckbox v-model="consentPersonalId" required></DgaCheckbox> Allow to use Digital ID for Request Permissions
+        <DgaCheckbox v-model="consentPersonalId" required></DgaCheckbox> {{ $t('requestPermissions.add.allowConsent') }}
       </div>
       <DgaButtonGroup class="md:col-span-2 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" title="Request Permissions" :disabled="!isFormValid" @click="requestPermissions"
         >
         <MaterialIcon icon="ballot" />
-          <span class="truncate">Request Permissions</span>
+          <span class="truncate">{{ $t('requestPermissions.add.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
     </div>
     <div v-else class="tetx-center text-2xl">
-      Please wait before request again
+      {{ $t('requestPermissions.add.pendingBlocked') }}
     </div>
     <DgaLoadingModal :show="waitRequest"></DgaLoadingModal>
   </div>
 </template>
   
 <script setup lang="ts">
-import { getFullPermissionTitle, getRequestablePermissions, getPresetPermissions } from "~~/src/utils/permissions";
-import { goBack, webAppName } from "~~/src/utils/utils"
+import { getRequestablePermissions, getPresetPermissions } from "~~/src/utils/permissions";
+
+const i18n = useI18n();
+const localePathOf = useLocalePath();
 
 definePageMeta({
   middleware: ["auth-voter"]
 })
 
 useHead({
-  title: `${webAppName} - Request Permissions`
+  title: `${i18n.t('appName')} - ${i18n.t('requestPermissions.add.title')}`
 });
 
+function getFullPermissionTitle(permission: EVotePermission) {
+  return i18n.t(`permissions.${permission}`, permission);
+}
+
+const presetOptions  = ref(["moderator", "developer"].map((value) => {
+  return {
+    label: i18n.t(`requestPermissions.add.requestTo.${value}`),
+    value: value
+  }
+}));
 
 const permissionsData = ref<RequestPermissionsFormData>({
   permissions: getPresetPermissions(),
@@ -70,12 +79,11 @@ if(data.value?.requestPermissions) {
 
 const isFormValid = computed(() => consentPersonalId.value && permissionsData.value.permissions.length > 0);
 
-function setPermissionsPreset(payload: Event) {
-  if(payload.target instanceof HTMLSelectElement) {
-    permissionsData.value.permissions = getPresetPermissions(payload.target.value)
-    permissionEditable.value = payload.target.value === "custom";
-  }
-}
+const _preset = computed(() => permissionsData.value.preset);
+watch(_preset, (value) => {
+  permissionsData.value.permissions = getPresetPermissions(value)
+  permissionEditable.value = (value === "custom");
+}, { immediate: true });
 
 async function requestPermissions() {
   if(!isFormValid.value) {
@@ -91,18 +99,18 @@ async function requestPermissions() {
 
   if(error.value) {
     useShowToast({
-      title: "Add Request Permissions",
-      content: "Add Request Permissions Failed",
+      title: i18n.t('requestPermissions.add.title'),
+      content: i18n.t('requestPermissions.add.failed'),
       autoCloseDelay: 5000,
     });
   } else {
     useShowToast({
-      title: "Add Request",
-      content: "Add Request Permissions Successful",
+      title: i18n.t('requestPermissions.add.title'),
+      content: i18n.t('requestPermissions.add.success'),
       autoCloseDelay: 5000,
     });
 
-    goBack();
+    navigateTo(localePathOf("/"));
   }
 
   waitRequest.value = false;

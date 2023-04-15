@@ -9,8 +9,8 @@
       <div class="bg-dga-blue rounded-lg p-6 text-white flex flex-col gap-4">
         <slot>Modal</slot>
         <div v-if="!hideButtons" class="flex flex-row items-center justify-center gap-4">
-          <DgaButton color="dga-orange" @click="emit('cancel')">Cancel</DgaButton>
-          <DgaButton color="green" @click="emit('confirm')">Confirm</DgaButton>
+          <DgaButton color="dga-orange" :title="$t('modal.cancel')" @click="emit('cancel')">{{ $t('modal.cancel') }}</DgaButton>
+          <DgaButton color="green" :title="$t('modal.confirm')" @click="emit('confirm')">{{ $t('modal.confirm')}}</DgaButton>
         </div>
       </div>
     </div>

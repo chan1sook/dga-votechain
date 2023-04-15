@@ -3,8 +3,7 @@ import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 
 import { FilterQuery, model, Schema, Types } from "mongoose";
-import { escapeRegExp, isThaiCitizenId } from "../../src/utils/utils";
-import { getNtpTime } from "~~/server/ntp";
+import { escapeRegExp } from "../../src/utils/utils";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -20,6 +19,10 @@ const schema = new Schema<TopicData, TopicModel>({
   status: {
     type: String,
     required: true,
+  },
+  multipleVotes: {
+    type: Boolean,
+    default: false,
   },
   choices: {
     type: new Schema<ChoicesData>({
@@ -43,20 +46,12 @@ const schema = new Schema<TopicData, TopicModel>({
     required: true,
   },
   createdBy: {
-    type: String,
-    required: true,
-  },
-  createdByName: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "dga-user"
   },
   updatedBy: {
-    type: String,
-    required: true,
-  },
-  updatedByName: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "dga-user"
   },
   voteStartAt: {
     type: Date,
@@ -66,39 +61,11 @@ const schema = new Schema<TopicData, TopicModel>({
     type: Date,
     required: true,
   },
-  pauseDuration: {
-    type: Number,
-    default: 0,
-  },
-  voterAllows: [new Schema({
-    citizenId: {
-      type: String,
-      required: [true, 'Is Must Valid Thai CitizenId'],
-      validate: {
-        validator: isThaiCitizenId,
-      },
-    },
-    totalVotes: {
-      type: Number,
-      required: true,
-    },
-    remainVotes: {
-      type: Number,
-      required: true,
-    },
-  })],
   publicVote: {
     type: Boolean,
     required: true,
   },
-  notifyVoter: {
-    type: Boolean,
-    required: true,
-  },
-  votePauseAt: {
-    type: Date,
-  },
-  showVotersScore: {
+  showScores: {
     type: Boolean,
     required: true,
   },
@@ -106,72 +73,23 @@ const schema = new Schema<TopicData, TopicModel>({
     type: Boolean,
     required: true,
   },
-  createdAt: {
-    type: Date,
-    required: true,
-    immutable: true,
-  },
-  updatedAt: {
-    type: Date,
-    required: true,
-  },
-});
-
-schema.pre('save', async function () {
-  const today = await getNtpTime();
-  if (!this.createdAt) {
-    this.createdAt = today;
+  notifyVoter: {
+    type: Boolean,
+    default: true,
   }
-  this.createdAt = today;
-});
+}, { timestamps: true });
 
-schema.static("getLastestAvailableTopics", async function getLastestAvailableTopics(
-  filter?: TopicFilterParams, includePrivate?: boolean
-) {
-  const query : FilterQuery<TopicData> = {};
-  
-  if(filter) {
-    if(filter.type === "ticketId") {
-      query._id = new Types.ObjectId(filter.ticketId);
-    } else if(filter.type === "date") {
-      const today = await getNtpTime();
-      const startDate = dayjs(today).tz("Asia/Bangkok").year(filter.year).month(filter.month).date(1).hour(0).minute(0).second(0).millisecond(0);
-      const endDate = startDate.month(filter.month + 1);
-      
-      query.voteStartAt = {
-        $gte: startDate.toDate(),
-        $lte: endDate.toDate(),
-      }
-    } else if(filter.type === "topicName") {
-      const regex = RegExp(escapeRegExp(filter.keyword));
-      query.name = regex;
-    }
-
-    if(filter.startid) {
-      query._id = { $lt: new Types.ObjectId(filter.startid) }
-    }
-
-    if(!includePrivate) {
-      query.publicVote = true;
-    }
-  }
-  
-  return await this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 });
-});
-
-schema.static("getLastestActiveTopics", async function getLastestActiveTopics(
-  userData: UserData, filter?: TopicFilterParams
-) {
+schema.statics.getLastestPublicVoteTopics = function getLastestAvailableTopics(filter?: TopicFilterParams) {
   const query : FilterQuery<TopicData> = {
     status: "approved",
-    "voterAllows.citizenId" : userData.digitalIdUserInfo.citizen_id,
+    publicVote: true,
   };
 
   if(filter) {
     if(filter.type === "ticketId") {
       query._id = new Types.ObjectId(filter.ticketId);
     } else if(filter.type === "date") {
-      const today = await getNtpTime();
+      const today = new Date();
       const startDate = dayjs(today).tz("Asia/Bangkok").year(filter.year).month(filter.month).date(1).hour(0).minute(0).second(0).millisecond(0);
       const endDate = startDate.month(filter.month + 1);
       
@@ -189,7 +107,70 @@ schema.static("getLastestActiveTopics", async function getLastestActiveTopics(
     }
   }
   
-  return await this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 });
-});
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
+};
 
+schema.statics.getLastestPublicVoteWithIdsTopics = function getLastestAvailableTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) {
+  const query : FilterQuery<TopicData> = {
+    status: "approved",
+    $or: [
+      { publicVote: true },
+      { _id: { $in: ids }},
+    ]
+  };
+
+  if(filter) {
+    if(filter.type === "ticketId") {
+      query._id = new Types.ObjectId(filter.ticketId);
+    } else if(filter.type === "date") {
+      const today = new Date();
+      const startDate = dayjs(today).tz("Asia/Bangkok").year(filter.year).month(filter.month).date(1).hour(0).minute(0).second(0).millisecond(0);
+      const endDate = startDate.month(filter.month + 1);
+      
+      query.voteStartAt = {
+        $gte: startDate.toDate(),
+        $lte: endDate.toDate(),
+      }
+    } else if(filter.type === "topicName") {
+      const regex = RegExp(escapeRegExp(filter.keyword));
+      query.name = regex;
+    }
+
+    if(filter.startid) {
+      query._id = { $lt: new Types.ObjectId(filter.startid) }
+    }
+  }
+  
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
+};
+
+schema.statics.getLastestAvailableTopics = function(filter?: TopicFilterParams) {
+  const query : FilterQuery<TopicData> = {
+    status: "approved",
+  };
+
+  if(filter) {
+    if(filter.type === "ticketId") {
+      query._id = new Types.ObjectId(filter.ticketId);
+    } else if(filter.type === "date") {
+      const today = new Date();
+      const startDate = dayjs(today).tz("Asia/Bangkok").year(filter.year).month(filter.month).date(1).hour(0).minute(0).second(0).millisecond(0);
+      const endDate = startDate.month(filter.month + 1);
+      
+      query.voteStartAt = {
+        $gte: startDate.toDate(),
+        $lte: endDate.toDate(),
+      }
+    } else if(filter.type === "topicName") {
+      const regex = RegExp(escapeRegExp(filter.keyword));
+      query.name = regex;
+    }
+
+    if(filter.startid) {
+      query._id = { $lt: new Types.ObjectId(filter.startid) }
+    }
+  }
+  
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
+}
 export default model<TopicData, TopicModel>('topic', schema);

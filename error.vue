@@ -9,10 +9,12 @@
       </div>
       <div class="my-2 text-center">
         <DgaButton class="inline-flex flex-row gap-x-2 items-center justify-center truncate"
-          color="dga-orange" title="Back to Home" @click="handleClearError"
+          color="dga-orange" :title="$t('error.backToHome')" @click="handleClearError"
         >
           <MaterialIcon icon="home"/>
-          <span class="truncate">Back to Home</span>
+          <span class="truncate">
+            {{  $t('error.backToHome') }}
+          </span>
         </DgaButton>
       </div>
     </div>
@@ -20,10 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { webAppName } from '~~/src/utils/utils';
+const i18n = useI18n()
 
 useHead({
-  title: `${webAppName} - Error`,
+  title: `${i18n.t('appName')} - ${i18n.t('error.title')}`,
   link: [
     {
       rel: "stylesheet",

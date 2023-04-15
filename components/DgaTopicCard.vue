@@ -1,84 +1,90 @@
 <template>
   <div class="dga-topic-card" :class="[isPublicVote ? 'public' : 'private']">
     <div class="inner">
-      <div v-if="isPublicVote" class="public" >Public Vote</div>
-      <div v-else class="private" >Private Vote</div>
+      <div v-if="isPublicVote" class="public">
+        {{ $t('voting.publicVote') }}
+      </div>
+      <div v-else class="private" >
+        {{ $t('voting.privateVote') }}
+      </div>
       <div class="content">
         <div class="name">{{ props.topic.name }}</div>
-        <div class="time">Vote on {{ prettyStartAt }}</div>
-        <div class="createdby">Create by {{ props.topic.createdByName }} (#Ticket {{ props.topic._id }})</div>
+        <div class="time">{{ $t('voting.voteOn') }} {{ prettyStartAt }}</div>
+        <div class="createdby">{{ $t('voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
       </div>
       <div class="status">
-        <button v-if="mode === 'admin' || mode === 'developer'" @click="emit('access', 'edit')">
-          Edit
+        <button v-if="props.editable" :title="$t('voting.editTopic')" @click="emit('edit')">
+          {{ $t('voting.editTopic') }}
         </button>
-        <button v-if="status === 'result'" class="result"  @click="emit('access', status)">Result</button>
-        <button v-else-if="status === 'access'" class="access" @click="emit('access', status)">Access</button>
-        <button v-else-if="status === 'completed'" class="completed" @click="emit('access', status)">Completed</button>
-        <button v-else class="waiting" disabled @click="emit('access', status)">Waiting</button>
+        <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
+          {{ actualStatusStr }}
+        </button>
       </div>
 
-      <div v-if="status === 'result'" class="duration expired">Close</div>
-      <div v-else class="duration">Period: {{ prettyDuationHours }}</div>
+      <div v-if="status === 'result'" class="duration expired">
+      {{ $t('voting.expired') }}
+      </div>
+      <div v-else class="duration">{{ $t('voting.period')}} : {{ prettyDuation }}</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { isTopicExpired, isTopicVoteable, isTopicVoted } from '~~/src/utils/topic';
-import { perttyDurationDHM } from '~~/src/utils/datetime';
 
-type TopicCardType = "result" | "access" | "waiting" | "completed" | "edit";
-const props = defineProps<{
+const i18n = useI18n();
+
+const props = withDefaults(defineProps<{
   topic: TopicResponseData,
-  mode?: UserRole, 
-}>();
+  editable?: boolean,
+  status?: TopicCardStatus,
+}>(), {
+  status: "access",
+});
 
 const emit = defineEmits<{
-  (e: 'access', v: TopicCardType) : void,
+  (e: 'edit') : void,
+  (e: 'action', v:TopicCardStatus) : void,
 }>();
+
+const actualStatusStr = computed(() => {
+  return i18n.t(`voting.status.${props.status}`, i18n.t('voting.status.access'))
+})
 
 const isPublicVote = computed(() => {
   return props.topic.publicVote
 })
 
-const status = computed(() => {
-  if(props.mode === 'admin' || props.mode === 'developer') {
-    if(isTopicExpired(props.topic)) {
-      return "result";
-    } else if(isTopicVoteable(props.topic)) {
-      return "access";
-    } else {
-      return "waiting";
-    }
-  } else if(props.mode === 'voter') {
-    if(isTopicExpired(props.topic)) {
-      return "result";
-    } else if(isTopicVoted(props.topic, useSessionData().value?.digitalIdUserInfo?.citizen_id)) {
-      return "completed";
-    }  else if(isTopicVoteable(props.topic)) {
-      return "access";
-    } else {
-      return "waiting";
-    }
-  } else {
-    if(isTopicExpired(props.topic)) {
-      return "result";
-    } else {
-      return "waiting";
-    }
-  }
-})
-
-const prettyDuationHours = computed(() => {
+const prettyDuation = computed(() => {
   const originalDuration = dayjs(props.topic.voteExpiredAt).diff(props.topic.voteStartAt);
-  return perttyDurationDHM(originalDuration);
+  const days = Math.floor(originalDuration / (24 * 60 * 60 * 1000));
+  if(days >= 1) {
+    return `${days} ${i18n.t("timePeriod.day", {count: days})}`;
+  }
+
+  const hours = Math.floor(originalDuration / (60 * 60 * 1000));
+  if(hours >= 1) {
+    return `${hours} ${i18n.t("timePeriod.hour", {count: hours})}`;
+  }
+
+  const minutes = Math.floor(originalDuration / (60 * 1000));
+  if(minutes >= 1) {
+    return `${minutes} ${i18n.t("timePeriod.minute", {count: minutes})}`;
+  }
+
+  return i18n.t("timePeriod.nearZeroMinute")
 })
 
 const prettyStartAt = computed(() => {
-  return dayjs(props.topic.voteStartAt).format("YYYY-MM-DD HH:MM");
+  return i18n.d(dayjs(props.topic.voteStartAt).toDate(), "long");
 })
+
+function getCreatedByName(createdBy?: UserResponseFilterData) {
+  if(createdBy && createdBy.firstName) {
+    return createdBy.lastName ? `${createdBy.firstName} ${createdBy.lastName}` : createdBy.firstName;
+  }
+  return createdBy || "-";
+}
 
 </script>
 
@@ -109,7 +115,7 @@ const prettyStartAt = computed(() => {
   @apply flex flex-row flex-wrap gap-y-2 gap-x-4
 }
 .dga-topic-card > .inner > .content > .name {
-  @apply w-full
+  @apply w-full text-xl font-bold
 }
 .dga-topic-card > .inner > .content > .time
 {
@@ -122,10 +128,14 @@ const prettyStartAt = computed(() => {
 .dga-topic-card > .inner > .status > * {
   @apply rounded-full px-3 py-1 text-center text-sm text-white bg-dga-orange;
 }
-.dga-topic-card > .inner > .status > .completed {
+.dga-topic-card > .inner > .status > .voted {
   @apply bg-dga-blue;
 }
-.dga-topic-card > .inner > .status > .access {
+.dga-topic-card > .inner > .status > .finished {
+  @apply bg-blue-700;
+}
+.dga-topic-card > .inner > .status > .access,
+.dga-topic-card > .inner > .status > .voting  {
   @apply bg-green-700
 }
 .dga-topic-card > .inner > .status > .waiting {

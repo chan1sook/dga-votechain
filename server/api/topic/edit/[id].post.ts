@@ -1,11 +1,11 @@
 import dayjs from "dayjs";
 
 import TopicModel from "~~/server/models/topic"
-import NotificationModel from "~~/server/models/notification"
-import { isTopicFormValid } from "~~/src/utils/topic";
+import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
+import TopicNotificationData from "~~/server/models/topic-notifications"
+import { isTopicFormValid, isTopicReadyToVote } from "~~/src/utils/topic";
 import { checkPermissionSelections } from "~~/src/utils/permissions";
-import { getDigitalIdName } from "~~/src/utils/digitalid-protocol";
-import { getNtpTime } from "~~/server/ntp";
+import mongoose, { Types } from "mongoose";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -17,110 +17,147 @@ export default defineEventHandler(async (event) => {
   }
   
   const topicFormData: Partial<TopicFormEditBodyData>  = await readBody(event);
+  const today = new Date();
 
-  const topicData = await TopicModel.findById(event.context.params?.id);
-  if(!topicData) {
+  const dbSession = await mongoose.startSession();
+  dbSession.startTransaction();
+
+  const topicDoc = await TopicModel.findById(event.context.params?.id);
+  if(!topicDoc) {
     throw createError({
       statusCode: 400,
       statusMessage: "Topic not found",
     });
+  } else if(!isTopicReadyToVote(topicDoc)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Topic not editable",
+    });
   }
-  topicData.updatedBy = userData.userid;
-  topicData.updatedAt = await getNtpTime();
-  topicData.updatedByName = getDigitalIdName(userData.digitalIdUserInfo);
+  topicDoc.updatedBy = userData._id;
+  topicDoc.updatedAt = today;
 
   if(topicFormData.name !== undefined) {
-    topicData.name = topicFormData.name;
+    topicDoc.name = topicFormData.name;
   }
 
   if(topicFormData.description !== undefined) {
-    topicData.description = topicFormData.description;
+    topicDoc.description = topicFormData.description;
   }
-  
+
+  if(topicFormData.multipleVotes !== undefined) {
+    topicDoc.multipleVotes = topicFormData.multipleVotes;
+  }
+
   if(topicFormData.choices !== undefined) {
-    topicData.choices = topicFormData.choices;
+    topicDoc.choices = topicFormData.choices;
   }
   
   if(topicFormData.status !== undefined) {
-    topicData.status = topicFormData.status;
+    topicDoc.status = topicFormData.status;
   }
 
   if(topicFormData.voteStartAt !== undefined) {
-    topicData.voteStartAt = dayjs(topicFormData.voteStartAt).toDate();
+    topicDoc.voteStartAt = dayjs(topicFormData.voteStartAt).toDate();
   }
   
   if(topicFormData.voteExpiredAt !== undefined) {
-    topicData.voteExpiredAt = dayjs(topicFormData.voteExpiredAt).toDate();
+    topicDoc.voteExpiredAt = dayjs(topicFormData.voteExpiredAt).toDate();
   }
 
   if(topicFormData.publicVote !== undefined) {
-    topicData.publicVote = topicFormData.publicVote;
+    topicDoc.publicVote = topicFormData.publicVote;
   }
 
-  if(topicFormData.showVotersScore !== undefined) {
-    topicData.showVotersScore = topicFormData.showVotersScore;
+  if(topicFormData.showScores !== undefined) {
+    topicDoc.showScores = topicFormData.showScores;
   }
 
   if(topicFormData.showVotersChoicesPublic !== undefined) {
-    topicData.showVotersChoicesPublic = topicFormData.showVotersChoicesPublic;
+    topicDoc.showVotersChoicesPublic = topicFormData.showVotersChoicesPublic;
   }
 
-  if(topicFormData.notifyVoter !== undefined) {
-    topicData.notifyVoter = topicFormData.notifyVoter;
+  if(topicFormData.recoredToBlockchain !== undefined) {
+    topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
   }
-
+  
   if(topicFormData.voterAllows !== undefined) {
-    topicData.voterAllows = topicFormData.voterAllows.map((ele) => {
+    await TopicVoterAllowsModel.deleteMany({ topicid: topicDoc._id })
+    const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
       return {
-        ...ele,
+        topicid: topicDoc._id,
+        userid: new Types.ObjectId(ele.userid),
+        totalVotes: ele.totalVotes,
         remainVotes: ele.totalVotes,
       }
     });
+    await TopicVoterAllowsModel.insertMany(voterAllows);
   }
 
-  if(!isTopicFormValid(topicData)) {
+  const voterAllowDocs = await TopicVoterAllowsModel.find({ topicid: topicDoc._id });
+
+  await TopicNotificationData.deleteMany({ topicid: topicDoc._id });
+  if(topicFormData.notifyVoter) {
+    const topicNotifications : Array<TopicNotificationData> = voterAllowDocs.map((ele) => {
+      return {
+        userid: ele.userid,
+        topicid: topicDoc._id,
+        createdAt: today,
+        updatedAt: today,
+        notifyAt: topicDoc.voteStartAt,
+      }
+    });
+    await TopicNotificationData.insertMany(topicNotifications);
+  }
+  
+  if(!isTopicFormValid({
+    ...topicDoc.toJSON(),
+    voterAllows: voterAllowDocs.map((ele) => {
+      return {
+        userid: ele.userid.toString(),
+        totalVotes: ele.totalVotes,
+      }
+    })
+  })) {
     throw createError({
       statusCode: 400,
       statusMessage: "Input Invalid",
     });
   }
 
-  await topicData.save();
-  if(topicData.notifyVoter) {
-    await NotificationModel.findOneAndUpdate({
-      tags: `topic-${topicData._id}-access`
-    }, {
-      $set: {
-        target: topicData.voterAllows,
-        title: `Topic "${topicData.name}" Avaliable`,
-        content: `Topic "${topicData.name}"  Avaliable`,
-        notifyAt: topicData.voteStartAt,
-      }
-    });
-  } else {
-    await NotificationModel.findOneAndDelete({
-      tags: `topic-${topicData._id}-access`
-    });
-  }
+  await topicDoc.save();
 
+  await dbSession.commitTransaction();
+  await dbSession.endSession();
+  
   const topic : TopicResponseData = {
-    _id: topicData._id.toString(),
-    status: topicData.status,
-    name: topicData.name,
-    description: topicData.description,
-    choices: topicData.choices,
-    voteStartAt: dayjs(topicData.voteStartAt).toISOString(),
-    voteExpiredAt: dayjs(topicData.voteExpiredAt).toISOString(),
-    pauseDuration: topicData.pauseDuration,
-    createdAt: dayjs(topicData.createdAt).toISOString(),
-    createdByName: topicData.createdByName,
-    updatedAt: dayjs(topicData.updatedAt).toISOString(),
-    updatedByName: topicData.updatedByName,
-    publicVote: topicData.publicVote,
-    showVotersScore: topicData.showVotersScore,
-    showVotersChoicesPublic: topicData.showVotersChoicesPublic,
-    notifyVoter: topicData.notifyVoter,
-    voterAllows: topicData.voterAllows,
+    _id: topicDoc._id.toString(),
+    status: topicDoc.status,
+    name: topicDoc.name,
+    description: topicDoc.description,
+    multipleVotes: topicDoc.multipleVotes,
+    choices: topicDoc.choices,
+    voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
+    voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
+    createdAt: dayjs(topicDoc.createdAt).toISOString(),
+    updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
+    createdBy: topicDoc.createdBy && !(topicDoc.createdBy instanceof Types.ObjectId) ? {
+      _id: topicDoc.createdBy._id,
+      firstName: topicDoc.createdBy.firstName,
+      lastName: topicDoc.createdBy.lastName,
+      email: topicDoc.createdBy.email,
+    } : undefined,
+    updatedBy: topicDoc.updatedBy && !(topicDoc.updatedBy instanceof Types.ObjectId) ? {
+      _id: topicDoc.updatedBy._id,
+      firstName: topicDoc.updatedBy.firstName,
+      lastName: topicDoc.updatedBy.lastName,
+      email: topicDoc.updatedBy.email,
+    } : undefined,
+    publicVote: topicDoc.publicVote,
+    showScores: topicDoc.showScores,
+    showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
+    recoredToBlockchain: topicDoc.recoredToBlockchain,
+    notifyVoter: topicDoc.notifyVoter,
   };
 
   return {

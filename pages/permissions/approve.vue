@@ -1,36 +1,39 @@
 <template>
   <div>
-    <DgaHead>Approve Request Permissions</DgaHead>
+    <DgaHead>{{ $t('requestPermissions.approveRequestPermissions') }}</DgaHead>
     <div class="grid-2-content">
       <template v-for="request of permissionsList">
         <div class="flex flex-row gap-2 items-center">
-          <button type="button" class="inline-flex gap-2 items-center justify-center" title="Approve" @click="setApprovePermissions(request._id, 'approved')">
+          <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.approve')"
+            @click="setApprovePermissions(request._id, 'approved')">
             <MaterialIcon icon="check" />
           </button>
-          <button type="button" class="inline-flex gap-2 items-center justify-center" title="Reject" @click="setApprovePermissions(request._id, 'rejected')">
+          <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.reject')" @click="setApprovePermissions(request._id, 'rejected')">
             <MaterialIcon icon="close" />
           </button>
         </div>
         <div class="border-l border-dga-blue pl-2">
           <div class="flex flex-row gap-2 flex-wrap">
-            <b>Userid:</b>
+            <b>{{ $t('requestPermissions.userid') }}:</b>
             <span>{{ request.userid }}</span>
           </div>
           <div class="flex flex-row gap-2 flex-wrap">
-            <b>Some DID Data:</b> 
-            <abbr title="Citizen ID">{{ request.digitalIdUserInfo.citizen_id }}</abbr>
-            <abbr title="Name">{{ formatFullName(request.digitalIdUserInfo) }}</abbr>
-            <abbr v-if="request.digitalIdUserInfo.email" title="Email">{{ request.digitalIdUserInfo.email }}</abbr>
+            <b>{{ $t('requestPermissions.personalData') }}:</b> 
+            <abbr v-if="request.personalData.citizenId" :title="$t('requestPermissions.citizenid')">{{ request.personalData.citizenId }}</abbr>
+            <abbr :title="$t('requestPermissions.name')">{{ formatFullName(request.personalData) }}</abbr>
+            <abbr v-if="request.personalData.email" :title="$t('requestPermissions.email')">{{ request.personalData.email }}</abbr>
           </div>
           <div class="flex flex-row gap-2 flex-wrap">
-            <b>Note:</b> 
+            <b>{{ $t('requestPermissions.note')  }}:</b> 
             <span v-if="request.note">{{ request.note }}</span>
-            <span v-else class="italic">None</span>
+            <span v-else class="italic">{{ $t('requestPermissions.noteNone') }}</span>
           </div>
           <div class="flex flex-row gap-x-2 flex-wrap">
-            <b>Permissions: </b>
+            <b>{{ $t('requestPermissions.permissions') }}: </b>
             <details>
-              <summary>{{ request.preset }}</summary>
+              <summary>
+                {{ $t(`requestPermissions.add.requestTo.${request.preset}`, request.preset) }}
+              </summary>
               <abbr v-for="permission of request.permissions" :title="getFullPermissionTitle(permission)">
                 {{ permission }}
               </abbr>
@@ -40,7 +43,7 @@
         <hr class="col-span-2">
       </template>
       <div v-if="permissionsList.length === 0" class="col-span-2 italic text-2xl text-center">
-        Requests not found
+        {{ $t('requestPermissions.requestsNotFound') }}
       </div>
     </div>
     <DgaLoadingModal :show="isWaitAction">
@@ -49,16 +52,19 @@
 </template>
   
 <script setup lang="ts">
-import { getFullPermissionTitle } from "~~/src/utils/permissions";
-import { webAppName } from "~~/src/utils/utils"
+const i18n = useI18n();
 
 definePageMeta({
   middleware: ["auth-admin"]
 })
 
 useHead({
-  title: `${webAppName} - Approve Request Permissions`
+  title: `${i18n.t('appName')} - ${i18n.t('requestPermissions.approveRequestPermissions')}`
 });
+
+function getFullPermissionTitle(permission: EVotePermission) {
+  return i18n.t(`permissions.${permission}`, permission);
+}
 
 const { data } = await useFetch("/api/permissions/request/lists");
 
@@ -71,14 +77,11 @@ if (!data.value) {
   permissionsList.value =  data.value?.requestPermissions;
 }
 
-function formatFullName(digitalIdData: DigitalIDUserDataResponse) {
-  const { given_name, family_name, middle_name } = digitalIdData;
-  let result = given_name
-  if(middle_name) {
-    result += ` (${middle_name})`
+function formatFullName(personalData: { firstName?: string, lastName?: string}) {
+  if(personalData.firstName) {
+    return personalData.lastName ? `${personalData.firstName} ${personalData.lastName}` : personalData.firstName;
   }
-  result +=  ` ${family_name}`
-  return result;
+  return "-"
 }
 
 async function setApprovePermissions(id: string, status: RequestPermissionStatus) {
@@ -101,8 +104,6 @@ async function setApprovePermissions(id: string, status: RequestPermissionStatus
 
   isWaitAction.value = false;
 }
-
-
 </script>
 
 <style scoped>

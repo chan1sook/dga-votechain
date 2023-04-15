@@ -1,31 +1,49 @@
 <template>
   <div>
-    <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-4">
-      <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="flex-[2] min-w-[150px]"></DgaSelect>
+    <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-4 mx-auto max-w-6xl">
+      <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="w-56"></DgaSelect>
       <template v-if="filter.type === 'date'">
-        <DgaSelect v-model="filter.year" :options="yearOptions" class="flex-1 min-w-[100px]"></DgaSelect>
-        <DgaSelect v-model="filter.month" :options="monthOptions" class="flex-1 min-w-[100px]"></DgaSelect>
+        <DgaSelect v-model="filter.year" :options="yearOptions" class="w-24"></DgaSelect>
+        <DgaSelect v-model="filter.month" :options="monthOptions" class="w-24"></DgaSelect>
       </template>
       <template v-else-if="filter.type === 'ticketId'">
-        <DgaInput v-model="filter.ticketId" placeholder="#Ticket Vote" class="flex-1 min-w-[150px]"></DgaInput>
+        <DgaInput v-model="filter.ticketId" :placeholder="$t('voting.filters.ticketIdPlaceholder')" class="w-56"></DgaInput>
       </template>
       <template v-else-if="filter.type === 'topicName'">
-        <DgaInput v-model="filter.keyword" placeholder="Topic Question" class="flex-1 min-w-[150px]"></DgaInput>
+        <DgaInput v-model="filter.keyword" :placeholder="$t('voting.filters.topicNamePlaceholder')" class="w-56"></DgaInput>
       </template>
-      <DgaButton color="dga-orange" class="flex-0" @click="resetTopics">Go</DgaButton>
+      <DgaButton color="dga-orange" class="flex-0" :title="$t('voting.filters.search')" @click="resetTopics">
+        {{ $t("voting.filters.search") }}
+      </DgaButton>
+      <DgaButton 
+        v-if="roleMode === 'admin' || roleMode === 'developer'"
+        class="md:ml-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
+        :title="$t('voting.createTopic')"
+        :href="localePathOf('/topic/create')"
+      >
+        <MaterialIcon icon="add_circle"></MaterialIcon>
+        {{ $t('voting.createTopic') }}
+      </DgaButton>
     </div>
-    <div class="my-4 flex flex-col gap-4">
-      <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode" @access="accessTo(topic, $event)"></DgaTopicCard>
+    <div class="my-4 flex flex-col gap-4 mx-auto max-w-6xl">
+      <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
+        :editable="isAdminMode"
+        :status="getStatusOf(topic)"
+        @edit="toEditTopicPage(topic)"
+        @action="handleStatusAction(topic, $event)"
+      ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
         <div class="text-center text-xl italic">
-          Loading...
+          {{ $t("voting.loadingTopic") }}
         </div>
       </template>
       <template v-else>
         <div v-if="loadedTopics.length === 0 && !hasMoreTopics" class="text-center text-xl italic">
-          No more topics
+          {{ $t("voting.noMoreTopic") }}
         </div>
-        <DgaButton v-if="hasMoreTopics && isLoadMoreTopics" color="dga-orange" class="mx-auto" @click="loadMoreTopics">Load more topics</DgaButton>
+        <DgaButton v-if="hasMoreTopics && isLoadMoreTopics" color="dga-orange" class="mx-auto" :title="$t('voting.loadMoreTopic')" @click="loadMoreTopics">
+          {{ $t('voting.loadMoreTopic') }}
+        </DgaButton>
       </template>
     </div>
   </div>
@@ -33,15 +51,18 @@
 
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { webAppName } from "~~/src/utils/utils"
-import { getComputedServerTime as serverTime } from "~~/src/utils/datetime"
+import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime"
+import { isTopicExpired, isTopicReadyToVote } from "~~/src/utils/topic";
+
+const localePathOf = useLocalePath();
+const i18n = useI18n();
 
 definePageMeta({
-  middleware: ["auth-voter"]
-});
-
+  middleware: ["auth"]
+})
+const roleMode = computed(() => useSessionData().value.roleMode);
 useHead({
-  title: `${webAppName} - ร่วมโหวต`
+  title: `${i18n.t('appName')} - ${i18n.t('voting.title')}`
 });
 
 const filter = ref({
@@ -52,22 +73,14 @@ const filter = ref({
   keyword: "",
 });
 
-const topicFilterOptions = ref([{
-  label: "ทั้งหมด",
-  value: "all",
-},
-{
-  label: "จากวันที่",
-  value: "date",
-},
-{
-  label: "จาก Ticket Vote",
-  value: "ticketId", 
-},
-{
-  label: "จาก Topic Question",
-  value: "topicName", 
-}]);
+const topicFilterOptions = ref(
+  ["all", "date", "ticketId", "topicName"].map((value) => {
+    return {
+      label: i18n.t(`voting.filters.${value}`),
+      value: value
+    }
+  })
+);
 
 const startDate = dayjs("2023-04-03T07:00:00.000");
 
@@ -86,7 +99,7 @@ const yearOptions = ref(new Array(dayjs(serverTime()).year() - startDate.year() 
   }
 }))
 
-const loadedTopics : Ref<Array<TopicResponseData>> = ref([]);
+const loadedTopics : Ref<Array<TopicResponseDataExtended>> = ref([]);
 
 const pagesize = ref(50);
 const startid = computed(() => {
@@ -95,38 +108,75 @@ const startid = computed(() => {
 const hasMoreTopics = ref(false);
 const isLoadMoreTopics = ref(false);
 
-const roleMode = computed(() => useSessionData().value.roleMode);
-
 function resetTopics() {
   loadedTopics.value = [];
   hasMoreTopics.value = true;
   loadMoreTopics();
 }
 
-function accessTo(topic: TopicResponseData, type: string) {
-  const id = topic._id;
-  switch(type) {
-    case "edit":
-      navigateTo(`/topic/edit/${id}`);
+const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
+
+function toEditTopicPage(topic: TopicResponseDataExtended) {
+  if(isTopicReadyToVote(topic)) {
+    useShowToast({
+      title: i18n.t('topic.edit.tile'),
+      content: i18n.t('topic.error.notEditable') ,
+      autoCloseDelay: 5000,
+    })
+    return;
+  }
+
+  navigateTo(localePathOf(`/topic/edit/${topic._id}`));
+}
+
+function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
+  if(isTopicExpired(topic, getComputedServerTime().getTime())) {
+    return "result";
+  } else if(!isTopicReadyToVote(topic, getComputedServerTime().getTime())) {
+    return "waiting";
+  } else if(!useSessionData().value.userid) {
+      return "voting";
+  } else if(!isAdminMode) {
+    if(topic.voterAllow) {
+      return topic.voterAllow.remainVotes > 0 ? "access" : "voted"
+    } else {
+      return "voting";
+    }
+  }
+
+  return "access";
+}
+
+function handleStatusAction(topic: TopicResponseDataExtended, status: TopicCardStatus) {
+  switch(status) {
+    case "result":
+      navigateTo(localePathOf(`/topic/result/${topic._id}`));
       break;
     case "access":
-    case "completed":
-      navigateTo(`/vote/${id}`);
+    case "voted":
+      navigateTo(localePathOf(`/vote/${topic._id}`));
       break;
-    case "result":
-      navigateTo(`/topic/result/${id}`);
-      break;
+    case "voting":
+      useShowToast({
+        title: i18n.t('voting.error.title'),
+        content: i18n.t('voting.error.notVoteable') ,
+        autoCloseDelay: 5000,
+      })
       break;
     case "waiting":
-      // navigateTo(`/topic/${id}`);
+      useShowToast({
+        title: i18n.t('voting.error.title'),
+        content: i18n.t('voting.error.waiting') ,
+        autoCloseDelay: 5000,
+      });
       break;
   }
 }
 
-async function fetchTopics(type: TopicQueryType, filter: TopicFilterParams) {
+async function fetchTopics(filter: TopicFilterParams) {
   const fetchResult = await Promise.all([
     useFetch("/api/topics", {
-      query: { type, filter }
+      query: { filter }
     })
   ])
   const [ topics ] = fetchResult.map((ele) => ele.data.value);
@@ -165,7 +215,7 @@ async function loadMoreTopics() {
     };
   }
   
-  const topics = await fetchTopics("active", actualFilter);
+  const topics = await fetchTopics(actualFilter);
   if(topics) {
     loadedTopics.value.push(...topics.topics);
     hasMoreTopics.value = topics.topics.length === pagesize.value;

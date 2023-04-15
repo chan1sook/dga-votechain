@@ -1,11 +1,12 @@
-import { Types } from "mongoose";
 import dayjs from "dayjs";
 
 import TopicModel from "~~/server/models/topic"
+import TopicVoterAllowModel from "~~/server/models/topic-voters-allow"
 import VoteModel from "~~/server/models/vote"
 
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { getNtpTime } from "~~/server/ntp";
+import { getEventEmitter } from "../global-emitter";
+import mongoose from "mongoose";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -16,6 +17,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Forbidden",
     });
   }
+  
+  const dbSession = await mongoose.startSession();
+  dbSession.startTransaction();
 
   const voteFormData : VoteFormData = await readBody(event);
 
@@ -27,51 +31,71 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  const voteAllowData = topicDoc.voterAllows.find((ele) => ele.citizenId === userData.digitalIdUserInfo.citizen_id);
-  if(!voteAllowData) {
+  const voterAllowData = await TopicVoterAllowModel.findOne({
+    userid: userData._id,
+    topicid: topicDoc._id,
+  });
+
+  if(!voterAllowData) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
 
-  const remainVotes = voteAllowData.remainVotes;
+  const remainVotes = voterAllowData.remainVotes;
   if(remainVotes <= 0) {
     throw createError({
       statusCode: 400,
       statusMessage: "Can't vote anymore",
     });
   }
-  if(voteFormData.votes.length > voteAllowData.remainVotes) {
-    voteFormData.votes = voteFormData.votes.slice(0, voteAllowData.remainVotes);
-  }
-  voteAllowData.remainVotes -= voteFormData.votes.length;
 
-  const today = await getNtpTime();
+  if(topicDoc.multipleVotes) {
+    if(voteFormData.votes.length > voterAllowData.remainVotes) {
+      voteFormData.votes = voteFormData.votes.slice(0, voterAllowData.remainVotes);
+    }
+    voterAllowData.remainVotes -= voteFormData.votes.length;
+  } else {
+    voteFormData.votes = voteFormData.votes.slice(0, 1);
+    voterAllowData.remainVotes = 0;
+  }
+
+
+  const today = new Date();
   const voteDatas : Array<VoteData> = voteFormData.votes.map((choice) => {
     return {
-      userid: userData.userid,
-      citizenId: userData.digitalIdUserInfo.citizen_id,
-      topicid: new Types.ObjectId(voteFormData.topicid),
+      userid: userData._id,
+      topicid: topicDoc._id,
       choice: choice,
       createdAt: today,
+      updatedAt: today,
     }
   });
 
   const [docs] = await Promise.all([
     VoteModel.insertMany(voteDatas),
-    topicDoc.save(),
+    voterAllowData.save(),
   ]);
   
   const votes : Array<VoteResponseData> = docs.map((newVoteDoc) => {
     return {
       _id: `${newVoteDoc._id}`,
-      userid: newVoteDoc.userid,
-      citizenId: userData.digitalIdUserInfo.citizen_id,
+      userid: `${newVoteDoc.userid}`,
       topicid: `${newVoteDoc.topicid}`,
       choice: newVoteDoc.choice,
       createdAt: dayjs(newVoteDoc.createdAt).toString(),
     }
+  });
+
+  await dbSession.commitTransaction();
+  await dbSession.endSession();
+
+  const eventEmitter = getEventEmitter();
+
+  eventEmitter.emit("voted", {
+    id: topicDoc._id.toString(),
+    votes,
   });
   
   return {

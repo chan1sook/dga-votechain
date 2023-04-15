@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   
   const newsFormData: NewsFormBodyData = await readBody(event);
 
-  const today = await getNtpTime();
+  const today = getNtpTime();
   const newNewsData: NewsData = {
     visibility: newsFormData.visibility,
     title: newsFormData.title,

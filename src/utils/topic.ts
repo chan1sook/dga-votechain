@@ -1,5 +1,4 @@
 import dayjs from "dayjs"
-import { isThaiCitizenId } from "./utils";
 
 export function useWatchVoteDateTimes(
   topicData: Ref<TopicFormData> | Ref<TopicFormEditData>,
@@ -7,30 +6,30 @@ export function useWatchVoteDateTimes(
   expiredDateStr: Ref<string>, expiredTimeStr: Ref<string>
 ) {
   watch(startDateStr, (newValue) => {
-    const voteStartAt = dayjs(`${newValue} ${startTimeStr.value}`, "YYYY-MM-DD HH:MM").toDate();
+    const voteStartAt = dayjs(`${newValue} ${startTimeStr.value}`, "YYYY-MM-DD HH:mm").toDate();
     const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
   
     topicData.value.voteStartAt = voteStartAt;
     topicData.value.voteExpiredAt = voteExpiredAt;
   
     expiredDateStr.value = dayjs(voteExpiredAt).format("YYYY-MM-DD")
-    expiredTimeStr.value = dayjs(voteExpiredAt).format("HH:MM")
+    expiredTimeStr.value = dayjs(voteExpiredAt).format("HH:mm")
   });
   watch(startTimeStr, (newValue) => {
-    const voteStartAt = dayjs(`${startDateStr.value} ${newValue}`, "YYYY-MM-DD HH:MM").toDate();
+    const voteStartAt = dayjs(`${startDateStr.value} ${newValue}`, "YYYY-MM-DD HH:mm").toDate();
     const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
   
     topicData.value.voteStartAt = voteStartAt;
     topicData.value.voteExpiredAt = voteExpiredAt;
   
     expiredDateStr.value = dayjs(voteExpiredAt).format("YYYY-MM-DD")
-    expiredTimeStr.value = dayjs(voteExpiredAt).format("HH:MM")
+    expiredTimeStr.value = dayjs(voteExpiredAt).format("HH:mm")
   });
   watch(expiredDateStr, (newValue) => {
-    topicData.value.voteExpiredAt = dayjs(`${newValue} ${expiredTimeStr.value}`, "YYYY-MM-DD HH:MM").toDate();
+    topicData.value.voteExpiredAt = dayjs(`${newValue} ${expiredTimeStr.value}`, "YYYY-MM-DD HH:mm").toDate();
   });
   watch(expiredTimeStr, (newValue) => {
-    topicData.value.voteExpiredAt = dayjs(`${expiredDateStr.value} ${newValue}`, "YYYY-MM-DD HH:MM").toDate();
+    topicData.value.voteExpiredAt = dayjs(`${expiredDateStr.value} ${newValue}`, "YYYY-MM-DD HH:mm").toDate();
   });
 }
 
@@ -45,11 +44,11 @@ export function useWatchVoteDateTimes2(
   }>,
 ) {
   watch(voteStart, (newValue) => {
-    const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:MM").toDate();
+    const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
     const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
   
     voteEnd.value.dateStr = dayjs(voteExpiredAt).format("YYYY-MM-DD");
-    voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:MM");
+    voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:mm");
   }, { deep: true });
 }
 
@@ -90,9 +89,9 @@ export function choiceCounts(choices: ChoicesData, choice: string) {
   }, 0);
 }
 
-export function voterCounts(voterAllows: Array<Omit<VoteAllowData, "remainVotes">>, citizenId: string) {
+export function voterCounts(voterAllows: Array<TopicVoterAllowFormDataWithHint>, userid: string) {
   return voterAllows.reduce((prev, current) => {
-    if(current.citizenId === citizenId) {
+    if(current.userid === userid) {
       return prev + 1;
     }
     return prev;
@@ -111,10 +110,9 @@ function isChoicesValid(choices: Array<{name: string}>) {
   );
 }
 
-function isVoteAllowsValid(voterAllows: Array<Omit<VoteAllowData, "remainVotes">>) {
-  return voterAllows.length > 0  && voterAllows.every(
-    (ele, i, arr) => isThaiCitizenId(ele.citizenId) && 
-      arr.findIndex((ele2) => ele2.citizenId === ele.citizenId) === i
+function isVoterAllowsValid(voterAllows: Array<TopicVoterAllowFormData>) {
+  return voterAllows.length > 0 && voterAllows.every(
+    (ele, i, arr) => arr.findIndex((ele2) => ele2.userid === ele.userid) === i
   );
 }
 
@@ -122,17 +120,13 @@ export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
   return topicData.name !== "" && 
     isVoteDateTimeValid(topicData.voteStartAt, topicData.voteExpiredAt) && 
     isChoicesValid(topicData.choices.choices) &&
-    isVoteAllowsValid(topicData.voterAllows);
+    isVoterAllowsValid(topicData.voterAllows);
 }
 
-export function isTopicExpired(topic: TopicData | TopicResponseData, now = Date.now()) {
-  return now >= dayjs(topic.voteExpiredAt).valueOf();
+export function isTopicExpired(topic: TopicResponseDataExtended, now = Date.now()) {
+  return now >= dayjs(topic.voteExpiredAt).valueOf() && topic.pauseData.some((ele) => !ele.resumeAt);
 }
 
-export function isTopicVoteable(topic: TopicData | TopicResponseData, now = Date.now()) {
-  return topic.status === "approved" && !isTopicExpired(topic, now) && now >= dayjs(topic.voteStartAt).valueOf();
-}
-
-export function isTopicVoted(topic: TopicData | TopicResponseData, citizenId?: string) {
-  return isTopicVoteable(topic) && Array.isArray(topic.voterAllows) && topic.voterAllows.find((ele) => ele.citizenId === citizenId && ele.remainVotes === 0);
+export function isTopicReadyToVote(topic: TopicData | TopicResponseData, now = Date.now()) {
+  return topic.status === "approved" && now >= dayjs(topic.voteStartAt).valueOf();
 }

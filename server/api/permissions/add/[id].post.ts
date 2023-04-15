@@ -1,10 +1,10 @@
 import UserModel from "~~/server/models/user"
-import { checkPermissionNeeds, checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
+import { checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-permissions:basic", "change-permissions:advance")) {
+  if(!userData || !checkPermissionSelections(userData.permissions, "change-others-permissions")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -12,13 +12,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { permissions } : RequestPermissionsAddFormData = await readBody(event);
-
-  if(isContainsAdvancePermissions(...permissions) && !checkPermissionNeeds(userData.permissions, "change-permissions:advance")) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
   
   const userDoc = await UserModel.findById(event.context.params?.id);
   if(!userDoc) {
@@ -33,12 +26,12 @@ export default defineEventHandler(async (event) => {
 
   await userDoc.save();
 
-  if(userData.userid === userDoc.userid) {
+  if(userData._id.toString() === userDoc._id.toString()) {
     userData.permissions = userDoc.permissions;
   }
 
   const permissionsResponse : RequestPermissionsAddResponseData = {
-    userid: userDoc.userid,
+    userid: userDoc._id.toString(),
     permissions: userDoc.permissions,
   }
   return {

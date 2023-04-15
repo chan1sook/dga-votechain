@@ -1,68 +1,118 @@
 import dayjs from "dayjs";
+import { Types } from "mongoose";
 import TopicModel from "~~/server/models/topic"
+import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
+import TopicPauseData from "~~/server/models/topic-pause"
 import VoteModel from "~~/server/models/vote"
-import { getNtpNow } from "~~/server/ntp";
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { isTopicExpired } from "~~/src/utils/topic";
 
 export default defineEventHandler(async (event) => {
-  const { withVotes } : { withVotes?: string } = getQuery(event);
-
-  const topicDoc = await TopicModel.findById(event.context.params?.id);
+  const topicDoc = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not found",
     });
   }
+  
+  const userData = event.context.userData;
 
-  const topic : TopicResponseData = {
+  let voterAllow;
+  let votes : Array<VoteResponseData> = [];
+  let adminVoterAllows : Array<TopicVoterAllowResponseData> | undefined;
+
+  const topicPauseData = await TopicPauseData.find({
+    topicid: topicDoc._id,
+  });
+
+  if(userData) {
+    const [_voterAllow, _votes] = await Promise.all([
+      TopicVoterAllowsModel.findOne({
+        topicid: topicDoc._id,
+        userid: userData._id
+      }),
+      VoteModel.find({ topicid: topicDoc._id, userid: userData._id })
+    ])
+
+    if(_voterAllow) {
+      voterAllow = {
+        userid: userData._id.toString(),
+        topicid: topicDoc._id.toString(),
+        remainVotes: _voterAllow.remainVotes,
+        totalVotes: _voterAllow.totalVotes,
+      }
+    }
+    
+    votes = _votes.map((vote) => {
+      return {
+        _id: `${vote._id}`,
+        userid: `${vote.userid}`,
+        topicid: `${vote.topicid}`,
+        choice: vote.choice,
+        createdAt: dayjs(vote.createdAt).toISOString()
+      }
+    })
+
+    if(userData.roleMode === "admin" || userData.roleMode === "developer") {
+      const voterAllowsDocs = await TopicVoterAllowsModel.find({
+        topicid: topicDoc._id,
+      })
+      
+      adminVoterAllows = voterAllowsDocs.map((ele) => {
+        return ele.userid ? {
+          topicid: topicDoc._id.toString(),
+          userid: ele.userid._id.toString(),
+          totalVotes: ele.totalVotes,
+          remainVotes: ele.remainVotes
+        } : {
+          topicid: topicDoc._id.toString(),
+          userid: `${ele.userid}`,
+          totalVotes: ele.totalVotes,
+          remainVotes: ele.remainVotes
+        }
+      })
+    }
+  }
+  
+  const topic : TopicResponseDataExtended = {
     _id: topicDoc._id.toString(),
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
+    multipleVotes: topicDoc.multipleVotes,
     choices: topicDoc.choices,
     voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
-    pauseDuration: topicDoc.pauseDuration,
     createdAt: dayjs(topicDoc.createdAt).toISOString(),
-    createdByName: topicDoc.createdByName,
     updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
-    updatedByName: topicDoc.updatedByName,
+    createdBy: topicDoc.createdBy && !(topicDoc.createdBy instanceof Types.ObjectId) ? {
+      _id: topicDoc.createdBy._id,
+      firstName: topicDoc.createdBy.firstName,
+      lastName: topicDoc.createdBy.lastName,
+      email: topicDoc.createdBy.email,
+    } : undefined,
+    updatedBy: topicDoc.updatedBy && !(topicDoc.updatedBy instanceof Types.ObjectId) ? {
+      _id: topicDoc.updatedBy._id,
+      firstName: topicDoc.updatedBy.firstName,
+      lastName: topicDoc.updatedBy.lastName,
+      email: topicDoc.updatedBy.email,
+    } : undefined,
     publicVote: topicDoc.publicVote,
-    showVotersScore: topicDoc.showVotersScore,
+    showScores: topicDoc.showScores,
     showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
-    notifyVoter: topicDoc.notifyVoter,
-    voterAllows: topicDoc.voterAllows,
+    recoredToBlockchain: topicDoc.recoredToBlockchain,
+    voterAllow,
+    pauseData: topicPauseData.map((ele) => {
+      return {
+        topicid: topicDoc._id.toString(),
+        pauseAt: dayjs(ele.pauseAt).toISOString(),
+        resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toISOString() : undefined,
+      }
+    })
   };
 
-  let existsVotes : Array<VoteResponseData> | undefined;
-  let remainVotes : number | undefined;
-
-  if(withVotes && !isTopicExpired(topicDoc, await getNtpNow())) {
-    const userData = event.context.userData;
-    if(userData && checkPermissionNeeds(userData.permissions, "vote-topic")) {
-      const voteAllowData = topicDoc.voterAllows.find((ele) => ele.citizenId === userData.digitalIdUserInfo.citizen_id);
-      if(voteAllowData) {
-        const voteDocs = await VoteModel.find({ userid: userData.userid, topicid: topicDoc._id });
-        existsVotes = voteDocs.map((voteDoc) => {
-          return {
-            _id: `${voteDoc._id}`,
-            userid: userData.userid,
-            citizenId: voteDoc.citizenId,
-            topicid: `${topic._id}`,
-            choice: voteDoc.choice,
-            createdAt: dayjs(voteDoc.createdAt).toString()
-          }
-        });
-        remainVotes = voteAllowData?.remainVotes || 0;
-      }
-    }
-  }
-  
   return {
     topic,
-    existsVotes,
-    remainVotes,
-  }
+    votes,
+    adminVoterAllows
+  };
 })

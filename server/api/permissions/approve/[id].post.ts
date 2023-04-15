@@ -1,13 +1,12 @@
 import UserModel from "~~/server/models/user"
-import RequestPermissionsModel from "~~/server/models/reqpermission"
+import RequestPermissionsModel from "~~/server/models/request-permission"
 import NotificationModel from "~~/server/models/notification";
-import { checkPermissionNeeds, checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
-import { getNtpTime } from "~~/server/ntp";
+import { checkPermissionSelections, combinePermissions } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-permissions:basic", "change-permissions:advance")) {
+  if(!userData || !checkPermissionSelections(userData.permissions, "change-others-permissions")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -28,14 +27,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if(isContainsAdvancePermissions(...reqData.permissions) && !checkPermissionNeeds(userData.permissions, "change-permissions:advance")) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
-
-  // assign here
   const userDoc = await UserModel.findOne({ userid: reqData.userid });
   if(!userDoc) {
     reqData.status = "rejected";
@@ -51,34 +42,36 @@ export default defineEventHandler(async (event) => {
     userDoc.permissions = combinePermissions(userData.permissions, ...reqData.permissions);
   }
   
-  const today = await getNtpTime();
+  const today = new Date();
 
   if(status === "approved") {
+    const content = `{{notification.requestPermission.title}} #${reqData.id} {{otification.requestPermission.approved}}`
     await Promise.all([
       userDoc.save(),
       reqData.save(),
       new NotificationModel(
         {
           from: "system",
-          target: [{ citizenId: userData.digitalIdUserInfo.citizen_id }],
-          title: `Request Permission #${reqData.id} approved`,
-          content: `Request Permission #${reqData.id} approved`,
+          target: [{ userid: userData._id }],
+          title: content,
+          content: content,
           notifyAt: today,
           createdAt: today,
           updatedAt: today,
           tags: [`request-${reqData._id}-approved`],
         }
-      ).save()
+      ).save(),
     ]);
   } else {
+    const content = `{{notification.requestPermission.title}} #${reqData.id} {{otification.requestPermission.rejected}}`
     await Promise.all([
       reqData.save(),
       new NotificationModel(
         {
           from: "system",
-          target: [{ citizenId: userData.digitalIdUserInfo.citizen_id }],
-          title: `Request Permission #${reqData.id} rejected`,
-          content: `Request Permission #${reqData.id} rejected`,
+          target: [{ userid: userData._id }],
+          title: content,
+          content: content,
           notifyAt: today,
           createdAt: today,
           updatedAt: today,
@@ -88,7 +81,7 @@ export default defineEventHandler(async (event) => {
     ]);
   }
 
-  if(userData.userid === userDoc.userid) {
+  if(userData._id.toString() === userDoc._id.toString()) {
     userData.permissions = userDoc.permissions;
   }
 

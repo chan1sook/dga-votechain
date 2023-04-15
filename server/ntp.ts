@@ -1,6 +1,6 @@
 
 import { NtpTimeSync } from "ntp-time-sync";
-
+import cron from "node-cron";
 
 function getNtpServerFromPreset(preset = 'demo') {
   switch(preset) {
@@ -16,10 +16,19 @@ function getNtpServerFromPreset(preset = 'demo') {
   }
 }
 
-const SYNC_DELAY = 60 * 60 * 1000;
+function getSyncDelay(preset = 'demo') {
+  switch(preset) {
+    case "nimt":
+    case "demo":
+    default:
+      return 12 * 60 * 60 * 1000;
+  }
+}
+
+const PRESET = "nimt";
 
 const timeSync = NtpTimeSync.getInstance({
-  servers: getNtpServerFromPreset()
+  servers: getNtpServerFromPreset(PRESET)
 });
 
 class NtpTime {
@@ -32,26 +41,27 @@ class NtpTime {
     this.lastSyncNtpTime = undefined;
   }
 
-  #localDiff() {
-    return this.lastSyncLocalTime ? (Date.now() - this.lastSyncLocalTime.getTime()) : 0;
+  localDiff() {
+    return Date.now() - this.lastSyncLocalTime.getTime();
   }
 
-  async getNtpTime() {
-    // console.log(this.lastSyncNtpTime,this.lastSyncLocalTime);
-    
-    if(!this.lastSyncNtpTime || this.#localDiff() >= SYNC_DELAY) {
-      console.log("Need sync time");
-      this.lastSyncNtpTime = await timeSync.now();
-      this.lastSyncLocalTime = new Date();
-    } else {
-      console.log("Mixed Ntp and Local time", this.#localDiff());
+  async syncTime() {
+    console.log("Sync time");
+    this.lastSyncNtpTime = await timeSync.now();
+    this.lastSyncLocalTime = new Date();
+    console.log("New time", this.lastSyncNtpTime);
+  }
+
+  getNtpTime() {
+    if(!this.lastSyncNtpTime) {
+      return new Date(this.lastSyncLocalTime.getTime() + this.localDiff());
     }
   
-    return new Date(this.lastSyncNtpTime.getTime() + this.#localDiff());
+    return new Date(this.lastSyncNtpTime.getTime() + this.localDiff());
   }
 
-  async getNtpNow() {
-    return (await this.getNtpTime()).getTime();
+  getNtpNow() {
+    return this.getNtpTime().getTime();
   }
 }
 
@@ -63,3 +73,12 @@ export function getNtpTime() {
 export function getNtpNow() {
   return ntpTime.getNtpNow();
 };
+
+export async function beginNtpTime() {
+  await ntpTime.syncTime();
+  cron.schedule("* * * * *", async () => {
+    if(ntpTime.localDiff() >= getSyncDelay(PRESET)) {
+      await ntpTime.syncTime();
+    }
+  })
+}

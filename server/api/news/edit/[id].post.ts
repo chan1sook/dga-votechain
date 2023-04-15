@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
     });
   }
   newsData.updatedBy = userData.userid;
-  newsData.updatedAt = await getNtpTime();
+  newsData.updatedAt = getNtpTime();
 
   if(topicFormData.visibility !== undefined) {
     newsData.visibility = topicFormData.visibility;

@@ -16,7 +16,7 @@
 
 @layer components {
   .dga-container {
-    @apply p-8 min-h-[calc(100vh-5rem)]
+    @apply p-8
   }
 
   .dga-evote-input {
