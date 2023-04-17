@@ -8,4 +8,4 @@ node_modules
 dist
 .DS_Store
 .output.zip
-assets/DGA_Artwork
+etc/

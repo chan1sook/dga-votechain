@@ -57,7 +57,7 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
-    vueI18n: {
+    config: {
       fallbackLocale: 'th',
       datetimeFormats: {
         th: {

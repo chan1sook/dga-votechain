@@ -124,7 +124,7 @@ export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
 }
 
 export function isTopicExpired(topic: TopicResponseDataExtended, now = Date.now()) {
-  return now >= dayjs(topic.voteExpiredAt).valueOf() && topic.pauseData.some((ele) => !ele.resumeAt);
+  return now >= dayjs(topic.voteExpiredAt).valueOf() && (topic.pauseData.length === 0 || topic.pauseData.some((ele) => !ele.resumeAt));
 }
 
 export function isTopicReadyToVote(topic: TopicData | TopicResponseData, now = Date.now()) {

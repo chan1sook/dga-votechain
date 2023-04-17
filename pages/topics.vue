@@ -136,7 +136,7 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
     return "waiting";
   } else if(!useSessionData().value.userid) {
       return "voting";
-  } else if(!isAdminMode) {
+  } else if( !isAdminMode) {
     if(topic.voterAllow) {
       return topic.voterAllow.remainVotes > 0 ? "access" : "voted"
     } else {
