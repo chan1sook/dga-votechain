@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-4 items-center">
       <MaterialIcon icon="hourglass_top" class="!text-4xl animate-spin"></MaterialIcon>
       <div>
-        {{ $t('loading') }}...
+        {{ $t('loading', "Loading") }}...
       </div>
     </div>
   </DgaModal>

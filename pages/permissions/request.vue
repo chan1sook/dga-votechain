@@ -55,7 +55,7 @@ function getFullPermissionTitle(permission: EVotePermission) {
   return i18n.t(`permissions.${permission}`, permission);
 }
 
-const presetOptions  = ref(["moderator", "developer"].map((value) => {
+const presetOptions  = computed(() => ["moderator", "developer"].map((value) => {
   return {
     label: i18n.t(`requestPermissions.add.requestTo.${value}`),
     value: value

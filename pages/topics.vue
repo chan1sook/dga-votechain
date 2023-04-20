@@ -3,8 +3,8 @@
     <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-4 mx-auto max-w-6xl">
       <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="w-56"></DgaSelect>
       <template v-if="filter.type === 'date'">
-        <DgaSelect v-model="filter.year" :options="yearOptions" class="w-24"></DgaSelect>
-        <DgaSelect v-model="filter.month" :options="monthOptions" class="w-24"></DgaSelect>
+        <DgaSelect v-model="filter.year" :options="yearOptions" class="w-32"></DgaSelect>
+        <DgaSelect v-model="filter.month" :options="monthOptions" class="w-32"></DgaSelect>
       </template>
       <template v-else-if="filter.type === 'ticketId'">
         <DgaInput v-model="filter.ticketId" :placeholder="$t('voting.filters.ticketIdPlaceholder')" class="w-56"></DgaInput>
@@ -73,7 +73,7 @@ const filter = ref({
   keyword: "",
 });
 
-const topicFilterOptions = ref(
+const topicFilterOptions = computed(() => 
   ["all", "date", "ticketId", "topicName"].map((value) => {
     return {
       label: i18n.t(`voting.filters.${value}`),

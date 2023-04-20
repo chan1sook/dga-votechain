@@ -1,16 +1,17 @@
 <template>
-  <div>
+  <div v-if="langLoaded">
     <DgaContainer>
       <slot></slot>
     </DgaContainer>
     <DgaToastController></DgaToastController>
   </div>
+  <DgaLoadingModal :show="!langLoaded"></DgaLoadingModal>
 </template>
 
 <script setup lang="ts">
 import DgaToastController from '~~/components/DgaToastController.vue';
 const i18n = useI18n();
-
+const langLoaded = ref(false);
 useSocketIO();
 
 useHead({
@@ -32,9 +33,13 @@ useHead({
   ],
 });
 
-onMounted(() => {
+onMounted(async () => {
   document.body.addEventListener("click", () => {
     useVisibleMenuGroup().value = undefined;
   })
+
+  await i18n.waitForPendingLocaleChange();
+  console.log("Langauge Loaded");
+  langLoaded.value = true;
 })
 </script>

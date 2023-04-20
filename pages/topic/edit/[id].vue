@@ -211,11 +211,11 @@ const durationMode = ref("startDuration");
 const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
-const votePublicOptions = ref([
+const votePublicOptions = computed(() => [
   { label: i18n.t('topic.publicVoteAccess'), value: true },
   { label: i18n.t('topic.publicVoteAccess'), value: false }
 ]);
-const durationModeOptions = ref(["startDuration", "startEnd"].map((mode) => {
+const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mode) => {
   return {
     label: i18n.t(`topic.voteDuration.mode.${mode}`),
     value: mode
