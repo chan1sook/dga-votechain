@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Mitr:wght@400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Mitr", system-ui, sans-serif;
+  }
+
+  body {
+    @apply text-dga-blue;
+  }
+}
+
+@layer components {
+  .dga-container {
+    @apply p-8
+  }
+
+  .dga-evote-input {
+    @apply transition duration-200 border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75;
+  }
+}
