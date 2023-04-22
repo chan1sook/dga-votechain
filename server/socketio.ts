@@ -16,7 +16,7 @@ import { getEventEmitter } from "./global-emitter";
 import mongoose from "mongoose";
 
 export default async () => {
-  const { SOCKETIO_ORIGIN_URL } = useRuntimeConfig();
+  const { SOCKETIO_ORIGIN_URL, REDIS_URI } = useRuntimeConfig();
   
   const io = new Server({
     cors: {
@@ -139,7 +139,7 @@ export default async () => {
     })
   });
 
-  const pubClient = createClient({ url: "redis://localhost:6379" });
+  const pubClient = createClient({ url: REDIS_URI });
   const subClient = pubClient.duplicate();
 
   await Promise.all([pubClient.connect(), subClient.connect()]).then(() => {

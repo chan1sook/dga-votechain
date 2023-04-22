@@ -96,23 +96,18 @@ async function migrateToNewUserFormat() {
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log("[Config] View Config");
-  const { MONGODB_URI, DB_NAME, DID_LOGIN_CALLBACK, PREDEFINED_DEV_USERS, public: { DID_API_URL, SOCKETIO_URL } } = useRuntimeConfig();
-
-  console.log(`MONGODB_URI: ${MONGODB_URI}`);
-  console.log(`DB_NAME: ${DB_NAME}`);
-  console.log(`DID_API_URL: ${DID_API_URL}`);
-  console.log(`DID_LOGIN_CALLBACK: ${DID_LOGIN_CALLBACK}`);
-  console.log(`SOCKETIO_URL: ${SOCKETIO_URL}`);
+  const runtimeConfig = useRuntimeConfig();
+  console.log(runtimeConfig);
 
   console.log("[MongoDB] Init");
   
   await io();
   
-  await mongoose.connect(`${MONGODB_URI}`, {
-    dbName: DB_NAME,
+  await mongoose.connect(`${runtimeConfig.MONGODB_URI}`, {
+    dbName: runtimeConfig.DB_NAME,
   });
   console.log('[MongoDB] Connected!');
 
-  await setPredefinedDevs(PREDEFINED_DEV_USERS);
+  await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
   await migrateToNewUserFormat();
 });

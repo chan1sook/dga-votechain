@@ -11,4 +11,3 @@ dist
 .output.zip
 etc/
 .config/
-nuxt.config.ts
