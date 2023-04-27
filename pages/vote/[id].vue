@@ -62,7 +62,7 @@
         </template>
       </div>
       <div class="w-48 bg-dga-orange text-white rounded-lg flex flex-col text-center gap-2 px-8 py-4">
-          <template v-if="canVote">
+        <template v-if="canVote">
           <div>{{ $t("voting.remainVotes") }}:</div>
           <div class="text-xl">{{ noVoteLocked ? 0 : remainVotes || 0 }} {{ $t("voting.vote", { count: remainVotes || 0 }) }}</div>
         </template>
@@ -165,7 +165,7 @@ const waitVote = ref(false);
 const remainVotes = ref(0);
 const totalVotes = ref(0);
 const canVote = computed(() => {
-  return topic.value && topic.value.voterAllow  && topic.value.voterAllow.remainVotes > 0;
+  return topic.value && topic.value.voterAllow && topic.value.voterAllow.remainVotes > 0;
 });
 const remainTime = ref(0);
 const pauseTime = ref(0);
@@ -218,7 +218,7 @@ if (!data.value) {
   const { topic: _topic, votes, adminVoterAllows: _adminVoterAllows } = data.value;
   topic.value = _topic;
   voted.value = votes;
-  totalVotes.value = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
+  totalVotes.value = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
   remainVotes.value = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
   if(_adminVoterAllows) {
     adminVoterAllows.value = _adminVoterAllows;
@@ -247,7 +247,7 @@ function clearVotes() {
   if(!canVote.value) { return; }
   noVoteLocked.value = false;
   currentVotes.value = [];
-  remainVotes.value = totalVotes.value - adminVoterAllows.value.length;
+  remainVotes.value = totalVotes.value;
 }
 
 function lockVotes() {
@@ -271,9 +271,11 @@ async function submitVotes() {
     method: "POST",
     body: voteFormData
   });
-
-  remainVotes.value -= currentVotes.value.length;
+  
+  remainVotes.value -= votes.length;
+  totalVotes.value -= votes.length;
   clearVotes();
+
   if(remainVotes.value === 0) {
     navigateTo(localePathOf("/topics"))
   } else {
@@ -350,7 +352,9 @@ socket.on("voted", (votes: Array<VoteResponseData>) => {
         continue;
       }
 
-      voted.value.push(vote);
+      if(vote.userid === useSessionData().value.userid) {
+        voted.value.push(vote);
+      }
       
       if(topic.value.voterAllow && vote.userid === topic.value.voterAllow.userid) {
         topic.value.voterAllow.remainVotes -= 1;

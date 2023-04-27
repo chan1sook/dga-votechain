@@ -126,9 +126,7 @@
                 {{ voter.email || "-" }}
               </td>
               <td v-if="topicData.multipleVotes">
-                <DgaInput 
-                  v-model.number="voter.totalVotes" type="number" class="w-full !border-l-0 !rounded-l-none" :placeholder="$t('topic.voterList.totalVotes')"
-                ></DgaInput>
+                <DgaInput v-model.number="voter.totalVotes" type="number" class="w-full" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
               </td>
               <td>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
@@ -213,7 +211,7 @@ const waitEdit = ref(false);
 
 const votePublicOptions = computed(() => [
   { label: i18n.t('topic.publicVoteAccess'), value: true },
-  { label: i18n.t('topic.publicVoteAccess'), value: false }
+  { label: i18n.t('topic.privateVoteAccess'), value: false }
 ]);
 const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mode) => {
   return {
@@ -238,7 +236,7 @@ const voteDuration = ref({
   durationHours: dayjs(expiredDate).diff(startDate, "hours") % 24,
   durationMinutes: dayjs(expiredDate).diff(startDate, "minutes") % 60,
 });
-const startExpiredDateStr = computed(() => dayjs(voteStart.value.dateStr, "YYYY-MM-DD").add(1, "day").format("YYYY-MM-DD"));
+const startExpiredDateStr = computed(() => dayjs(voteStart.value.dateStr, "YYYY-MM-DD").format("YYYY-MM-DD"));
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -367,7 +365,7 @@ async function editTopic() {
 
   topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
     
-  if(durationMode.value === "duration") {
+  if(durationMode.value === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
       .add(voteDuration.value.durationDays, "days")
       .add(voteDuration.value.durationHours, "hours")
