@@ -197,7 +197,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('topic.create.title')}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('topic.create.title')}`
 });
 
 const showDescription = ref(false);

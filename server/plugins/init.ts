@@ -3,6 +3,7 @@ import EVoteUserModel from "~~/server/models/user"
 import OldUserModel from "~~/server/models/old-user"
 import { combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
 import io from "~~/server/socketio"
+import hyperledgerTest from '../hyperledger-rpc';
 
 let migrationSeq = 0;
 
@@ -98,6 +99,9 @@ export default defineNitroPlugin(async (nitroApp) => {
   console.log("[Config] View Config");
   const runtimeConfig = useRuntimeConfig();
   console.log(runtimeConfig);
+
+  console.log("[Hyperledger] Test");
+  await hyperledgerTest();
 
   console.log("[MongoDB] Init");
   

@@ -66,7 +66,7 @@ const i18n = useI18n();
 const localePathOf = useLocalePath();
 
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('news.create.title')}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('news.create.title')}`
 });
 
 const showConfirmModal = ref(false);

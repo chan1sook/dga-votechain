@@ -25,7 +25,7 @@
 const i18n = useI18n()
 
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('error.title')}`,
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('error.title')}`,
   link: [
     {
       rel: "stylesheet",

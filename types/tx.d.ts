@@ -6,28 +6,23 @@ declare global {
     keyword?: string,
   }
 
-  type TxResponseData = Omit<VoteData, "_id" | "userid" | "topicid" | "createdAt"> & {
-    _id: string,
-    userid: string,
-    topicid: string,
-    createdAt: DateString,
+  interface VoteDataBlockchainRespose {
+    Choice: string,
+    TopicID: string,
+    UserID: string,
+    VoteID: string,
+    BookmarkID?: string,
   }
 
-  type TxResponseDataWithPopulated = Omit<TxResponseData, "userid" | "topicid"> & {
-    userid: {
-      _id: string,
-      firstName?: string,
-      lastName?: string,
-      email?: string
-    },
-    topicid: {
-      _id: string,
-      name: string,
-      voteStartAt: DateString,
-      voteExpiredAt: DateString,
-    },
+  type TxResponseData = {
+    TopicID: string,
+    UserID: string,
+    VoteID: string,
+    Choice: string | null,
+    CreatedAt: DateString,
+    BookmarkID?: string,
+    Mined: boolean,
   }
-
   interface TxInfoResponseData {
     server: {
       online: number,

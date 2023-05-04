@@ -211,6 +211,9 @@ export default {
     stats: "Stats",
     noVoted: "No Voted",
     total: "Total",
+    notIncludeNoVote: "Not include No Vote",
+    winner: "Winner",
+    yourChoice: "Your Choice",
     voteLogs: "Vote Logs"
   },
   news: {
@@ -308,7 +311,12 @@ export default {
     txid: "TX ID",
     txInfo: "Tx Info",
     liveTxUpdate: "Live TX Update",
-    type: "Type",
+    type: {
+      title: "Type",
+      vote: "Vote",
+      result: "Vote Result"
+    },
+    createdAt: "Created At",
     status: "Status",
     blockdata: "Block Data"
   },
@@ -326,5 +334,10 @@ export default {
     title: "Error",
     backToHome: "Back to Home"
   },
-  loading: "Loading"
+  loading: "Loading",
+  cookieConsent: {
+    useCookie: "This website use cookies",
+    acceptAll: "Accept All",
+    acceptRequiredOnly: "Accept Required-Only",
+  }
 }

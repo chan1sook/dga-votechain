@@ -48,7 +48,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('requestPermissions.add.title')}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('requestPermissions.add.title')}`
 });
 
 function getFullPermissionTitle(permission: EVotePermission) {

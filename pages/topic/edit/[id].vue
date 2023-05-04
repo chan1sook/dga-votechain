@@ -198,7 +198,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('topic.edit.title')}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('topic.edit.title')}`
 });
 
 const { id: topicid } = useRoute().params;
@@ -283,6 +283,7 @@ if (!data.value) {
   topicData.value.showScores = topic.showScores;
   topicData.value.recoredToBlockchain = topic.recoredToBlockchain;
   topicData.value.notifyVoter = topic.notifyVoter === true;
+  topicData.value.multipleVotes = topic.multipleVotes;
   voterAllowsWithHint.value = voterAllows;
     
   voteStart.value.dateStr = dayjs(startDate).format("YYYY-MM-DD");

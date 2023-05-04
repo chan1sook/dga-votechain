@@ -6,10 +6,10 @@
       <div class="content"><slot></slot></div>
       <div class="status">
         <button v-if="props.mined" class="mined" @click="emit('detail')">
-          Mined
+          {{ $t('blockchain.blockInfo.mined') }}
         </button>
-        <button v-else class="pending">
-          Pending
+        <button v-else class="pending" @click="emit('detail')">
+          {{ $t('blockchain.blockInfo.pending') }}
         </button>
       </div>
     </div>
@@ -29,7 +29,7 @@ const emit = defineEmits<{
 
 <style scoped>
 .dga-tx-demo-card {
-  @apply rounded-lg shadow-lg bg-red-800 pl-6
+  @apply rounded-lg shadow-lg bg-red-800 pl-6 overflow-hidden
 }
 .dga-tx-demo-card.mined {
   @apply bg-green-700
@@ -37,7 +37,7 @@ const emit = defineEmits<{
 
 .dga-tx-demo-card > .inner {
   @apply rounded-lg bg-white grid items-center px-4 py-4;
-  grid-template-areas: "tx content status" "type content status";
+  grid-template-areas: "tx tx tx"  "type content status" "type content status";
   grid-template-columns: 150px auto 100px;
 }
 

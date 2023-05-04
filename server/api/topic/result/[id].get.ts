@@ -18,6 +18,7 @@ export default defineEventHandler(async (event) => {
     topicid: topicDoc._id, resumeAt: { $exists: false }
   })
 
+
   if(topicDoc.status !== "approved") {
     throw createError({
       statusCode: 404,
@@ -30,9 +31,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if(!topicDoc.publicVote) {
-    const userData = event.context.userData;
+  const userData = event.context.userData;
     
+  if(!topicDoc.publicVote) {
     if(!userData) {
       throw createError({
         statusCode: 403,
@@ -64,10 +65,20 @@ export default defineEventHandler(async (event) => {
       voteRecords.push({ choice: vote.choice, count: 1 })
     }
   }
-  allVotes.reduce((prev, current) => {
-    return prev;
-  }, voteRecords);
   voteRecords.sort((a, b) => b.count - a.count);
+  
+  let yourVotes: Array<{
+    choice: string | null,
+    createdAt: DateString
+  }> = [];
+  if(userData) {
+    yourVotes = allVotes.filter((ele) => ele.userid.toString() === userData._id.toString()).map((ele) => {
+      return {
+        choice: ele.choice,
+        createdAt: dayjs(ele.createdAt).toString(),
+      }
+    })
+  }
 
   const voteResult : TopicVoteCountResponse = {
     _id: `${topicDoc._id}`,
@@ -79,6 +90,7 @@ export default defineEventHandler(async (event) => {
     createdAt: dayjs(topicDoc.createdAt).toString(),
     updatedAt: dayjs(topicDoc.updatedAt).toString(),
     winners: [],
+    yourVotes: userData ? yourVotes : undefined,
   }
 
   if(topicDoc.showScores) {

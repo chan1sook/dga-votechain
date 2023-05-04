@@ -6,16 +6,22 @@
     <DgaToastController></DgaToastController>
   </div>
   <DgaLoadingModal :show="!langLoaded"></DgaLoadingModal>
+  <DgaCookieConsent v-show="langLoaded && cookieConsentShow"
+    @accept-all="acceptAllCookies"
+    @accept-required="acceptRequiredOnly"
+    @manage="manageCookiesPopup"
+  ></DgaCookieConsent>
 </template>
 
 <script setup lang="ts">
 import DgaToastController from '~~/components/DgaToastController.vue';
 const i18n = useI18n();
 const langLoaded = ref(false);
+const cookieConsentShow = ref(false);
 useSocketIO();
 
 useHead({
-  title: `${i18n.t('appName')}`,
+  title: `${i18n.t('appName', 'Dga E-Voting')}`,
   meta: [
     {name: "msapplication-TileColor", content: "#da532c"},
     {name: "theme-color", content: "#ffffff"}
@@ -41,5 +47,27 @@ onMounted(async () => {
   await i18n.waitForPendingLocaleChange();
   console.log("Langauge Loaded");
   langLoaded.value = true;
+  
+  const ccShow = useCookie("ccShow", { secure: true, sameSite: "lax"});
+  cookieConsentShow.value = !Boolean(ccShow.value);
 })
+
+function acceptAllCookies() {
+  const ccShow = useCookie("ccShow", { secure: true, sameSite: "lax"});
+  ccShow.value = "1";
+  // TODO all cookies
+  cookieConsentShow.value = false;
+}
+
+function acceptRequiredOnly() {
+  const ccShow = useCookie("ccShow", { secure: true, sameSite: "lax"});
+  ccShow.value = "1";
+  // TODO required cookies
+  cookieConsentShow.value = false;
+}
+
+function manageCookiesPopup() {
+
+}
+
 </script>

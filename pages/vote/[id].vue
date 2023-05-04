@@ -68,7 +68,7 @@
         </template>
         <template v-else>
           <div>{{ $t("voting.totalVotes") }}:</div>
-          <div class="text-xl">{{ adminVoterAllows.length || 0 }}  {{ $t("voting.vote", { count: adminVoterAllows.length  }) }}</div>
+          <div class="text-xl">{{ totalVotes || 0 }}  {{ $t("voting.vote", { count: totalVotes  }) }}</div>
         </template>
       </div>
     </div>
@@ -103,12 +103,12 @@
           <div class="flex-1 truncate text-left">{{ choice.name }}</div>
           <div class="relative w-12">
             <template v-if="canVote">
-              <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && totalVotes > 1">
+              <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && topic.multipleVotes">
                 x{{ voteCount(choice.name) }}
               </div>
             </template>
             <template v-else>
-              <div v-if="votedCount(choice.name) > 0 && totalVotes > 1">
+              <div v-if="votedCount(choice.name) > 0 && topic.multipleVotes">
                 x{{ votedCount(choice.name) }}
               </div>
             </template>
@@ -155,7 +155,7 @@ const { id } = useRoute().params;
 const topicid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('voting.title')} #${topicid}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('voting.title')} #${topicid}`
 });
 
 const topic: Ref<TopicResponseDataExtended | undefined> = ref(undefined);

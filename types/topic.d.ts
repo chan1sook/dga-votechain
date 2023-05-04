@@ -91,5 +91,9 @@ declare global {
       },
       createdAt: DateString
     }>,
+    yourVotes?: Array<{
+      choice: string | null,
+      createdAt: DateString
+    }>
   }
 }

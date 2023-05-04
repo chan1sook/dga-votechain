@@ -1,16 +1,16 @@
-import VoteModel from "~~/server/models/vote"
+import { getTxArr } from "../utils";
 
 export default defineEventHandler(async (event) => {
-  const voteTotal = await VoteModel.countDocuments();
-  const blocks = Math.ceil(voteTotal / 32);
+  const txDocs= await getTxArr(100000, "");
+
   return {
     server: {
-      online: 1,
-      total: 1,
+      online: 3,
+      total: 3,
     },
     blocks: {
-      mined: blocks > 0 ? blocks - 1 : 0,
-      total: blocks,
+      mined: txDocs.filter((ele) => ele.Mined).length,
+      total: txDocs.length,
     }
   }
 })

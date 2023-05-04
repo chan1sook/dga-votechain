@@ -211,6 +211,9 @@ export default {
     },
     winners: "ผู้ชนะ",
     stats: "สถิติ",
+    yourChoice: "คุณเลือก",
+    notIncludeNoVote: "ไม่รวมไม่ประสงค์ลงคะแนน",
+    winner: "ผู้ชนะ",
     noVoted: "ไม่ประสงค์ลงคะแนน",
     total: "รวมทั้งหมด",
     voteLogs: "บันทึกการโหวต"
@@ -310,7 +313,12 @@ export default {
     txid: "TX ID",
     txInfo: "ข้อมูล TX",
     liveTxUpdate: "รายการ TX ล่าสุด",
-    type: "ประเภท",
+    type: {
+      title: "ประเภท",
+      vote: "โหวต",
+      result: "ผลโหวต"
+    },
+    createdAt: "สร้างเมื่อ",
     status: "สถานะ",
     blockdata: "ข้อมูลบล็อก"
   },
@@ -328,5 +336,10 @@ export default {
     title: "ผิดพลาด",
     backToHome: "กลับสู่หน้าหลัก"
   },
-  loading: "รอสักครู่"
+  loading: "รอสักครู่",
+  cookieConsent: {
+    useCookie: "เว็บไซต์นี้ใช้คุกกี้",
+    acceptAll: "รับทั้งหมด",
+    acceptRequiredOnly: "รับเฉพาะที่จำเป็น",
+  }
 }

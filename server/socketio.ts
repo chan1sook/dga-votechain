@@ -24,18 +24,23 @@ export default async () => {
     }
   });
   const eventEmitter = getEventEmitter();
-  eventEmitter.on("voted", async ({ id, votes } : { id: string, votes: Array<VoteResponseData> }) => {
+  eventEmitter.on("voted", async (votes : Array<VoteResponseData>) => {
     io.emit("voted", votes);
     const txChain : Array<TxResponseData> = votes.map((tx) => {
       return {
-        _id: `${tx._id}`,
-        userid: `${tx.userid}`,
-        topicid: `${tx.topicid}`,
-        choice: tx.choice,
-        createdAt: dayjs(tx.createdAt).toString(),
+        VoteID: `${tx._id}`,
+        UserID: `${tx.userid}`,
+        TopicID: `${tx.topicid}`,
+        Choice: tx.choice,
+        CreatedAt: dayjs(tx.createdAt).toString(),
+        Mined: false,
       }
     });
     io.emit("tx", txChain);
+  });
+
+  eventEmitter.on("txmined", async (tx : TxResponseData) => {
+    io.emit("tx", tx);
   });
   
   async function emitServerTime() {

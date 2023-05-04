@@ -7,6 +7,7 @@
       <NuxtLink :href="localePathOf('/about')" class="dga-menu-item">{{ $t("navbar.about") }}</NuxtLink>
       <NuxtLink :href="localePathOf('/help')" class="dga-menu-item">{{ $t("navbar.help") }}</NuxtLink>
       <NuxtLink :href="localePathOf('/contact-us')" class="dga-menu-item">{{ $t("navbar.contactUs") }}</NuxtLink>
+      <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/blockchain/admin')" class="dga-menu-item">Blockchain</NuxtLink>
 
       <div class="ml-auto inline-flex flex-row items-center gap-4">
         <button type="button" class="dga-small-btn" @click="toggleLang">
@@ -38,6 +39,7 @@
       </div>
     </div>
     <div>
+      <div class="dga-footer">Power by Digital Government Development Agency (Public Organization) (DGA) </div>
       <div class="dga-footer-about">
         <img src="~/assets/images/logo_dga.png" class="block h-12" />
         <div class="flex flex-row flex-wrap gap-x-2 gap-y-1 text-sm justify-center">
@@ -54,7 +56,6 @@
           </div>
         </div>
       </div>
-      <div class="dga-footer">Power by Digital Government Development Agency (Public Organization) (DGA) </div>
     </div>
   </div>
 </template>
@@ -119,6 +120,6 @@ const isShowPermissionsApprover = computed(() => {
   @apply transition duration-100 px-4 py-2 cursor-pointer text-sm whitespace-nowrap hover:text-gray-200
 }
 .dga-footer {
-  @apply text-center px-4 py-4 text-sm font-bold truncate
+  @apply bg-gray-50 text-center px-4 py-4 text-sm font-bold truncate
 }
 </style>

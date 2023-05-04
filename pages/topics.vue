@@ -62,7 +62,7 @@ definePageMeta({
 })
 const roleMode = computed(() => useSessionData().value.roleMode);
 useHead({
-  title: `${i18n.t('appName')} - ${i18n.t('voting.title')}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('voting.title')}`
 });
 
 const filter = ref({
@@ -119,7 +119,7 @@ const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value
 function toEditTopicPage(topic: TopicResponseDataExtended) {
   if(isTopicReadyToVote(topic)) {
     useShowToast({
-      title: i18n.t('topic.edit.tile'),
+      title: i18n.t('topic.edit.title'),
       content: i18n.t('topic.error.notEditable') ,
       autoCloseDelay: 5000,
     })

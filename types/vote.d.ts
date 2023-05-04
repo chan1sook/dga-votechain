@@ -14,6 +14,13 @@ declare global {
     getLastestVotesByUserid(userid: DigitalIDUserId, pagesize?: number, startid?: string) : Query<Array<VoteData>, VoteData>;
   }
 
+  type VoteDataBlockchainInput = {
+    _id: Types.ObjectId,
+    userid: Types.ObjectId,
+    topicid: Types.ObjectId,
+    choice: string | null,
+  };
+  
   type VoteUserData = {
     _id: Types.ObjectId,
   } & Pick<UserData, "firstName" | "lastName" | "email">;

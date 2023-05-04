@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
       statusMessage: "Topic not found",
     });
-  } else if(!isTopicReadyToVote(topicDoc)) {
+  } else if(isTopicReadyToVote(topicDoc)) {
     throw createError({
       statusCode: 400,
       statusMessage: "Topic not editable",

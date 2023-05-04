@@ -90,7 +90,7 @@ function getCreatedByName(createdBy?: UserResponseFilterData) {
 
 <style scoped>
 .dga-topic-card {
-  @apply rounded-lg shadow-lg bg-red-800 pl-6
+  @apply rounded-lg shadow-lg bg-red-800 pl-6 overflow-hidden
 }
 .dga-topic-card.public {
   @apply bg-green-700

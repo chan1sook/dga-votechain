@@ -7,6 +7,7 @@ import VoteModel from "~~/server/models/vote"
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 import { getEventEmitter } from "../global-emitter";
 import mongoose from "mongoose";
+import { writeManyVoteDataToBlockchain } from "../hyperledger-rpc";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Can't vote anymore",
     });
   }
-
+  
   if(topicDoc.multipleVotes) {
     if(voteFormData.votes.length > voterAllowData.remainVotes) {
       voteFormData.votes = voteFormData.votes.slice(0, voterAllowData.remainVotes);
@@ -73,12 +74,12 @@ export default defineEventHandler(async (event) => {
     }
   });
 
-  const [docs] = await Promise.all([
+  const [voteDocs] = await Promise.all([
     VoteModel.insertMany(voteDatas),
     voterAllowData.save(),
   ]);
   
-  const votes : Array<VoteResponseData> = docs.map((newVoteDoc) => {
+  const votes : Array<VoteResponseData> = voteDocs.map((newVoteDoc) => {
     return {
       _id: `${newVoteDoc._id}`,
       userid: `${newVoteDoc.userid}`,
@@ -91,12 +92,21 @@ export default defineEventHandler(async (event) => {
   await dbSession.commitTransaction();
   await dbSession.endSession();
 
+  if(topicDoc.recoredToBlockchain) {
+    const votes : Array<VoteDataBlockchainInput> = voteDocs.map((newVoteDoc) => {
+      return {
+        _id: newVoteDoc._id,
+        userid: newVoteDoc.userid,
+        topicid: newVoteDoc.topicid,
+        choice: newVoteDoc.choice,
+      }
+    });
+    writeManyVoteDataToBlockchain(...votes).catch(console.error)
+  }
+
   const eventEmitter = getEventEmitter();
 
-  eventEmitter.emit("voted", {
-    id: topicDoc._id.toString(),
-    votes,
-  });
+  eventEmitter.emit("voted", votes);
   
   return {
     votes,
