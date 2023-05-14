@@ -1,4 +1,3 @@
-import { getUserInfoDigitalID } from "../src/utils/digitalid-protocol";
 import { Storage, prefixStorage } from "unstorage";
 import EVoteUserModel from "~~/server/models/user";
 
@@ -78,7 +77,7 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
           firstName: userData.firstName,
           lastName: userData.lastName,
           email: userData.email,
-          digitalUserIdToken: userSessionData.digitalUserIdToken,
+          authFrom: userSessionData.authFrom,
         };
       }
       return null;

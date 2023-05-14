@@ -11,3 +11,5 @@ dist
 .output.zip
 etc/
 .config/
+blockchain*/
+firebase-admin-config.json

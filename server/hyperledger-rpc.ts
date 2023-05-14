@@ -35,6 +35,10 @@ let firstEvoteResultChoice = "A";
 
 const eventEmitter = getEventEmitter();
 
+function isHyperledgerAvailable() {
+  return process.env.NODE_ENV !== 'production';
+}
+
 async function newGrpcConnection() {
   const tlsRootCert = await fs.readFile(tlsCertPath);
   const tlsCredentials = grpc.credentials.createSsl(tlsRootCert);
@@ -86,6 +90,10 @@ function getContract(gateway: Gateway, name: string) {
 }
 
 export const writeVoteDataToBlockchain = async function (voteData : VoteDataBlockchainInput) {
+  if(!isHyperledgerAvailable()) {
+    throw new Error("Hyperleader N/A");
+  }
+
   const gateway = await waitConnection();
   const contract = getContract(gateway, "EvoteVote");
 
@@ -105,12 +113,20 @@ export const writeVoteDataToBlockchain = async function (voteData : VoteDataBloc
 }
 
 export const writeManyVoteDataToBlockchain = async function (...votesData : Array<VoteDataBlockchainInput>) {
+  if(!isHyperledgerAvailable()) {
+    throw new Error("Hyperleader N/A");
+  }
+
   for(const voteData of votesData) {
     await writeVoteDataToBlockchain(voteData);
   }
 }
 
 export const queryVoteDatasFromBlockchain = async function (pagesize: number, startid: string | undefined) : Promise<Array<VoteDataBlockchainRespose>> {
+  if(!isHyperledgerAvailable()) {
+    throw new Error("Hyperleader N/A");
+  }
+
   const gateway = await waitConnection();
   const contract = getContract(gateway, "EvoteVote");
 
@@ -124,6 +140,10 @@ export const queryVoteDatasFromBlockchain = async function (pagesize: number, st
 }
 
 export const queryVoteDatasByIdFromBlockchain = async function (voteid: string) : Promise<VoteDataBlockchainRespose> {
+  if(!isHyperledgerAvailable()) {
+    throw new Error("Hyperleader N/A");
+  }
+
   const gateway = await waitConnection();
   const contract = getContract(gateway, "EvoteVote");
 
@@ -136,6 +156,10 @@ export const queryVoteDatasByIdFromBlockchain = async function (voteid: string) 
 }
 
 export const queryVoteDatasByTopicIdFromBlockchain = async function (topicid: string, pagesize: number, startid: string | undefined) : Promise<Array<VoteDataBlockchainRespose>> {
+  if(!isHyperledgerAvailable()) {
+    throw new Error("Hyperleader N/A");
+  }
+
   const gateway = await waitConnection();
   const contract = getContract(gateway, "EvoteVote");
 
@@ -253,24 +277,24 @@ async function readEvoteResults(contract: Contract) {
  * displayInputParameters() will print the global scope parameters used by the main driver routine.
  */
 function displayInputParameters() {
-    console.log(`channelName:       ${channelName}`);
-    console.log(`chaincodeName:     ${chaincodeName}`);
-    console.log(`mspId:             ${mspId}`);
-    console.log(`cryptoPath:        ${cryptoPath}`);
-    console.log(`keyDirectoryPath:  ${keyDirectoryPath}`);
-    console.log(`certPath:          ${certPath}`);
-    console.log(`tlsCertPath:       ${tlsCertPath}`);
-    console.log(`peerEndpoint:      ${peerEndpoint}`);
-    console.log(`peerHostAlias:     ${peerHostAlias}`);
+  console.log(`channelName:       ${channelName}`);
+  console.log(`chaincodeName:     ${chaincodeName}`);
+  console.log(`mspId:             ${mspId}`);
+  console.log(`cryptoPath:        ${cryptoPath}`);
+  console.log(`keyDirectoryPath:  ${keyDirectoryPath}`);
+  console.log(`certPath:          ${certPath}`);
+  console.log(`tlsCertPath:       ${tlsCertPath}`);
+  console.log(`peerEndpoint:      ${peerEndpoint}`);
+  console.log(`peerHostAlias:     ${peerHostAlias}`);
 }
 
 export default async function hyperleaderTest() {
-  if(process.env.NODE_ENV !== 'production') {
+  displayInputParameters();
+
+  if(!isHyperledgerAvailable()) {
     console.warn("Hyperleader N/A");
     return;
   }
-
-  displayInputParameters();
 
   try {
     const gateway = await waitConnection();

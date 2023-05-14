@@ -186,7 +186,7 @@
 
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { getComputedServerTime as serverTime } from "~~/src/utils/datetime";
+import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime";
 import { getPresetChoices, isTopicFormValid, voterCounts, choiceCounts, isTopicReadyToVote } from "~~/src/utils/topic";
 import { getVoterName } from "~~/src/utils/utils";
 
@@ -266,7 +266,7 @@ watch(voterAllowsWithHint, (value) => {
 const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 if (!data.value) {
   showError(i18n.t('topic.error.notFound'));
-} else if(isTopicReadyToVote(data.value.topic)) {
+} else if(isTopicReadyToVote(data.value.topic, getComputedServerTime().getTime())) {
   showError(i18n.t('topic.error.notEditable'));
 } else {
   const { topic, voterAllows } = data.value;

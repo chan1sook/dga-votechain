@@ -4,8 +4,9 @@ declare global {
   type UserRole = "guest" | "voter" | "admin" | "developer";
 
   interface UserAuthSource {
-    authSource: "digitalId",
+    authSource: "digitalId" | "firebase",
     digitalIdUserId?: DigitalIDUserId,
+    firebaseUid?: string,
   }
   
   interface UserData {
@@ -23,7 +24,9 @@ declare global {
   interface UserSessionSavedData {
     userid: string,
     roleMode: UserRole,
-    digitalUserIdToken?: string,
+    authFrom: UserAuthSource & {
+      digitalUserIdToken?: string,
+    },
   }
 
   type UserSessionData = Omit<UserData, "authSources"> & { _id: Types.ObjectId } & Omit<UserSessionSavedData, "userid">;

@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
     userid: userData._id.toString(),
     roleMode: newMode,
-    digitalUserIdToken: userData.digitalUserIdToken,
+    authFrom: userData.authFrom,
   });
 
   return { resopse: "OK", newMode };

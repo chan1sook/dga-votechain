@@ -14,6 +14,9 @@ const schema = new Schema<UserData>({
     digitalIdUserId: {
       type: String
     },
+    firebaseUid:  {
+      type: String
+    },
   })],
   firstName: {
     type: String,
