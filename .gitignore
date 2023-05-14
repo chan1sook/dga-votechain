@@ -12,4 +12,4 @@ dist
 etc/
 .config/
 blockchain*/
-logisensesdns-firebase-adminsdk-j54e3-afd409c9ac.json
+firebase-admin-config.json
