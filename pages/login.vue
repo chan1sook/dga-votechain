@@ -4,7 +4,7 @@
       {{  $t("login.title") }}
     </h2>
     <DgaButtonGroup larger class="mt-6">
-      <a href="/api/login?source=dga">
+      <a href="/api/login?source=digitalId">
         <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('login.loginDigitalId')"
         >
@@ -14,6 +14,18 @@
           </span>
         </DgaButton>
       </a>
+    </DgaButtonGroup>
+    <DgaButtonGroup larger class="mt-2">
+      <div>
+        <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
+          :title="$t('login.loginWithGoogle')" @click="loginWithGoogle"
+        >
+          <MaterialIcon icon="fingerprint"/>
+          <span class="truncate">
+            {{ $t("login.loginWithGoogle") }}
+          </span>
+        </DgaButton>
+      </div>
     </DgaButtonGroup>
     <DgaButtonGroup larger class="mt-2">
       <NuxtLink :to="registerDigitalIdUrl">
@@ -31,15 +43,28 @@
 </template>
 
 <script setup lang="ts">
+import { GoogleAuthProvider, useDeviceLanguage, signInWithPopup } from 'firebase/auth'
+
 const i18n = useI18n();
 
 definePageMeta({
   middleware: ["auth-guest"]
 })
 useHead({
-  title: `${i18n.t('login.appName')} - ${i18n.t('login.title')}`
+  title: `${i18n.t('appName')} - ${i18n.t('login.title')}`
 });
 
 const { DID_API_URL } = useRuntimeConfig();
 const registerDigitalIdUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
+const nuxtApp = useNuxtApp()
+
+async function loginWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  useDeviceLanguage(nuxtApp.$auth);
+  const user = await signInWithPopup(nuxtApp.$auth, provider);
+  if (user) {
+    const token = await user.user.getIdToken();
+    location.href = `/api/login?source=firebase&token=${token}`
+  }
+}
 </script>

@@ -2,8 +2,9 @@ import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~~/src/utils/d
 
 import EVoteUserModel from "~~/server/models/user"
 
-import { checkPermissionNeeds, checkPermissionSelections, legacyRoleToPermissions } from "~~/src/utils/permissions";
+import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
 import { USER_SESSION_KEY } from "~~/server/session-handler";
+import { getUserByAuthSource, getUserByCitizenId } from "~~/server/utils";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
@@ -13,32 +14,37 @@ export default defineEventHandler(async (event) => {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE });
 
     const digitalIdUserInfo = await getUserInfoDigitalID(access_token, { DID_API_URL });
-    
-    let userDoc = await EVoteUserModel.findOne()
-      .where("authSources").elemMatch({
-        authSource: "digitalId",
-        digitalIdUserId: digitalIdUserInfo.user_id
-      });
-
-    if(userDoc && checkPermissionSelections(userDoc.permissions, "banned")) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden: Banned"
-      })
-    }
+    const authSource : UserAuthSource = {
+      authSource: "digitalId",
+      digitalIdUserId: digitalIdUserInfo.user_id
+    };
+    let userDoc = await getUserByAuthSource(authSource);
 
     if(userDoc) {
       userDoc.firstName = digitalIdUserInfo.given_name;
       userDoc.lastName = digitalIdUserInfo.family_name;
       userDoc.email = digitalIdUserInfo.email;
       userDoc.citizenId = digitalIdUserInfo.citizen_id;
+      await userDoc.save();
     } else {
-      userDoc = new EVoteUserModel({
-        permissions: legacyRoleToPermissions("voter"),
-        authSources: [
-          { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
-        ]
-      });
+      userDoc = await getUserByCitizenId(digitalIdUserInfo.citizen_id);
+      if(!userDoc) {
+        userDoc = new EVoteUserModel({
+          permissions: legacyRoleToPermissions("voter"),
+          authSources: [
+            { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
+          ],
+          firstName: digitalIdUserInfo.given_name,
+          lastName: digitalIdUserInfo.family_name,
+          email: digitalIdUserInfo.email,
+          citizenId: digitalIdUserInfo.citizen_id,
+        });
+        await userDoc.save();
+      } else {
+        userDoc.authSources.push({ authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id });
+        userDoc.markModified("authSources");
+        await userDoc.save();
+      }
     }
 
     let defaultRoleMode : UserRole = "voter";
@@ -46,11 +52,13 @@ export default defineEventHandler(async (event) => {
       defaultRoleMode = "admin";
     }
 
-    await userDoc.save();
     await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
       userid: userDoc._id.toString(),
       roleMode: defaultRoleMode,
-      digitalUserIdToken: id_token,
+      authFrom: {
+        ...authSource,
+        digitalUserIdToken: id_token,
+      },
     });
 
     return sendRedirect(event, "/topics");

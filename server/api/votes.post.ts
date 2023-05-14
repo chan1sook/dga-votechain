@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 
 import TopicModel from "~~/server/models/topic"
 import TopicVoterAllowModel from "~~/server/models/topic-voters-allow"
+import TopicPauseModel from "~~/server/models/topic-pause"
 import VoteModel from "~~/server/models/vote"
 
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
@@ -41,6 +42,18 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
+    });
+  }
+
+  const votePauseData = await TopicPauseModel.findOne({
+    topicid: topicDoc._id,
+    resumeAt: { $exists: false }
+  });
+
+  if(votePauseData) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Voting Pause",
     });
   }
 

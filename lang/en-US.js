@@ -63,7 +63,19 @@ export default {
   login: {
     title: "Login",
     loginDigitalId: "Login with DigitalID",
+    loginWithGoogle: "Login with Google",
     registerDigitalId: "Register",
+  },
+  register: {
+    firebase: {
+      title: "Register with google account",
+      token: "Token"
+    },
+    citizenid: "Citizen ID",
+    action: "Register",
+    confirm: "Confirm your data?",
+    success: "Register Successful",
+    failed: "Register Failed",
   },
   role: {
     guest: "Guest",
@@ -109,6 +121,7 @@ export default {
     },
     back: "Back",
     now: "Now",
+    localtime: "Local Time",
     remainVotes: "Remain",
     totalVotes: "Total",
     vote: "Vote | Votes",
@@ -298,7 +311,7 @@ export default {
     blockInfo: {
       title: "Block Info",
       total: "Total",
-      mined: "Mined",
+      mined: "Confirmed",
       pending: "Pending",
     },
     serverStatus: {
@@ -318,6 +331,7 @@ export default {
     },
     createdAt: "Created At",
     status: "Status",
+    detail: "Detail",
     blockdata: "Block Data"
   },
   timePeriod: {

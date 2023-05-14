@@ -51,7 +51,11 @@
             <DgaTxCard v-for="ele of txData" :mined="ele.Mined" @detail="toTxPage(ele.VoteID.toString())">
               <template #txid>TX: #{{ ele.VoteID }}</template>
               <template #type>{{ $t('blockchain.type.vote') }}</template>
-              {{ ele.TopicID }} : {{ ele.UserID }} => {{ ele.Choice }} 
+              <span>
+                {{ ele.TopicID }} : {{ ele.UserID }} =>
+                <template v-if="ele.Choice">{{ ele.Choice }}</template> 
+                <i v-else>{{ $t('voting.noVote')}}</i>
+              </span>
             </DgaTxCard>
           </div>
         </div>
@@ -65,7 +69,7 @@ const i18n = useI18n();
 const localePathOf = useLocalePath();
 
 definePageMeta({
-  middleware: ["auth"]
+  middleware: ["auth-dev"]
 })
 useHead({
   title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('blockchain.title')}`

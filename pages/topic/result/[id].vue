@@ -65,22 +65,22 @@
               </div>
             </div>
             <div v-if="getScore(choice.name)">
-              {{ getScore(choice.name)?.count }} {{ $t('voting.vote' , { count: getScore(choice.name)?.count })}}
+              {{ getScore(choice.name)?.count }} {{ $t('voting.vote' , { count: getScore(choice.name).count })}}
             </div>
-            <div v-if="getScore(choice.name)" class="absolute left-0 top-0 bottom-0 bg-dga-blue/25"
+            <div v-if="getScore(choice.name)" class="absolute z-[-1] left-0 top-0 bottom-0 bg-dga-blue opacity-25"
               :style="{ width: getPercentOfOptIn(getScore(choice.name)).toFixed(2) + '%'}"
             ></div>
           </div>
           <div class="relative flex flex-row gap-2 border-2 px-2 py-1 my-1 mt-4 rounded-md border-dga-blue">
             <div class="flex-1 flex flex-row gap-2">
               <div class="flex-1">{{ $t('result.noVoted')}}</div>
-              <div v-if="scores">{{ (noVotesCount * 100 / totalVotes).toFixed(2) }}% |</div>
+              <div v-if="scores">{{ getPercentOf(getScore(null)).toFixed(2) }}% |</div>
             </div>
             <div v-if="scores">
-              {{ totalVotes - noVotesCount }} {{ $t('voting.vote' , { count: totalVotes - noVotesCount  })}}
+              {{ totalVotes - getScore(null).count }} {{ $t('voting.vote' , { count: totalVotes - getScore(null).count })}}
             </div>
-            <div  v-if="scores" class="absolute left-0 top-0 bottom-0 bg-dga-blue/25"
-              :style="{ width: (noVotesCount * 100 / totalVotes).toFixed(2) + '%'}">
+            <div v-if="scores" class="absolute z-[-1] left-0 top-0 bottom-0 bg-dga-blue opacity-25"
+              :style="{ width: (getScore(null).count * 100 / totalVotes).toFixed(2) + '%'}">
             </div>
           </div>
         </div>
@@ -148,7 +148,12 @@ const yourVotes = computed(() => voteResult.value ? voteResult.value.yourVotes :
 const showVotingLog = ref(false);
 
 const novoteResult = computed(() => {
-  return scores.value ? scores.value.find((ele) => !ele.choice) : undefined;
+  if(!scores.value) {
+    return { choice: null, count: 0 };
+  }
+
+  const target = scores.value.find((ele) => !ele.choice);
+  return target || { choice: null, count: 0 };
 })
 
 const noVotesCount = computed(() => {
@@ -172,6 +177,11 @@ function exportResult() {
   print();
 }
 
+function getPercentOf(vote?: TopicVoteCountRecord) {
+  if(totalVotes.value <= 0 || !vote) { return 0 }
+  return vote.count * 100 / totalVotes.value;
+}
+
 function getPercentOfOptIn(vote?: TopicVoteCountRecord) {
   if(totalVotesnotNoVote.value <= 0 || !vote) { return 0 }
   return vote.count * 100 / totalVotesnotNoVote.value;
@@ -179,7 +189,10 @@ function getPercentOfOptIn(vote?: TopicVoteCountRecord) {
 
 function getScore(choice: string | null) {
   if(!scores.value) {
-    return undefined;
+    return {
+      choice,
+      count: 0,
+    };
   }
   
   return scores.value.find((ele) => ele.choice === choice) || {

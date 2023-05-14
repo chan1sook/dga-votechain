@@ -23,7 +23,11 @@
       <div>
         <div v-for="(val, key) of filtertxData(txData)" class="flex flex-row gap-2 items-start">
           <div class="font-bold">{{ key }} :</div>
-          <div class="flex-1">{{ val }}</div>
+          <div v-if="key === 'Choice'" class="flex-1">
+            <template v-if="val">{{ val }}</template> 
+            <i v-else>{{ $t('voting.noVote')}}</i>
+          </div>
+          <div v-else class="flex-1">{{ val }}</div>
         </div>
       </div>
     </div>
@@ -36,7 +40,7 @@ import dayjs from 'dayjs';
 const i18n = useI18n();
 
 definePageMeta({
-  middleware: ["auth"]
+  middleware: ["auth-dev"]
 })
 const { id } = useRoute().params;
 let txid = Array.isArray(id) ? id[id.length - 1] : id;

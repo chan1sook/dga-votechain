@@ -1,5 +1,5 @@
 <template>
-  <input :type="props.type" :value="props.modelValue" :placeholder="props.placeholder" :required="props.required"
+  <input :type="props.type" :value="props.modelValue" :placeholder="props.placeholder" :required="props.required" :disabled="props.disabled"
     class="dga-input" @input="event => emit('update:modelValue', event.target.value)"/>
 </template>
 
@@ -9,6 +9,7 @@
     type?: string,
     placeholder?: string,
     required?: boolean,
+    disabled?: boolean,
   }>(), {
     type: "text",
   });

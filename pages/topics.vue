@@ -27,9 +27,9 @@
     </div>
     <div class="my-4 flex flex-col gap-4 mx-auto max-w-6xl">
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
-        :editable="isAdminMode"
+        :editable="isAdminMode && !isTopicExpired(topic, getComputedServerTime().getTime())"
         :status="getStatusOf(topic)"
-        @edit="toEditTopicPage(topic)"
+        @edit="toEditTopic(topic)"
         @action="handleStatusAction(topic, $event)"
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
@@ -115,9 +115,14 @@ function resetTopics() {
 }
 
 const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
+function isTopicEditable(topic: TopicResponseDataExtended) {
+  return isAdminMode.value && 
+    !isTopicReadyToVote(topic, getComputedServerTime().getTime()) && 
+    !isTopicExpired(topic, getComputedServerTime().getTime());
+}
 
-function toEditTopicPage(topic: TopicResponseDataExtended) {
-  if(isTopicReadyToVote(topic)) {
+function toEditTopic(topic: TopicResponseDataExtended) {
+  if(!isTopicEditable(topic)) {
     useShowToast({
       title: i18n.t('topic.edit.title'),
       content: i18n.t('topic.error.notEditable') ,
@@ -126,7 +131,12 @@ function toEditTopicPage(topic: TopicResponseDataExtended) {
     return;
   }
 
-  navigateTo(localePathOf(`/topic/edit/${topic._id}`));
+
+  if(isTopicReadyToVote(topic, getComputedServerTime().getTime())) {
+    /// TODO vote controller handle
+  } else {
+    navigateTo(localePathOf(`/topic/edit/${topic._id}`));
+  }
 }
 
 function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
@@ -135,7 +145,7 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
   } else if(!isTopicReadyToVote(topic, getComputedServerTime().getTime())) {
     return "waiting";
   } else if(!useSessionData().value.userid) {
-      return "voting";
+    return "voting";
   } else if( !isAdminMode) {
     if(topic.voterAllow) {
       return topic.voterAllow.remainVotes > 0 ? "access" : "voted"

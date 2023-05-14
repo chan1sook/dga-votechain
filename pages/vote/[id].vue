@@ -4,8 +4,9 @@
       <button class="absolute left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
         <MaterialIcon icon="arrow_left" /> {{ $t("voting.back") }}
       </button>
-      <div v-if="!isAdminMode" class="font-bold text-2xl">
-        {{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}
+      <div v-if="!isAdminMode" class="font-bold text-2xl" @click="showLocaltime = !showLocaltime">
+        <div class="flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
+        <div v-if="showLocaltime" class="flex flex-row justify-center items-center gap-2 text-sm">{{ $t("voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
       </div>
     </div>
     <div v-if="isAdminMode" class="flex flex-row gap-2 my-4">
@@ -17,8 +18,9 @@
           {{ $t("voting.remainVotes") }}: {{ totalRemainVotes || 0 }} {{ $t("voting.vote", { count: totalRemainVotes || 0 }) }}
         </div>
       </div>
-      <div class="flex-1 justify-center text-xl bg-dga-blue text-white rounded-lg flex flex-row items-center gap-2 px-8 py-4">
-        {{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}
+      <div class="flex-1 justify-center text-xl bg-dga-blue text-white rounded-lg px-8 py-4 flex flex-col gap-y-1" @click="showLocaltime = !showLocaltime" >
+        <div class="flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
+        <div v-if="showLocaltime" class="flex flex-row justify-center items-center gap-2 text-sm">{{ $t("voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
       </div>
       <div class="w-72 overflow-hidden border-2 border-dga-blue rounded-lg bg-white text-xs flex flex-row items-stretch">
         <div class="flex-1 order-2 flex flex-col gap-1 p-2 whitespace-nowrap justify-center">
@@ -123,7 +125,7 @@
       <DgaButton color="gray" @click="lockVotes">
         {{ $t("voting.noVote") }}
       </DgaButton>
-      <DgaButton :disabled="currentVotes.length === 0 && !noVoteLocked" @click="showConfirmModal = true">
+      <DgaButton :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused" @click="showConfirmModal = true">
         {{ $t("voting.submit") }}
       </DgaButton>
     </div>
@@ -140,7 +142,8 @@
 
 <script setup lang="ts">
 import dayjs from "dayjs";
-import { formatDateTime, getComputedServerTime as serverTime, perttyDuration, isServerTimeSync } from '~~/src/utils/datetime';
+import { formatDateTime, getComputedServerTime as serverTime, perttyDuration, isServerTimeSync, getComputedServerTime } from '~~/src/utils/datetime';
+import { isTopicExpired } from "~~/src/utils/topic";
 
 definePageMeta({
   middleware: ["auth-voter"]
@@ -176,6 +179,8 @@ const isPaused = computed(() => {
   return topic.value.pauseData.some((ele) => !ele.resumeAt);
 });
 const todayTime = ref(Date.now());
+const localTime = ref(Date.now());
+const showLocaltime = ref(false);
 const isSync = ref(false);
 const roleMode = computed(() => useSessionData().value.roleMode);
 const isAdminMode = computed(() => roleMode.value !== 'voter');
@@ -216,12 +221,17 @@ if (!data.value) {
   showError("Topic not found");
 } else {
   const { topic: _topic, votes, adminVoterAllows: _adminVoterAllows } = data.value;
-  topic.value = _topic;
-  voted.value = votes;
-  totalVotes.value = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
-  remainVotes.value = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
-  if(_adminVoterAllows) {
-    adminVoterAllows.value = _adminVoterAllows;
+
+  if(isTopicExpired(_topic, getComputedServerTime().getTime())) {
+    navigateTo(`/topic/result/${_topic._id}`);
+  } else {
+    topic.value = _topic;
+    voted.value = votes;
+    totalVotes.value = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
+    remainVotes.value = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
+    if(_adminVoterAllows) {
+      adminVoterAllows.value = _adminVoterAllows;
+    }
   }
 }
 
@@ -256,7 +266,7 @@ function lockVotes() {
 }
 
 async function submitVotes() {
-  if (!canVote.value) { return; }
+  if (!canVote.value || isPaused.value) { return; }
 
   showConfirmModal.value = false;
   waitVote.value = true;
@@ -276,19 +286,19 @@ async function submitVotes() {
   totalVotes.value -= votes.length;
   clearVotes();
 
-  if(remainVotes.value === 0) {
+  if(remainVotes.value === 0 && roleMode.value === "voter") {
     navigateTo(localePathOf("/topics"))
   } else {
     waitVote.value = false;
   }
 }
 
-const totalVoteDuration = computed(() => {
+const durationDiff = computed(() => {
   if(!topic.value) {
     return 0;
   }
 
-  return dayjs(topic.value.voteExpiredAt).diff(topic.value.voteStartAt);
+  return dayjs(topic.value.voteExpiredAt).diff(getComputedServerTime());
 });
 
 function computeRemainTime() {
@@ -319,12 +329,13 @@ function computePauseTime() {
 
 function updateTime() {
   todayTime.value = serverTime().getTime();
+  localTime.value = Date.now();
   isSync.value = isServerTimeSync(SYNCTIME_THERSOLD);
   
   computeRemainTime();
   computePauseTime();
 
-  if(topic.value && totalVoteDuration.value <= 0) {
+  if(topic.value && !isPaused.value && durationDiff.value <= 0) {
     navigateTo(localePathOf(`/topic/result/${topic.value._id}`));
   }
 }

@@ -5,11 +5,14 @@
       <div class="type"><slot name="type"></slot></div>
       <div class="content"><slot></slot></div>
       <div class="status">
-        <button v-if="props.mined" class="mined" @click="emit('detail')">
+        <button v-if="props.mined" class="mined cursor-default">
           {{ $t('blockchain.blockInfo.mined') }}
         </button>
-        <button v-else class="pending" @click="emit('detail')">
+        <button v-else class="pending cursor-default">
           {{ $t('blockchain.blockInfo.pending') }}
+        </button>
+        <button class="detail" @click="emit('detail')">
+          {{ $t('blockchain.detail') }}
         </button>
       </div>
     </div>

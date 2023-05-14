@@ -64,7 +64,19 @@ export default {
   login: {
     title: "เข้าสู่ระบบ",
     loginDigitalId: "เข้าสู่ระบบด้วย DigitalID",
+    loginWithGoogle: "เข้าสู่ระบบด้วย Google",
     registerDigitalId: "ลงทะเบียน",
+  },
+  register: {
+    firebase: {
+      title: "ลงทะเบียนด้วยบัญชี Google",
+      token: "Token"
+    },
+    citizenid: "รหัสบัตรประชาชน",
+    action: "ลงทะเบียน",
+    confirm: "ยืนยันข้อมูล?",
+    success: "ลงทะเบียนสำเร็จ",
+    failed: "ลงทะเบียนล้มเหลว",
   },
   role: {
     guest: "แขกรับเชิญ",
@@ -110,6 +122,7 @@ export default {
     },
     back: "กลับ",
     now: "ขณะนี้",
+    localtime: "เวลาท้องถิ่น",
     remainVotes: "เหลืออีก",
     totalVotes: "ทั้งหมด",
     vote: "โหวต",
@@ -300,8 +313,8 @@ export default {
     blockInfo: {
       title: "ข้อมูลบล็อก",
       total: "ทั้งหมด",
-      mined: "ขุดแล้ว",
-      pending: "รอขุด",
+      mined: "ยืนยันแล้ว",
+      pending: "รอดำเนินการ",
     },
     serverStatus: {
       title: "ข้อมูล Server",
@@ -320,6 +333,7 @@ export default {
     },
     createdAt: "สร้างเมื่อ",
     status: "สถานะ",
+    detail: "รายละเอียด",
     blockdata: "ข้อมูลบล็อก"
   },
   timePeriod: {
