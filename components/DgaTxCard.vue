@@ -1,5 +1,5 @@
 <template>
-  <div class="dga-tx-demo-card" :class="[props.mined ? 'mined' : '']">
+  <div class="dga-tx-card" :class="[props.mined ? 'mined' : '']">
     <div class="inner">
       <div class="tx"><slot name="txid"></slot></div>
       <div class="type"><slot name="type"></slot></div>
@@ -31,58 +31,65 @@ const emit = defineEmits<{
 </script>
 
 <style scoped>
-.dga-tx-demo-card {
-  @apply rounded-lg shadow-lg bg-red-800 pl-6 overflow-hidden
+.dga-tx-card {
+  @apply rounded-lg shadow-lg bg-red-800 pl-4 md:pl-6 overflow-hidden
 }
-.dga-tx-demo-card.mined {
+.dga-tx-card.mined {
   @apply bg-green-700
 }
 
-.dga-tx-demo-card > .inner {
-  @apply rounded-lg bg-white grid items-center px-4 py-4;
-  grid-template-areas: "tx tx tx"  "type content status" "type content status";
-  grid-template-columns: 150px auto 100px;
+.dga-tx-card > .inner {
+  @apply rounded-lg bg-white grid items-center p-2 md:p-4 gap-2 md:gap-y-0 overflow-auto;
+  grid-template-areas: "tx" "type" "content" "status";
+  grid-template-columns: auto;
 }
 
-.dga-tx-demo-card > .inner > .private {
+@media (min-width: 768px) {
+  .dga-tx-card > .inner {
+    grid-template-areas: "tx tx tx"  "type content status" "type content status";
+    grid-template-columns: 150px auto 120px;
+  }
+}
+
+.dga-tx-card > .inner > .private {
   grid-area: public;
   @apply text-xl text-red-700;
 }
-.dga-tx-demo-card > .inner > .public {
+.dga-tx-card > .inner > .public {
   @apply text-green-700;
 }
 
-.dga-tx-demo-card > .inner > .tx {
+.dga-tx-card > .inner > .tx {
   grid-area: tx;
   @apply text-sm;
 }
-.dga-tx-demo-card > .inner > .type {
+.dga-tx-card > .inner > .type {
   grid-area: type;
   @apply text-lg;
 }
 
-.dga-tx-demo-card > .inner > .content {
+.dga-tx-card > .inner > .content {
   grid-area: content;
   @apply flex flex-row flex-wrap gap-y-2 gap-x-4
 }
-.dga-tx-demo-card > .inner > .content > .name {
+.dga-tx-card > .inner > .content > .name {
   @apply w-full text-xl font-bold
 }
-.dga-tx-demo-card > .inner > .content > .time
+.dga-tx-card > .inner > .content > .time
 {
   @apply flex-none
 }
-.dga-tx-demo-card > .inner > .status {
+.dga-tx-card > .inner > .status {
   grid-area: status;
   @apply flex flex-col gap-2
 }
-.dga-tx-demo-card > .inner > .status > * {
-  @apply rounded-full px-3 py-1 text-center text-sm text-white bg-dga-orange;
+.dga-tx-card > .inner > .status > * {
+  @apply rounded-full w-full max-w-[160px] md:max-w-none mx-auto px-3 py-1 text-center text-sm text-white bg-dga-orange;
 }
-.dga-tx-demo-card > .inner > .status > .mined  {
+.dga-tx-card > .inner > .status > .mined  {
   @apply bg-green-700
 }
-.dga-tx-demo-card > .inner > .status > .pending {
+.dga-tx-card > .inner > .status > .pending {
   @apply bg-gray-400;
 }
 </style>

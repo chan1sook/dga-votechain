@@ -4,15 +4,15 @@
     <div class="text-2xl font-bold text-center">{{ voteResult.name }}</div>
     <div class="grid grid-cols-2 gap-2 my-2">
       <div class="col-span-2 flex flex-row items-center gap-2 mb-4 flex-wrap">
-        <div class="flex flex-row gap-2 items-start">
-          <h3 class="font-bold">{{ $t('result.ticketid')}}:</h3>
+        <div class="flex-1 w-full lg:w-auto lg:flex-none flex flex-row gap-2 items-start">
+          <h3 class="font-bold whitespace-nowrap">{{ $t('result.ticketid')}}:</h3>
           <span>#{{ topicid }}</span>
         </div>
-        <DgaButton class="ml-auto" theme="hollow" color="dga-orange" @click="exportResult">Export Result</DgaButton>
+        <DgaButton class="w-full max-w-[200px] mx-auto lg:mr-0 whitespace-nowrap" theme="hollow" color="dga-orange" @click="exportResult">{{  $t('result.export') }}</DgaButton>
       </div>
       <div class="col-span-2 flex flex-col gap-2 mb-4">
-        <h3 class="font-bold">{{ $t('result.description.title') }}:</h3>
         <template v-if="showDescription">
+          <h3 class="font-bold">{{ $t('result.description.title') }}:</h3>
           <div class="flex flex-row items-start gap-4">
             <label class="flex-none">{{ $t('result.description.title') }}</label>
             <SimpleContentFormatter :content="voteResult.description"></SimpleContentFormatter>

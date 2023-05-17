@@ -6,7 +6,7 @@
     leave-to-class="opacity-0"
   >
     <div v-if="show" class="z-[1000] fixed inset-0 bg-gray-500/50 flex flex-row items-center justify-center" @click="backdropClose">
-      <div class="bg-dga-blue rounded-lg p-6 text-white flex flex-col gap-4">
+      <div class="bg-dga-blue rounded-lg p-6 text-white flex flex-col gap-4" @click.stop>
         <slot>Modal</slot>
         <div v-if="!hideButtons" class="flex flex-row items-center justify-center gap-4">
           <DgaButton color="dga-orange" :title="$t('modal.cancel')" @click="emit('cancel')">{{ $t('modal.cancel') }}</DgaButton>

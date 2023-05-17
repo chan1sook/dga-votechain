@@ -1,49 +1,47 @@
 <template>
   <div v-if="editable">
     <DgaHead>{{ $t('topic.edit.title')  }}</DgaHead>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto my-4">
-      <div class="md:col-span-2 flex flex-row gap-2 items-center">
-        <div>
-          {{ $t('topic.accessModifier') }}
-        </div>
-        <DgaSelect v-model="topicData.publicVote" :options="votePublicOptions"></DgaSelect>
+    <div class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
+      <div class="col-span-12 md:col-span-2">
+        {{ $t('topic.accessModifier') }}
       </div>
-      <div class="md:col-span-2 flex flex-col gap-2">
-        <h3 class="font-bold">{{ $t('topic.voteDuration.title')}}</h3>
-        <div class="flex flex-row flex-wrap gap-2 items-center">
-          <div>{{ $t('topic.voteDuration.inputMode')}}</div>
-          <DgaSelect v-model="durationMode" :options="durationModeOptions"></DgaSelect>
-        </div>
-        <div class="flex flex-row items-center gap-2 flex-wrap">
-          <label class="flex-none">{{ $t('topic.voteDuration.start') }}</label>
-          <DgaInput v-model="voteStart.dateStr" type="date" class="w-48" :placeholder="$t('topic.voteDuration.startDate')"></DgaInput>
-          <DgaInput v-model="voteStart.timeStr" type="time" class="w-48" :placeholder="$t('topic.voteDuration.startTime')"></DgaInput>
-        </div>
-        <div v-if="durationMode === 'startDuration'" class="flex flex-row flex-wrap gap-2 items-center">
-          <label class="flex-none">{{ $t('topic.voteDuration.duration')}}</label>
-          <div class="inline-flex flex-row items-center gap-2">
+      <DgaSelect v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"></DgaSelect>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.voteDuration.title')}}</h3>
+      <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.inputMode')}}</div>
+      <div class="col-span-12 md:col-span-10">
+        <DgaSelect v-model="durationMode" :options="durationModeOptions"></DgaSelect>
+      </div>
+      <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.start') }}</div>
+      <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
+        <DgaInput v-model="voteStart.dateStr" type="date" class="w-full" :placeholder="$t('topic.voteDuration.startDate')"></DgaInput> 
+        <DgaInput v-model="voteStart.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.startTime')"></DgaInput>
+      </div>
+      <template v-if="durationMode === 'startDuration'">
+        <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.duration')}}</div>
+        <div class="col-span-12 md:col-span-10 flex flex-col sm:flex-row gap-2">
+          <div class="w-full flex flex-row items-center gap-2">
             <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
-            <div>{{ $t('timePeriod.day', { count: 2 }) }}</div>
+            <div class="w-16 sm:w-auto">{{ $t('timePeriod.day', { count: 2 }) }}</div>
           </div>
-          <div class="inline-flex flex-row items-center gap-2">
+          <div class="w-full flex flex-row items-center gap-2">
             <DgaInput type="number" v-model.number="voteDuration.durationHours" :placeholder="$t('timePeriod.hour', { count: 2})" min="0" max="23" class="w-20 flex-1"></DgaInput>
-            <div>{{ $t('timePeriod.hour', { count: 2 }) }}</div>
+            <div class="w-16 sm:w-auto">{{ $t('timePeriod.hour', { count: 2 }) }}</div>
           </div>
-          <div class="inline-flex flex-row items-center gap-2">
+          <div class="w-full flex flex-row items-center gap-2">
             <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
-            <div>{{ $t('timePeriod.minute', { count: 2 }) }}</div>
+            <div class="w-16 sm:w-auto">{{ $t('timePeriod.minute', { count: 2 }) }}</div>
           </div>
         </div>
-        <template v-else>
-          <div class="flex flex-row items-center gap-2">
-            <label class="flex-none">{{ $t('topic.voteDuration.end')}}</label>
-            <DgaInput v-model="voteEnd.dateStr" type="date" class="w-48" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
-            <DgaInput  v-model="voteEnd.timeStr" type="time" class="w-48" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
-          </div>
-        </template>
-      </div>
-      <div class="md:col-span-2 flex flex-col gap-2">
-        <h3 class="font-bold">{{ $t('topic.topicQuestion')}}</h3>
+      </template>
+      <template v-else>
+        <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.end')}}</div>
+        <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
+          <DgaInput v-model="voteEnd.dateStr" type="date" class="w-full" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
+          <DgaInput v-model="voteEnd.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
+        </div>
+      </template>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.topicQuestion')}}</h3>
+      <div class="col-span-12">
         <DgaInput
           v-model="topicData.name" type="text" 
           class="dga-evote-input w-full" :placeholder="$t('topic.topicQuestion')" 
@@ -51,27 +49,23 @@
         >
         </DgaInput>
       </div>
-      <div class="md:col-span-2 flex flex-col gap-2">
-        <template v-if="showDescription">
-          <div class="flex flex-row items-start gap-2">
-            <label class="flex-none">{{ $t('topic.description.title')  }}</label>
-            <DgaTextArea v-model="topicData.description" class="flex-1 h-32" :placeholder="$t('topic.description.title')"></DgaTextArea>
-          </div>
-          <button @click="showDescription = false" :title="$t('topic.description.hide')" class="ml-auto">
-            {{ $t('topic.description.hide')}}
-          </button>
-        </template>
-        <div v-else>
-          <button class="inline-flex flex-row gap-2 items-center" :title="$t('topic.description.add')" @click="showDescription = true">
-            <MaterialIcon icon="add"></MaterialIcon> {{ $t('topic.description.add') }}
-          </button>
+      <template v-if="showDescription">
+        <div class="col-span-12 md:col-span-2 self-start">{{ $t('topic.description.title') }}</div>
+        <div class="col-span-12 md:col-span-10">
+          <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('topic.description.title')"></DgaTextArea>
         </div>
-      </div>
-      <div class="md:col-span-2 flex flex-col gap-2">
-        <h3 class="font-bold">
-          {{ $t('topic.addChoice.title') }}
-        </h3>
-        <div v-for="choice, i of topicData.choices.choices" class="w-full max-w-xl flex flex-row items-center justify-center mx-auto">
+        <button  @click="showDescription = false" :title="$t('topic.description.hide')" class="col-span-12 ml-auto">
+          {{ $t('topic.description.hide')}}
+        </button>
+      </template>
+      <template v-else>
+        <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('topic.description.add')" @click="showDescription = true">
+          <MaterialIcon icon="add"></MaterialIcon> {{ $t('topic.description.add') }}
+        </button>
+      </template>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.addChoice.title') }}</h3>
+      <div v-for="choice, i of topicData.choices.choices" class="col-span-12 flex justify-center items-center">
+        <div class="w-full max-w-xl flex flex-row gap-2 justify-center items-center">
           <MaterialIcon :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
             icon="priority_high" class="text-red-500"
             :title="getChoiceErrorReason(choice.name)"
@@ -85,16 +79,16 @@
             </button>
           </div>
         </div>
-        <div class="w-full flex flex-row justify-center items-center">
-          <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('topic.addChoice.add')" 
-            @click="addOption"
-          >
-            {{ $t('topic.addChoice.add') }} <MaterialIcon icon="add" />
-          </DgaButton>
-        </div>
       </div>
-      <div class="md:col-span-2 flex flex-col gap-2">
-        <h3 class="font-bold">{{ $t('topic.voterList.title') }}</h3>
+      <div class="col-span-12 flex justify-center items-center">
+        <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('topic.addChoice.add')" 
+          @click="addOption"
+        >
+          {{ $t('topic.addChoice.add') }} <MaterialIcon icon="add" />
+        </DgaButton>
+      </div>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.voterList.title') }}</h3>
+      <div class="col-span-12 flex flex-col gap-2">
         <div class="flex flex-row gap-2 items-center">
           <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
           <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
@@ -126,7 +120,7 @@
                 {{ voter.email || "-" }}
               </td>
               <td v-if="topicData.multipleVotes">
-                <DgaInput v-model.number="voter.totalVotes" type="number" class="w-full" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
+                <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
               </td>
               <td>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
@@ -146,32 +140,31 @@
           </tbody>
         </table>
       </div>
-      <div class="md:col-span-2 flex flex-row items-center gap-2">
+      <div class="col-span-12 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="topicData.notifyVoter"></DgaCheckbox> 
         <label class="flex-none"> {{ $t('topic.notifyUsers') }}</label>
       </div>
-      <div class="md:col-span-2 flex flex-row items-center gap-2">
+      <div class="col-span-12 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="topicData.showScores"></DgaCheckbox> 
         <label class="flex-none"> {{ $t('topic.showScores') }}</label>
       </div>
-      <div class="md:col-span-2 flex flex-row items-center gap-2">
+      <div class="col-span-12 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
         <label class="flex-none"> {{ $t('topic.skipBlockchain') }}</label>
       </div>
-      <div class="md:col-span-2 flex flex-row items-center gap-2">
+      <div class="col-span-12 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="topicData.showVotersChoicesPublic" :disabled="!topicData.showScores"></DgaCheckbox> 
         <label class="flex-none">{{ $t('topic.voterScorePublic') }}</label>
       </div>
-      <ClientOnly>
-        <DgaButtonGroup class="md:col-span-2 mt-4">
-          <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-            color="dga-orange" :title="$t('topic.edit.title')" :disabled="!isFormValid" @click="showConfirmModal = true"
-          >
-            <MaterialIcon icon="ballot" />
-            <span class="truncate">{{ $t('topic.edit.title') }}</span>
-          </DgaButton>
-        </DgaButtonGroup>
-      </ClientOnly>
+      
+      <DgaButtonGroup class="col-span-12 mt-4">
+        <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
+          color="dga-orange" :title="$t('topic.edit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+        >
+          <MaterialIcon icon="ballot" />
+          <span class="truncate">{{ $t('topic.edit.action') }}</span>
+        </DgaButton>
+      </DgaButtonGroup>
     </div>
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="editTopic"

@@ -20,9 +20,9 @@
         {{ $d(dayjs(txData.CreatedAt).toDate(), "long") }}
       </span>
       <h3 class="font-bold">{{ $t('blockchain.blockdata')}}</h3>
-      <div>
+      <div class="overflow-x-auto">
         <div v-for="(val, key) of filtertxData(txData)" class="flex flex-row gap-2 items-start">
-          <div class="font-bold">{{ key }} :</div>
+          <div class="font-bold whitespace-nowrap">{{ key }} :</div>
           <div v-if="key === 'Choice'" class="flex-1">
             <template v-if="val">{{ val }}</template> 
             <i v-else>{{ $t('voting.noVote')}}</i>

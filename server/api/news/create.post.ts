@@ -8,7 +8,7 @@ import { checkPermissionSelections } from "~~/src/utils/permissions";
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionSelections(userData.permissions, "create-news")) {
+  if(!userData || !checkPermissionSelections(userData.permissions, "admin-mode")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
     author: newsFormData.author,
     content: newsFormData.content,
     references: newsFormData.references,
-    createdBy: userData.userid,
-    updatedBy: userData.userid,
+    createdBy: userData._id,
+    updatedBy: userData._id,
     createdAt: today,
     updatedAt: today,
     newsPublishAt: dayjs(newsFormData.newsPublishAt).toDate(),

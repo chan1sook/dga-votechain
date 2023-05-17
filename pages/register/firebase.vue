@@ -1,20 +1,20 @@
 <template>
   <div v-if="token">
     <DgaHead>{{ $t("register.firebase.title") }}</DgaHead>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto my-4">
-      <div class="md:col-span-2 flex flex-row gap-2 items-center">
-        <div>
-          {{ $t('register.firebase.token') }}
-        </div>
-        <DgaInput :value="token" disabled class="flex-1" :placeholder="$t('register.firebase.token')"></DgaInput>
+    <div class="grid grid-cols-12 gap-4 max-w-4xl mx-auto my-4">
+      <div class="col-span-12 md:col-span-3">
+        {{ $t('register.firebase.token') }}
       </div>
-      <div class="md:col-span-2 flex flex-row gap-2 items-center">
-        <div>
-          {{ $t('register.citizenid') }}
-        </div>
-        <DgaInput v-model="citizenid" class="flex-1" :placeholder="$t('register.citizenid')"></DgaInput>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput :value="token" disabled class="w-full" :placeholder="$t('register.firebase.token')"></DgaInput>
       </div>
-      <DgaButtonGroup class="md:col-span-2 mt-4">
+      <div class="col-span-12 md:col-span-3">
+        {{ $t('register.citizenid') }}
+      </div>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput v-model="citizenid" class="w-full" :placeholder="$t('register.citizenid')"></DgaInput>
+      </div>
+      <DgaButtonGroup class="col-span-12 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('register.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
         >

@@ -1,53 +1,58 @@
 <template>
   <div>
     <DgaHead>{{ $t('news.edit.title') }}</DgaHead>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto my-4">
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <label class="flex-none">{{ $t('news.newsTitle') }}</label>
-        <DgaInput v-model="newsData.title" type="text" :placeholder="$t('news.newsTitle')" class="flex-1"></DgaInput>
+    <div class="grid grid-cols-12 gap-4 max-w-7xl mx-auto my-4">
+      <label class="col-span-12 md:col-span-2">
+        {{ $t('news.newsTitle') }}
         <span class="text-red-500" :title="$t('news.required')">*</span>
+      </label>
+      <div class="col-span-12 md:col-span-10">
+        <DgaInput v-model="newsData.title" type="text" :placeholder="$t('news.newsTitle')" class="w-full" required></DgaInput>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <label class="flex-none">{{ $t('news.author') }}</label>
-        <DgaInput v-model="newsData.author" type="text" :placeholder="$t('news.author')" class="flex-1"></DgaInput>
+      <label class="col-span-12 md:col-span-2">{{ $t('news.author') }}</label>
+      <div class="col-span-12 md:col-span-10">
+        <DgaInput v-model="newsData.author" type="text" :placeholder="$t('news.author')" class="w-full"></DgaInput>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-start gap-2">
-        <label class="flex-none">{{ $t('news.content') }}</label>
-        <DgaTextArea v-model="newsData.content" type="text" :placeholder="$t('news.content')" class="flex-1"></DgaTextArea>
+      <label class="col-span-12 md:col-span-2">
+        {{ $t('news.content') }} 
         <span class="text-red-500" :title="$t('news.required')">*</span>
+      </label>
+      <div class="col-span-12 md:col-span-10">
+        <DgaTextArea v-model="newsData.content" type="text" :placeholder="$t('news.content')" class="w-full" required></DgaTextArea>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <label class="flex-none">{{ $t('news.references') }}</label>
-        <DgaInput v-model="newsData.references" type="text" :placeholder="$t('news.references')" class="flex-1"></DgaInput>
+      <label class="col-span-12 md:col-span-2">{{ $t('news.references') }}</label>
+      <div class="col-span-12 md:col-span-10">
+        <DgaInput v-model="newsData.references" type="text" :placeholder="$t('news.references')" class="w-full"></DgaInput>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <label class="flex-none">{{ $t('news.publishTime.title') }}</label>
-        <DgaInput v-model="publishDateStr" type="date" :placeholder="$t('news.publishTime.date')" class="flex-1"></DgaInput>
-        <DgaInput v-model="publishTimeStr" type="time" :placeholder="$t('news.publishTime.time')" class="flex-1"></DgaInput>
+      <label class="col-span-12 md:col-span-2">{{ $t('news.publishTime.title') }}</label>
+      <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
+        <DgaInput v-model="publishDateStr" type="date" :placeholder="$t('news.publishTime.date')" class="w-full"></DgaInput>
+        <DgaInput v-model="publishTimeStr" type="time" :placeholder="$t('news.publishTime.time')" class="w-full"></DgaInput>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
+      <div class="col-span-12 md:col-span-2 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="isNewsExpired"></DgaCheckbox>
         <label class="flex-none">{{ $t('news.newsExpired') }}</label>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <DgaInput v-model="expiredDateStr" type="date" :placeholder="$t('news.expiredTime.date')" :min="startExpiredDateStr" class="flex-1" :disabled="!isNewsExpired"></DgaInput>
-        <DgaInput v-model="expiredTimeStr" type="time" :placeholder="$t('news.expiredTime.time')" class="flex-1" :disabled="!isNewsExpired"></DgaInput>
+      <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
+        <DgaInput v-model="expiredDateStr" type="date" :placeholder="$t('news.expiredTime.date')" :min="startExpiredDateStr" class="w-full" :disabled="!isNewsExpired"></DgaInput>
+        <DgaInput v-model="expiredTimeStr" type="time" :placeholder="$t('news.expiredTime.time')" class="w-full" :disabled="!isNewsExpired"></DgaInput>
       </div>
-      <DgaButtonGroup class="md:col-span-2 mt-4">
-        <DgaButton class="!flex flex-row gap-x-2 mx-auto items-center justify-center truncate"
+      <DgaButtonGroup class="col-span-12 mt-4">
+        <DgaButton class="!flex flex-row gap-x-2 items-center mx-auto justify-center truncate"
           color="dga-orange" :title="$t('news.edit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
         >
-        <MaterialIcon icon="edit" />
-          <span class="truncate">{{ $t('news.edit.action') }}s</span>
+          <MaterialIcon icon="newspaper" />
+          <span class="truncate">{{ $t('news.edit.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
     </div>
+    
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="editNews"
       @close="showConfirmModal = false"
       @cancel="showConfirmModal = false"
     >
-      {{ $t('news.create.confirm') }}
+      {{ $t('news.edit.confirm') }}
     </DgaModal>
     <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>

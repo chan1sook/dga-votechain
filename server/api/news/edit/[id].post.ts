@@ -7,7 +7,7 @@ import { checkPermissionSelections } from "~~/src/utils/permissions";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-news")) {
+  if(!userData || !checkPermissionSelections(userData.permissions, "admin-mode")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "News not found",
     });
   }
-  newsData.updatedBy = userData.userid;
+  newsData.updatedBy = userData._id;
   newsData.updatedAt = getNtpTime();
 
   if(topicFormData.visibility !== undefined) {

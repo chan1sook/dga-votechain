@@ -1,23 +1,23 @@
 <template>
   <div>
-    <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-4 mx-auto max-w-6xl">
-      <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="w-56"></DgaSelect>
+    <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-2 mx-auto max-w-6xl">
+      <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-56"></DgaSelect>
       <template v-if="filter.type === 'date'">
-        <DgaSelect v-model="filter.year" :options="yearOptions" class="w-32"></DgaSelect>
-        <DgaSelect v-model="filter.month" :options="monthOptions" class="w-32"></DgaSelect>
+        <DgaSelect v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
+        <DgaSelect v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
       </template>
       <template v-else-if="filter.type === 'ticketId'">
-        <DgaInput v-model="filter.ticketId" :placeholder="$t('voting.filters.ticketIdPlaceholder')" class="w-56"></DgaInput>
+        <DgaInput v-model="filter.ticketId" :placeholder="$t('voting.filters.ticketIdPlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
       <template v-else-if="filter.type === 'topicName'">
-        <DgaInput v-model="filter.keyword" :placeholder="$t('voting.filters.topicNamePlaceholder')" class="w-56"></DgaInput>
+        <DgaInput v-model="filter.keyword" :placeholder="$t('voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
       <DgaButton color="dga-orange" class="flex-0" :title="$t('voting.filters.search')" @click="resetTopics">
         {{ $t("voting.filters.search") }}
       </DgaButton>
       <DgaButton 
         v-if="roleMode === 'admin' || roleMode === 'developer'"
-        class="md:ml-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
+        class="ml-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
         :title="$t('voting.createTopic')"
         :href="localePathOf('/topic/create')"
       >

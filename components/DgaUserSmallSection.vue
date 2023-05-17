@@ -1,45 +1,37 @@
 <template>
-  <div class="relative" @click.stop>
-    <button type="button" @click="toggleShowOption" :title="$t('navbar.user.title')">
-      <MaterialIcon icon="account_circle"></MaterialIcon>
-      <div class="text-white text-xs px-2 py-0.5 -mt-1 bg-dga-orange rounded-full whitespace-nowrap">
-        {{ $t(`role.${roleMode}`, $t("role.guest")) }}
-      </div>
-    </button>
-    <div v-if="showOption" class="z-[402] bg-white border rounded-md rounded-b-3xl overflow-hidden shadow fixed right-0 top-16 md:top-20 w-64" @click.stop>
-      <div class="flex-1 flex flex-col gap-2 px-4 py-4">
+  <div @click.stop>
+    <div class="flex flex-row gap-2 px-2 py-1">
+      <div class="flex-1 flex flex-col gap-y-1 justify-center items-center whitespace-nowrap">
+        <div>{{ userName }} ({{ $t(`role.${roleMode}`, $t("role.guest")) }})</div>
         <div class="font-bold flex flex-row gap-2 items-center">
           {{ perttyTime }}
           <MaterialIcon v-if="!isSync" 
             icon="priority_high" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')"
           ></MaterialIcon>
         </div>
-        <hr class="border-2 border-dga-orange w-16"/>
-        <div class="font-bold">
-          {{ $t('navbar.user.welcome') }}
+        <div class="flex flex-row flex-wrap gap-x-2 gap-y-1 justify-center items-center">
+          <DgaButton v-if="(isAdmin || isDeveloper) && roleMode !== 'voter'" color="dga-orange" theme="hollow" 
+            class="!py-1 !text-sm" :title="switchRoleStrOf('voter')" @click="switchRoleMode('voter')"
+          >
+            {{ $t('role.voter') }}
+          </DgaButton>
+          <DgaButton v-if="isAdmin && roleMode !== 'admin'" color="dga-orange" theme="hollow" 
+            class="!py-1 !text-sm" :title="switchRoleStrOf('admin')" @click="switchRoleMode('admin')"
+          >
+            {{ $t('role.admin') }}
+          </DgaButton>
+          <DgaButton v-if="isDeveloper && roleMode !== 'developer'" color="dga-orange" theme="hollow" 
+            class="!py-1 !text-sm" :title="switchRoleStrOf('developer')" @click="switchRoleMode('developer')"
+          >
+            {{ $t('role.developer') }}
+          </DgaButton>
         </div>
-        <div>{{ userName }}</div>
-        <DgaButton v-if="isAdmin || isDeveloper" color="dga-orange" :theme="roleMode !== 'voter' ? 'hollow' : undefined" 
-          class="!py-1 !text-sm" :title="switchRoleStrOf('voter')" @click="switchRoleMode('voter')"
-        >
-          {{ $t('role.voter') }}
-        </DgaButton>
-        <DgaButton v-if="isAdmin" color="dga-orange" :theme="roleMode !== 'admin' ? 'hollow' : undefined" 
-          class="!py-1 !text-sm" :title="switchRoleStrOf('admin')" @click="switchRoleMode('admin')"
-        >
-          {{ $t('role.admin') }}
-        </DgaButton>
-        <DgaButton v-if="isDeveloper" color="dga-orange" :theme="roleMode !== 'developer' ? 'hollow' : undefined" 
-          class="!py-1 !text-sm" :title="switchRoleStrOf('developer')" @click="switchRoleMode('developer')"
-        >
-          {{ $t('role.developer') }}
-        </DgaButton>
       </div>
-      <a href="/api/logout" class="flex flex-row gap-2 items-center justify-center bg-dga-blue-lighter text-white px-2 py-2" :title="$t('navbar.logout')">
-        <MaterialIcon icon="logout" class="!text-lg"></MaterialIcon>
-        {{ $t('navbar.logout') }}
-      </a>
     </div>
+    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')">
+      <MaterialIcon icon="logout" class="!text-lg"></MaterialIcon>
+      {{ $t('navbar.logout') }}
+    </a>
   </div>
 </template>
 
@@ -49,15 +41,6 @@ import { checkPermissionNeeds } from '~~/src/utils/permissions';
 import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
 
 const i18n = useI18n();
-const showOption = computed(() => useVisibleMenuGroup().value === 'user');
-
-function toggleShowOption() {
-  if(!showOption.value) {
-    useVisibleMenuGroup().value = 'user';
-  } else {
-    useVisibleMenuGroup().value = undefined;
-  }
-}
 
 const { SYNCTIME_THERSOLD } = useRuntimeConfig();
 

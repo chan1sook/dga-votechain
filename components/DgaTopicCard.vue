@@ -90,17 +90,25 @@ function getCreatedByName(createdBy?: UserResponseFilterData) {
 
 <style scoped>
 .dga-topic-card {
-  @apply rounded-lg shadow-lg bg-red-800 pl-6 overflow-hidden
+  @apply rounded-lg shadow-lg bg-red-800 pl-4 sm:pl-6 overflow-hidden;
 }
 .dga-topic-card.public {
   @apply bg-green-700
 }
 
 .dga-topic-card > .inner {
-  @apply rounded-lg bg-white grid items-center px-4 py-4;
-  grid-template-areas: "public content status" "duration content status";
-  grid-template-columns: 150px auto 100px;
+  @apply rounded-lg bg-white grid items-center p-2 sm:p-4 gap-2 sm:gap-y-0 overflow-auto;
+  grid-template-areas: "public duration" "content content" "status status";
+  grid-template-columns: 150px auto;
 }
+
+@media (min-width: 640px) {
+  .dga-topic-card > .inner {
+    grid-template-areas: "public content status" "duration content status";
+    grid-template-columns: 150px auto 120px;
+  }
+}
+
 
 .dga-topic-card > .inner > .private {
   grid-area: public;
@@ -123,10 +131,10 @@ function getCreatedByName(createdBy?: UserResponseFilterData) {
 }
 .dga-topic-card > .inner > .status {
   grid-area: status;
-  @apply flex flex-col gap-2
+  @apply flex flex-col justify-center gap-2
 }
 .dga-topic-card > .inner > .status > * {
-  @apply rounded-full px-3 py-1 text-center text-sm text-white bg-dga-orange;
+  @apply rounded-full w-full max-w-[160px] sm:max-w-none mx-auto px-3 py-1 text-center text-sm text-white bg-dga-orange;
 }
 .dga-topic-card > .inner > .status > .voted {
   @apply bg-dga-blue;

@@ -1,28 +1,28 @@
 <template>
   <div v-if="topic">
-    <div class="relative flex flex-row justify-center items-center">
-      <button class="absolute left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
+    <div class="relative flex flex-col md:flex-row gap-x-2 gap-y-1 justify-center items-center">
+      <button class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
         <MaterialIcon icon="arrow_left" /> {{ $t("voting.back") }}
       </button>
-      <div v-if="!isAdminMode" class="font-bold text-2xl" @click="showLocaltime = !showLocaltime">
-        <div class="flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
-        <div v-if="showLocaltime" class="flex flex-row justify-center items-center gap-2 text-sm">{{ $t("voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
+      <div v-if="!isAdminMode" class="font-bold text-xl md:text-2xl" @click="showLocaltime = !showLocaltime">
+        <div class="text-center flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
+        <div v-if="showLocaltime" class="text-center flex flex-row justify-center items-center gap-2 text-sm">{{ $t("voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
       </div>
     </div>
-    <div v-if="isAdminMode" class="flex flex-row gap-2 my-4">
-      <div class="w-64 bg-dga-orange text-white rounded-lg flex flex-col justify-center text-center gap-2 px-8 py-4">
+    <div v-if="isAdminMode" class="flex flex-col md:flex-row gap-2 my-4">
+      <div class="w-full md:w-64 bg-dga-orange text-white rounded-lg flex flex-row md:flex-col justify-center text-center gap-2 px-4 py-2 md:px-8 md:py-4">
         <div>
           {{ $t("voting.voterVoted") }}: {{ totalVotersVoted }}/{{ totalVoters }}
         </div>
-        <div class="text-xl">
+        <div class="ml-auto md:ml-0 md:text-xl">
           {{ $t("voting.remainVotes") }}: {{ totalRemainVotes || 0 }} {{ $t("voting.vote", { count: totalRemainVotes || 0 }) }}
         </div>
       </div>
-      <div class="flex-1 justify-center text-xl bg-dga-blue text-white rounded-lg px-8 py-4 flex flex-col gap-y-1" @click="showLocaltime = !showLocaltime" >
-        <div class="flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
-        <div v-if="showLocaltime" class="flex flex-row justify-center items-center gap-2 text-sm">{{ $t("voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
+      <div class="flex-1 justify-center text-xl bg-dga-blue text-white rounded-lg px-4 py-2 md:px-8 md:py-4 flex flex-col gap-y-1" @click="showLocaltime = !showLocaltime" >
+        <div class="text-center flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
+        <div v-if="showLocaltime" class="text-center flex flex-row justify-center items-center gap-2 text-sm">{{ $t("voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
       </div>
-      <div class="w-72 overflow-hidden border-2 border-dga-blue rounded-lg bg-white text-xs flex flex-row items-stretch">
+      <div class="w-full md:w-72 overflow-hidden border-2 border-dga-blue rounded-lg bg-white text-xs flex flex-row items-stretch">
         <div class="flex-1 order-2 flex flex-col gap-1 p-2 whitespace-nowrap justify-center">
           <div>{{ $t("voting.startVoteOn") }}: {{ formatDateTime(topic.voteStartAt) }}</div>
           <div>{{ $t("voting.timeRemain") }}: {{ perttyDuration(remainTime) }}</div>
@@ -48,10 +48,10 @@
         </button>
       </div>
     </div>
-    <div v-else class="flex flex-row gap-2 my-4">
-      <div class="flex-1 justify-center text-xl bg-dga-blue text-white rounded-lg flex flex-row items-center gap-2 px-8 py-4">
+    <div v-else class="flex flex-col md:flex-row gap-2 my-4">
+      <div class="flex-1 justify-center text-base md:text-xl bg-dga-blue text-white rounded-lg flex flex-row flex-wrap md:flex-nowrap items-center gap-2 px-4 py-2 md:px-8 md:py-4">
         <template v-if="canVote">
-          <div>{{ $t("voting.remainTimeVoting") }}</div>
+          <div class="w-full text-center md:w-auto">{{ $t("voting.remainTimeVoting") }}</div>
           <div class="timer-counter"> {{ getDays(remainTime) }} </div>
           <div>{{ $t("timePeriod.day", { count: 2 }) }}</div>
           <div class="timer-counter"> {{ getHours(remainTime) }} </div>
@@ -63,18 +63,18 @@
           <div>{{ $t("voting.yourVote") }}</div>
         </template>
       </div>
-      <div class="w-48 bg-dga-orange text-white rounded-lg flex flex-col text-center gap-2 px-8 py-4">
+      <div class="w-full md:w-48 bg-dga-orange text-white rounded-lg flex flex-row md:flex-col text-center gap-2 px-4 py-2 md:px-8 md:py-4">
         <template v-if="canVote">
           <div>{{ $t("voting.remainVotes") }}:</div>
-          <div class="text-xl">{{ noVoteLocked ? 0 : remainVotes || 0 }} {{ $t("voting.vote", { count: remainVotes || 0 }) }}</div>
+          <div class="ml-auto md:ml-0 md:text-xl">{{ noVoteLocked ? 0 : remainVotes || 0 }} {{ $t("voting.vote", { count: remainVotes || 0 }) }}</div>
         </template>
         <template v-else>
           <div>{{ $t("voting.totalVotes") }}:</div>
-          <div class="text-xl">{{ totalVotes || 0 }}  {{ $t("voting.vote", { count: totalVotes  }) }}</div>
+          <div class="ml-auto md:ml-0 md:text-xl">{{ totalVotes || 0 }}  {{ $t("voting.vote", { count: totalVotes  }) }}</div>
         </template>
       </div>
     </div>
-    <h2 class="text-4xl font-bold text-center my-4">
+    <h2 class="text-2xl md:text-4xl font-bold text-center my-4">
       {{ topic.name }}
     </h2>
     <div class="flex flex-col flex-wrap justify-center gap-2">
@@ -118,14 +118,14 @@
         </DgaButton>
       </template>
     </div>
-    <div v-if="canVote" class="text-sm flex flex-row justify-center gap-x-4 my-4">
-      <DgaButton color="dga-orange" @click="clearVotes">
+    <div v-if="canVote" class="text-sm flex flex-col md:flex-row justify-center gap-x-4 gap-y-2 my-4">
+      <DgaButton color="dga-orange" class="mx-auto md:mx-0 w-48 md:w-auto" @click="clearVotes">
         {{ $t("voting.clear") }}
       </DgaButton>
-      <DgaButton color="gray" @click="lockVotes">
+      <DgaButton color="gray" class="mx-auto md:mx-0 w-48 md:w-auto" @click="lockVotes">
         {{ $t("voting.noVote") }}
       </DgaButton>
-      <DgaButton :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused" @click="showConfirmModal = true">
+      <DgaButton class="mx-auto md:mx-0 w-48 md:w-auto" :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused" @click="showConfirmModal = true">
         {{ $t("voting.submit") }}
       </DgaButton>
     </div>
@@ -423,6 +423,6 @@ onUnmounted(() => {
 
 <style scoped>
 .timer-counter {
-  @apply bg-white text-dga-orange text-2xl font-bold rounded-lg p-4;
+  @apply bg-white text-dga-orange text-xl md:text-2xl font-bold rounded-lg p-4;
 }
 </style>

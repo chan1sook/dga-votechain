@@ -20,12 +20,12 @@ const schema = new Schema<NewsData, NewsModel>({
     type: String,
   },
   createdBy: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "dga-user",
   },
   updatedBy: {
-    type: String,
-    required: true,
+    type: Schema.Types.ObjectId,
+    ref: "dga-user",
   },
   newsPublishAt: {
     type: Date,

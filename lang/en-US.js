@@ -6,7 +6,9 @@ export default {
     about: "About",
     help: "Help",
     contactUs: "Contact Us",
+    blockchain: "Blockchain",
     login: "Login",
+    language: "Current Language",
     news: {
       title: "News",
       loadingNews: "Loading...",
@@ -227,21 +229,22 @@ export default {
     notIncludeNoVote: "Not include No Vote",
     winner: "Winner",
     yourChoice: "Your Choice",
-    voteLogs: "Vote Logs"
+    voteLogs: "Vote Logs",
+    export: "Export Result",
   },
   news: {
     title: "News",
     id: "News ID",
     create: {
       title: "Create News",
-      confim: "Confirm Create News?",
+      confirm: "Confirm Create News?",
       action: "Create News",
       success: "Create News Successful",
       failed: "Create News Failed",
     },
     edit: {
       title: "Edit News",
-      confim: "Confirm Edit News?",
+      confirm: "Confirm Edit News?",
       action: "Edit News",
       success: "Edit News Successful",
       failed: "Edit News Failed",
@@ -268,7 +271,7 @@ export default {
   requestPermissions: {
     add: {
       title: "Add Request Permissions",
-      noteToApprover: "Note for approver",
+      noteToApprover: "Note",
       requestTo: {
         title: "Request to",
         moderator: "Moderator",

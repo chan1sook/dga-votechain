@@ -1,16 +1,16 @@
 <template>
   <div>
     <DgaHead>{{ $t('requestPermissions.add.title') }}</DgaHead>
-    <div v-if="allowInputForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto my-4">
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-start gap-2">
-        <label class="flex-none">{{ $t('requestPermissions.add.noteToApprover') }}</label>
+    <div v-if="allowInputForm" class="grid grid-cols-12 gap-x-4 gap-y-2 max-w-7xl mx-auto my-4">
+      <label class="col-span-12 md:col-span-2">{{ $t('requestPermissions.add.noteToApprover') }}</label>
+      <div class="col-span-12 md:col-span-10">
         <DgaTextArea v-model="permissionsData.note" :placeholder="$t('requestPermissions.note')" class="w-full"></DgaTextArea>
       </div>
-      <div class="md:col-span-2 p-2 pb-0 flex flex-row items-center gap-2">
-        <label class="flex-none">{{ $t('requestPermissions.add.requestTo.title') }}</label>
+      <label class="col-span-12 md:col-span-2">{{ $t('requestPermissions.add.requestTo.title') }}</label>
+      <div class="col-span-12 md:col-span-10">
         <DgaSelect v-model="permissionsData.preset" :options="presetOptions"></DgaSelect>
       </div>
-      <div v-if="permissionEditable" class="md:col-span-2 grid-2-content">
+      <div v-if="permissionEditable" class="col-span-12 grid-2-content">
         <template v-for="permission of getRequestablePermissions()">
           <DgaCheckbox v-model="permissionsData.permissions" :value="permission" :disabled="!permissionEditable"></DgaCheckbox>
           <div class="line-clamp-3">
@@ -18,10 +18,10 @@
           </div>
         </template>
       </div>
-      <div class="md:col-span-2 my-2 text-center">
+      <div class="col-span-12 my-2 text-center">
         <DgaCheckbox v-model="consentPersonalId" required></DgaCheckbox> {{ $t('requestPermissions.add.allowConsent') }}
       </div>
-      <DgaButtonGroup class="md:col-span-2 mt-4">
+      <DgaButtonGroup class="col-span-12 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" title="Request Permissions" :disabled="!isFormValid" @click="requestPermissions"
         >
@@ -119,7 +119,7 @@ async function requestPermissions() {
 
 <style scoped>
 .grid-2-content {
-  @apply p-4 my-2 grid gap-2 items-center rounded-lg border-2 border-dga-blue;
+  @apply p-4 my-2 grid gap-2 items-center rounded-lg border-2 border-dga-orange;
   grid-template-columns: min-content auto;
 }
 </style>

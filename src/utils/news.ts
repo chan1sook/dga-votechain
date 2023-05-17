@@ -38,5 +38,6 @@ export function useWatchNewsDateTimes(
 }
 
 export function isNewsFormValid(newsData: NewsFormData | NewsFormBodyData) {
+  console.log(newsData);
   return newsData.title !== "" && newsData.content !== "";
 }

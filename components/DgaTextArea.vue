@@ -1,5 +1,7 @@
 <template>
-  <textarea :value="value" :placeholder="props.placeholder" :required="props.required" class="dga-textarea"></textarea>
+  <textarea :value="value" :placeholder="props.placeholder" :required="props.required" class="dga-textarea" 
+    @input="event => emit('update:modelValue', event.target.value)">
+  </textarea>
 </template>
 
 <script setup lang="ts">

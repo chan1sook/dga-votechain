@@ -12,7 +12,7 @@
             <MaterialIcon icon="close" />
           </button>
         </div>
-        <div class="border-l border-dga-blue pl-2">
+        <div class="border-l border-dga-orange pl-2 overflow-x-auto">
           <div class="flex flex-row gap-2 flex-wrap">
             <b>{{ $t('requestPermissions.userid') }}:</b>
             <span>{{ request.userid }}</span>
