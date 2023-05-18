@@ -8,8 +8,7 @@ node_modules
 .env_prod
 dist
 .DS_Store
-.output.zip
+.output*.zip
 etc/
 .config/
-blockchain*/
 firebase-admin-config.json

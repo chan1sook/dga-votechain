@@ -6,6 +6,7 @@ export default {
     about: "About",
     help: "Help",
     contactUs: "Contact Us",
+    adminShowUsers: "User Lists",
     blockchain: "Blockchain",
     login: "Login",
     language: "Current Language",
@@ -108,7 +109,7 @@ export default {
     createTopic: "Create",
     editTopic: "Edit",
     status: {
-      waiting: "Wating",
+      waiting: "Waiting",
       result: "Result",
       access: "Access",
       voting: "Voting",
@@ -229,6 +230,7 @@ export default {
     notIncludeNoVote: "Not include No Vote",
     winner: "Winner",
     yourChoice: "Your Choice",
+    showVoteLogs: "Show Vote Logs",
     voteLogs: "Vote Logs",
     export: "Export Result",
   },
@@ -309,33 +311,39 @@ export default {
     "transfer-topic-controller": "Transfer Topic Controller to Other User",
     "change-others-permissions": "Allow Change Other User Permissions",
   },
-  blockchain: {
-    title: "Blockchain Admin",
-    blockInfo: {
-      title: "Block Info",
-      total: "Total",
-      mined: "Confirmed",
-      pending: "Pending",
+  admin: {
+    user: {
+      title: "User List",
     },
-    serverStatus: {
-      title: "Server Status",
-      total: "Total",
-      online: "Online",
-      offline: "Offline",
+    blockchain: {
+      title: "Blockchain Admin",
+      blockInfo: {
+        title: "Block Info",
+        total: "Total",
+        mined: "Confirmed",
+        pending: "Pending",
+        invalid: "Invalid",
+      },
+      serverStatus: {
+        title: "Server Status",
+        total: "Total",
+        online: "Online",
+        offline: "Offline",
+      },
+      searchTx: "Search TX",
+      txid: "TX ID",
+      txInfo: "Tx Info",
+      liveTxUpdate: "Live TX Update",
+      type: {
+        title: "Type",
+        vote: "Vote",
+        result: "Vote Result"
+      },
+      createdAt: "Created At",
+      status: "Status",
+      detail: "Detail",
+      blockdata: "Block Data"
     },
-    searchTx: "Search TX",
-    txid: "TX ID",
-    txInfo: "Tx Info",
-    liveTxUpdate: "Live TX Update",
-    type: {
-      title: "Type",
-      vote: "Vote",
-      result: "Vote Result"
-    },
-    createdAt: "Created At",
-    status: "Status",
-    detail: "Detail",
-    blockdata: "Block Data"
   },
   timePeriod: {
     nearZeroMinute: "Less than a minute",

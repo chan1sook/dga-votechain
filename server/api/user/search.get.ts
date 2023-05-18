@@ -1,7 +1,17 @@
 import EVoteUserModel from "~~/server/models/user"
+import { isAdminRole } from "~~/src/utils/role";
 import { escapeRegExp } from "~~/src/utils/utils";
 
 export default defineEventHandler(async (event) => {
+  const userData = event.context.userData;
+
+  if(!userData || !isAdminRole(userData.roleMode)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
+    });
+  }
+
   const query = getQuery(event);
 
   let keyword = "";

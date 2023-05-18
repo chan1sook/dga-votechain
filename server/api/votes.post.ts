@@ -8,12 +8,12 @@ import VoteModel from "~~/server/models/vote"
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 import { getEventEmitter } from "../global-emitter";
 import mongoose from "mongoose";
-import { writeManyVoteDataToBlockchain } from "../hyperledger-rpc";
+import { addVoteOnBlockchain } from "../smart-contract";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic")) {
+  if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") || userData.roleMode !== "voter") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -84,6 +84,7 @@ export default defineEventHandler(async (event) => {
       choice: choice,
       createdAt: today,
       updatedAt: today,
+      tx: null,
     }
   });
 
@@ -99,23 +100,24 @@ export default defineEventHandler(async (event) => {
       topicid: `${newVoteDoc.topicid}`,
       choice: newVoteDoc.choice,
       createdAt: dayjs(newVoteDoc.createdAt).toString(),
+      tx: newVoteDoc.tx,
     }
   });
+  if(topicDoc.recoredToBlockchain) {
+    await Promise.all(
+      voteDocs.map(async (vote) => {
+        return addVoteOnBlockchain(vote._id.toString(), vote.topicid.toString(), vote.userid.toString(), vote.choice)
+          .then((txResponse) => {
+            vote.tx = txResponse.transactionHash;
+            return vote.save();
+          }
+        ).catch(console.error)
+      })
+    )
+  }
 
   await dbSession.commitTransaction();
   await dbSession.endSession();
-
-  if(topicDoc.recoredToBlockchain) {
-    const votes : Array<VoteDataBlockchainInput> = voteDocs.map((newVoteDoc) => {
-      return {
-        _id: newVoteDoc._id,
-        userid: newVoteDoc.userid,
-        topicid: newVoteDoc.topicid,
-        choice: newVoteDoc.choice,
-      }
-    });
-    writeManyVoteDataToBlockchain(...votes).catch(console.error)
-  }
 
   const eventEmitter = getEventEmitter();
 

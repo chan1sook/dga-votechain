@@ -6,6 +6,7 @@ export default {
     about: "เกี่ยวกับบริการ",
     help: "วิธีใช้งาน",
     contactUs: "ติดต่อเรา",
+    adminShowUsers: "รายชื่อผู้ใช้",
     blockchain: "Blockchain",
     login: "เข้าสู่ระบบ",
     language: "ภาษาปัจจุบัน",
@@ -231,6 +232,7 @@ export default {
     winner: "ผู้ชนะ",
     noVoted: "ไม่ประสงค์ลงคะแนน",
     total: "รวมทั้งหมด",
+    showVoteLogs: "แสดงบันทึกการโหวต",
     voteLogs: "บันทึกการโหวต",
     export: "ส่งออกผลโหวต",
   },
@@ -311,33 +313,39 @@ export default {
     "transfer-topic-controller": "โอนสิทธิ์ควบคุมการโหวต",
     "change-others-permissions": "เปลี่ยนสิทธ์คนอื่น",
   },
-  blockchain: {
-    title: "จัดการ Blockchain",
-    blockInfo: {
-      title: "ข้อมูลบล็อก",
-      total: "ทั้งหมด",
-      mined: "ยืนยันแล้ว",
-      pending: "รอดำเนินการ",
+  admin: {
+    user: {
+      title: "รายชื่อผู้ใช้งาน",
     },
-    serverStatus: {
-      title: "ข้อมูล Server",
-      total: "ทั้งหมด",
-      online: "ออนไลน์",
-      offline: "ออฟไลน์",
+    blockchain: {
+      title: "จัดการ Blockchain",
+      blockInfo: {
+        title: "ข้อมูลบล็อก",
+        total: "ทั้งหมด",
+        mined: "ยืนยันแล้ว",
+        pending: "รอดำเนินการ",
+        invalid: "ไม่ถูกต้อง",
+      },
+      serverStatus: {
+        title: "ข้อมูล Server",
+        total: "ทั้งหมด",
+        online: "ออนไลน์",
+        offline: "ออฟไลน์",
+      },
+      searchTx: "ค้นหา",
+      txid: "TX ID",
+      txInfo: "ข้อมูล TX",
+      liveTxUpdate: "รายการ TX ล่าสุด",
+      type: {
+        title: "ประเภท",
+        vote: "โหวต",
+        result: "ผลโหวต"
+      },
+      createdAt: "สร้างเมื่อ",
+      status: "สถานะ",
+      detail: "รายละเอียด",
+      blockdata: "ข้อมูลบล็อก"
     },
-    searchTx: "ค้นหา",
-    txid: "TX ID",
-    txInfo: "ข้อมูล TX",
-    liveTxUpdate: "รายการ TX ล่าสุด",
-    type: {
-      title: "ประเภท",
-      vote: "โหวต",
-      result: "ผลโหวต"
-    },
-    createdAt: "สร้างเมื่อ",
-    status: "สถานะ",
-    detail: "รายละเอียด",
-    blockdata: "ข้อมูลบล็อก"
   },
   timePeriod: {
     nearZeroMinute: "ไม่ถึงนาที",

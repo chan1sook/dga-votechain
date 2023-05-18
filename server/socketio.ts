@@ -26,7 +26,7 @@ export default async () => {
   const eventEmitter = getEventEmitter();
   eventEmitter.on("voted", async (votes : Array<VoteResponseData>) => {
     io.emit("voted", votes);
-    const txChain : Array<TxResponseData> = votes.map((tx) => {
+    const txChain : Array<TxResponseOldData> = votes.map((tx) => {
       return {
         VoteID: `${tx._id}`,
         UserID: `${tx.userid}`,
@@ -39,7 +39,7 @@ export default async () => {
     io.emit("tx", txChain);
   });
 
-  eventEmitter.on("txmined", async (tx : TxResponseData) => {
+  eventEmitter.on("txmined", async (tx : TxResponseOldData) => {
     io.emit("tx", tx);
   });
   

@@ -46,5 +46,11 @@ declare global {
     _id: string,
   } & Pick<UserData, "firstName" | "lastName" | "email">;
 
+  type UserShowAdminResponseData = {
+    _id: string,
+    role: UserRole,
+  } & Pick<UserData, "firstName" | "lastName" | "email">;
+
+
   type TopicVoterAllowDataPopulated = Omit<TopicVoterAllowData, "userid"> & { userid?: UserData & { _id: Types.ObjectId } }
 }

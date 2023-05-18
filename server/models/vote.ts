@@ -13,6 +13,9 @@ const schema = new Schema<VoteData, VoteModel>({
   choice: {
     type: String,
   },
+  tx: {
+    type: String,
+  }
 }, { timestamps: true });
 
 schema.static("getLastestVotes", function getLastestVotes(pagesize?: number, startid?: string, filterKeyword?: string) {

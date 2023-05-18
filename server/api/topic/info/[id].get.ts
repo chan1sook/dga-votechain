@@ -42,13 +42,21 @@ export default defineEventHandler(async (event) => {
       }
     }
     
+    if(userData.roleMode === "voter" && !_voterAllow) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+    
     votes = _votes.map((vote) => {
       return {
         _id: `${vote._id}`,
         userid: `${vote.userid}`,
         topicid: `${vote.topicid}`,
         choice: vote.choice,
-        createdAt: dayjs(vote.createdAt).toISOString()
+        createdAt: dayjs(vote.createdAt).toISOString(),
+        tx: vote.tx,
       }
     })
 

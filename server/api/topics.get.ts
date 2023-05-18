@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   if(!userData || userData.roleMode === "guest") {
     topicsData = await TopicModel.getLastestPublicVoteTopics(filterParams);
   } else if(userData.roleMode === "voter") {
-    topicsData = await TopicModel.getLastestPublicVoteWithIdsTopics(topicVoterAllowsDocs.map((ele) => ele._id), filterParams);
+    topicsData = await TopicModel.getLastestVoteWithIdsTopics(topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i), filterParams);
   } else {
     topicsData = await TopicModel.getLastestAvailableTopics(filterParams);
   }

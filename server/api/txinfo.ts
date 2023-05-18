@@ -1,7 +1,7 @@
 import { getTxArr } from "../utils";
 
 export default defineEventHandler(async (event) => {
-  const txDocs= await getTxArr(100000, "");
+  const txDocs = await getTxArr(100000, "");
 
   return {
     server: {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
       total: 3,
     },
     blocks: {
-      mined: txDocs.filter((ele) => ele.Mined).length,
+      mined: txDocs.filter((ele) => ele.mined).length,
       total: txDocs.length,
     }
   }

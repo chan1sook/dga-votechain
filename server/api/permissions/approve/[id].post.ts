@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userDoc = await UserModel.findOne({ userid: reqData.userid });
+  const userDoc = await UserModel.findOne({ _id: reqData.userid });
   if(!userDoc) {
     reqData.status = "rejected";
     await reqData.save();
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
   const today = new Date();
 
   if(status === "approved") {
-    const content = `{{notification.requestPermission.title}} #${reqData.id} {{otification.requestPermission.approved}}`
+    const content = `{{notification.requestPermission.title}} #${reqData.id} {{notification.requestPermission.approved}}`
     await Promise.all([
       userDoc.save(),
       reqData.save(),
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
       ).save(),
     ]);
   } else {
-    const content = `{{notification.requestPermission.title}} #${reqData.id} {{otification.requestPermission.rejected}}`
+    const content = `{{notification.requestPermission.title}} #${reqData.id} {{notification.requestPermission.rejected}}`
     await Promise.all([
       reqData.save(),
       new NotificationModel(

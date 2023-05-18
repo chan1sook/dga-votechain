@@ -28,7 +28,7 @@ declare global {
   
   interface TopicModel extends Model<TopicData> {
     getLastestPublicVoteTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
-    getLastestPublicVoteWithIdsTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
+    getLastestVoteWithIdsTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
     getLastestAvailableTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
   }
   

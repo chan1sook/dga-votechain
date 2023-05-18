@@ -5,5 +5,5 @@ export default defineEventHandler(async (event) => {
   
   const txDocs = await getTxArr(pagesize || 100000, startid || "");
 
-  return txDocs
+  return txDocs;
 })

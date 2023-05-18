@@ -6,7 +6,8 @@
     <NuxtLink :href="localePathOf('/about')" class="dga-menu-item">{{ $t("navbar.about") }}</NuxtLink>
     <NuxtLink :href="localePathOf('/help')" class="dga-menu-item">{{ $t("navbar.help") }}</NuxtLink>
     <NuxtLink :href="localePathOf('/contact-us')" class="dga-menu-item">{{ $t("navbar.contactUs") }}</NuxtLink>
-    <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/blockchain/admin')" class="dga-menu-item">{{ $t('navbar.blockchain') }}</NuxtLink>
+    <NuxtLink v-if="roleMode === 'admin'" :href="localePathOf('/admin/users')" class="dga-menu-item">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
+    <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item">{{ $t('navbar.blockchain') }}</NuxtLink>
     
     <div class="inline-flex ml-auto flex-row items-center gap-4">
       <button type="button" class="dga-small-btn !hidden sm:!inline-flex" @click="toggleLang">
@@ -33,7 +34,8 @@
       <NuxtLink :href="localePathOf('/about')" class="dga-menu-item-small">{{ $t("navbar.about") }}</NuxtLink>
       <NuxtLink :href="localePathOf('/help')" class="dga-menu-item-small">{{ $t("navbar.help") }}</NuxtLink>
       <NuxtLink :href="localePathOf('/contact-us')" class="dga-menu-item-small">{{ $t("navbar.contactUs") }}</NuxtLink>
-      <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/blockchain/admin')" class="dga-menu-item-small">{{ $t('navbar.blockchain')}}</NuxtLink>
+      <NuxtLink v-if="roleMode === 'admin'" :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
+      <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('navbar.blockchain')}}</NuxtLink>
       <div class="border-t my-1"></div>
       <div class="dga-menu-item-small" @click="toggleLang">{{ $t('navbar.language') }}: {{ prettyLocaleCode  }}</div>
       <NuxtLink v-if="!isLogin" :href="localePathOf('/login')" class="dga-menu-item-small">{{ $t('navbar.login') }}</NuxtLink>

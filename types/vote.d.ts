@@ -7,6 +7,7 @@ declare global {
     topicid: Types.ObjectId,
     choice: string | null,
     createdAt: Date,
+    tx: string | null,
   }
 
   interface VoteModel extends Model<VoteData> {

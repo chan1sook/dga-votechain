@@ -7,6 +7,8 @@
 @layer base {
   html {
     font-family: "Mitr", system-ui, sans-serif;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   body {

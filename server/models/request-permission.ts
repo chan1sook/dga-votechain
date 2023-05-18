@@ -31,7 +31,7 @@ schema.static("getPendingRequestPermissionsData", function getRequestPermissions
     query._id = { $lt: new Types.ObjectId(startid) }
   }
   
-  return this.find(query).limit(pagesize || 50).sort({_id: -1 });
+  return this.find(query).limit(pagesize || 50).sort({_id: -1 }).populate("userid");
 });
 
 schema.static("getExistsRequestPermissionsData", function getExistsRequestPermissionsData(userid: Types.ObjectId) {

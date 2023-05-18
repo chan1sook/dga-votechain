@@ -76,6 +76,10 @@ const schema = new Schema<TopicData, TopicModel>({
   notifyVoter: {
     type: Boolean,
     default: true,
+  },
+  recoredToBlockchain: {
+    type: Boolean,
+    default: true,
   }
 }, { timestamps: true });
 
@@ -110,13 +114,10 @@ schema.statics.getLastestPublicVoteTopics = function getLastestAvailableTopics(f
   return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
 };
 
-schema.statics.getLastestPublicVoteWithIdsTopics = function getLastestAvailableTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) {
+schema.statics.getLastestVoteWithIdsTopics = function getLastestAvailableTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) {
   const query : FilterQuery<TopicData> = {
     status: "approved",
-    $or: [
-      { publicVote: true },
-      { _id: { $in: ids }},
-    ]
+    _id: { $in: ids },
   };
 
   if(filter) {
@@ -140,7 +141,6 @@ schema.statics.getLastestPublicVoteWithIdsTopics = function getLastestAvailableT
       query._id = { $lt: new Types.ObjectId(filter.startid) }
     }
   }
-  
   return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
 };
 

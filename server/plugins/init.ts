@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import io from "~~/server/socketio"
-import hyperledgerTest from '../hyperledger-rpc';
+import smartContract from '../smart-contract';
 import { migrateToNewUserFormat, setPredefinedDevs } from '../migrate-old-users';
 import { initFirebase } from '../firebase';
 
@@ -9,8 +9,8 @@ export default defineNitroPlugin(async (nitroApp) => {
   const runtimeConfig = useRuntimeConfig();
   console.log(runtimeConfig);
 
-  console.log("[Hyperledger] Test");
-  await hyperledgerTest();
+  console.log("[Blockchain] Test");
+  smartContract.init();
 
   console.log("[Firebase] Init");
   initFirebase();

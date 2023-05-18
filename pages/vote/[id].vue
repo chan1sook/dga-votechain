@@ -77,58 +77,65 @@
     <h2 class="text-2xl md:text-4xl font-bold text-center my-4">
       {{ topic.name }}
     </h2>
-    <div class="flex flex-col flex-wrap justify-center gap-2">
-      <template v-for="choice of topic.choices.choices">
-        <DgaButton 
-          class="relative w-full max-w-md mx-auto flex flex-row gap-8 items-center justify-center !px-4"
-          :theme="getBtnThemeOfChoice(choice)"
-          :color="(canVote && noVoteLocked) ? 'gray' : 'dga-blue'"
-          :disabled="!canVote || noVoteLocked"
-          :disabled-vivid="!canVote"
-          @click="addVote(choice.name)"
-        >
-          <div class="relative w-24">
-            <template v-if="canVote">
-              <div v-if="noVoteLocked" class="text-white bg-gray-500 rounded-full px-8 py-1 text-sm">VOTE</div>
-              <div v-else-if="voteCount(choice.name) === 0" class="text-white bg-dga-orange rounded-full px-8 py-1 text-sm">VOTE</div>
-              <div v-else class="text-white bg-green-700 rounded-full pl-10 pr-6 py-1 text-sm flex flex-row items-center">
-                <MaterialIcon class="absolute left-2" icon="check" /> VOTED
+    <template v-if="!isAdminMode">
+      <template v-if="!isPaused">
+        <div class="flex flex-col flex-wrap justify-center gap-2">
+          <template v-for="choice of topic.choices.choices">
+            <DgaButton 
+              class="relative w-full max-w-md mx-auto flex flex-row gap-8 items-center justify-center !px-4"
+              :theme="getBtnThemeOfChoice(choice)"
+              :color="(canVote && noVoteLocked) ? 'gray' : 'dga-blue'"
+              :disabled="!canVote || noVoteLocked"
+              :disabled-vivid="!canVote"
+              @click="addVote(choice.name)"
+            >
+              <div class="relative w-24">
+                <template v-if="canVote">
+                  <div v-if="noVoteLocked" class="text-white bg-gray-500 rounded-full px-8 py-1 text-sm">VOTE</div>
+                  <div v-else-if="voteCount(choice.name) === 0" class="text-white bg-dga-orange rounded-full px-8 py-1 text-sm">VOTE</div>
+                  <div v-else class="text-white bg-green-700 rounded-full pl-10 pr-6 py-1 text-sm flex flex-row items-center">
+                    <MaterialIcon class="absolute left-2" icon="check" /> VOTED
+                  </div>
+                </template>
+                <template v-else>
+                  <div v-if="votedCount(choice.name) === 0" class="text-white bg-dga-orange rounded-full px-8 py-1 text-sm">VOTE</div>
+                  <div v-else class="text-white bg-green-700 rounded-full pl-10 pr-6 py-1 text-sm flex flex-row items-center">
+                    <MaterialIcon class="absolute left-2" icon="check" /> VOTED
+                  </div>
+                </template>
               </div>
-            </template>
-            <template v-else>
-              <div v-if="votedCount(choice.name) === 0" class="text-white bg-dga-orange rounded-full px-8 py-1 text-sm">VOTE</div>
-              <div v-else class="text-white bg-green-700 rounded-full pl-10 pr-6 py-1 text-sm flex flex-row items-center">
-                <MaterialIcon class="absolute left-2" icon="check" /> VOTED
+              <div class="flex-1 truncate text-left">{{ choice.name }}</div>
+              <div class="relative w-12">
+                <template v-if="canVote">
+                  <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && topic.multipleVotes">
+                    x{{ voteCount(choice.name) }}
+                  </div>
+                </template>
+                <template v-else>
+                  <div v-if="votedCount(choice.name) > 0 && topic.multipleVotes">
+                    x{{ votedCount(choice.name) }}
+                  </div>
+                </template>
               </div>
-            </template>
-          </div>
-          <div class="flex-1 truncate text-left">{{ choice.name }}</div>
-          <div class="relative w-12">
-            <template v-if="canVote">
-              <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && topic.multipleVotes">
-                x{{ voteCount(choice.name) }}
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="votedCount(choice.name) > 0 && topic.multipleVotes">
-                x{{ votedCount(choice.name) }}
-              </div>
-            </template>
-          </div>
-        </DgaButton>
+            </DgaButton>
+          </template>
+        </div>
+        <div v-if="canVote" class="text-sm flex flex-col md:flex-row justify-center gap-x-4 gap-y-2 my-4">
+          <DgaButton color="dga-orange" class="mx-auto md:mx-0 w-48 md:w-auto" @click="clearVotes">
+            {{ $t("voting.clear") }}
+          </DgaButton>
+          <DgaButton color="gray" class="mx-auto md:mx-0 w-48 md:w-auto" @click="lockVotes">
+            {{ $t("voting.noVote") }}
+          </DgaButton>
+          <DgaButton class="mx-auto md:mx-0 w-48 md:w-auto" :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused" @click="showConfirmModal = true">
+            {{ $t("voting.submit") }}
+          </DgaButton>
+        </div>
       </template>
-    </div>
-    <div v-if="canVote" class="text-sm flex flex-col md:flex-row justify-center gap-x-4 gap-y-2 my-4">
-      <DgaButton color="dga-orange" class="mx-auto md:mx-0 w-48 md:w-auto" @click="clearVotes">
-        {{ $t("voting.clear") }}
-      </DgaButton>
-      <DgaButton color="gray" class="mx-auto md:mx-0 w-48 md:w-auto" @click="lockVotes">
-        {{ $t("voting.noVote") }}
-      </DgaButton>
-      <DgaButton class="mx-auto md:mx-0 w-48 md:w-auto" :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused" @click="showConfirmModal = true">
-        {{ $t("voting.submit") }}
-      </DgaButton>
-    </div>
+      <template v-else>
+        <div class="text-center text-2xl">{{ $t("voting.evoteState.paused") }}</div>
+      </template>
+    </template>
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="submitVotes"
       @close="showConfirmModal = false"
@@ -382,6 +389,7 @@ socket.on("voted", (votes: Array<VoteResponseData>) => {
 socket.on(`pauseVote/${topicid}`, (pauseData: TopicPauseResponseData) => {
   if(topic.value) {
     topic.value.pauseData.push(pauseData);
+    clearVotes();
   }
 });
 socket.on(`resumeVote/${topicid}`, (pauseData: TopicPauseResponseData & { voteExpiredAt: DateString }) => {

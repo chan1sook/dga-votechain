@@ -27,95 +27,101 @@
           </button>
         </div>
       </div>
-    </div>
-    <div class="my-2 max-w-4xl mx-auto">
-      <h3 class="font-bold text-xl">{{ $t('result.stats')}}</h3>
-      <div class="flex flex-row gap-2">
-        <div v-if="yourVotes && yourVotes.length > 0">
-          <div class="px-2 py-1 my-1 h-[2rem] mb-4"></div>
-          <div v-for="choice of voteResult.choices.choices" class="px-2 py-1 my-1 h-[2rem]">
-            <template v-if="yourVotes.length > 0">
-              {{ $t('result.yourChoice') }} (x{{ yourVoteCount(choice.name) }}) ===>
-            </template>
-            <template v-else-if="yourVoteCount(choice.name) > 0">
-              {{ $t('result.yourChoice') }} ===>
-            </template>
-          </div>
-          <div class="px-2 py-1 my-1 h-[2rem] mt-4">
-            <template v-if="!yourVotes || yourVotes.length === 0 || yourVoteCount(null) === yourVotes.length">
-              {{ $t('result.yourChoice') }} ===>
-            </template>
+    </div>  
+    
+    <div class="max-w-4xl mx-auto grid grid-cols-12 items-center gap-y-1 gap-x-2">
+      <h3 class="col-span-12 font-bold text-xl">{{ $t('result.stats')}}</h3>
+      <div class="hidden sm:block sm:col-span-2"></div>
+      <div class="col-span-10 sm:col-span-8 flex flex-row gap-2 px-2 py-1 mb-4">
+        <div class="flex-1 flex flex-row gap-2 items-center">
+          <div class="flex-1">{{ $t('result.total')}}</div>
+          <div>100.00% |</div>
+          <div>
+            <abbr :title="$t('result.notIncludeNoVote')">{{ totalVotes }}  {{ $t('voting.vote' , { count: totalVotes })}}*</abbr>
           </div>
         </div>
-        <div class="flex-1">
-          <div class="flex flex-row gap-2 px-2 py-1 my-1 mb-4">
-            <div class="flex-1 flex flex-row gap-2">
-              <div class="flex-1">{{ $t('result.total')}}</div>
-              <div>100.00% |</div>
-            </div>
-            <div>
-              <abbr :title="$t('result.notIncludeNoVote')">{{ totalVotes }}  {{ $t('voting.vote' , { count: totalVotes })}}*</abbr>
-            </div>
-          </div>
-          <div v-for="choice of voteResult.choices.choices" class="relative flex flex-row gap-2 border-2 px-2 py-1 my-1 rounded-md border-dga-blue">
-            <div class="flex-1 flex flex-row gap-2">
+      </div>
+      <div class="col-span-2"></div>
+      <template v-for="choice of voteResult.choices.choices">
+        <div class="hidden sm:block sm:col-span-2 text-right">
+          <template v-if="yourVotes && yourVotes.length > 0">
+            x{{ yourVoteCount(choice.name) }} =>
+          </template>
+          <template v-else-if="yourVoteCount(choice.name) > 0">
+            ===>
+          </template>
+        </div>
+        <div class="col-span-10 sm:col-span-8 relative rounded-md border-2 border-dga-blue">
+          <div class="flex flex-row gap-2 px-2 py-1">
+            <div class="flex-1 flex flex-row items-center gap-2">
               <div class="flex-1">{{ choice.name }}</div>
-              <div v-if="getScore(choice.name)">
-                {{ getPercentOfOptIn(getScore(choice.name)).toFixed(2) }}% |
-              </div>
+              <template v-if="getScore(choice.name)">
+                <div>{{ getPercentOfOptIn(getScore(choice.name)).toFixed(2) }}% |</div>
+                <div>
+                  {{ getScore(choice.name)?.count }} {{ $t('voting.vote' , { count: getScore(choice.name).count })}}
+                </div>
+              </template>
             </div>
-            <div v-if="getScore(choice.name)">
-              {{ getScore(choice.name)?.count }} {{ $t('voting.vote' , { count: getScore(choice.name).count })}}
-            </div>
-            <div v-if="getScore(choice.name)" class="absolute z-[-1] left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-              :style="{ width: getPercentOfOptIn(getScore(choice.name)).toFixed(2) + '%'}"
-            ></div>
           </div>
-          <div class="relative flex flex-row gap-2 border-2 px-2 py-1 my-1 mt-4 rounded-md border-dga-blue">
-            <div class="flex-1 flex flex-row gap-2">
+          <div v-if="scores" class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
+            :style="{ width: getPercentOfOptIn(getScore(choice.name)).toFixed(2) + '%'}"
+          ></div>
+        </div>
+        <div class="col-span-2">
+          <span v-if="getWinner(choice.name)">
+            #{{ getWinner(choice.name)?.rank }}
+          </span>
+          <span v-if="getWinner(choice.name) && getWinner(choice.name)?.rank === 1" class="ml-2">
+            {{ $t('result.winner') }}
+          </span>
+        </div>
+      </template>
+      <template v-if="getScore(null).count > 0">
+        <div class="hidden sm:block sm:col-span-2 text-right mt-4">
+          <template v-if="yourVotes && yourVoteCount(null) > 0">
+            x{{ yourVoteCount(null) }} =>
+          </template>
+        </div>
+        <div class="col-span-10 sm:col-span-8 relative mt-4 border-2 rounded-md border-dga-blue">
+          <div class="flex flex-row gap-2 px-2 py-1 ">
+            <div class="flex-1 flex flex-row gap-2 items-center">
               <div class="flex-1">{{ $t('result.noVoted')}}</div>
-              <div v-if="scores">{{ getPercentOf(getScore(null)).toFixed(2) }}% |</div>
-            </div>
-            <div v-if="scores">
-              {{ totalVotes - getScore(null).count }} {{ $t('voting.vote' , { count: totalVotes - getScore(null).count })}}
+              <template v-if="scores">
+                <div>{{ getPercentOf(getScore(null)).toFixed(2) }}% |</div>
+                <div>
+                  {{ getScore(null).count }} {{ $t('voting.vote' , { count: totalVotes - getScore(null).count })}}
+                </div>
+              </template>
             </div>
             <div v-if="scores" class="absolute z-[-1] left-0 top-0 bottom-0 bg-dga-blue opacity-25"
               :style="{ width: (getScore(null).count * 100 / totalVotes).toFixed(2) + '%'}">
             </div>
           </div>
         </div>
-        <div>
-          <div class="px-2 py-1 my-1 mb-4 h-[2rem]"></div>
-          <div v-for="choice of voteResult.choices.choices" class="px-2 py-1 my-1 h-[2rem] flex flex-row gap-2">
-            <span v-if="getWinner(choice.name)">
-              #{{ getWinner(choice.name)?.rank }}
-            </span>
-            <span v-if="getWinner(choice.name) && getWinner(choice.name)?.rank === 1">
-              {{ $t('result.winner') }}
-            </span>
-          </div>
-          <div class="px-2 py-1 my-1 h-[2rem] mt-4"></div>
+        <div class="col-span-2 mt-4"></div>
+      </template>
+      
+    </div>
+
+    <template v-if="votes">
+      <div v-if="!showVotingLog" class="mt-4 text-center">
+        <DgaButton color="dga-orange" @click="showVotingLog = true">{{  $t('result.showVoteLogs') }}</DgaButton>
+      </div>
+      <div v-else class="col-span-2 flex flex-col mt-4 gap-2">
+        <h3 class="font-bold text-xl">{{  $t('result.voteLogs') }}</h3>
+        <div class="border-2 border-dga-blue rounded-lg p-2 max-h-[2000px] overflow-auto">
+          <table class="w-full">
+            <tbody>
+              <tr v-for="vote of votes" class="transition hover:bg-slate-200">
+                <td class="px-2 py-1 text-left" style="width: 200px">{{ $d(dayjs(vote.createdAt).toDate(), "short") }}</td>
+                <td class="px-2 py-1 text-left">{{ getVoterName(vote.userid ) }}</td>
+                <td class="px-2 py-1 text-right" style="width: 120px">{{ vote.choice }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
-    <div v-if="votes" class="gap-2 my-2">
-      <DgaButton color="dga-orange" @click="showVotingLog = true">Show Voting Log</DgaButton>
-    </div>
-    
-    <div v-if="votes && showVotingLog" class="col-span-2 flex flex-col gap-2">
-      <h3 class="font-bold text-xl">{{  $t('result.voteLogs') }}</h3>
-      <div class="border-2 border-dga-blue rounded-lg p-2 max-h-[2000px] overflow-auto">
-        <table class="w-full">
-          <tbody>
-            <tr v-for="vote of votes" class="transition hover:bg-slate-200">
-              <td class="px-2 py-1 text-left" style="width: 200px">{{ $d(dayjs(vote.createdAt).toDate(), "short") }}</td>
-              <td class="px-2 py-1 text-left">{{ getVoterName(vote.userid ) }}</td>
-              <td class="px-2 py-1 text-right" style="width: 120px">{{ vote.choice }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -231,15 +237,3 @@ function getVoterName(voter: {
 }
 
 </script>
-
-<style scoped>
-.rank-1 {
-  @apply text-2xl;
-}
-.rank-2 {
-  @apply text-xl;
-}
-.rank-3 {
-  @apply text-lg;
-}
-</style>

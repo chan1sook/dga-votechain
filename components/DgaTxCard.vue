@@ -6,13 +6,13 @@
       <div class="content"><slot></slot></div>
       <div class="status">
         <button v-if="props.mined" class="mined cursor-default">
-          {{ $t('blockchain.blockInfo.mined') }}
+          {{ $t('admin.blockchain.blockInfo.mined') }}
         </button>
         <button v-else class="pending cursor-default">
-          {{ $t('blockchain.blockInfo.pending') }}
+          {{ $t('admin.blockchain.blockInfo.pending') }}
         </button>
         <button class="detail" @click="emit('detail')">
-          {{ $t('blockchain.detail') }}
+          {{ $t('admin.blockchain.detail') }}
         </button>
       </div>
     </div>
@@ -72,13 +72,7 @@ const emit = defineEmits<{
   grid-area: content;
   @apply flex flex-row flex-wrap gap-y-2 gap-x-4
 }
-.dga-tx-card > .inner > .content > .name {
-  @apply w-full text-xl font-bold
-}
-.dga-tx-card > .inner > .content > .time
-{
-  @apply flex-none
-}
+
 .dga-tx-card > .inner > .status {
   grid-area: status;
   @apply flex flex-col gap-2

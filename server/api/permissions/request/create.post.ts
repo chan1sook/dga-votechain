@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
   }
   const reqPermissionsDoc = await new RequestPermissionsModel(reqPermissions).save();
   
-  const content = `{{notification.requestPermission.title}} #${reqPermissionsDoc.id} {{otification.requestPermission.inProgress}}`
+  const content = `{{notification.requestPermission.title}} #${reqPermissionsDoc.id} {{notification.requestPermission.inProgress}}`
   await new NotificationModel(
     {
       from: "system",

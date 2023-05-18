@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
     createdAt: DateString
   }> = [];
   if(userData) {
-    yourVotes = allVotes.filter((ele) => ele.userid.toString() === userData._id.toString()).map((ele) => {
+    yourVotes = allVotes.filter((ele) => ele.userid._id.toString() === userData._id.toString()).map((ele) => {
       return {
         choice: ele.choice,
         createdAt: dayjs(ele.createdAt).toString(),

@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
+import { ObjectId } from "mongodb";
 import { Types } from "mongoose";
-import { queryVoteDatasByIdFromBlockchain } from "~~/server/hyperledger-rpc";
 
 import VoteModel from "~~/server/models/vote"
+import { getVoteOnBlockchain } from "~~/server/smart-contract";
 
 export default defineEventHandler(async (event) => {
   if(!event.context.params?.id) {
@@ -14,28 +15,27 @@ export default defineEventHandler(async (event) => {
   
   let txData: TxResponseData | undefined;
   try {
-    const _txData = await queryVoteDatasByIdFromBlockchain(event.context.params?.id);
-    const voteid = new Types.ObjectId(_txData.VoteID);
+    const blockchainData = await getVoteOnBlockchain(event.context.params?.id);
+    const valid = blockchainData.voteid === event.context.params?.id && ObjectId.isValid(blockchainData.voteid);
     txData = {
-      VoteID: `${_txData.VoteID}`,
-      UserID: `${_txData.UserID}`,
-      TopicID: `${_txData.TopicID}`,
-      Choice: _txData.Choice === "" ? null : _txData.Choice,
-      BookmarkID: _txData.BookmarkID,
-      CreatedAt: dayjs(voteid.getTimestamp()).toString(),
-      Mined: true,
+      ...blockchainData,
+      choice: blockchainData.choice === "" ? null : blockchainData.choice,
+      createdAt: valid ? new Types.ObjectId(blockchainData.voteid).getTimestamp().toString() : undefined,
+      valid,
+      mined: valid,
     }
   } catch(_err) {
     console.error(_err);
     const voteDoc : VoteData & { _id: Types.ObjectId } | null = await VoteModel.findById(event.context.params?.id);   
     if(voteDoc) {
       txData = {
-        VoteID: `${voteDoc._id}`,
-        UserID: voteDoc.topicid.toString(),
-        TopicID: voteDoc.userid.toString(),
-        Choice: voteDoc.choice === "" ? null : voteDoc.choice,
-        CreatedAt: dayjs(voteDoc.createdAt).toString(),
-        Mined: true,
+        voteid: `${voteDoc._id}`,
+        topicid: voteDoc.topicid.toString(),
+        userid: voteDoc.userid.toString(),
+        choice: voteDoc.choice === "" ? null : voteDoc.choice,
+        createdAt: dayjs(voteDoc.createdAt).toString(),
+        valid: false,
+        mined: false,
       }
     }
 
