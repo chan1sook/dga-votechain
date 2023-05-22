@@ -20,12 +20,14 @@ export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
   const topicVoterAllowsDocs = userData ? await TopicVoterAllowsModel.getVoterAllowForTopicsFilters(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
   
+  let filterIds;
   if(!userData || userData.roleMode === "guest") {
-    topicsData = await TopicModel.getLastestPublicVoteTopics(filterParams);
+    topicsData = await TopicModel.getLastestFinishedPublicVoteTopics(filterParams);
   } else if(userData.roleMode === "voter") {
-    topicsData = await TopicModel.getLastestVoteWithIdsTopics(topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i), filterParams);
+    filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
+    topicsData = await TopicModel.getLastestVoterTopicsWithIds(filterIds, filterParams);
   } else {
-    topicsData = await TopicModel.getLastestAvailableTopics(filterParams);
+    topicsData = await TopicModel.getLastestAdminTopics(filterParams);
   }
 
   const topicPauseDocs = await TopicPauseModel.find({ topicid: { $in: topicsData.map((ele) => ele._id)} });
@@ -55,6 +57,7 @@ export default defineEventHandler(async (event) => {
       } : undefined,
       createdAt: dayjs(topicData.createdAt).toISOString(),
       updatedAt: dayjs(topicData.updatedAt).toISOString(),
+      durationMode: topicData.durationMode,
       voteStartAt: dayjs(topicData.voteStartAt).toISOString(),
       voteExpiredAt: dayjs(topicData.voteExpiredAt).toISOString(),
       publicVote: topicData.publicVote,

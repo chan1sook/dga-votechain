@@ -21,6 +21,7 @@ export default defineNuxtConfig({
       DID_API_URL: isProduction ? process.env.DID_API_URL : process.env.DEV_DID_API_URL,
       SOCKETIO_URL: isProduction ? process.env.SOCKETIO_URL : process.env.DEV_SOCKETIO_URL,
       SYNCTIME_THERSOLD: 60 * 1000,
+      BLOCKCHAIN_SERVERHB_TIME_THERSOLD: 5 * 60 * 1000,
       FB_API_KEY: process.env.FB_API_KEY,
       FB_AUTH_DOMAIN: process.env.FB_AUTH_DOMAIN,
       FB_PROJECT_ID: process.env.FB_PROJECT_ID,
@@ -84,7 +85,7 @@ export default defineNuxtConfig({
         }
       }
     },
-    lazy: true,
+    lazy: false,
     langDir: 'lang',
     defaultLocale: 'th',
     locales: [

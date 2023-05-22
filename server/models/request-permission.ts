@@ -21,7 +21,7 @@ const schema = new Schema<RequestPermissionsData, RequestPermissionsModel>({
 }, { timestamps: true });
 
 schema.static("getPendingRequestPermissionsData", function getRequestPermissionsData(
-  pagesize?: number, startid?: string
+  pagesize?: number, startid?: string, advance?: boolean
 )  {
   const query : FilterQuery<RequestPermissionsData> = {
     status: "pending"
@@ -29,6 +29,12 @@ schema.static("getPendingRequestPermissionsData", function getRequestPermissions
 
   if(startid) {
     query._id = { $lt: new Types.ObjectId(startid) }
+  }
+
+  if(!advance) {
+    query.permissions = {
+      $nin: getAdvancePermissions(),
+    }
   }
   
   return this.find(query).limit(pagesize || 50).sort({_id: -1 }).populate("userid");

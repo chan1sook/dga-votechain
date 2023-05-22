@@ -139,10 +139,11 @@ export default {
       running: "การโหวตกำลังดำเนินการ",
       paused: "การโหวตหยุดชั่วคราว",
     },
+    adminWarning: "ให้เปลี่ยนสถานะเป็น ผู้โหวต ก่อนการลงคะแนนเสียง",
     pause: "หยุด",
     resume: "โหวตต่อ",
     clear: "ล้าง",
-    noVote: "ไม่โหวต",
+    noVote: "งดออกเสียง",
     submit: "ส่ง",
     confirm: "ยืนยันการเลือกโหวตนี้?"
   },
@@ -293,6 +294,7 @@ export default {
     approveRequestPermissions: "อนุมัติการขอสิทธิ์",
     requestsNotFound: "ไม่พบรายการขอสิทธิ์",
     approve: "อนุมัติ",
+    manageApproveList: "จัดการรายการอนุมัติ",
     reject: "ปฏิเสธ",
     userid: "ID ผู้ใช้",
     personalData: "ข้อมูลส่วนบุคคล",
@@ -311,7 +313,6 @@ export default {
     "change-topic": "แก้ไขข้อมูลการโหวต",
     "grant-topic-controller": "ให้สิทธิ์ควบคุมการโหวต",
     "transfer-topic-controller": "โอนสิทธิ์ควบคุมการโหวต",
-    "change-others-permissions": "เปลี่ยนสิทธ์คนอื่น",
   },
   admin: {
     user: {
@@ -333,7 +334,8 @@ export default {
         offline: "ออฟไลน์",
       },
       searchTx: "ค้นหา",
-      txid: "TX ID",
+      txhash: "TX Hash",
+      voteid: "Vote ID",
       txInfo: "ข้อมูล TX",
       liveTxUpdate: "รายการ TX ล่าสุด",
       type: {
@@ -344,7 +346,8 @@ export default {
       createdAt: "สร้างเมื่อ",
       status: "สถานะ",
       detail: "รายละเอียด",
-      blockdata: "ข้อมูลบล็อก"
+      transactionData: "ข้อมูลใน TX",
+      transactionRawData: "ข้อมูลดิบ TX",
     },
   },
   timePeriod: {

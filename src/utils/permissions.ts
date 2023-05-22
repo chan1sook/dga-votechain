@@ -5,9 +5,9 @@ export function legacyRoleToPermissionsExcludes(role: UserRole) : Array<EVotePer
     case "voter":
       return ["request-permissions", "voter-mode", "vote-topic", "transfer-topic-controller"];
     case "admin":
-      return ["admin-mode", "create-topic", "change-topic", "grant-topic-controller", "create-news", "change-news"];
+      return ["admin-mode", "create-topic", "change-topic", "grant-topic-controller", "create-news", "change-news", "change-permissions:basic"];
     case "developer":
-      return ["dev-mode", "change-others-permissions"];
+      return ["dev-mode", "change-permissions:advance"];
     default:
       return [];
   }

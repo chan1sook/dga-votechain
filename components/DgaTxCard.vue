@@ -1,12 +1,16 @@
 <template>
-  <div class="dga-tx-card" :class="[props.mined ? 'mined' : '']">
+  <div class="dga-tx-card" :class="[props.status || 'pending']">
     <div class="inner">
+      <div class="voteid"><slot name="voteid"></slot></div>
       <div class="tx"><slot name="txid"></slot></div>
       <div class="type"><slot name="type"></slot></div>
       <div class="content"><slot></slot></div>
       <div class="status">
-        <button v-if="props.mined" class="mined cursor-default">
+        <button v-if="props.status === 'valid'" class="valid cursor-default">
           {{ $t('admin.blockchain.blockInfo.mined') }}
+        </button>
+        <button v-else-if="props.status === 'invalid'" class="invalid cursor-default">
+          {{ $t('admin.blockchain.blockInfo.invalid') }}
         </button>
         <button v-else class="pending cursor-default">
           {{ $t('admin.blockchain.blockInfo.pending') }}
@@ -21,7 +25,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  mined?: boolean,
+  status?: TxStatus,
 }>();
 
 const emit = defineEmits<{
@@ -40,13 +44,13 @@ const emit = defineEmits<{
 
 .dga-tx-card > .inner {
   @apply rounded-lg bg-white grid items-center p-2 md:p-4 gap-2 md:gap-y-0 overflow-auto;
-  grid-template-areas: "tx" "type" "content" "status";
+  grid-template-areas: "voteid" "tx" "type" "content" "status";
   grid-template-columns: auto;
 }
 
 @media (min-width: 768px) {
   .dga-tx-card > .inner {
-    grid-template-areas: "tx tx tx"  "type content status" "type content status";
+    grid-template-areas: "voteid voteid voteid" "tx tx tx"  "type content status" "type content status";
     grid-template-columns: 150px auto 120px;
   }
 }
@@ -57,6 +61,11 @@ const emit = defineEmits<{
 }
 .dga-tx-card > .inner > .public {
   @apply text-green-700;
+}
+
+.dga-tx-card > .inner > .voteid {
+  grid-area: voteid;
+  @apply text-sm;
 }
 
 .dga-tx-card > .inner > .tx {
@@ -80,8 +89,11 @@ const emit = defineEmits<{
 .dga-tx-card > .inner > .status > * {
   @apply rounded-full w-full max-w-[160px] md:max-w-none mx-auto px-3 py-1 text-center text-sm text-white bg-dga-orange;
 }
-.dga-tx-card > .inner > .status > .mined  {
+.dga-tx-card > .inner > .status > .valid  {
   @apply bg-green-700
+}
+.dga-tx-card > .inner > .status > .invalid {
+  @apply bg-red-800;
 }
 .dga-tx-card > .inner > .status > .pending {
   @apply bg-gray-400;

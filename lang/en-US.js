@@ -138,6 +138,7 @@ export default {
       running: "E-voting is Running",
       paused: "E-voting is Paused",
     },
+    adminWarning: "Please change mode to Voter for voting topic.",
     pause: "Paused",
     resume: "Resume",
     clear: "Clear",
@@ -291,6 +292,7 @@ export default {
     approveRequestPermissions: "Approve Request Permission",
     requestsNotFound: "Requests not found",
     approve: "Approve",
+    manageApproveList: "Manage Approve List",
     reject: "Reject",
     userid: "User ID",
     personalData: "Personal Data",
@@ -309,7 +311,6 @@ export default {
     "change-topic": "Change Topic Data",
     "grant-topic-controller": "Grant Topic Controller to Other User",
     "transfer-topic-controller": "Transfer Topic Controller to Other User",
-    "change-others-permissions": "Allow Change Other User Permissions",
   },
   admin: {
     user: {
@@ -331,7 +332,8 @@ export default {
         offline: "Offline",
       },
       searchTx: "Search TX",
-      txid: "TX ID",
+      txhash: "TX Hash",
+      voteid: "Vote ID",
       txInfo: "Tx Info",
       liveTxUpdate: "Live TX Update",
       type: {
@@ -342,7 +344,8 @@ export default {
       createdAt: "Created At",
       status: "Status",
       detail: "Detail",
-      blockdata: "Block Data"
+      transactionData: "TX Data",
+      transactionRawData: "Raw TX Data",
     },
   },
   timePeriod: {

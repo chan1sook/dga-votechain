@@ -34,9 +34,11 @@
               <summary>
                 {{ $t(`requestPermissions.add.requestTo.${request.preset}`, request.preset) }}
               </summary>
-              <abbr v-for="permission of request.permissions" :title="getFullPermissionTitle(permission)">
-                {{ permission }}
-              </abbr>
+              <div class="inline-flex flex-row flex-wrap gap-x-2">
+                <abbr v-for="permission of request.permissions" :title="getFullPermissionTitle(permission)">
+                  {{ permission }}
+                </abbr>
+              </div>
             </details>
           </div>
         </div>

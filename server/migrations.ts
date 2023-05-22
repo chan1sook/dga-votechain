@@ -1,6 +1,7 @@
 import EVoteUserModel from "~~/server/models/user"
 import OldUserModel from "~~/server/models/old-user"
-import { combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
+import BlockchainServerModel from "~~/server/models/blockchain-server"
+import { checkPermissionSelections, combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
 
 let migrationSeq = 0;
 
@@ -89,5 +90,61 @@ export async function migrateToNewUserFormat() {
     }
   }))
 
-  console.log(`[Migration] MigrateToNewUserFormat (Upserted: ${result.upsertedCount})`);
+  console.log(`[Migration] MigrateToNewUserFormat (Upserted: ${result.upsertedCount}) (Modified: ${result.modifiedCount})`);
+}
+
+export async function migrateChangedPermissions() {
+  migrationSeq +=1 ;
+
+  console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);
+  
+  const userDocs = await EVoteUserModel.find({});
+  const userDocsToSave = [];
+
+  for(const userDoc of userDocs) {
+    if(checkPermissionSelections(userDoc.permissions, "admin-mode")) {
+      userDoc.permissions = combinePermissions(userDoc.permissions, "change-permissions:basic");
+      userDoc.markModified("permissions");
+    }
+    if(checkPermissionSelections(userDoc.permissions, "dev-mode")) {
+      userDoc.permissions = combinePermissions(userDoc.permissions, "change-permissions:advance");
+      userDoc.markModified("permissions");
+    }
+    userDocsToSave.push(userDoc);
+  }
+
+  const result = await EVoteUserModel.bulkSave(userDocsToSave);
+  console.log(`[Migration] MigrateChangePermissions (Modified: ${result.modifiedCount})`);
+}
+
+export async function setPredefinedBlockchainServers() {
+  migrationSeq +=1 ;
+
+  console.log(`[Migration] ${migrationSeq}. Add Predefined Blockchain Servers`);
+  
+  const serverCounts = await BlockchainServerModel.countDocuments();
+  let insertedCount = 0;
+  
+  if(serverCounts === 0) {
+    const today = new Date();
+    const result = await BlockchainServerModel.insertMany([
+      {
+        host: "209.15.108.160",
+        createdAt: today,
+        updatedAt: today,
+      },
+      {
+        host: "164.115.95.57",
+        createdAt: today,
+        updatedAt: today,
+      },
+      {
+        host: "35.239.20.185",
+        createdAt: today,
+        updatedAt: today,
+      }
+    ]);
+    insertedCount = result.length;
+  }
+  console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
 }

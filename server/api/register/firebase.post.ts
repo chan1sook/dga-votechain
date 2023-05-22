@@ -29,6 +29,7 @@ export default defineEventHandler(async (event) => {
           authSources: [
             { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
           ],
+          email: decodedFirebaseUserdata.email,
         });
         await userDoc.save();
       } else {

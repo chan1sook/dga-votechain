@@ -9,14 +9,21 @@
       <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.voteDuration.title')}}</h3>
       <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.inputMode')}}</div>
       <div class="col-span-12 md:col-span-10">
-        <DgaSelect v-model="durationMode" :options="durationModeOptions"></DgaSelect>
+        <DgaSelect v-model="topicData.durationMode" :options="durationModeOptions"></DgaSelect>
       </div>
       <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.start') }}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
         <DgaInput v-model="voteStart.dateStr" type="date" class="w-full" :placeholder="$t('topic.voteDuration.startDate')"></DgaInput> 
         <DgaInput v-model="voteStart.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.startTime')"></DgaInput>
       </div>
-      <template v-if="durationMode === 'startDuration'">
+      <template v-if="topicData.durationMode === 'startEnd'">
+        <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.end')}}</div>
+        <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
+          <DgaInput v-model="voteEnd.dateStr" type="date" class="w-full" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
+          <DgaInput v-model="voteEnd.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
+        </div>
+      </template>
+      <template v-else>
         <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.duration')}}</div>
         <div class="col-span-12 md:col-span-10 flex flex-col sm:flex-row gap-2">
           <div class="w-full flex flex-row items-center gap-2">
@@ -31,13 +38,6 @@
             <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
             <div class="w-16 sm:w-auto">{{ $t('timePeriod.minute', { count: 2 }) }}</div>
           </div>
-        </div>
-      </template>
-      <template v-else>
-        <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.end')}}</div>
-        <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-          <DgaInput v-model="voteEnd.dateStr" type="date" class="w-full" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
-          <DgaInput v-model="voteEnd.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
         </div>
       </template>
       <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.topicQuestion')}}</h3>
@@ -195,7 +195,6 @@ useHead({
 });
 
 const showDescription = ref(false);
-const durationMode = ref("startDuration");
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
@@ -232,6 +231,7 @@ const topicData = ref<TopicFormData>({
   name: "",
   description: "",
   choices: getPresetChoices(),
+  durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
   multipleVotes: false,
@@ -322,7 +322,7 @@ async function createTopic() {
 
   topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
     
-  if(durationMode.value === "startDuration") {
+  if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
       .add(voteDuration.value.durationDays, "days")
       .add(voteDuration.value.durationHours, "hours")
@@ -330,7 +330,7 @@ async function createTopic() {
   } else {
     topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
   }
-  
+
   const voterAllows = topicData.value.voterAllows.map((ele) => {
     return {
       userid: ele.userid,

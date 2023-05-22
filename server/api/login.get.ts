@@ -49,7 +49,12 @@ export default defineEventHandler(async (event) => {
       if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
         defaultRoleMode = "admin";
       }
-  
+      
+      if(!userDoc.email) {
+        userDoc.email = decodedFirebaseUserdata.email;
+        await userDoc.save();
+      }
+
       await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
         userid: userDoc._id.toString(),
         roleMode: defaultRoleMode,

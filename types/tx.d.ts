@@ -15,32 +15,26 @@ declare global {
   }
 
   interface VoteDataBlockchainResponse {
-    voteid: string,
-    topicid: string,
-    userid: string,
+    voteId: string,
+    topicId: string,
+    userId: string,
     choice: string,
   }
 
-  type TxResponseOldData = {
-    TopicID: string,
-    UserID: string,
-    VoteID: string,
-    Choice: string | null,
-    CreatedAt: DateString,
-    BookmarkID?: string,
-    Mined: boolean,
-  }
+  type TxStatus = "valid" | "invalid" | "pending";
   type TxResponseData = Omit<VoteDataBlockchainResponse, "choice"> & {
+    txhash: string | null,
     choice: string | null,
     createdAt: DateString | undefined,
-    valid: boolean,
-    mined: boolean,
+    txStatus: TxStatus,
   }
+
+  type TxResponseDataFull = TxResponseData & {
+    txData?: Object,
+  }
+
   interface TxInfoResponseData {
-    server: {
-      online: number,
-      total: number,
-    },
+    servers: Array<BlockchainServerDataResponse>,
     blocks: {
       mined: number,
       total: number,

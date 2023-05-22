@@ -12,6 +12,7 @@ declare global {
     choices: ChoicesData;
     createdBy?: Types.ObjectId | UserResponseFilterData;
     updatedBy?: Types.ObjectId | UserResponseFilterData;
+    durationMode?: TopicDurationMode,
     voteStartAt: Date;
     voteExpiredAt: Date;
     publicVote: boolean;
@@ -23,13 +24,15 @@ declare global {
     notifyVoter: boolean;
   }
 
+  type TopicDurationMode = "startDuration" | "startEnd";
+
   type TopicDataWithId = TopicData & { _id: Types.ObjectId };
   type TopicDataWithIdAndVoterAllow = TopicDataWithId & { voterAllow?: TopicVoterAllowData };
   
   interface TopicModel extends Model<TopicData> {
-    getLastestPublicVoteTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
-    getLastestVoteWithIdsTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
-    getLastestAvailableTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
+    getLastestFinishedPublicVoteTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
+    getLastestVoterTopicsWithIds(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
+    getLastestAdminTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
   }
   
   interface ChoicesData {
@@ -79,7 +82,7 @@ declare global {
     ) & PaginationParams;
 
   type TopicVoteCountRecord = {choice: string | null, count: number }
-  type TopicVoteCountResponse = Pick<TopicResponseData, "_id" | "name" | "description" | "choices" | "voteStartAt" | "voteExpiredAt" | "createdAt" | "updatedAt"> & {
+  type TopicVoteCountResponse = Pick<TopicResponseData, "_id" | "name" | "description" | "choices" | "voteStartAt" | "voteExpiredAt" | "createdAt" | "updatedAt" | "durationMode"> & {
     winners: Array<{choice: string | null, rank: number }>,
     scores?: Array<TopicVoteCountRecord>,
     votes?: Array<Omit<VoteResponseData, "_id" | "userid" | "topicid" | "createdAt"> & {

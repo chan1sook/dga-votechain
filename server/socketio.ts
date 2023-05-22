@@ -26,26 +26,36 @@ export default async () => {
   const eventEmitter = getEventEmitter();
   eventEmitter.on("voted", async (votes : Array<VoteResponseData>) => {
     io.emit("voted", votes);
-    const txChain : Array<TxResponseOldData> = votes.map((tx) => {
+    const txChain : Array<TxResponseData> = votes.map((tx) => {
       return {
-        VoteID: `${tx._id}`,
-        UserID: `${tx.userid}`,
-        TopicID: `${tx.topicid}`,
-        Choice: tx.choice,
-        CreatedAt: dayjs(tx.createdAt).toString(),
-        Mined: false,
+        voteId: `${tx._id}`,
+        topicId: tx.topicid.toString(),
+        userId: tx.userid.toString(),
+        choice: tx.choice === "" ? null : tx.choice,
+        createdAt: dayjs(tx.createdAt).toString(),
+        txhash: tx.tx,
+        txStatus: Boolean(tx.tx) ? "valid" : "invalid",
       }
     });
     io.emit("tx", txChain);
   });
 
-  eventEmitter.on("txmined", async (tx : TxResponseOldData) => {
+  eventEmitter.on("txmined", (tx : TxResponseData) => {
     io.emit("tx", tx);
+  });
+
+  eventEmitter.on("blockchain-server-hb", (svData: BlockchainServerData) => {
+    io.emit("blockchain-server-hb", {
+      _id: `${svData._id}`,
+      host: svData.host,
+      createdAt: dayjs(svData.createdAt).toString(),
+      updatedAt: dayjs(svData.updatedAt).toString(),
+      lastActiveAt: svData.lastActiveAt ? dayjs(svData.lastActiveAt).toString() : undefined,
+    });
   });
   
   async function emitServerTime() {
     const time = new Date();
-    console.log("IO", time);
     io.emit("ntpTime", time.toISOString());
   }
 

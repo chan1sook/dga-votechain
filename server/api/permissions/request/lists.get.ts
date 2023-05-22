@@ -1,19 +1,20 @@
 import dayjs from "dayjs";
 import RequestPermissionsModel from "~~/server/models/request-permission"
 import { checkPermissionSelections } from "~~/src/utils/permissions";
+import { isAdminRole } from "~~/src/utils/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-others-permissions")) {
+  if(!userData || !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
   const { startid, pagesize } : PaginationParams = getQuery(event);
-
-  const reqPermissionData = await RequestPermissionsModel.getPendingRequestPermissionsData(pagesize, startid);
+  const isAdvanceMode = userData.roleMode === "developer" && checkPermissionSelections(userData.permissions, "change-permissions:advance");
+  const reqPermissionData = await RequestPermissionsModel.getPendingRequestPermissionsData(pagesize, startid, isAdvanceMode);
   
   const requestPermissions : Array<RequestPermissionsListData> = reqPermissionData.map((doc) => {
     return {

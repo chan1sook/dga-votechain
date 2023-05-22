@@ -3,20 +3,20 @@ import dayjs from "dayjs";
 
 import EVoteUserModel from "~~/server/models/user"
 import VoteModel from "~~/server/models/vote"
+import { ObjectId } from "mongodb";
 
 export async function getTxArr(pagesize: number, startid: string) {
-  let txDocs : Array<TxResponseData & { tx: string | null }> = [];
+  let txDocs : Array<TxResponseData> = [];
   const _txDocs : Array<VoteData> = await VoteModel.getLastestVotes(pagesize, startid);
   for(const fakeTx of _txDocs) {
     txDocs.push({
-      voteid: `${fakeTx._id}`,
-      topicid: fakeTx.topicid.toString(),
-      userid: fakeTx.userid.toString(),
+      voteId: `${fakeTx._id}`,
+      topicId: fakeTx.topicid.toString(),
+      userId: fakeTx.userid.toString(),
       choice: fakeTx.choice === "" ? null : fakeTx.choice,
       createdAt: dayjs(fakeTx.createdAt).toString(),
-      valid: Boolean(fakeTx.tx),
-      mined: Boolean(fakeTx.tx),
-      tx: fakeTx.tx,
+      txhash: fakeTx.tx,
+      txStatus: !fakeTx.tx ? "invalid" : "valid",
     });
   }
 

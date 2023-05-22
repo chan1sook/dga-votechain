@@ -105,6 +105,7 @@ export default defineEventHandler(async (event) => {
           },
           createdAt: dayjs(ele.createdAt).toISOString(),
           choice: ele.choice,
+          tx: ele.tx,
         };
       })
     }
@@ -122,7 +123,7 @@ export default defineEventHandler(async (event) => {
     }
     return {
       choice: ele.choice,
-      rank: i + 1
+      rank,
     }
   });
 

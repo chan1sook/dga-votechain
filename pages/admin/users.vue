@@ -1,8 +1,17 @@
 <template>
   <div v-if="userData">
     <DgaHead>{{ $t('admin.user.title') }}</DgaHead>
-    <div class="grid grid-cols-12 py-2 gap-2 mx-auto max-w-6xl">
-      <div class="col-span-12 lg:col-span-8 flex flex-col border-2 border-dga-blue rounded-md max-h-[600px]">
+    <div class="flex flex-row gap-2 items-center justify-end">
+      <DgaButton 
+        class="flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
+        :href="localePathOf('/permissions/approve')"
+      >
+      <MaterialIcon icon="how_to_reg"></MaterialIcon>
+        {{ $t('requestPermissions.manageApproveList') }}
+      </DgaButton>
+    </div>
+    <div class="grid grid-cols-12 py-2 gap-2 mx-auto max-w-5xl">
+      <div class="col-span-12 flex flex-col border-2 border-dga-blue rounded-md max-h-[600px]">
         <h4 class="font-bold text-lg p-2">{{ $t('admin.user.title') }}</h4>
         <div class="flex-1 border-t-2 border-dga-blue p-2 overflow-y-auto">
           <div class="flex flex-col gap-2">

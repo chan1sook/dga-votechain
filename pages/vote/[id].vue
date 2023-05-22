@@ -136,6 +136,9 @@
         <div class="text-center text-2xl">{{ $t("voting.evoteState.paused") }}</div>
       </template>
     </template>
+    <template v-else>
+      <div class="text-center text-2xl">{{ $t("voting.adminWarning") }}</div>
+    </template>
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="submitVotes"
       @close="showConfirmModal = false"
@@ -165,7 +168,7 @@ const { id } = useRoute().params;
 const topicid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('voting.title')} #${topicid}`
+  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('voting.title', "Voting")} #${topicid}`
 });
 
 const topic: Ref<TopicResponseDataExtended | undefined> = ref(undefined);

@@ -1,12 +1,13 @@
 import UserModel from "~~/server/models/user"
 import RequestPermissionsModel from "~~/server/models/request-permission"
 import NotificationModel from "~~/server/models/notification";
-import { checkPermissionSelections, combinePermissions } from "~~/src/utils/permissions";
+import { checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
+import { isAdminRole } from "~~/src/utils/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-others-permissions")) {
+  if(!userData || !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -24,6 +25,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: "Can't change anymore",
+    });
+  }
+
+  if(isContainsAdvancePermissions(...reqData.permissions) && userData.roleMode !== "developer" && !checkPermissionSelections(userData.permissions, "change-permissions:advance")) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
     });
   }
 

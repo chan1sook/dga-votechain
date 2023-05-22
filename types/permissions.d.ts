@@ -3,10 +3,10 @@ import type { Model, Query } from "mongoose";
 declare global {
   type EVotePermissionBasic = "banned" | "request-permissions";
   type EVotePermissionVoter = "voter-mode" | "vote-topic" | "transfer-topic-controller";
-  type EVotePermissionAdmin = "admin-mode" | "create-topic" | "change-topic" | "create-news" | "change-news" | "grant-topic-controller";
-  type EVotePermissionDeveloper = "dev-mode" | "change-others-permissions";
+  type EVotePermissionAdmin = "admin-mode" | "create-topic" | "change-topic" | "create-news" | "change-news" | "grant-topic-controller" | "change-permissions:basic";
+  type EVotePermissionDeveloper = "dev-mode" | "change-permissions:advance";
 
-  type EVotePermissionUnused = "access-pages:user" | "access-notifications" | "request-topic" | "access-pages:admin" | "change-permissions:basic" | "access-pages:developer" | "change-permissions:advance";
+  type EVotePermissionUnused = "access-pages:user" | "access-notifications" | "request-topic" | "access-pages:admin" | "access-pages:developer";
 
   type EVotePermission = EVotePermissionBasic | EVotePermissionVoter | EVotePermissionAdmin | EVotePermissionDeveloper | EVotePermissionUnused;
 
@@ -25,7 +25,7 @@ declare global {
   }
 
   interface RequestPermissionsModel extends Model<RequestPermissionsData> {
-    getPendingRequestPermissionsData(pagesize?: number, startid?: string) : Query<Array<RequestPermissionsData>, RequestPermissionsData>;
+    getPendingRequestPermissionsData(pagesize?: number, startid?: string, advance?: boolean) : Query<Array<RequestPermissionsData>, RequestPermissionsData>;
     getExistsRequestPermissionsData(userid: Types.ObjectId) : Query<Array<RequestPermissionsDataWithPopulated>, RequestPermissionsDataWithPopulated>;
   }
 

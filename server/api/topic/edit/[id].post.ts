@@ -57,6 +57,10 @@ export default defineEventHandler(async (event) => {
     topicDoc.status = topicFormData.status;
   }
 
+  if(topicFormData.durationMode !== undefined) {
+    topicDoc.durationMode =topicFormData.durationMode;
+  }
+
   if(topicFormData.voteStartAt !== undefined) {
     topicDoc.voteStartAt = dayjs(topicFormData.voteStartAt).toDate();
   }
@@ -137,6 +141,7 @@ export default defineEventHandler(async (event) => {
     description: topicDoc.description,
     multipleVotes: topicDoc.multipleVotes,
     choices: topicDoc.choices,
+    durationMode: topicDoc.durationMode,
     voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
     createdAt: dayjs(topicDoc.createdAt).toISOString(),
