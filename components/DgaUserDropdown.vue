@@ -1,7 +1,7 @@
 <template>
   <div class="relative" @click.stop>
     <button type="button" @click="toggleShowOption" :title="$t('navbar.user.title')" class="flex flex-col items-center">
-      <AccountCircleOutlineIcon size="30" />
+      <AccountCircleOutlineIcon :size="30" />
       <div class="text-white text-xs mt-1 px-2 bg-dga-orange rounded-full whitespace-nowrap">
         {{ $t(`role.${roleMode}`, $t("role.guest")) }}
       </div>

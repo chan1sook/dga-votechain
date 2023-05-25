@@ -37,13 +37,13 @@
         <button v-if="!isPaused" class="w-16 text-white bg-red-700 rounded-l-lg order-3 flex flex-col items-center justify-center px-2 py-2"
           :title="$t('voting.pause')" @click="emitPause"
         >
-          <div><PauseIcon size="28" /></div>
+          <div><PauseIcon :size="28" /></div>
           <div>{{ $t("voting.pause") }}</div>
         </button>
         <button v-else class="w-16 bg-green-700 text-white rounded-r-lg order-1 flex flex-col items-center justify-center px-2 py-2"
         :title="$t('voting.resume')" @click="emitResume"
         >
-          <div><PlayIcon size="28" /></div>
+          <div><PlayIcon :size="28" /></div>
           <div>{{ $t("voting.resume") }}</div>
         </button>
       </div>
