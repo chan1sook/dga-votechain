@@ -54,7 +54,7 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('login.title', "Login")}`
 });
 
-const { DID_API_URL } = useRuntimeConfig();
+const { public: { DID_API_URL } } = useRuntimeConfig();
 const registerDigitalIdUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
 const nuxtApp = useNuxtApp()
 

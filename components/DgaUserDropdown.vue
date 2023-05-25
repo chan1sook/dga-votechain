@@ -59,7 +59,7 @@ function toggleShowOption() {
   }
 }
 
-const { SYNCTIME_THERSOLD } = useRuntimeConfig();
+const { public: { SYNCTIME_THERSOLD } } = useRuntimeConfig();
 
 const todayTime = ref(Date.now());
 const isSync = ref(false);

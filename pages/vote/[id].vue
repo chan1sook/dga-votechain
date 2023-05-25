@@ -169,7 +169,7 @@ definePageMeta({
 const i18n = useI18n()
 const localePathOf = useLocalePath();
 
-const { SYNCTIME_THERSOLD } = useRuntimeConfig();
+const { public: { SYNCTIME_THERSOLD } } = useRuntimeConfig();
 
 const { id } = useRoute().params;
 const topicid = Array.isArray(id) ? id[id.length - 1] : id;

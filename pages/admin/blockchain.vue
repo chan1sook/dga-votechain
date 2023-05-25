@@ -101,7 +101,7 @@ function toTxPage(id : string) {
 }
 
 function countServerOnlines(servers: Array<BlockchainServerDataResponse>) {
-  const onlineThershold = useRuntimeConfig().BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
+  const onlineThershold = useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if(current.lastActiveAt) {
       const diff = dayjs(getComputedServerTime()).diff(current.lastActiveAt);
