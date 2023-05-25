@@ -16,14 +16,32 @@
         {{ $t("voting.filters.search") }}
       </DgaButton>
       <DgaButton 
-        v-if="roleMode === 'admin' || roleMode === 'developer'"
+        v-if="roleMode === 'voter'"
         class="ml-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
-        :title="$t('voting.createTopic')"
-        :href="localePathOf('/topic/create')"
+        :title="$t('voting.requestTopic')"
+        :href="localePathOf('/topic/request')"
       >
         <MaterialIcon icon="add_circle"></MaterialIcon>
-        {{ $t('voting.createTopic') }}
+        {{ $t('voting.requestTopic') }}
       </DgaButton>
+      <div v-else-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
+        <DgaButton 
+          class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
+          :title="$t('voting.pendingTopic')"
+          :href="localePathOf('/topics/pending')"
+        >
+          <MaterialIcon icon="check"></MaterialIcon>
+          {{ $t('voting.pendingTopic') }}
+        </DgaButton>
+        <DgaButton 
+          class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
+          :title="$t('voting.createTopic')"
+          :href="localePathOf('/topic/create')"
+        >
+          <MaterialIcon icon="add_circle"></MaterialIcon>
+          {{ $t('voting.createTopic') }}
+        </DgaButton>
+      </div>
     </div>
     <div class="my-4 flex flex-col gap-4 mx-auto max-w-6xl">
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
@@ -52,6 +70,7 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
 import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime"
+import { isAdminRole } from "~~/src/utils/role";
 import { isTopicExpired, isTopicReadyToVote } from "~~/src/utils/topic";
 
 const localePathOf = useLocalePath();
@@ -62,7 +81,7 @@ definePageMeta({
 })
 const roleMode = computed(() => useSessionData().value.roleMode);
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('voting.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('voting.title')}`
 });
 
 const filter = ref({
@@ -117,7 +136,6 @@ function resetTopics() {
 const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return isAdminMode.value && 
-    !isTopicReadyToVote(topic, getComputedServerTime().getTime()) && 
     !isTopicExpired(topic, getComputedServerTime().getTime());
 }
 
@@ -131,12 +149,7 @@ function toEditTopic(topic: TopicResponseDataExtended) {
     return;
   }
 
-
-  if(isTopicReadyToVote(topic, getComputedServerTime().getTime())) {
-    /// TODO vote controller handle
-  } else {
-    navigateTo(localePathOf(`/topic/edit/${topic._id}`));
-  }
+  navigateTo(localePathOf(`/topic/edit/${topic._id}`));
 }
 
 function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
@@ -185,7 +198,7 @@ function handleStatusAction(topic: TopicResponseDataExtended, status: TopicCardS
 
 async function fetchTopics(filter: TopicFilterParams) {
   const fetchResult = await Promise.all([
-    useFetch("/api/topics", {
+    useFetch("/api/topics/avaliable", {
       query: { filter }
     })
   ])

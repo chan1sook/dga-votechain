@@ -93,52 +93,75 @@
           <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
           <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
         </div>
-        <table class="table mx-auto w-full max-w-[1600px] border-spacing-0 border-collapse">
-          <tbody>
-            <tr class="border-b-2 border-dga-blue">
-              <th style="width: 30px"></th>
-              <th style="width: 180px">{{ $t('topic.voterList.userId') }}</th>
-              <th>{{ $t('topic.voterList.name') }}</th>
-              <th>{{ $t('topic.voterList.email') }}</th>
-              <th v-if="topicData.multipleVotes">{{ $t('topic.voterList.totalVotes')}}</th>
-              <th style="width: 30px"></th>
-            </tr>
-            <tr v-for="voter of voterAllowsWithHint" class="transition hover:bg-slate-200">
-              <td>
+        <div class="overflow-auto max-h-[50vh]">
+          <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
+            <div class="font-bold"></div>
+            <div class="font-bold">{{ $t('topic.voterList.userId') }}</div>
+            <div class="font-bold">{{ $t('topic.voterList.name') }}</div>
+            <div class="font-bold">{{ $t('topic.voterList.email') }}</div>
+            <div v-if="topicData.multipleVotes" class="font-bold">{{ $t('topic.voterList.totalVotes')}}</div>
+            <div></div>
+            <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
+            <template v-for="voter of voterAllows">
+              <div>
                 <MaterialIcon
                   :class="[isVoterValid(voter) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
                   :title="getVoterErrorReason(voter)"
                 />
-              </td>
-              <td>
-                {{ voter.userid }}
-              </td>
-              <td>
-                {{ voter.firstName ? getVoterName(voter) : "-" }}
-              </td>
-              <td>
-                {{ voter.email || "-" }}
-              </td>
-              <td v-if="topicData.multipleVotes">
-                <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
-              </td>
-              <td>
+              </div>
+              <div>{{ voter.userid }}</div>
+              <div>{{ voter.firstName ? getVoterName(voter) : "-" }}</div>
+              <div>{{ voter.email || "-" }}</div>
+              <div v-if="topicData.multipleVotes">
+                <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full min-w-[100px]" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
+              </div>
+              <div>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                  :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter.userid)"
+                  :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter)"
                 >
                   <MaterialIcon icon="remove" />
                 </button>
-              </td>
-            </tr>
-            <tr>
-              <td :colspan="topicData.multipleVotes ? 6 : 5">
-                <div class="flex flex-row gap-2 items-center my-1">
-                  <DgaUserSearch class="flex-1" :placeholder="$t('topic.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
+          <DgaUserSearch class="flex-1 max-w-xl" :placeholder="$t('topic.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
+        </div>
+      </div>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.coadminList.title') }}</h3>
+      <div class="col-span-12 flex flex-col gap-2">
+        <div class="overflow-auto max-h-[50vh]">
+          <div class="user-grid">
+            <div class="font-bold"></div>
+            <div class="font-bold">{{ $t('topic.coadminList.userId') }}</div>
+            <div class="font-bold">{{ $t('topic.coadminList.name') }}</div>
+            <div class="font-bold">{{ $t('topic.coadminList.email') }}</div>
+            <div></div>
+            <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
+            <template v-for="admin of coadmins">
+              <div>
+                <MaterialIcon
+                  :class="[isCoadminValid(admin) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
+                  :title="getCoadminErrorReason(admin)"
+                />
+              </div>
+              <div>{{ admin.userid }}</div>
+              <div>{{ admin.firstName ? getCoadminName(admin) : "-" }}</div>
+              <div>{{ admin.email || "-" }}</div>
+              <div>
+                <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
+                  :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
+                >
+                  <MaterialIcon icon="remove" />
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
+          <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
+        </div>
       </div>
       <div class="col-span-12 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="topicData.notifyVoter"></DgaCheckbox> 
@@ -180,8 +203,8 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
 import { getComputedServerTime as serverTime } from "~~/src/utils/datetime";
-import { getPresetChoices, isTopicFormValid, voterCounts, choiceCounts } from "~~/src/utils/topic";
-import { getVoterName } from "~~/src/utils/utils";
+import { getPresetChoices, isTopicFormValid, voterCounts, choiceCounts, coadminCounts } from "~~/src/utils/topic";
+import { getVoterName,  getCoadminName } from "~~/src/utils/utils";
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -191,7 +214,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('topic.create.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('topic.create.title')}`
 });
 
 const showDescription = ref(false);
@@ -210,7 +233,7 @@ const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mo
 }));
 
 const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
-const expiredDate = dayjs(startDate).add(1, "month").minute(0).second(0).millisecond(0).toDate();
+const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
 const voteStart = ref({
   dateStr: dayjs(startDate).format("YYYY-MM-DD"),
@@ -234,6 +257,7 @@ const topicData = ref<TopicFormData>({
   durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
+  coadmins: [],
   multipleVotes: false,
   publicVote: true,
   notifyVoter: true,
@@ -243,8 +267,13 @@ const topicData = ref<TopicFormData>({
   recoredToBlockchain: true,
 });
 
-const voterAllowsWithHint : Ref<Array<TopicVoterAllowFormDataWithHint>> = ref([]);
-watch(voterAllowsWithHint, (value) => {
+const skipBlockchain = ref(false);
+watch(skipBlockchain, (value) => {
+  topicData.value.recoredToBlockchain = !value
+}, { immediate: true })
+
+const voterAllows : Ref<Array<TopicVoterAllowFormData>> = ref([]);
+watch(voterAllows, (value) => {
   topicData.value.voterAllows = value.map((ele) => {
     return {
       userid: ele.userid,
@@ -253,10 +282,16 @@ watch(voterAllowsWithHint, (value) => {
   })
 }, { immediate: true, deep: true })
 
-const skipBlockchain = ref(false);
-watch(skipBlockchain, (value) => {
-  topicData.value.recoredToBlockchain = !value
-}, { immediate: true })
+const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+watch(coadmins, (value) => {
+  const result : Array<string> = [];
+  for(const ele of value) {
+    if(ele.userid) {
+      result.push(ele.userid)
+    }
+  }
+  topicData.value.coadmins = result;
+}, { immediate: true, deep: true })
 
 function isChoiceValid(choice: string) {
   return choice !== "" && choiceCounts(topicData.value.choices, choice) === 1;
@@ -269,18 +304,25 @@ function getChoiceErrorReason(choice: string) {
   return i18n.t('topic.addChoice.error.duplicated');
 }
 
-function isVoterValid(voter: TopicVoterAllowFormDataWithHint) {
-  return voterCounts(voterAllowsWithHint.value, voter.userid) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
+function isVoterValid(voter: TopicVoterAllowFormData) {
+  return voterCounts(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
 }
-function getVoterErrorReason(voter: TopicVoterAllowFormDataWithHint) {
+function getVoterErrorReason(voter: TopicVoterAllowFormData) {
   return i18n.t('topic.voterList.error.duplicated');
+}
+
+function isCoadminValid(coadmin: CoadminFormData) {
+  return coadminCounts(coadmins.value, coadmin) < 2;
+}
+function getCoadminErrorReason(coadmin: CoadminFormData) {
+  return i18n.t('topic.coadminList.error.duplicated');
 }
 
 const isFormValid = computed(() => isTopicFormValid(topicData.value))
 
 watch(voteStart, (newValue) => {
   const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
-  const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
+  const voteExpiredAt = dayjs(voteStartAt).add(1, "hour").toDate();
 
   voteEnd.value.dateStr = dayjs(voteExpiredAt).format("YYYY-MM-DD");
   voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:mm");
@@ -294,18 +336,41 @@ function addOption() {
   topicData.value.choices.choices.push({ name: "" });
 }
 
-function removeVoter(userid: string) {
-  voterAllowsWithHint.value = voterAllowsWithHint.value.filter((ele) => ele.userid !== userid);
+function removeVoter(user: TopicVoterAllowFormData) {
+  const compareData = JSON.stringify(user);
+  voterAllows.value = voterAllows.value.filter((ele) => {
+    return compareData !== JSON.stringify(ele);
+  });
 }
 
 function addVoter(user: UserSearchResponseData) {
-  if(voterAllowsWithHint.value.every((ele) => ele.userid !== user._id)) {
-    voterAllowsWithHint.value.push({
+  if(voterAllows.value.every((ele) => ele.userid !== user._id)) {
+    voterAllows.value.push({
       userid: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       totalVotes: 1,
+    });
+  }
+
+  return true
+}
+
+function removeCoadmin(user: CoadminFormData) {
+  const compareData = JSON.stringify(user);
+  coadmins.value = coadmins.value.filter((ele) => {
+    return compareData !== JSON.stringify(ele);
+  });
+}
+
+function addCoadmin(user: UserSearchResponseData) {
+  if(coadmins.value.every((ele) => ele.userid !== user._id)) {
+    coadmins.value.push({
+      userid: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
     });
   }
 
@@ -366,7 +431,11 @@ async function createTopic() {
 </script>
 
 <style scoped>
-.table th, .table td {
-  @apply py-3 px-2;
+.user-grid {
+  @apply grid w-full items-center gap-x-4 pb-2 gap-y-2 whitespace-nowrap;
+  grid-template-columns: 36px 2fr 4fr 3fr 36px;
+}
+.user-grid.multichoice {
+  grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
 }
 </style>

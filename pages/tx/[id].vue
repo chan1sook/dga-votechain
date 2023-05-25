@@ -62,7 +62,7 @@ const { id } = useRoute().params;
 let voteid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('admin.blockchain.txInfo')} ${voteid}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.blockchain.txInfo')} ${voteid}`
 });
 
 const txData: Ref<TxResponseDataFull | undefined> = ref(undefined);

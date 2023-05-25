@@ -80,7 +80,7 @@ definePageMeta({
   middleware: ["auth-dev"]
 })
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('admin.blockchain.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.blockchain.title')}`
 });
 
 const txInfo : Ref<TxInfoResponseData | undefined> = ref(undefined);

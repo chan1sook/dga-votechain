@@ -1,7 +1,8 @@
 <template>
-  <div v-if="userData">
+  <div v-if="userList">
     <DgaHead>{{ $t('admin.user.title') }}</DgaHead>
-    <div class="flex flex-row gap-2 items-center justify-end">
+    <div class="flex flex-col sm:flex-row gap-2 items-center my-2">
+      <DgaUserSearch class="flex-1 w-full" :placeholder="$t('topic.coadminList.searchUser')" @select="selectUser"></DgaUserSearch>
       <DgaButton 
         class="flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
         :href="localePathOf('/permissions/approve')"
@@ -15,7 +16,7 @@
         <h4 class="font-bold text-lg p-2">{{ $t('admin.user.title') }}</h4>
         <div class="flex-1 border-t-2 border-dga-blue p-2 overflow-y-auto">
           <div class="flex flex-col gap-2">
-            <DgaUserCard v-for="ele of userData" :role="ele.role">
+            <DgaUserCard v-if="!selectedUser" v-for="ele of userList" :role="ele.role" editable @change="toChangeUserPage(ele)">
               <template #userid>#{{ ele._id }}</template>
               <template #role>{{ $t(`role.${ele.role}`, ele.role) }}</template>
               <div> 
@@ -28,6 +29,24 @@
                 <span class="italic" v-else>-</span>
               </div>
             </DgaUserCard>
+            <template v-else>
+              <DgaUserCard @change="toChangeUserPage(selectedUser)">
+                <template #userid>#{{ selectedUser._id }}</template>
+                <template #role>{{ $t(`role.${selectedUser.role}`, selectedUser.role) }}</template>
+                <div> 
+                  <span v-if="userNameOf(selectedUser)">{{ userNameOf(selectedUser) }}</span>
+                  <span class="italic" v-else>{{ $t("navbar.user.anonymous") }}</span>
+                </div>
+                <div>
+                  <span class="font-bold"></span>{{ $t('requestPermissions.email') }}: 
+                  <template v-if="selectedUser.email">{{ selectedUser.email }}</template>
+                  <span class="italic" v-else>-</span>
+                </div>
+              </DgaUserCard>
+              <DgaButton color="dga-orange"  class="w-full mx-auto max-w-sm" @click="selectedUser = undefined">
+                {{ $t('admin.user.showAllUsers') }}
+              </DgaButton>
+            </template>
           </div>
         </div>
 
@@ -44,19 +63,21 @@ definePageMeta({
   middleware: ["auth-admin"]
 })
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('admin.user.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.user.title')}`
 });
 
-const userData : Ref<Array<UserShowAdminResponseData> | undefined> = ref(undefined);
+const userList : Ref<Array<UserSearchResponseData> | undefined> = ref(undefined);
+const selectedUser : Ref<UserSearchResponseData | undefined> = ref(undefined);
+
 const { data: users } = await useFetch("/api/user/showall");
 
 if(users.value) {
-  userData.value = users.value;
+  userList.value = users.value;
 } else {
   showError("Can't get user data")
 }
 
-function userNameOf(userData: UserShowAdminResponseData) {
+function userNameOf(userData: UserSearchResponseData) {
   let name = "";
   if(userData.firstName) {
     name = userData.firstName;
@@ -65,5 +86,19 @@ function userNameOf(userData: UserShowAdminResponseData) {
     }
   }
   return name;
+}
+
+function selectUser(user: UserSearchResponseData) {
+  selectedUser.value = {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role,
+  };
+}
+
+function toChangeUserPage(user: UserSearchResponseData) {
+  navigateTo(localePathOf(`/permissions/change/${user._id}`));
 }
 </script>

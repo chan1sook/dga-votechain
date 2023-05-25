@@ -51,7 +51,7 @@ definePageMeta({
   middleware: ["auth-guest"]
 })
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('login.title', "Login")}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('login.title', "Login")}`
 });
 
 const { DID_API_URL } = useRuntimeConfig();

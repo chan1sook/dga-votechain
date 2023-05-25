@@ -73,7 +73,7 @@ const localePathOf = useLocalePath();
 const { id: newsid } = useRoute().params;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('news.create.edit')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('news.create.edit')}`
 });
 
 const { data } = await useFetch(`/api/news/info/${newsid}`);

@@ -26,7 +26,6 @@ export default defineEventHandler(async (event) => {
       personalData: {
         firstName: doc.userid.firstName,
         lastName: doc.userid.lastName,
-        citizenId: doc.userid.citizenId,
         email: doc.userid.email,
       },
       createdAt: dayjs(doc.createdAt).toISOString(),

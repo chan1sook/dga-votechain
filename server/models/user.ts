@@ -1,10 +1,6 @@
 import { model, Schema } from "mongoose";
 
 const schema = new Schema<UserData>({
-  version: {
-    type: Number,
-    default: 1,
-  },
   permissions: [String],
   authSources: [new Schema({
     authSource: {
@@ -27,9 +23,13 @@ const schema = new Schema<UserData>({
   email: {
     type: String,
   },
+  hashedCitizenId: {
+    type: String,
+  },
   citizenId: {
     type: String,
   },
+  group: [String],
 }, {
   timestamps: true,
   query: {

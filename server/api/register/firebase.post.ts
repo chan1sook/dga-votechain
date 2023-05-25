@@ -1,15 +1,18 @@
-import EVoteUserModel from "~~/server/models/user"
 
-import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
-import { USER_SESSION_KEY } from "~~/server/session-handler";
-import { getUserByAuthSource, getUserByCitizenId } from "~~/server/utils";
 import { getAuth } from "firebase-admin/auth";
 import { getApp } from "firebase-admin/app";
+import bcrypt from "bcrypt";
+
+import EVoteUserModel from "~~/server/models/user"
+import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
+import { USER_SESSION_KEY } from "~~/server/session-handler";
+import { getUserByAuthSource, getUserByEmail } from "~~/server/utils";
 
 export default defineEventHandler(async (event) => {
   const { token, citizenid } : { token? :string, citizenid?: string} = await readBody(event);
 
   if(typeof token === "string" && typeof citizenid === "string") {
+    const hashedCitizenId = bcrypt.hashSync(citizenid, 12);
     const decodedFirebaseUserdata = await getAuth(getApp()).verifyIdToken(token, true).catch((err) => {
       throw createError({
         statusCode: 400,
@@ -22,7 +25,7 @@ export default defineEventHandler(async (event) => {
     };
     let userDoc = await getUserByAuthSource(authSource);
     if(!userDoc) {
-      userDoc = await getUserByCitizenId(citizenid);
+      userDoc = await getUserByEmail(decodedFirebaseUserdata.email);
       if(!userDoc) {
         userDoc = new EVoteUserModel({
           permissions: legacyRoleToPermissions("voter"),
@@ -30,6 +33,7 @@ export default defineEventHandler(async (event) => {
             { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
           ],
           email: decodedFirebaseUserdata.email,
+          hashedCitizenId,
         });
         await userDoc.save();
       } else {

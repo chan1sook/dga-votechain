@@ -1,10 +1,11 @@
+
+import bcrypt from "bcrypt";
+
 import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~~/src/utils/digitalid-protocol";
-
 import EVoteUserModel from "~~/server/models/user"
-
 import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
 import { USER_SESSION_KEY } from "~~/server/session-handler";
-import { getUserByAuthSource, getUserByCitizenId } from "~~/server/utils";
+import { getUserByAuthSource, getUserByEmail } from "~~/server/utils";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
@@ -14,6 +15,8 @@ export default defineEventHandler(async (event) => {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE });
 
     const digitalIdUserInfo = await getUserInfoDigitalID(access_token, { DID_API_URL });
+    const hashedCitizenID = bcrypt.hashSync(digitalIdUserInfo.citizen_id, 10);
+
     const authSource : UserAuthSource = {
       authSource: "digitalId",
       digitalIdUserId: digitalIdUserInfo.user_id
@@ -24,10 +27,10 @@ export default defineEventHandler(async (event) => {
       userDoc.firstName = digitalIdUserInfo.given_name;
       userDoc.lastName = digitalIdUserInfo.family_name;
       userDoc.email = digitalIdUserInfo.email;
-      userDoc.citizenId = digitalIdUserInfo.citizen_id;
+      userDoc.hashedCitizenId = hashedCitizenID;
       await userDoc.save();
     } else {
-      userDoc = await getUserByCitizenId(digitalIdUserInfo.citizen_id);
+      userDoc = await getUserByEmail(digitalIdUserInfo.email);
       if(!userDoc) {
         userDoc = new EVoteUserModel({
           permissions: legacyRoleToPermissions("voter"),
@@ -37,7 +40,7 @@ export default defineEventHandler(async (event) => {
           firstName: digitalIdUserInfo.given_name,
           lastName: digitalIdUserInfo.family_name,
           email: digitalIdUserInfo.email,
-          citizenId: digitalIdUserInfo.citizen_id,
+          hashedCitizenId: hashedCitizenID,
         });
         await userDoc.save();
       } else {

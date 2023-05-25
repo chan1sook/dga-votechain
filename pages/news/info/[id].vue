@@ -48,7 +48,7 @@ const { id } = useRoute().params;
 let newsid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('news.title')} #${newsid}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('news.title')} #${newsid}`
 });
 
 const isAdminRole = computed(() => {

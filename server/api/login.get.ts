@@ -62,7 +62,6 @@ export default defineEventHandler(async (event) => {
       });
       return sendRedirect(event, "/topics");
     } else {
-      // prompt citizenId
       return sendRedirect(event, `/register/firebase?token=${query.token}`);
     }
   }

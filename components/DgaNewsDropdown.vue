@@ -6,7 +6,7 @@
     <div v-if="showOption" class="z-[400] bg-white border rounded-md rounded-b-3xl shadow fixed right-0 top-16 md:top-20 w-72 max-h-[400px] overflow-y-auto" @click.stop>
       <div class="flex-1 flex flex-col gap-2 px-4 py-2">
         <DgaHead>{{ $t('navbar.news.title') }}</DgaHead>
-        <div v-if="roleMode === 'admin' || roleMode === 'developer'" class="absolute right-0 top-2">
+        <div v-if="isAdminRole(roleMode)" class="absolute right-0 top-2">
           <NuxtLink :href="localePathOf('/news/create')" :title="$t('navbar.news.add')" @click="useVisibleMenuGroup().value = undefined">
             <MaterialIcon icon="add"></MaterialIcon>
           </NuxtLink>
@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs';
+import { isAdminRole } from '~~/src/utils/role';
 const i18t = useI18n();
 const localePathOf = useLocalePath();
 

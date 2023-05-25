@@ -19,7 +19,6 @@ export default defineEventHandler(async (event) => {
     personalData: {
       firstName: existsRequests[0].userid.firstName,
       lastName: existsRequests[0].userid.lastName,
-      citizenId: existsRequests[0].userid.citizenId,
       email: existsRequests[0].userid.email,
     },
     note: existsRequests[0].note,

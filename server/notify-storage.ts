@@ -4,8 +4,8 @@ export class NotifyHandler {
   #userid: string;
   #storage: UnstorageStorage;
   
-  constructor(citizenId: string, sessionStorage: UnstorageStorage) {
-    this.#userid = citizenId;
+  constructor(userid: string, sessionStorage: UnstorageStorage) {
+    this.#userid = userid;
     this.#storage = sessionStorage;
   }
 
@@ -27,7 +27,7 @@ export class NotifyHandler {
   }
 
   async set<T>(key: string, value: T) {
-    if(key === "citizenId") {
+    if(key === "userid") {
       throw new Error("Reserved key");
     }
 
@@ -37,7 +37,7 @@ export class NotifyHandler {
   }
 
   async unset(key: string) {
-    if(key === "citizenId") {
+    if(key === "userid") {
       throw new Error("Reserved key");
     }
 
@@ -48,7 +48,7 @@ export class NotifyHandler {
 
   async clear() {
     return this.#storage.setItem(this.#userid, {
-      citizenId: this.#userid,
+      userid: this.#userid,
     });
   }
 }

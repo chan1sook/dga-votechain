@@ -89,9 +89,18 @@ export function choiceCounts(choices: ChoicesData, choice: string) {
   }, 0);
 }
 
-export function voterCounts(voterAllows: Array<TopicVoterAllowFormDataWithHint>, userid: string) {
+export function voterCounts(voterAllows: Array<TopicVoterAllowFormData>, user: TopicVoterAllowFormData) {
   return voterAllows.reduce((prev, current) => {
-    if(current.userid === userid) {
+    if(user.userid && current.userid === user.userid) {
+      return prev + 1;
+    }
+    return prev;
+  }, 0);
+}
+
+export function coadminCounts(coadmins: Array<CoadminFormData>, user: CoadminFormData) {
+  return coadmins.reduce((prev, current) => {
+    if(user.userid && current.userid === user.userid) {
       return prev + 1;
     }
     return prev;

@@ -9,7 +9,6 @@
   <DgaCookieConsent v-show="langLoaded && cookieConsentShow"
     @accept-all="acceptAllCookies"
     @accept-required="acceptRequiredOnly"
-    @manage="manageCookiesPopup"
   ></DgaCookieConsent>
 </template>
 
@@ -21,17 +20,23 @@ const cookieConsentShow = ref(false);
 useSocketIO();
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')}`,
+  title: `${i18n.t('appName', 'DGA E-Voting')}`,
   meta: [
     {name: "msapplication-TileColor", content: "#da532c"},
     {name: "theme-color", content: "#ffffff"}
   ],
   link: [
-    { rel: "apple-touch-icon", size:"180x180", href:"/apple-touch-icon.png" },
-    { rel: "icon", type: "image/png", size:"32x32", href:"/favicon-32x32.png" },
-    { rel: "icon", type: "image/png", size:"16x16", href:"/favicon-16x16.png" },
+    { rel: "apple-touch-icon", sizes:"180x180", href:"/apple-touch-icon.png" },
+    { rel: "icon", type: "image/png", sizes:"32x32", href:"/favicon-32x32.png" },
+    { rel: "icon", type: "image/png", sizes:"16x16", href:"/favicon-16x16.png" },
     { rel: "manifest", href: "/site.webmanifest" },
     { rel: "mask-icon", href: "/safari-pinned-tab.svg", color:"#5bbad5" },
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    // { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Mitr:wght@400&display=swap"
+    },
     {
       rel: "stylesheet",
       href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -39,6 +44,7 @@ useHead({
   ],
 });
 
+const cookieName = "ccShow"
 onMounted(async () => {
   document.body.addEventListener("click", () => {
     useVisibleMenuGroup().value = undefined;
@@ -48,26 +54,31 @@ onMounted(async () => {
   console.log("Langauge Loaded");
   langLoaded.value = true;
   
-  const ccShow = useCookie("ccShow", { secure: true, sameSite: "lax"});
-  cookieConsentShow.value = !Boolean(ccShow.value);
+  const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
+  cookieConsentShow.value = !Boolean(cc.value);
+  enforceCookie(cc.value);
 })
 
+function enforceCookie(value: string | null) {
+  if(value === "all") {
+    // all
+  } else {
+    /// required only
+  }
+}
+
 function acceptAllCookies() {
-  const ccShow = useCookie("ccShow", { secure: true, sameSite: "lax"});
-  ccShow.value = "1";
-  // TODO all cookies
+  const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
+  cc.value = "all";
   cookieConsentShow.value = false;
+  enforceCookie(cc.value);
 }
 
 function acceptRequiredOnly() {
-  const ccShow = useCookie("ccShow", { secure: true, sameSite: "lax"});
-  ccShow.value = "1";
-  // TODO required cookies
+  const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
+  cc.value = "required";
   cookieConsentShow.value = false;
-}
-
-function manageCookiesPopup() {
-
+  enforceCookie(cc.value);
 }
 
 </script>

@@ -1,12 +1,11 @@
 import dayjs from "dayjs";
-import { Types } from "mongoose";
 import TopicModel from "~~/server/models/topic"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicPauseData from "~~/server/models/topic-pause"
 import VoteModel from "~~/server/models/vote"
 
 export default defineEventHandler(async (event) => {
-  const topicDoc = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
+  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,
@@ -93,18 +92,17 @@ export default defineEventHandler(async (event) => {
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
     createdAt: dayjs(topicDoc.createdAt).toISOString(),
     updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
-    createdBy: topicDoc.createdBy && !(topicDoc.createdBy instanceof Types.ObjectId) ? {
-      _id: topicDoc.createdBy._id,
+    createdBy: {
+      _id: topicDoc.createdBy._id.toString(),
       firstName: topicDoc.createdBy.firstName,
       lastName: topicDoc.createdBy.lastName,
       email: topicDoc.createdBy.email,
-    } : undefined,
-    updatedBy: topicDoc.updatedBy && !(topicDoc.updatedBy instanceof Types.ObjectId) ? {
-      _id: topicDoc.updatedBy._id,
-      firstName: topicDoc.updatedBy.firstName,
-      lastName: topicDoc.updatedBy.lastName,
-      email: topicDoc.updatedBy.email,
-    } : undefined,
+    },
+    updatedBy: topicDoc.updatedBy.toString(),
+    admin: topicDoc.admin.toString(),
+    coadmins: topicDoc.coadmins.map((ele) => {
+      return ele.toString()
+    }),
     publicVote: topicDoc.publicVote,
     showScores: topicDoc.showScores,
     showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,

@@ -3,9 +3,9 @@ import { isAdminRole, isDeveloperRole, isVoterRole } from "./role";
 export function legacyRoleToPermissionsExcludes(role: UserRole) : Array<EVotePermission> {
   switch(role) {
     case "voter":
-      return ["request-permissions", "voter-mode", "vote-topic", "transfer-topic-controller"];
+      return ["request-permissions", "voter-mode", "vote-topic"];
     case "admin":
-      return ["admin-mode", "create-topic", "change-topic", "grant-topic-controller", "create-news", "change-news", "change-permissions:basic"];
+      return ["admin-mode", "create-topic", "change-topic", "create-news", "change-news", "change-permissions:basic"];
     case "developer":
       return ["dev-mode", "change-permissions:advance"];
     default:
@@ -31,11 +31,22 @@ export function legacyRoleToPermissions(role: UserRole) {
   return permissions;
 }
 
+export function getBasicPermissions() {
+  return legacyRoleToPermissionsExcludes("voter");
+}
 export function getAdvancePermissions() {
   return combinePermissions(
     legacyRoleToPermissionsExcludes("admin"),
     ...legacyRoleToPermissionsExcludes("developer")
   );
+}
+
+export function getUnusedPermissions() : Array<EVotePermission> {
+  return ["access-pages:user", "access-notifications", "transfer-topic-controller", "grant-topic-controller", "access-pages:admin", "access-pages:developer"]
+}
+
+export function getNotSelfEditablePermissions() : Array<EVotePermission> {
+  return ["voter-mode", "admin-mode", "dev-mode", "change-permissions:basic", "change-permissions:advance"]
 }
 
 export function isContainsAdvancePermissions(...selections: Array<EVotePermission>) {

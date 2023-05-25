@@ -25,8 +25,16 @@
 const i18n = useI18n()
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('error.title')}`,
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('error.title')}`,
   link: [
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Mitr:wght@400&display=swap"
+    },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    },
     {
       rel: "stylesheet",
       href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"

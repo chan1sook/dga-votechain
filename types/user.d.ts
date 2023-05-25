@@ -10,15 +10,16 @@ declare global {
   }
   
   interface UserData {
-    version: Number,
     permissions: Array<EVotePermission>,
     authSources: Array<UserAuthSource>,
     firstName?: string,
     lastName?: string,
     email?: string,
     citizenId?: string,
+    hashedCitizenId: string,
     createdAt: Date,
     updatedAt: Date,
+    group: Array<string>,
   }
   
   interface UserSessionSavedData {
@@ -29,7 +30,7 @@ declare global {
     },
   }
 
-  type UserSessionData = Omit<UserData, "authSources"> & { _id: Types.ObjectId } & Omit<UserSessionSavedData, "userid">;
+  type UserSessionData = Omit<UserData, "authSources" | "hashedCitizenId"> & { _id: Types.ObjectId } & Omit<UserSessionSavedData, "userid">;
 
   type UserResponseData = {
     sid: string,
@@ -37,20 +38,23 @@ declare global {
     roleMode?: UserRole,
   } & Pick<UserData, "permissions" | "firstName" | "lastName" | "email">;
 
-  type UserResponseFilterData = Pick<UserResponseData, "_id" | "firstName" | "lastName" | "email">;
+  type UserResponseFilterData = Pick<UserResponseData, "firstName" | "lastName" | "email"> & {
+    _id: Types.ObjectId
+  };
 
   type UserSearchQueryParams = {
     keyword?: string
   }
   type UserSearchResponseData = {
     _id: string,
-  } & Pick<UserData, "firstName" | "lastName" | "email">;
-
-  type UserShowAdminResponseData = {
-    _id: string,
     role: UserRole,
   } & Pick<UserData, "firstName" | "lastName" | "email">;
 
-
-  type TopicVoterAllowDataPopulated = Omit<TopicVoterAllowData, "userid"> & { userid?: UserData & { _id: Types.ObjectId } }
+  type UserPermissionsFormData = {
+    _id: string,
+    firstName? : string,
+    lastName? : string,
+    email? : string,
+    permissions: Array<EVotePermission>,
+  }
 }

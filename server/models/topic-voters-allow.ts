@@ -16,6 +16,15 @@ const schema = new Schema<TopicVoterAllowData, TopicVoterAllowModel>({
     type: Schema.Types.ObjectId,
     ref: "dga-user",
   },
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
   remainVotes: {
     type: Number,
     default: 0,

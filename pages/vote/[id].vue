@@ -82,29 +82,35 @@
         <div class="flex flex-col flex-wrap justify-center gap-2">
           <template v-for="choice of topic.choices.choices">
             <DgaButton 
-              class="relative w-full max-w-md mx-auto flex flex-row gap-8 items-center justify-center !px-4"
+              class="relative w-full max-w-md mx-auto flex flex-row gap-x-4 items-center justify-center !px-4 !rounded-3xl"
               :theme="getBtnThemeOfChoice(choice)"
               :color="(canVote && noVoteLocked) ? 'gray' : 'dga-blue'"
               :disabled="!canVote || noVoteLocked"
               :disabled-vivid="!canVote"
               @click="addVote(choice.name)"
             >
-              <div class="relative w-24">
+              <div class="w-8 sm:w-24 h-8 flex flex-row justify-center">
                 <template v-if="canVote">
-                  <div v-if="noVoteLocked" class="text-white bg-gray-500 rounded-full px-8 py-1 text-sm">VOTE</div>
-                  <div v-else-if="voteCount(choice.name) === 0" class="text-white bg-dga-orange rounded-full px-8 py-1 text-sm">VOTE</div>
-                  <div v-else class="text-white bg-green-700 rounded-full pl-10 pr-6 py-1 text-sm flex flex-row items-center">
-                    <MaterialIcon class="absolute left-2" icon="check" /> VOTED
+                  <div v-if="noVoteLocked" class="w-full text-white bg-gray-500 rounded-full px-4 sm:px-8 py-1 text-sm">
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div v-else-if="voteCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div v-else class="w-full text-white bg-green-700 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
+                    <MaterialIcon icon="check"/> <span class="hidden sm:block">VOTED</span>
                   </div>
                 </template>
                 <template v-else>
-                  <div v-if="votedCount(choice.name) === 0" class="text-white bg-dga-orange rounded-full px-8 py-1 text-sm">VOTE</div>
-                  <div v-else class="text-white bg-green-700 rounded-full pl-10 pr-6 py-1 text-sm flex flex-row items-center">
-                    <MaterialIcon class="absolute left-2" icon="check" /> VOTED
+                  <div v-if="votedCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div v-else class="w-full text-white bg-green-700 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
+                    <MaterialIcon icon="check"/> <span class="hidden sm:block">VOTED</span>
                   </div>
                 </template>
               </div>
-              <div class="flex-1 truncate text-left">{{ choice.name }}</div>
+              <div class="flex-1 text-left">{{ choice.name }}</div>
               <div class="relative w-12">
                 <template v-if="canVote">
                   <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && topic.multipleVotes">
@@ -137,7 +143,8 @@
       </template>
     </template>
     <template v-else>
-      <div class="text-center text-2xl">{{ $t("voting.adminWarning") }}</div>
+      <div v-if="canVote" class="text-center text-2xl">{{ $t("voting.adminWarning") }}</div>
+      <div v-else class="text-center text-2xl">{{ $t("voting.cannotVote") }}</div>
     </template>
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="submitVotes"
@@ -168,7 +175,7 @@ const { id } = useRoute().params;
 const topicid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('voting.title', "Voting")} #${topicid}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('voting.title', "Voting")} #${topicid}`
 });
 
 const topic: Ref<TopicResponseDataExtended | undefined> = ref(undefined);
@@ -228,7 +235,7 @@ function getBtnThemeOfChoice(choice: { name: string }) {
 const { data } = await useFetch(`/api/topic/info/${topicid}`);
 
 if (!data.value) {
-  showError("Topic not found");
+  showError(i18n.t("voting.cannotVote"));
 } else {
   const { topic: _topic, votes, adminVoterAllows: _adminVoterAllows } = data.value;
 

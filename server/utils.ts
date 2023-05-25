@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 
 import EVoteUserModel from "~~/server/models/user"
 import VoteModel from "~~/server/models/vote"
-import { ObjectId } from "mongodb";
 
 export async function getTxArr(pagesize: number, startid: string) {
   let txDocs : Array<TxResponseData> = [];
@@ -23,26 +22,47 @@ export async function getTxArr(pagesize: number, startid: string) {
   return txDocs;
 }
 
+export async function getTxCounts() {
+  const txCursor = VoteModel.find().cursor();
+  let tx = await txCursor.next();
+  const result = {
+    mined: 0,
+    invalid: 0,
+    pending: 0,
+    total: 0,
+  }
+  while(tx) {
+    result.total += 1;
+    const txStatus = !tx.tx ? "invalid" : "valid";
+    switch(txStatus) {
+      case "invalid":
+        result.invalid += 1;
+        break;
+      case "valid":
+        result.mined += 1;
+        break;
+    }
+    tx = await txCursor.next();
+  }
+
+  return result;
+}
+
 export async function getUserByAuthSource(authSource: UserAuthSource) {
   const userDoc = await EVoteUserModel.findOne({
     authSources: { $elemMatch: authSource }
   })
 
-  if(userDoc && checkPermissionSelections(userDoc.permissions, "banned")) {
-    throw new Error("Forbidden: Banned");
-  }
-
   return userDoc;
 }
-
-export async function getUserByCitizenId(citiezenId: string) {
-  const userDoc = await EVoteUserModel.findOne({
-    citizenId: citiezenId
-  })
-
-  if(userDoc && checkPermissionSelections(userDoc.permissions, "banned")) {
-    throw new Error("Forbidden: Banned");
+export async function getUserByEmail(email?: string) {
+  if(!email) {
+    return null;
   }
+  
+  const userDoc = await EVoteUserModel.findOne({
+    email,
+  });
 
   return userDoc;
 }

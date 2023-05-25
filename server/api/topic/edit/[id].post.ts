@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 
+import UserModel from "~~/server/models/user"
 import TopicModel from "~~/server/models/topic"
+import TopicPauseModel from "~~/server/models/topic-pause"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicNotificationData from "~~/server/models/topic-notifications"
 import { isTopicFormValid, isTopicReadyToVote } from "~~/src/utils/topic";
@@ -28,89 +30,119 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
       statusMessage: "Topic not found",
     });
-  } else if(isTopicReadyToVote(topicDoc)) {
+  }
+
+  if(topicDoc.admin.toString() !== userData._id.toString()) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Topic not editable",
+      statusCode: 403,
+      statusMessage: "Forbidden",
     });
   }
+
+  const pauseData = await TopicPauseModel.find({ topicid: topicDoc._id });
+  if(pauseData.every((ele) => ele.resumeAt) && dayjs().diff(topicDoc.voteExpiredAt) > 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Topic Expired",
+    });
+  }
+  
+  const isTopicVoting = isTopicReadyToVote(topicDoc);
+
   topicDoc.updatedBy = userData._id;
   topicDoc.updatedAt = today;
 
-  if(topicFormData.name !== undefined) {
-    topicDoc.name = topicFormData.name;
-  }
-
-  if(topicFormData.description !== undefined) {
-    topicDoc.description = topicFormData.description;
-  }
-
-  if(topicFormData.multipleVotes !== undefined) {
-    topicDoc.multipleVotes = topicFormData.multipleVotes;
-  }
-
-  if(topicFormData.choices !== undefined) {
-    topicDoc.choices = topicFormData.choices;
-  }
+  if(!isTopicVoting) {
+    if(topicFormData.name !== undefined) {
+      topicDoc.name = topicFormData.name;
+    }
   
-  if(topicFormData.status !== undefined) {
-    topicDoc.status = topicFormData.status;
-  }
-
-  if(topicFormData.durationMode !== undefined) {
-    topicDoc.durationMode =topicFormData.durationMode;
-  }
-
-  if(topicFormData.voteStartAt !== undefined) {
-    topicDoc.voteStartAt = dayjs(topicFormData.voteStartAt).toDate();
-  }
+    if(topicFormData.description !== undefined) {
+      topicDoc.description = topicFormData.description;
+    }
   
-  if(topicFormData.voteExpiredAt !== undefined) {
-    topicDoc.voteExpiredAt = dayjs(topicFormData.voteExpiredAt).toDate();
-  }
-
-  if(topicFormData.publicVote !== undefined) {
-    topicDoc.publicVote = topicFormData.publicVote;
-  }
-
-  if(topicFormData.showScores !== undefined) {
-    topicDoc.showScores = topicFormData.showScores;
-  }
-
-  if(topicFormData.showVotersChoicesPublic !== undefined) {
-    topicDoc.showVotersChoicesPublic = topicFormData.showVotersChoicesPublic;
-  }
-
-  if(topicFormData.recoredToBlockchain !== undefined) {
-    topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
-  }
+    if(topicFormData.multipleVotes !== undefined) {
+      topicDoc.multipleVotes = topicFormData.multipleVotes;
+    }
   
-  if(topicFormData.voterAllows !== undefined) {
-    await TopicVoterAllowsModel.deleteMany({ topicid: topicDoc._id })
-    const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
-      return {
-        topicid: topicDoc._id,
-        userid: new Types.ObjectId(ele.userid),
-        totalVotes: ele.totalVotes,
-        remainVotes: ele.totalVotes,
-      }
-    });
-    await TopicVoterAllowsModel.insertMany(voterAllows);
+    if(topicFormData.choices !== undefined) {
+      topicDoc.choices = topicFormData.choices;
+    }
+    
+    if(topicFormData.status !== undefined) {
+      topicDoc.status = topicFormData.status;
+    }
+  
+    if(topicFormData.durationMode !== undefined) {
+      topicDoc.durationMode =topicFormData.durationMode;
+    }
+  
+    if(topicFormData.voteStartAt !== undefined) {
+      topicDoc.voteStartAt = dayjs(topicFormData.voteStartAt).toDate();
+    }
+    
+    if(topicFormData.voteExpiredAt !== undefined) {
+      topicDoc.voteExpiredAt = dayjs(topicFormData.voteExpiredAt).toDate();
+    }
+  
+    if(topicFormData.publicVote !== undefined) {
+      topicDoc.publicVote = topicFormData.publicVote;
+    }
+  
+    if(topicFormData.showScores !== undefined) {
+      topicDoc.showScores = topicFormData.showScores;
+    }
+  
+    if(topicFormData.showVotersChoicesPublic !== undefined) {
+      topicDoc.showVotersChoicesPublic = topicFormData.showVotersChoicesPublic;
+    }
+  
+    if(topicFormData.recoredToBlockchain !== undefined) {
+      topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
+    }
+    
+    if(topicFormData.voterAllows !== undefined) {
+      await TopicVoterAllowsModel.deleteMany({ topicid: topicDoc._id })
+      const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
+        return {
+          topicid: topicDoc._id,
+          userid: new Types.ObjectId(ele.userid),
+          totalVotes: ele.totalVotes,
+          remainVotes: ele.totalVotes,
+        }
+      });
+      await TopicVoterAllowsModel.insertMany(voterAllows);
+    }
+  }
+
+  if(topicFormData.coadmins !== undefined) {
+    const coadminsDocs = await UserModel.find({
+      $and: [
+        { _id: { $ne: userData._id } },
+        { _id: { $in: topicFormData.coadmins.map((ele) => new Types.ObjectId(ele)) }}
+      ]
+    })
+
+    topicDoc.coadmins = coadminsDocs.map((ele) => ele._id);
   }
 
   const voterAllowDocs = await TopicVoterAllowsModel.find({ topicid: topicDoc._id });
 
   await TopicNotificationData.deleteMany({ topicid: topicDoc._id });
   if(topicFormData.notifyVoter) {
-    const topicNotifications : Array<TopicNotificationData> = voterAllowDocs.map((ele) => {
-      return {
-        userid: ele.userid,
-        topicid: topicDoc._id,
-        createdAt: today,
-        updatedAt: today,
-        notifyAt: topicDoc.voteStartAt,
+    const topicNotifications : Array<TopicNotificationData> = [];
+    for(const voteAllow of voterAllowDocs) {
+      if(voteAllow.userid) {
+        topicNotifications.push({
+          userid: voteAllow.userid,
+          topicid: topicDoc._id,
+          createdAt: today,
+          updatedAt: today,
+          notifyAt: topicDoc.voteStartAt,
+        })
       }
-    });
+    }
+    
     await TopicNotificationData.insertMany(topicNotifications);
   }
   
@@ -118,7 +150,7 @@ export default defineEventHandler(async (event) => {
     ...topicDoc.toJSON(),
     voterAllows: voterAllowDocs.map((ele) => {
       return {
-        userid: ele.userid.toString(),
+        userid: `${ele.userid}`,
         totalVotes: ele.totalVotes,
       }
     })
@@ -133,39 +165,8 @@ export default defineEventHandler(async (event) => {
 
   await dbSession.commitTransaction();
   await dbSession.endSession();
-  
-  const topic : TopicResponseData = {
-    _id: topicDoc._id.toString(),
-    status: topicDoc.status,
-    name: topicDoc.name,
-    description: topicDoc.description,
-    multipleVotes: topicDoc.multipleVotes,
-    choices: topicDoc.choices,
-    durationMode: topicDoc.durationMode,
-    voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
-    voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
-    createdAt: dayjs(topicDoc.createdAt).toISOString(),
-    updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
-    createdBy: topicDoc.createdBy && !(topicDoc.createdBy instanceof Types.ObjectId) ? {
-      _id: topicDoc.createdBy._id,
-      firstName: topicDoc.createdBy.firstName,
-      lastName: topicDoc.createdBy.lastName,
-      email: topicDoc.createdBy.email,
-    } : undefined,
-    updatedBy: topicDoc.updatedBy && !(topicDoc.updatedBy instanceof Types.ObjectId) ? {
-      _id: topicDoc.updatedBy._id,
-      firstName: topicDoc.updatedBy.firstName,
-      lastName: topicDoc.updatedBy.lastName,
-      email: topicDoc.updatedBy.email,
-    } : undefined,
-    publicVote: topicDoc.publicVote,
-    showScores: topicDoc.showScores,
-    showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
-    recoredToBlockchain: topicDoc.recoredToBlockchain,
-    notifyVoter: topicDoc.notifyVoter,
-  };
 
   return {
-    topic,
+    status: "OK",
   }
 })

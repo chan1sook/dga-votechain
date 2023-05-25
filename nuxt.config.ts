@@ -39,6 +39,7 @@ export default defineNuxtConfig({
   telemetry: false,
   dev: true,
   nitro: {
+    compressPublicAssets: true,
     storage: {
       session: {
         driver: "redis",

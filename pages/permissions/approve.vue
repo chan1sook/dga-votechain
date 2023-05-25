@@ -19,7 +19,6 @@
           </div>
           <div class="flex flex-row gap-2 flex-wrap">
             <b>{{ $t('requestPermissions.personalData') }}:</b> 
-            <abbr v-if="request.personalData.citizenId" :title="$t('requestPermissions.citizenid')">{{ request.personalData.citizenId }}</abbr>
             <abbr :title="$t('requestPermissions.name')">{{ formatFullName(request.personalData) }}</abbr>
             <abbr v-if="request.personalData.email" :title="$t('requestPermissions.email')">{{ request.personalData.email }}</abbr>
           </div>
@@ -61,7 +60,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('requestPermissions.approveRequestPermissions')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('requestPermissions.approveRequestPermissions')}`
 });
 
 function getFullPermissionTitle(permission: EVotePermission) {

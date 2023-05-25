@@ -1,7 +1,7 @@
 <template>
   <div v-if="editable">
     <DgaHead>{{ $t('topic.edit.title')  }}</DgaHead>
-    <div class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
+    <div v-if="!isTopicStartVote" class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
       <div class="col-span-12 md:col-span-2">
         {{ $t('topic.accessModifier') }}
       </div>
@@ -80,6 +80,40 @@
           </div>
         </div>
       </div>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.coadminList.title') }}</h3>
+      <div class="col-span-12 flex flex-col gap-2">
+        <div class="overflow-auto max-h-[50vh]">
+          <div class="user-grid">
+            <div class="font-bold"></div>
+            <div class="font-bold">{{ $t('topic.coadminList.userId') }}</div>
+            <div class="font-bold">{{ $t('topic.coadminList.name') }}</div>
+            <div class="font-bold">{{ $t('topic.coadminList.email') }}</div>
+            <div></div>
+            <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
+            <template v-for="admin of coadmins">
+              <div>
+                <MaterialIcon
+                  :class="[isCoadminValid(admin) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
+                  :title="getCoadminErrorReason(admin)"
+                />
+              </div>
+              <div>{{ admin.userid }}</div>
+              <div>{{ admin.firstName ? getCoadminName(admin) : "-" }}</div>
+              <div>{{ admin.email || "-" }}</div>
+              <div>
+                <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
+                  :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
+                >
+                  <MaterialIcon icon="remove" />
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
+          <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
+        </div>
+      </div>
       <div class="col-span-12 flex justify-center items-center">
         <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('topic.addChoice.add')" 
           @click="addOption"
@@ -93,52 +127,41 @@
           <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
           <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
         </div>
-        <table class="table mx-auto w-full max-w-[1600px] border-spacing-0 border-collapse">
-          <tbody>
-            <tr class="border-b-2 border-dga-blue">
-              <th style="width: 30px"></th>
-              <th style="width: 180px">{{ $t('topic.voterList.userId') }}</th>
-              <th>{{ $t('topic.voterList.name') }}</th>
-              <th>{{ $t('topic.voterList.email') }}</th>
-              <th v-if="topicData.multipleVotes">{{ $t('topic.voterList.totalVotes')}}</th>
-              <th style="width: 30px"></th>
-            </tr>
-            <tr v-for="voter of voterAllowsWithHint" class="transition hover:bg-slate-200">
-              <td>
+        <div class="overflow-auto max-h-[50vh]">
+          <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
+            <div class="font-bold"></div>
+            <div class="font-bold">{{ $t('topic.voterList.userId') }}</div>
+            <div class="font-bold">{{ $t('topic.voterList.name') }}</div>
+            <div class="font-bold">{{ $t('topic.voterList.email') }}</div>
+            <div v-if="topicData.multipleVotes" class="font-bold">{{ $t('topic.voterList.totalVotes')}}</div>
+            <div></div>
+            <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
+            <template v-for="voter of voterAllows">
+              <div>
                 <MaterialIcon
                   :class="[isVoterValid(voter) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
                   :title="getVoterErrorReason(voter)"
                 />
-              </td>
-              <td>
-                {{ voter.userid }}
-              </td>
-              <td>
-                {{ voter.firstName ? getVoterName(voter) : "-" }}
-              </td>
-              <td>
-                {{ voter.email || "-" }}
-              </td>
-              <td v-if="topicData.multipleVotes">
-                <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
-              </td>
-              <td>
+              </div>
+              <div>{{ voter.userid }}</div>
+              <div>{{ voter.firstName ? getVoterName(voter) : "-" }}</div>
+              <div>{{ voter.email || "-" }}</div>
+              <div v-if="topicData.multipleVotes">
+                <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full min-w-[100px]" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
+              </div>
+              <div>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                  :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter.userid)"
+                  :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter)"
                 >
                   <MaterialIcon icon="remove" />
                 </button>
-              </td>
-            </tr>
-            <tr>
-              <td :colspan="topicData.multipleVotes ? 6 : 5">
-                <div class="flex flex-row gap-2 items-center my-1">
-                  <DgaUserSearch class="flex-1" :placeholder="$t('topic.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
+          <DgaUserSearch class="flex-1 max-w-xl" :placeholder="$t('topic.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
+        </div>
       </div>
       <div class="col-span-12 flex flex-row items-center gap-2">
         <DgaCheckbox v-model="topicData.notifyVoter"></DgaCheckbox> 
@@ -166,6 +189,60 @@
         </DgaButton>
       </DgaButtonGroup>
     </div>
+    <div v-else class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.topicQuestion')}}</h3>
+      <div class="col-span-12">
+        <DgaInput
+          :value="topicData.name" type="text" 
+          readonly
+          class="dga-evote-input w-full" :placeholder="$t('topic.topicQuestion')" 
+          required
+        >
+        </DgaInput>
+      </div>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.coadminList.title') }}</h3>
+      <div class="col-span-12 flex flex-col gap-2">
+        <div class="overflow-auto max-h-[50vh]">
+          <div class="user-grid">
+            <div class="font-bold"></div>
+            <div class="font-bold">{{ $t('topic.coadminList.userId') }}</div>
+            <div class="font-bold">{{ $t('topic.coadminList.name') }}</div>
+            <div class="font-bold">{{ $t('topic.coadminList.email') }}</div>
+            <div></div>
+            <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
+            <template v-for="admin of coadmins">
+              <div>
+                <MaterialIcon
+                  :class="[isCoadminValid(admin) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
+                  :title="getCoadminErrorReason(admin)"
+                />
+              </div>
+              <div>{{ admin.userid }}</div>
+              <div>{{ admin.firstName ? getCoadminName(admin) : "-" }}</div>
+              <div>{{ admin.email || "-" }}</div>
+              <div>
+                <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
+                  :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
+                >
+                  <MaterialIcon icon="remove" />
+                </button>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
+          <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
+        </div>
+      </div>
+      <DgaButtonGroup class="col-span-12 mt-4">
+        <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
+          color="dga-orange" :title="$t('topic.edit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+        >
+          <MaterialIcon icon="ballot" />
+          <span class="truncate">{{ $t('topic.edit.action') }}</span>
+        </DgaButton>
+      </DgaButtonGroup>
+    </div>
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="editTopic"
       @close="showConfirmModal = false"
@@ -180,8 +257,8 @@
 <script setup lang="ts">
 import dayjs from "dayjs";
 import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime";
-import { getPresetChoices, isTopicFormValid, voterCounts, choiceCounts, isTopicReadyToVote } from "~~/src/utils/topic";
-import { getVoterName } from "~~/src/utils/utils";
+import { getPresetChoices, isTopicFormValid, voterCounts, choiceCounts, isTopicReadyToVote, coadminCounts } from "~~/src/utils/topic";
+import { getVoterName, getCoadminName } from "~~/src/utils/utils";
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -191,7 +268,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('topic.edit.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('topic.edit.title')}`
 });
 
 const { id: topicid } = useRoute().params;
@@ -213,7 +290,7 @@ const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mo
 }));
 
 const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
-const expiredDate = dayjs(startDate).add(1, "month").minute(0).second(0).millisecond(0).toDate();
+const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
 const voteStart = ref({
   dateStr: dayjs(startDate).format("YYYY-MM-DD"),
@@ -229,7 +306,6 @@ const voteDuration = ref({
   durationMinutes: dayjs(expiredDate).diff(startDate, "minutes") % 60,
 });
 const startExpiredDateStr = computed(() => dayjs(voteStart.value.dateStr, "YYYY-MM-DD").format("YYYY-MM-DD"));
-
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
@@ -242,12 +318,24 @@ const topicData = ref<TopicFormData>({
   notifyVoter: true,
   showVotersChoicesPublic: false,
   showScores: true,
+  coadmins: [],
   voterAllows: [],
   recoredToBlockchain: true,
 });
 
-const voterAllowsWithHint : Ref<Array<TopicVoterAllowFormDataWithHint>> = ref([]);
-watch(voterAllowsWithHint, (value) => {
+const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+watch(coadmins, (value) => {
+  const result : Array<string> = [];
+  for(const ele of value) {
+    if(ele.userid) {
+      result.push(ele.userid)
+    }
+  }
+  topicData.value.coadmins = result;
+}, { immediate: true, deep: true })
+
+const voterAllows : Ref<Array<TopicVoterAllowFormData>> = ref([]);
+watch(voterAllows, (value) => {
   topicData.value.voterAllows = value.map((ele) => {
     return {
       userid: ele.userid,
@@ -256,42 +344,48 @@ watch(voterAllowsWithHint, (value) => {
   })
 }, { immediate: true, deep: true })
 
+const skipBlockchain = ref(false);
+const isTopicStartVote = ref(false);
+
 const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 if (!data.value) {
   showError(i18n.t('topic.error.notFound'));
-} else if(isTopicReadyToVote(data.value.topic, getComputedServerTime().getTime())) {
-  showError(i18n.t('topic.error.notEditable'));
 } else {
-  const { topic, voterAllows } = data.value;
-  const startDate = dayjs(topic.voteStartAt).toDate();
-  const expiredDate = dayjs(topic.voteExpiredAt).toDate();
+  const { topic, voterAllows: _voteAllows, coadmins: _coadmins, pauseData } = data.value;
+  if(pauseData.every((ele) => ele.resumeAt) && dayjs(getComputedServerTime()).diff(topic.voteExpiredAt) > 0) {
+    showError(i18n.t('topic.error.notEditable'));
+  } else {
+    const startDate = dayjs(topic.voteStartAt).toDate();
+    const expiredDate = dayjs(topic.voteExpiredAt).toDate();
 
-  topicData.value.name = topic.name;
-  topicData.value.description = topic.description;
-  topicData.value.choices = topic.choices;
-  topicData.value.durationMode = topic.durationMode || "startDuration";
-  topicData.value.voteStartAt = startDate;
-  topicData.value.voteExpiredAt = expiredDate;
-  topicData.value.publicVote = topic.publicVote;
-  topicData.value.showVotersChoicesPublic = topic.showVotersChoicesPublic;
-  topicData.value.showScores = topic.showScores;
-  topicData.value.recoredToBlockchain = topic.recoredToBlockchain;
-  topicData.value.notifyVoter = topic.notifyVoter === true;
-  topicData.value.multipleVotes = topic.multipleVotes;
-  voterAllowsWithHint.value = voterAllows;
-    
-  voteStart.value.dateStr = dayjs(startDate).format("YYYY-MM-DD");
-  voteStart.value.timeStr = dayjs(startDate).format("HH:mm");
-  voteEnd.value.dateStr = dayjs(expiredDate).format("YYYY-MM-DD");
-  voteEnd.value.timeStr = dayjs(expiredDate).format("HH:mm");
-  voteDuration.value.durationDays = dayjs(expiredDate).diff(startDate, "days"),
-  voteDuration.value.durationHours = dayjs(expiredDate).diff(startDate, "hours") % 24;
-  voteDuration.value.durationMinutes = dayjs(expiredDate).diff(startDate, "minutes") % 60;
+    isTopicStartVote.value = isTopicReadyToVote(topic);
+    topicData.value.name = topic.name;
+    topicData.value.description = topic.description;
+    topicData.value.choices = topic.choices;
+    topicData.value.durationMode = topic.durationMode || "startDuration";
+    topicData.value.voteStartAt = startDate;
+    topicData.value.voteExpiredAt = expiredDate;
+    topicData.value.publicVote = topic.publicVote;
+    topicData.value.showVotersChoicesPublic = topic.showVotersChoicesPublic;
+    topicData.value.showScores = topic.showScores;
+    skipBlockchain.value = !topic.recoredToBlockchain;
+    topicData.value.notifyVoter = topic.notifyVoter === true;
+    topicData.value.multipleVotes = topic.multipleVotes;
+    voterAllows.value = _voteAllows;
+    coadmins.value = _coadmins;
+      
+    voteStart.value.dateStr = dayjs(startDate).format("YYYY-MM-DD");
+    voteStart.value.timeStr = dayjs(startDate).format("HH:mm");
+    voteEnd.value.dateStr = dayjs(expiredDate).format("YYYY-MM-DD");
+    voteEnd.value.timeStr = dayjs(expiredDate).format("HH:mm");
+    voteDuration.value.durationDays = dayjs(expiredDate).diff(startDate, "days"),
+    voteDuration.value.durationHours = dayjs(expiredDate).diff(startDate, "hours") % 24;
+    voteDuration.value.durationMinutes = dayjs(expiredDate).diff(startDate, "minutes") % 60;
 
-  editable.value = true;
+    editable.value = true;
+  }
 }
 
-const skipBlockchain = ref(false);
 watch(skipBlockchain, (value) => {
   topicData.value.recoredToBlockchain = !value
 }, { immediate: true })
@@ -307,18 +401,25 @@ function getChoiceErrorReason(choice: string) {
   return i18n.t('topic.addChoice.error.duplicated');
 }
 
-function isVoterValid(voter: TopicVoterAllowFormDataWithHint) {
-  return voterCounts(voterAllowsWithHint.value, voter.userid) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
+function isVoterValid(voter: TopicVoterAllowFormData) {
+  return voterCounts(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
 }
-function getVoterErrorReason(voter: TopicVoterAllowFormDataWithHint) {
+function getVoterErrorReason(voter: TopicVoterAllowFormData) {
   return i18n.t('topic.voterList.error.duplicated');
+}
+
+function isCoadminValid(coadmin: CoadminFormData) {
+  return coadminCounts(coadmins.value, coadmin) < 2;
+}
+function getCoadminErrorReason(coadmin: CoadminFormData) {
+  return i18n.t('topic.coadminList.error.duplicated');
 }
 
 const isFormValid = computed(() => isTopicFormValid(topicData.value))
 
 watch(voteStart, (newValue) => {
   const voteStartAt = dayjs(`${newValue.dateStr} ${newValue.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
-  const voteExpiredAt = dayjs(voteStartAt).add(1, "month").toDate();
+  const voteExpiredAt = dayjs(voteStartAt).add(1, "hour").toDate();
 
   voteEnd.value.dateStr = dayjs(voteExpiredAt).format("YYYY-MM-DD");
   voteEnd.value.timeStr = dayjs(voteExpiredAt).format("HH:mm");
@@ -332,18 +433,42 @@ function addOption() {
   topicData.value.choices.choices.push({ name: "" });
 }
 
-function removeVoter(userid: string) {
-  voterAllowsWithHint.value = voterAllowsWithHint.value.filter((ele) => ele.userid !== userid);
+function removeVoter(user: TopicVoterAllowFormData) {
+  const compareData = JSON.stringify(user);
+  voterAllows.value = voterAllows.value.filter((ele) => {
+    return compareData !== JSON.stringify(ele);
+  });
 }
 
 function addVoter(user: UserSearchResponseData) {
-  if(voterAllowsWithHint.value.every((ele) => ele.userid !== user._id)) {
-    voterAllowsWithHint.value.push({
+  if(voterAllows.value.every((ele) => ele.userid !== user._id)) {
+    voterAllows.value.push({
       userid: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       totalVotes: 1,
+    });
+  }
+
+  return true
+}
+
+
+function removeCoadmin(user: CoadminFormData) {
+  const compareData = JSON.stringify(user);
+  coadmins.value = coadmins.value.filter((ele) => {
+    return compareData !== JSON.stringify(ele);
+  });
+}
+
+function addCoadmin(user: UserSearchResponseData) {
+  if(coadmins.value.every((ele) => ele.userid !== user._id)) {
+    coadmins.value.push({
+      userid: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
     });
   }
 
@@ -403,8 +528,13 @@ async function editTopic() {
 }
 </script>
 
+
 <style scoped>
-.table th, .table td {
-  @apply py-3 px-2;
+.user-grid {
+  @apply grid w-full items-center gap-x-4 pb-2 gap-y-2 whitespace-nowrap;
+  grid-template-columns: 36px 2fr 4fr 3fr 36px;
+}
+.user-grid.multichoice {
+  grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
 }
 </style>

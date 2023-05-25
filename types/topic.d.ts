@@ -5,13 +5,15 @@ declare global {
   type TopicCardStatus = "waiting" | "access" | "voting" | "voted" | "finished" | "result";
 
   interface TopicData {
-    status: TopicStatus;
-    name: string;
-    description: string;
+    status: TopicStatus,
+    name: string,
+    description: string,
     multipleVotes: boolean,
-    choices: ChoicesData;
-    createdBy?: Types.ObjectId | UserResponseFilterData;
-    updatedBy?: Types.ObjectId | UserResponseFilterData;
+    choices: ChoicesData,
+    createdBy: Types.ObjectId,
+    updatedBy: Types.ObjectId,
+    admin: Types.ObjectId,
+    coadmins: Array<Types.ObjectId>
     durationMode?: TopicDurationMode,
     voteStartAt: Date;
     voteExpiredAt: Date;
@@ -27,12 +29,22 @@ declare global {
   type TopicDurationMode = "startDuration" | "startEnd";
 
   type TopicDataWithId = TopicData & { _id: Types.ObjectId };
+  type TopicDataWithIdPopulated = Omit<TopicDataWithId, "createdBy"> & {
+    createdBy: UserResponseFilterData;
+  };
+
   type TopicDataWithIdAndVoterAllow = TopicDataWithId & { voterAllow?: TopicVoterAllowData };
+  
+  interface VoteControllerData {
+    user: Types.ObjectId,
+    type: "admin" | "coadmin",
+  }
   
   interface TopicModel extends Model<TopicData> {
     getLastestFinishedPublicVoteTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
     getLastestVoterTopicsWithIds(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
-    getLastestAdminTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
+    getLastestAdminTopics(ids: Types.ObjectId, filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
+    getPendingTopics(filter?: TopicFilterParams) : Query<Array<TopicDataWithId>, TopicData>;
   }
   
   interface ChoicesData {
@@ -40,9 +52,15 @@ declare global {
     customable: boolean;
   }
   
-  type TopicFormData = Omit<TopicData, "_id" | "status" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "votePauseAt" | "pauseDuration" | "voterAllows"> & {
+  type TopicFormData = Omit<TopicData, "_id" | "status" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "votePauseAt" | "pauseDuration" | "admin" | "coadmins"> & {
     voterAllows: Array<TopicVoterAllowFormData>,
+    coadmins: Array<string>,
   };
+
+  type VoteControllerFormData = Omit<VoteControllerData, "user"> & {
+    user: string,
+  }
+
   type TopicFormBodyData = Omit<TopicFormData, "voteStartAt" | "voteExpiredAt"> & {
     voteStartAt: DateString,
     voteExpiredAt: DateString
@@ -51,13 +69,19 @@ declare global {
   type TopicFormEditData = TopicFormData & Pick<TopicData, "status">;
   type TopicFormEditBodyData = TopicFormBodyData & Pick<TopicData, "status">;
 
-  type TopicResponseData = Omit<TopicFormBodyData, "notifyVoter" | "voterAllows"> & Pick<TopicData, "status"> & {
+  type TopicResponseData = Omit<TopicFormBodyData, "voterAllows" | "admin" | "coadmins"> & Pick<TopicData, "status"> & {
     _id: string,
     createdAt: DateString,
     updatedAt: DateString,
-    notifyVoter?: boolean,
-    createdBy?: Pick<UserResponseData, "_id" | "firstName" | "lastName" | "email">,
-    updatedBy?: Pick<UserResponseData, "_id" | "firstName" | "lastName" | "email">,
+    createdBy: {
+      _id: string,
+      firstName?: string,
+      lastName?: string,
+      email?: string,
+    },
+    updatedBy: string,
+    admin: string,
+    coadmins: Array<string>,
   };
   type TopicResponseDataExtended = TopicResponseData & {
     voterAllow?: TopicVoterAllowResponseData,
