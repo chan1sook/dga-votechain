@@ -40,7 +40,7 @@
         <div class="flex flex-row gap-2 items-center p-2">
           <DgaInput v-model="searchKeyword" type="search" class="flex-1" :placeholder="$t('admin.blockchain.txhash')"></DgaInput>
           <DgaButton class="flex-row gap-2 items-center !px-4 !py-1" color="dga-orange" @click="toTxPage(searchKeyword)">
-            <MaterialIcon icon="search"></MaterialIcon>
+            <MagnifyIcon />
           </DgaButton>
         </div>
       </div>
@@ -70,6 +70,8 @@
 </template>
 
 <script setup lang="ts">
+import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
+
 import dayjs from 'dayjs';
 import { getComputedServerTime } from '~~/src/utils/datetime';
 
@@ -80,7 +82,7 @@ definePageMeta({
   middleware: ["auth-dev"]
 })
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('admin.blockchain.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.blockchain.title')}`
 });
 
 const txInfo : Ref<TxInfoResponseData | undefined> = ref(undefined);
@@ -101,7 +103,7 @@ function toTxPage(id : string) {
 }
 
 function countServerOnlines(servers: Array<BlockchainServerDataResponse>) {
-  const onlineThershold = useRuntimeConfig().BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
+  const onlineThershold = useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if(current.lastActiveAt) {
       const diff = dayjs(getComputedServerTime()).diff(current.lastActiveAt);

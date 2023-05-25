@@ -7,7 +7,7 @@ import TopicPauseModel from "~~/server/models/topic-pause"
 
 export default defineEventHandler(async (event) => {
   const { filter } = getQuery(event);
-  let topicsData: Array<TopicDataWithId> = [];
+  let topicsData: Array<TopicDataWithIdPopulated> = [];
   let filterParams : TopicFilterParams = { type: "all" };
   if(typeof filter === "string") {
     try {
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
     topicsData = await TopicModel.getLastestVoterTopicsWithIds(filterIds, filterParams);
   } else {
-    topicsData = await TopicModel.getLastestAdminTopics(filterParams);
+    topicsData = await TopicModel.getLastestAdminTopics(userData._id, filterParams);
   }
 
   const topicPauseDocs = await TopicPauseModel.find({ topicid: { $in: topicsData.map((ele) => ele._id)} });
@@ -43,18 +43,17 @@ export default defineEventHandler(async (event) => {
       description: topicData.description,
       multipleVotes: topicData.multipleVotes,
       choices: topicData.choices,
-      createdBy: topicData.createdBy && !(topicData.createdBy instanceof Types.ObjectId) ? {
-        _id: topicData.createdBy._id,
+      createdBy: {
+        _id: topicData.createdBy._id.toString(),
         firstName: topicData.createdBy.firstName,
         lastName: topicData.createdBy.lastName,
         email: topicData.createdBy.email,
-      } : undefined,
-      updatedBy: topicData.updatedBy && !(topicData.updatedBy instanceof Types.ObjectId) ? {
-        _id: topicData.updatedBy._id,
-        firstName: topicData.updatedBy.firstName,
-        lastName: topicData.updatedBy.lastName,
-        email: topicData.updatedBy.email,
-      } : undefined,
+      },
+      updatedBy: topicData.updatedBy.toString(),
+      admin: topicData.admin.toString(),
+      coadmins: topicData.coadmins.map((ele) => {
+        return ele.toString()
+      }),
       createdAt: dayjs(topicData.createdAt).toISOString(),
       updatedAt: dayjs(topicData.updatedAt).toISOString(),
       durationMode: topicData.durationMode,
@@ -66,7 +65,7 @@ export default defineEventHandler(async (event) => {
       recoredToBlockchain: topicData.recoredToBlockchain,
       voterAllow: topicAllowDoc ? {
         topicid: topicData._id.toString(),
-        userid: topicAllowDoc.userid.toString(),
+        userid: `${topicAllowDoc.userid}`,
         totalVotes: topicAllowDoc.totalVotes,
         remainVotes: topicAllowDoc.remainVotes,
       } : undefined,
@@ -76,7 +75,8 @@ export default defineEventHandler(async (event) => {
           pauseAt: dayjs(ele.pauseAt).toISOString(),
           resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toISOString() : undefined
         }
-      })
+      }),
+      notifyVoter: topicData.notifyVoter,
     }
   })
   

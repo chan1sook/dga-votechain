@@ -11,7 +11,7 @@
         <DgaButton class="inline-flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('error.backToHome')" @click="handleClearError"
         >
-          <MaterialIcon icon="home"/>
+          <HomeIcon />
           <span class="truncate">
             {{  $t('error.backToHome') }}
           </span>
@@ -22,15 +22,17 @@
 </template>
 
 <script setup lang="ts">
+import HomeIcon from 'vue-material-design-icons/Home.vue';
+
 const i18n = useI18n()
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('error.title')}`,
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('error.title')}`,
   link: [
     {
       rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-    }
+      href: "https://fonts.googleapis.com/css2?family=Mitr:wght@400&display=swap"
+    },
   ]
 });
 

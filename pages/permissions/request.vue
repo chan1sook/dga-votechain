@@ -25,7 +25,7 @@
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" title="Request Permissions" :disabled="!isFormValid" @click="requestPermissions"
         >
-        <MaterialIcon icon="ballot" />
+          <BallotOutlineIcon />
           <span class="truncate">{{ $t('requestPermissions.add.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
@@ -38,6 +38,8 @@
 </template>
   
 <script setup lang="ts">
+import BallotOutlineIcon from 'vue-material-design-icons/BallotOutline.vue';
+
 import { getRequestablePermissions, getPresetPermissions } from "~~/src/utils/permissions";
 
 const i18n = useI18n();
@@ -48,7 +50,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('requestPermissions.add.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('requestPermissions.add.title')}`
 });
 
 function getFullPermissionTitle(permission: EVotePermission) {

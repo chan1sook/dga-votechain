@@ -3,7 +3,13 @@ import { Model, Query, Types } from "mongoose";
 declare global {
   interface TopicVoterAllowData {
     topicid: Types.ObjectId,
-    userid: Types.ObjectId,
+    
+    userid?: Types.ObjectId,
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    hashedCitizenId?: string,
+
     remainVotes: number,
     totalVotes: number
   }
@@ -16,17 +22,24 @@ declare global {
 
   type TopicVoterAllowResponseData = Omit<TopicVoterAllowData, "topicid" | "userid"> & {
     topicid: string,
-    userid: string,
+    userid?: string,
   }
+
+  type TopicVoterAllowDataPopulated = Omit<TopicVoterAllowData, "userid"> & { userid?: UserData & { _id: Types.ObjectId } }
 
   interface TopicVoterAllowFormData {
-    userid: string,
-    totalVotes: number
-  }
-
-  type TopicVoterAllowFormDataWithHint = TopicVoterAllowFormData & {
+    userid?: string,
+    email?: string,
     firstName?: string,
     lastName?: string,
+    citizenId?: string,
+    totalVotes: number,
+  }
+
+  interface CoadminFormData {
+    userid?: string,
     email?: string,
+    firstName?: string,
+    lastName?: string,
   }
 }

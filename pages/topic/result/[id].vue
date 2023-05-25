@@ -138,7 +138,7 @@ const { id } = useRoute().params;
 let topicid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('topic.create.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('topic.create.title')}`
 });
 
 const showDescription = ref(false);

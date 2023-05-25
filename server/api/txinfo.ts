@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
-import { getTxArr } from "../utils";
+import { getTxCounts } from "../utils";
 import BlockchainServerModel from "~~/server/models/blockchain-server"
 
 export default defineEventHandler(async (event) => {
-  const [txDocs, blockchainServerDocs] = await Promise.all([
-    getTxArr(100000, ""),
+  const [txCounts, blockchainServerDocs] = await Promise.all([
+    getTxCounts(),
     BlockchainServerModel.find(),
   ]);
 
@@ -18,11 +18,6 @@ export default defineEventHandler(async (event) => {
         lastActiveAt: ele.lastActiveAt ? dayjs(ele.lastActiveAt).toString() : undefined,
       }
     }),
-    blocks: {
-      mined: txDocs.filter((ele) => ele.txStatus === "valid").length,
-      invalid: txDocs.filter((ele) => ele.txStatus === "invalid").length,
-      pending: txDocs.filter((ele) => ele.txStatus === "pending").length,
-      total: txDocs.length,
-    }
+    blocks: txCounts,
   }
 })

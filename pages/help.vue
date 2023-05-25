@@ -26,7 +26,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('help.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('help.title')}`
 });
 
 </script>

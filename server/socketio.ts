@@ -108,8 +108,8 @@ export default async () => {
         })
         
         await lastestPauseData.save()
-  
-        socket.emit(`pauseVote/${topicId}`, {
+        
+        io.emit(`pauseVote/${topicId}`, {
           topicid: lastestPauseData.topicid,
           pauseAt: dayjs(lastestPauseData.pauseAt).toISOString(),
         });
@@ -144,7 +144,7 @@ export default async () => {
         await dbSession.commitTransaction();
         await dbSession.endSession();
 
-        socket.emit(`resumeVote/${topicId}`, {
+        io.emit(`resumeVote/${topicId}`, {
           topicid: lastestPauseData.topicid,
           pauseAt: dayjs(lastestPauseData.pauseAt).toISOString(),
           resumeAt: dayjs(lastestPauseData.resumeAt).toISOString(),

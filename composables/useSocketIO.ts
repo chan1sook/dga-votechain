@@ -7,7 +7,7 @@ export const useSocketIO = () => {
   if(socket) {
     return socket;
   }
-  const { SOCKETIO_URL, SYNCTIME_THERSOLD } = useRuntimeConfig();
+  const { public: {SOCKETIO_URL, SYNCTIME_THERSOLD} } = useRuntimeConfig();
   
   const syncTime = Math.floor(SYNCTIME_THERSOLD / 2);
 

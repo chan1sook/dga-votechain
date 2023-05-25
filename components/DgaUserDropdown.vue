@@ -1,18 +1,16 @@
 <template>
   <div class="relative" @click.stop>
-    <button type="button" @click="toggleShowOption" :title="$t('navbar.user.title')">
-      <MaterialIcon icon="account_circle"></MaterialIcon>
-      <div class="text-white text-xs px-2 py-0.5 -mt-1 bg-dga-orange rounded-full whitespace-nowrap">
+    <button type="button" @click="toggleShowOption" :title="$t('navbar.user.title')" class="flex flex-col items-center">
+      <AccountCircleOutlineIcon :size="30" />
+      <div class="text-white text-xs mt-1 px-2 bg-dga-orange rounded-full whitespace-nowrap">
         {{ $t(`role.${roleMode}`, $t("role.guest")) }}
       </div>
     </button>
-    <div v-if="showOption" class="z-[402] bg-white border rounded-md rounded-b-3xl overflow-hidden shadow fixed right-0 top-16 md:top-20 w-64" @click.stop>
+    <div v-if="showOption" class="z-[402] bg-white border rounded-md rounded-b-3xl overflow-hidden shadow fixed right-0 top-16 lg:top-20 w-64" @click.stop>
       <div class="flex-1 flex flex-col gap-2 px-4 py-4">
         <div class="font-bold flex flex-row gap-2 items-center">
           {{ perttyTime }}
-          <MaterialIcon v-if="!isSync" 
-            icon="priority_high" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')"
-          ></MaterialIcon>
+          <ExclamationIcon v-if="!isSync" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')" />
         </div>
         <hr class="border-2 border-dga-orange w-16"/>
         <div class="font-bold">
@@ -36,7 +34,7 @@
         </DgaButton>
       </div>
       <a href="/api/logout" class="flex flex-row gap-2 items-center justify-center bg-dga-blue-lighter text-white px-2 py-2" :title="$t('navbar.logout')">
-        <MaterialIcon icon="logout" class="!text-lg"></MaterialIcon>
+        <LogoutIcon class="!text-lg" />
         {{ $t('navbar.logout') }}
       </a>
     </div>
@@ -44,6 +42,10 @@
 </template>
 
 <script setup lang="ts">
+import AccountCircleOutlineIcon from 'vue-material-design-icons/AccountCircleOutline.vue';
+import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
+import LogoutIcon from 'vue-material-design-icons/Logout.vue';
+
 import dayjs from 'dayjs';
 import { checkPermissionNeeds } from '~~/src/utils/permissions';
 import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
@@ -59,7 +61,7 @@ function toggleShowOption() {
   }
 }
 
-const { SYNCTIME_THERSOLD } = useRuntimeConfig();
+const { public: { SYNCTIME_THERSOLD } } = useRuntimeConfig();
 
 const todayTime = ref(Date.now());
 const isSync = ref(false);

@@ -53,6 +53,14 @@ const schema = new Schema<TopicData, TopicModel>({
     type: Schema.Types.ObjectId,
     ref: "dga-user"
   },
+  admin : {
+    type: Schema.Types.ObjectId,
+    ref: "dga-user"
+  },
+  coadmins: [{
+    type: Schema.Types.ObjectId,
+    ref: "dga-user"
+  },],
   durationMode: {
     type: String,
   },
@@ -86,7 +94,7 @@ const schema = new Schema<TopicData, TopicModel>({
   }
 }, { timestamps: true });
 
-schema.statics.getLastestFinishedPublicVoteTopics = function getLastestAdminTopics(filter?: TopicFilterParams) {
+schema.statics.getLastestFinishedPublicVoteTopics = function getLastestFinishedPublicVoteTopics(filter?: TopicFilterParams) {
   const query : FilterQuery<TopicData> = {
     status: "approved",
     publicVote: true,
@@ -115,10 +123,10 @@ schema.statics.getLastestFinishedPublicVoteTopics = function getLastestAdminTopi
     }
   }
   
-  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy");
 };
 
-schema.statics.getLastestVoterTopicsWithIds = function getLastestAdminTopics(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) {
+schema.statics.getLastestVoterTopicsWithIds = function getLastestVoterTopicsWithIds(ids: Array<Types.ObjectId>, filter?: TopicFilterParams) {
   const query : FilterQuery<TopicData> = {
     status: "approved",
     $or: [
@@ -148,12 +156,16 @@ schema.statics.getLastestVoterTopicsWithIds = function getLastestAdminTopics(ids
       query._id = { $lt: new Types.ObjectId(filter.startid) }
     }
   }
-  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy");
 };
 
-schema.statics.getLastestAdminTopics = function(filter?: TopicFilterParams) {
+schema.statics.getLastestAdminTopics = function getLastestAdminTopics(userid: Types.ObjectId, filter?: TopicFilterParams) {
   const query : FilterQuery<TopicData> = {
     status: "approved",
+    $or: [
+      { admin: userid },
+      { coadmins: userid }
+    ]
   };
 
   if(filter) {
@@ -178,6 +190,36 @@ schema.statics.getLastestAdminTopics = function(filter?: TopicFilterParams) {
     }
   }
   
-  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy updatedBy");
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy");
+}
+
+schema.statics.getPendingTopics = function getPendingTopics(filter?: TopicFilterParams) {
+  const query : FilterQuery<TopicData> = {
+    status: "pending",
+  };
+
+  if(filter) {
+    if(filter.type === "ticketId") {
+      query._id = new Types.ObjectId(filter.ticketId);
+    } else if(filter.type === "date") {
+      const today = new Date();
+      const startDate = dayjs(today).tz("Asia/Bangkok").year(filter.year).month(filter.month).date(1).hour(0).minute(0).second(0).millisecond(0);
+      const endDate = startDate.month(filter.month + 1);
+      
+      query.voteStartAt = {
+        $gte: startDate.toDate(),
+        $lte: endDate.toDate(),
+      }
+    } else if(filter.type === "topicName") {
+      const regex = RegExp(escapeRegExp(filter.keyword));
+      query.name = regex;
+    }
+
+    if(filter.startid) {
+      query._id = { $lt: new Types.ObjectId(filter.startid) }
+    }
+  }
+  
+  return this.find(query).limit(filter?.pagesize || 50).sort({_id: -1 }).populate("createdBy");
 }
 export default model<TopicData, TopicModel>('topic', schema);

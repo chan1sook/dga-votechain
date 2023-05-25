@@ -1,5 +1,5 @@
 export default {
-  appName: "Dga E-Voting",
+  appName: "DGA E-Voting",
   navbar: {
     home: "Home",
     voting: "Voting",
@@ -31,6 +31,12 @@ export default {
       desyncTime: "Desync time"
     },
     logout: "Logout"
+  },
+  privacyPolicy: {
+    title: "Private Policy"
+  },
+  cookiePolicy: {
+    title: "Cookie Policy"
   },
   notification: {
     topicStart: "Topic Started",
@@ -65,7 +71,7 @@ export default {
   },
   login: {
     title: "Login",
-    loginDigitalId: "Login with DigitalID",
+    loginDigitalId: "Login with Digital ID",
     loginWithGoogle: "Login with Google",
     registerDigitalId: "Register",
   },
@@ -107,6 +113,9 @@ export default {
     loadMoreTopic: "Load more topics",
     noMoreTopic: "No more topic",
     createTopic: "Create",
+    requestTopic: "Request",
+    avaliableTopic: "All Avaliable",
+    pendingTopic: "Check Pending",
     editTopic: "Edit",
     status: {
       waiting: "Waiting",
@@ -139,6 +148,7 @@ export default {
       paused: "E-voting is Paused",
     },
     adminWarning: "Please change mode to Voter for voting topic.",
+    cannotVote: "Can't vote",
     pause: "Paused",
     resume: "Resume",
     clear: "Clear",
@@ -147,6 +157,13 @@ export default {
     confirm: "Confirm voting choices?"
   },
   topic: {
+    request: {
+      title: "Request Topic",
+      action: "Request topic",
+      confirm: "Confirm data to add?",
+      success: 'Request topic successful',
+      failed: 'Request topic failed',
+    },
     create: {
       title: "Create Topic",
       action: "Add topic",
@@ -208,13 +225,26 @@ export default {
       remove: "Remove User",
       searchUser: "Search User",
       error: {
-        duplicated: "User ID Duplicated"
+        duplicated: "Duplicated User"
+      }
+    },
+    coadminList: {
+      title: "Co-Admin Lists",
+      userId: "User ID",
+      name: "Name",
+      add: "Add User",
+      remove: "Remove User",
+      searchUser: "Search User",
+      error: {
+        duplicated: "Duplicated User"
       }
     },
     notifyUsers: "Send notice to users",
     showScores: "Show Scores on result",
     skipBlockchain: "Not record to Blockchain",
     scorePublic: "Display voter choice(s) for public",
+    allow: "Allow",
+    deny: "Deny",
   },
   result: {
     title: "Voting Result",
@@ -286,6 +316,13 @@ export default {
       failed: "Add Request Failed",
       pendingBlocked: "Please wait before request again",
     },
+    change: {
+      title: "Change Permissions",
+      action: "Change",
+      confirm: "Confirm to Change Permissions?",
+      success: "Change Permissions Successful",
+      failed: "Change Permissions Failed",
+    },
     permissions: "Permissions",
     note: "Note",
     noteNone: "None",
@@ -301,7 +338,6 @@ export default {
     email: "Email"
   },
   permissions: {
-    "banned": "Mark Banned User",
     "request-permissions": "Request More Permissions",
     "voter-mode": "Access Voter Mode",
     "admin-mode": "Access Admin Mode",
@@ -309,12 +345,14 @@ export default {
     "vote-topic": "Vote Topics",
     "create-topic": "Create New Topics",
     "change-topic": "Change Topic Data",
-    "grant-topic-controller": "Grant Topic Controller to Other User",
-    "transfer-topic-controller": "Transfer Topic Controller to Other User",
+    "change-permissions:basic": "Change Basic Permissions",
+    "change-permissions:advance": "Change Advance Permissions",
   },
   admin: {
     user: {
       title: "User List",
+      changePermissions: "Change Permissions",
+      showAllUsers: "Show All Users",
     },
     blockchain: {
       title: "Blockchain Admin",
@@ -350,9 +388,9 @@ export default {
   },
   timePeriod: {
     nearZeroMinute: "Less than a minute",
-    minute: "Min | Mins",
-    hour: "Hour | Hours",
-    day: "Day | Days",
+    minute: "Mins",
+    hour: "Hours",
+    day: "Days",
   },
   modal: {
     cancel: "Cancel",

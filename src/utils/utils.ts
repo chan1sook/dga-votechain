@@ -25,7 +25,14 @@ export function isThaiCitizenId(str: string) {
   return sumDigitValue === checkshum;
 }
 
-export function getVoterName(voter: TopicVoterAllowFormDataWithHint) {
+export function getVoterName(voter: TopicVoterAllowFormData) {
+  if(voter.firstName) {
+    return voter.lastName ? `${voter.firstName} ${voter.lastName}` : voter.firstName;
+  }
+  return voter.userid
+}
+
+export function getCoadminName(voter: CoadminFormData) {
   if(voter.firstName) {
     return voter.lastName ? `${voter.firstName} ${voter.lastName}` : voter.firstName;
   }

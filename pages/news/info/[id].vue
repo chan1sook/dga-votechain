@@ -27,7 +27,7 @@
         <DgaButton class="!flex flex-row gap-x-2 mx-auto items-center justify-center truncate"
           color="dga-orange" :title="$t('news.edit.title')"
         >
-        <MaterialIcon icon="edit" />
+          <PencilIcon />
           <span class="truncate">{{ $t('news.edit.title') }}</span>
         </DgaButton>
       </NuxtLink>
@@ -36,6 +36,8 @@
 </template>
   
 <script setup lang="ts">
+import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+
 import dayjs from "dayjs";
 
 definePageMeta({
@@ -48,7 +50,7 @@ const { id } = useRoute().params;
 let newsid = Array.isArray(id) ? id[id.length - 1] : id;
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('news.title')} #${newsid}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('news.title')} #${newsid}`
 });
 
 const isAdminRole = computed(() => {

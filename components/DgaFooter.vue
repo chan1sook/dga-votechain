@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="dga-footer">Power by Digital Government Development Agency (Public Organization) (DGA) </div>
     <div class="dga-footer-about">
       <img src="~/assets/images/logo_dga.png" class="block h-8 md:h-12" />
       <div class="flex flex-row flex-wrap gap-x-2 gap-y-1 justify-center">
+        <div class="w-full">Powered by Digital Government Development Agency (Public Organization) (DGA)</div>
         <div>{{ $t('contactUs.info.address1') }}</div>
         <div>{{ $t('contactUs.info.address2') }}</div>
         <div>

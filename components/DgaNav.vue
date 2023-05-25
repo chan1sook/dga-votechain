@@ -6,15 +6,15 @@
     <NuxtLink :href="localePathOf('/about')" class="dga-menu-item">{{ $t("navbar.about") }}</NuxtLink>
     <NuxtLink :href="localePathOf('/help')" class="dga-menu-item">{{ $t("navbar.help") }}</NuxtLink>
     <NuxtLink :href="localePathOf('/contact-us')" class="dga-menu-item">{{ $t("navbar.contactUs") }}</NuxtLink>
-    <NuxtLink v-if="roleMode === 'admin'" :href="localePathOf('/admin/users')" class="dga-menu-item">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
+    <NuxtLink v-if="isAdminRole(roleMode)" :href="localePathOf('/admin/users')" class="dga-menu-item">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
     <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item">{{ $t('navbar.blockchain') }}</NuxtLink>
     
     <div class="inline-flex ml-auto flex-row items-center gap-4">
-      <button type="button" class="dga-small-btn !hidden sm:!inline-flex" @click="toggleLang">
+      <button type="button" class="dga-small-btn" @click="toggleLang">
         {{ prettyLocaleCode }}
       </button>
       <DgaButton v-if="!isLogin" 
-        :href="localePathOf('/login')" theme="hollow" class="whitespace-nowrap w-32 text-center !hidden sm:!inline-flex"
+        :href="localePathOf('/login')" theme="hollow" class="whitespace-nowrap w-32 text-center"
       >
         {{ $t('navbar.login') }}
       </DgaButton>      
@@ -26,7 +26,7 @@
     </div>
 
     <div class="inline-flex lg:hidden">
-      <MaterialIcon icon="menu" class="cursor-pointer" @click.stop="toggleShowOption"></MaterialIcon>
+      <MenuIcon class="cursor-pointer" @click.stop="toggleShowOption" />
     </div>
     <div v-if="showOption" class="collasped-menu">
       <NuxtLink :href="localePathOf('/')" class="dga-menu-item-small">{{ $t("navbar.home") }}</NuxtLink>
@@ -34,7 +34,7 @@
       <NuxtLink :href="localePathOf('/about')" class="dga-menu-item-small">{{ $t("navbar.about") }}</NuxtLink>
       <NuxtLink :href="localePathOf('/help')" class="dga-menu-item-small">{{ $t("navbar.help") }}</NuxtLink>
       <NuxtLink :href="localePathOf('/contact-us')" class="dga-menu-item-small">{{ $t("navbar.contactUs") }}</NuxtLink>
-      <NuxtLink v-if="roleMode === 'admin'" :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
+      <NuxtLink v-if="isAdminRole(roleMode)" :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
       <NuxtLink v-if="roleMode === 'developer'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('navbar.blockchain')}}</NuxtLink>
       <div class="border-t my-1"></div>
       <div class="dga-menu-item-small" @click="toggleLang">{{ $t('navbar.language') }}: {{ prettyLocaleCode  }}</div>
@@ -48,6 +48,9 @@
 </template>
 
 <script setup lang="ts">
+import MenuIcon from 'vue-material-design-icons/Menu.vue';
+import { isAdminRole } from '~~/src/utils/role';
+
 const i18n = useI18n();
 const localePathOf = useLocalePath();
 const prettyLocaleCode = computed(() => {

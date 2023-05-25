@@ -11,6 +11,8 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
   placeholder?: string,
+  adminOnly? : boolean,
+  notSelf? : boolean,
 }>(), {});
 
 
@@ -28,6 +30,8 @@ async function searchUsers() {
   isSearching.value = true;
   const { data } = await useFetch("/api/user/search", { query: {
     keyword: keyword.value,
+    adminOnly: props.adminOnly ? "1" : undefined,
+    notSelf: props.notSelf ? "1" : undefined,
   }})
   if(data.value) {
     searchedUsers.value = data.value;

@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 
+import UserModel from "~~/server/models/user"
 import TopicModel from "~~/server/models/topic"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicNotificationData from "~~/server/models/topic-notifications"
@@ -29,6 +30,14 @@ export default defineEventHandler(async (event) => {
   dbSession.startTransaction();
   
   const today = new Date();
+
+  const coadminsDocs = await UserModel.find({
+    $and: [
+      { _id: { $ne: userData._id } },
+      { _id: { $in: topicFormData.coadmins.map((ele) => new Types.ObjectId(ele)) }}
+    ]
+  })
+
   const newTopicDoc = new TopicModel({
     name: topicFormData.name,
     description: topicFormData.description,
@@ -38,6 +47,8 @@ export default defineEventHandler(async (event) => {
     updatedBy: userData._id,
     createdAt: today,
     updatedAt: today,
+    admin: userData._id,
+    coadmins: coadminsDocs.map((ele) => ele._id),
     durationMode: topicFormData.durationMode,
     voteStartAt: dayjs(topicFormData.voteStartAt).toDate(),
     voteExpiredAt: dayjs(topicFormData.voteExpiredAt).toDate(),
@@ -48,6 +59,7 @@ export default defineEventHandler(async (event) => {
     notifyVoter: topicFormData.notifyVoter,
     multipleVotes: topicFormData.multipleVotes,
   });
+  
   const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
     return {
       topicid: newTopicDoc._id,
@@ -77,41 +89,8 @@ export default defineEventHandler(async (event) => {
 
   await dbSession.commitTransaction();
   await dbSession.endSession();
-  
-  await newTopicDoc.populate("createdBy updatedBy");
-
-  const topic : TopicResponseData = {
-    _id: newTopicDoc._id.toString(),
-    status: newTopicDoc.status,
-    name: newTopicDoc.name,
-    description: newTopicDoc.description,
-    multipleVotes: newTopicDoc.multipleVotes,
-    choices: newTopicDoc.choices,
-    durationMode: newTopicDoc.durationMode,
-    voteStartAt: dayjs(newTopicDoc.voteStartAt).toISOString(),
-    voteExpiredAt: dayjs(newTopicDoc.voteExpiredAt).toISOString(),
-    createdAt: dayjs(newTopicDoc.createdAt).toISOString(),
-    updatedAt: dayjs(newTopicDoc.updatedAt).toISOString(),
-    createdBy: newTopicDoc.createdBy && !(newTopicDoc.createdBy instanceof Types.ObjectId) ? {
-      _id: newTopicDoc.createdBy._id,
-      firstName: newTopicDoc.createdBy.firstName,
-      lastName: newTopicDoc.createdBy.lastName,
-      email: newTopicDoc.createdBy.email,
-    } : undefined,
-    updatedBy: newTopicDoc.updatedBy && !(newTopicDoc.updatedBy instanceof Types.ObjectId) ? {
-      _id: newTopicDoc.updatedBy._id,
-      firstName: newTopicDoc.updatedBy.firstName,
-      lastName: newTopicDoc.updatedBy.lastName,
-      email: newTopicDoc.updatedBy.email,
-    } : undefined,
-    publicVote: newTopicDoc.publicVote,
-    showScores: newTopicDoc.showScores,
-    showVotersChoicesPublic: newTopicDoc.showVotersChoicesPublic,
-    recoredToBlockchain: newTopicDoc.recoredToBlockchain,
-    notifyVoter: newTopicDoc.notifyVoter,
-  };
 
   return {
-    topic,
+    status: "OK",
   }
 })

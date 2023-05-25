@@ -6,10 +6,10 @@
         <div class="flex flex-row gap-2 items-center">
           <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.approve')"
             @click="setApprovePermissions(request._id, 'approved')">
-            <MaterialIcon icon="check" />
+            <CheckIcon />
           </button>
           <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.reject')" @click="setApprovePermissions(request._id, 'rejected')">
-            <MaterialIcon icon="close" />
+            <CloseIcon/>
           </button>
         </div>
         <div class="border-l border-dga-orange pl-2 overflow-x-auto">
@@ -19,7 +19,6 @@
           </div>
           <div class="flex flex-row gap-2 flex-wrap">
             <b>{{ $t('requestPermissions.personalData') }}:</b> 
-            <abbr v-if="request.personalData.citizenId" :title="$t('requestPermissions.citizenid')">{{ request.personalData.citizenId }}</abbr>
             <abbr :title="$t('requestPermissions.name')">{{ formatFullName(request.personalData) }}</abbr>
             <abbr v-if="request.personalData.email" :title="$t('requestPermissions.email')">{{ request.personalData.email }}</abbr>
           </div>
@@ -54,6 +53,9 @@
 </template>
   
 <script setup lang="ts">
+import CheckIcon from 'vue-material-design-icons/Check.vue';
+import CloseIcon from 'vue-material-design-icons/Close.vue';
+
 const i18n = useI18n();
 
 definePageMeta({
@@ -61,7 +63,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('requestPermissions.approveRequestPermissions')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('requestPermissions.approveRequestPermissions')}`
 });
 
 function getFullPermissionTitle(permission: EVotePermission) {

@@ -5,9 +5,7 @@
         <div>{{ userName }} ({{ $t(`role.${roleMode}`, $t("role.guest")) }})</div>
         <div class="font-bold flex flex-row gap-2 items-center">
           {{ perttyTime }}
-          <MaterialIcon v-if="!isSync" 
-            icon="priority_high" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')"
-          ></MaterialIcon>
+          <ExclamationIcon v-if="!isSync" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')"/>
         </div>
         <div class="flex flex-row flex-wrap gap-x-2 gap-y-1 justify-center items-center">
           <DgaButton v-if="(isAdmin || isDeveloper) && roleMode !== 'voter'" color="dga-orange" theme="hollow" 
@@ -29,20 +27,23 @@
       </div>
     </div>
     <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')">
-      <MaterialIcon icon="logout" class="!text-lg"></MaterialIcon>
+      <LogoutIcon class="!text-lg" />
       {{ $t('navbar.logout') }}
     </a>
   </div>
 </template>
 
 <script setup lang="ts">
+import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
+import LogoutIcon from 'vue-material-design-icons/Logout.vue';
+
 import dayjs from 'dayjs';
 import { checkPermissionNeeds } from '~~/src/utils/permissions';
 import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
 
 const i18n = useI18n();
 
-const { SYNCTIME_THERSOLD } = useRuntimeConfig();
+const { public: {SYNCTIME_THERSOLD } } = useRuntimeConfig();
 
 const todayTime = ref(Date.now());
 const isSync = ref(false);

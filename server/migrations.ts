@@ -1,7 +1,9 @@
+import bcrypt from "bcrypt";
+
 import EVoteUserModel from "~~/server/models/user"
-import OldUserModel from "~~/server/models/old-user"
+import TopicModel from "~~/server/models/topic"
 import BlockchainServerModel from "~~/server/models/blockchain-server"
-import { checkPermissionSelections, combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
+import { combinePermissions, getUnusedPermissions, legacyRoleToPermissions, removePermissions } from '~~/src/utils/permissions';
 
 let migrationSeq = 0;
 
@@ -44,77 +46,47 @@ export async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
   console.log(`[Migration] Add Predefined Dev Users (Inserted: ${result.insertedCount})`);
 }
 
-function containsOldPermissions(permissions: Array<EVotePermission>) : boolean {
-  const unusedPermissions: Array<EVotePermission> = ["access-pages:user", "access-notifications", "request-topic", "access-pages:admin", "change-permissions:basic", "access-pages:developer", "change-permissions:advance"];
-  return permissions.some((ele) => unusedPermissions.includes(ele))
-}
-
-function oldPermissionsToRole(permissions: Array<EVotePermission>) : UserRole {
-  if(permissions.includes("access-pages:developer")) {
-    return "developer";
-  }
-  if(permissions.includes("access-pages:admin")) {
-    return "admin";
-  }
-  return "voter";
-}
-
-export async function migrateToNewUserFormat() {
+export async function migrateToNewUserFormat2() {
   migrationSeq +=1 ;
 
-  console.log(`[Migration] ${migrationSeq}. MigrateToNewUserFormat`);
-  const allUsers = await OldUserModel.find({});
-
-  const result = await EVoteUserModel.bulkWrite(allUsers.map((user) => {
-    return {
-      updateOne: {
-        filter: {
-          authSources: { $elemMatch: 
-            {
-              authSource: "digitalId",
-              digitalIdUserId:  { $in: user.userid }
-            }
-          }
-        },
-        update: {
-          $setOnInsert: {
-            permissions: containsOldPermissions(user.permissions) ? 
-              legacyRoleToPermissions(oldPermissionsToRole(user.permissions)) : user.permissions,
-            authSources: [
-              { authSource: "digitalId", digitalIdUserId: user.userid }
-            ],
-          }
-        },
-        upsert: true,
-      }
-    }
-  }))
-
-  console.log(`[Migration] MigrateToNewUserFormat (Upserted: ${result.upsertedCount}) (Modified: ${result.modifiedCount})`);
-}
-
-export async function migrateChangedPermissions() {
-  migrationSeq +=1 ;
-
-  console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);
+  console.log(`[Migration] ${migrationSeq}. migrateToNewUserFormat2`);
   
   const userDocs = await EVoteUserModel.find({});
   const userDocsToSave = [];
 
+  const unusedPermissions = getUnusedPermissions();
   for(const userDoc of userDocs) {
-    if(checkPermissionSelections(userDoc.permissions, "admin-mode")) {
-      userDoc.permissions = combinePermissions(userDoc.permissions, "change-permissions:basic");
-      userDoc.markModified("permissions");
+    if(userDoc.citizenId) {
+      userDoc.hashedCitizenId = bcrypt.hashSync(userDoc.citizenId, 12);
+      userDoc.citizenId = undefined;
+      userDocsToSave.push(userDoc);
     }
-    if(checkPermissionSelections(userDoc.permissions, "dev-mode")) {
-      userDoc.permissions = combinePermissions(userDoc.permissions, "change-permissions:advance");
-      userDoc.markModified("permissions");
-    }
-    userDocsToSave.push(userDoc);
+
+    userDoc.permissions = removePermissions(userDoc.permissions, ...unusedPermissions);
+    userDoc.markModified("permissions");
   }
 
   const result = await EVoteUserModel.bulkSave(userDocsToSave);
-  console.log(`[Migration] MigrateChangePermissions (Modified: ${result.modifiedCount})`);
+  console.log(`[Migration] migrateToNewUserFormat2 (Modified: ${result.modifiedCount})`);
+}
+
+export async function migrateTopicsDefaultAdmin() {
+  migrationSeq +=1 ;
+
+  console.log(`[Migration] ${migrationSeq}. Add default admin to topics`);
+  
+  const topicDocs = await TopicModel.find({
+    admin: { $exists: false }
+  });
+  const topicDocsToSave = [];
+
+  for(const topicDoc of topicDocs) {
+    topicDoc.admin = topicDoc.createdBy;
+    topicDocsToSave.push(topicDoc);
+  }
+
+  const result = await TopicModel.bulkSave(topicDocsToSave);
+  console.log(`[Migration] migrateTopicsDefaultAdmin (Modified: ${result.modifiedCount})`);
 }
 
 export async function setPredefinedBlockchainServers() {

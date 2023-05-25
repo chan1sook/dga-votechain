@@ -1,5 +1,5 @@
 export default {
-  appName: "Dga E-Voting",
+  appName: "DGA E-Voting",
   navbar: {
     home: "หน้าแรก",
     voting: "ร่วมโหวต",
@@ -31,6 +31,12 @@ export default {
       desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์"
     },
     logout: "ออกจากระบบ"
+  },
+  privacyPolicy: {
+    title: "นโยบายความเป็นส่วนตัว"
+  },
+  cookiePolicy: {
+    title: "นโยบายคุกกี้"
   },
   notification: {
     topicStart: "เริ่มเปิดโหวต",
@@ -66,7 +72,7 @@ export default {
   },
   login: {
     title: "เข้าสู่ระบบ",
-    loginDigitalId: "เข้าสู่ระบบด้วย DigitalID",
+    loginDigitalId: "เข้าสู่ระบบด้วย Digital ID",
     loginWithGoogle: "เข้าสู่ระบบด้วย Google",
     registerDigitalId: "ลงทะเบียน",
   },
@@ -108,6 +114,9 @@ export default {
     loadMoreTopic: "โหลดคำถามเพิ่มเติม",
     noMoreTopic: "ไม่พบคำถาม",
     createTopic: "ตั้งโหวต",
+    requestTopic: "ขอตั้งโหวต",
+    avaliableTopic: "โหวตที่เปิดอยู่",
+    pendingTopic: "รับรองโหวต",
     editTopic: "แก้ไข",
     status: {
       waiting: "รอเปิดโหวต",
@@ -140,6 +149,7 @@ export default {
       paused: "การโหวตหยุดชั่วคราว",
     },
     adminWarning: "ให้เปลี่ยนสถานะเป็น ผู้โหวต ก่อนการลงคะแนนเสียง",
+    cannotVote: "ไม่สามารถโหวตได้",
     pause: "หยุด",
     resume: "โหวตต่อ",
     clear: "ล้าง",
@@ -154,6 +164,13 @@ export default {
       confirm: "ยืนยันการตั้งโหวต",
       success: 'ตั้งโหวตสำเร็จ',
       failed: 'ตั้งโหวตล้มเหลว',
+    },
+    request: {
+      title: "ขอตั้งโหวต",
+      action: "ขอตั้งโหวต",
+      confirm: "ยืนยันการขอตั้งโหวต?",
+      success: 'ขอตั้งโหวตสำเร็จ',
+      failed: 'ขอตั้งโหวตล้มเหลว',
     },
     edit: {
       title: "แก้ไขโหวต",
@@ -210,13 +227,27 @@ export default {
       remove: "ลบชื่อ",
       searchUser: "ค้นหาผู้ใช้",
       error: {
-        duplicated: "รหัสผู้ใช้ซ้ำ"
+        duplicated: "ผู้ใช้ซ้ำ"
       }
-    } ,
+    },
+    coadminList: {
+      title: "รายชื่อแอดมินร่วม",
+      userId: "User ID",
+      email: "Email",
+      name: "ชื่อ",
+      add: "เพิ่มชื่อ",
+      remove: "ลบชื่อ",
+      searchUser: "ค้นหาผู้ใช้",
+      error: {
+        duplicated: "ผู้ใช้ซ้ำ"
+      }
+    },
     notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
     showScores: "แสดงจำนวนหลังโหวตเสร็จ",
     skipBlockchain: "ไม่บันทึกลง Blockchain",
     voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
+    allow: "อนุญาต",
+    deny: "ปฏิเสธ",
   },
   result: {
     title: "ผลการโหวต",
@@ -288,6 +319,13 @@ export default {
       failed: "ส่งคำขอไม่สำเร็จ",
       pendingBlocked: "กรุณารอคำขอพิจารณาสำเร็จก่อนกรอกอีกครั้ง",
     },
+    change: {
+      title: "แก้ไขสิทธิ์",
+      action: "เปลี่ยน",
+      confirm: "ยืนยันการเปลี่ยนสิทธิ์?",
+      success: "เปลี่ยนสิทธิ์สำเร็จ",
+      failed: "เปลี่ยนสิทธิ์ล้มเหลว",
+    },
     permissions: "สิทธิ์",
     note: "หมายเหตุ",
     noteNone: "ไม่มี",
@@ -303,7 +341,6 @@ export default {
     email: "อีเมล์"
   },
   permissions: {
-    "banned": "ถูกแบน",
     "request-permissions": "ขอสิทธิ์เพิ่มเติม",
     "voter-mode": "เข้าโหมดผู้โหวต",
     "admin-mode": "เข้าโหมดผู้ดูแล",
@@ -311,12 +348,14 @@ export default {
     "vote-topic": "โหวตคำถาม",
     "create-topic": "สร้างการโหวต",
     "change-topic": "แก้ไขข้อมูลการโหวต",
-    "grant-topic-controller": "ให้สิทธิ์ควบคุมการโหวต",
-    "transfer-topic-controller": "โอนสิทธิ์ควบคุมการโหวต",
+    "change-permissions:basic": "เปลี่ยนสิทธิ์ขั้นพื้นฐาน",
+    "change-permissions:advance": "เปลี่ยนสิทธิ์ขั้นสูง",
   },
   admin: {
     user: {
       title: "รายชื่อผู้ใช้งาน",
+      changePermissions: "แก้ไขสิทธิ์",
+      showAllUsers: "แสดงผู้ใช้ทั้งหมด",
     },
     blockchain: {
       title: "จัดการ Blockchain",
@@ -367,6 +406,8 @@ export default {
   loading: "รอสักครู่",
   cookieConsent: {
     useCookie: "เว็บไซต์นี้ใช้คุกกี้",
+    useCookieInfo1: "เราใช้คุกกี้เพื่อประสบการณ์ที่ดีที่สุดในเว็บไซต์ของเรา",
+    useCookieInfo2: "โปรดศึกษาเพิ่มเติมที่",
     acceptAll: "รับทั้งหมด",
     acceptRequiredOnly: "รับเฉพาะที่จำเป็น",
   }

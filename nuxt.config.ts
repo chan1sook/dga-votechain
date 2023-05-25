@@ -39,6 +39,7 @@ export default defineNuxtConfig({
   telemetry: false,
   dev: true,
   nitro: {
+    compressPublicAssets: true,
     storage: {
       session: {
         driver: "redis",
@@ -59,32 +60,7 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
-    vueI18n: {
-      fallbackLocale: 'th',
-      datetimeFormats: {
-        th: {
-          long: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' },
-          short: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
-        },
-        en: {
-          long: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' },
-          short: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
-        }
-      }
-    },
-    config: {
-      fallbackLocale: 'th',
-      datetimeFormats: {
-        th: {
-          long: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' },
-          short: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
-        },
-        en: {
-          long: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' },
-          short: { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }
-        }
-      }
-    },
+    config: './i18n.config.ts',
     lazy: false,
     langDir: 'lang',
     defaultLocale: 'th',

@@ -1,7 +1,9 @@
 import dayjs from "dayjs";
-import { Types } from "mongoose";
+import UserModel from "~~/server/models/user"
 import TopicModel from "~~/server/models/topic"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
+import TopicPauseModel from "~~/server/models/topic-pause"
+import { Types } from "mongoose";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -13,7 +15,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const topicDoc = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
+  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,
@@ -21,7 +23,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const topic : TopicResponseData = {
+  const topic : TopicResponseData & { notifyVoter: boolean } = {
     _id: topicDoc._id.toString(),
     status: topicDoc.status,
     name: topicDoc.name,
@@ -33,18 +35,17 @@ export default defineEventHandler(async (event) => {
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
     createdAt: dayjs(topicDoc.createdAt).toISOString(),
     updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
-    createdBy: topicDoc.createdBy && !(topicDoc.createdBy instanceof Types.ObjectId) ? {
-      _id: topicDoc.createdBy._id,
+    createdBy: {
+      _id: topicDoc.createdBy._id.toString(),
       firstName: topicDoc.createdBy.firstName,
       lastName: topicDoc.createdBy.lastName,
       email: topicDoc.createdBy.email,
-    } : undefined,
-    updatedBy: topicDoc.updatedBy && !(topicDoc.updatedBy instanceof Types.ObjectId) ? {
-      _id: topicDoc.updatedBy._id,
-      firstName: topicDoc.updatedBy.firstName,
-      lastName: topicDoc.updatedBy.lastName,
-      email: topicDoc.updatedBy.email,
-    } : undefined,
+    },
+    updatedBy: topicDoc.updatedBy.toString(),
+    admin: topicDoc.admin.toString(),
+    coadmins: topicDoc.coadmins.map((ele) => {
+      return ele.toString()
+    }),
     publicVote: topicDoc.publicVote,
     showScores: topicDoc.showScores,
     showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
@@ -52,11 +53,13 @@ export default defineEventHandler(async (event) => {
     notifyVoter: topicDoc.notifyVoter,
   };
 
-  const voterAllowDocs : Array<TopicVoterAllowDataPopulated> = await TopicVoterAllowsModel.find({
-    topicid: topicDoc._id,
-  }).populate("userid");
+  const [voterAllowDocs, coadminDocs, pauseDataDocs] : [Array<TopicVoterAllowDataPopulated>, Array<UserData & { _id: Types.ObjectId}>, Array<TopicPauseData>] = await Promise.all([
+    TopicVoterAllowsModel.find({ topicid: topicDoc._id }).populate("userid"),
+    UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) }}),
+    TopicPauseModel.find({ topicid: topicDoc._id }),
+  ]);
   
-  const voterAllows : Array<TopicVoterAllowFormDataWithHint> = voterAllowDocs.map((ele) => {
+  const voterAllows : Array<TopicVoterAllowFormData> = voterAllowDocs.map((ele) => {
     return ele.userid ? {
       userid: ele.userid._id.toString(),
       firstName: ele.userid.firstName,
@@ -71,8 +74,27 @@ export default defineEventHandler(async (event) => {
     }
   })
   
+  const coadmins : Array<CoadminFormData> = coadminDocs.map((ele) => {
+    return {
+      userid: ele._id.toString(),
+      email: ele.email,
+      firstName: ele.firstName,
+      lastName: ele.lastName,
+    }
+  })
+
+  const pauseData : Array<TopicPauseResponseData> = pauseDataDocs.map((ele) => {
+    return {
+      topicid: ele.topicid.toString(),
+      pauseAt: dayjs(ele.pauseAt).toString(),
+      resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toString() : undefined,
+    }
+  });
+
   return {
     topic,
-    voterAllows
+    voterAllows,
+    coadmins,
+    pauseData
   }
 })

@@ -41,7 +41,7 @@
         <DgaButton class="!flex flex-row gap-x-2 items-center mx-auto justify-center truncate"
           color="dga-orange" :title="$t('news.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
         >
-          <MaterialIcon icon="newspaper" />
+          <NewspaperIcon />
           <span class="truncate">{{ $t('news.create.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
@@ -58,6 +58,8 @@
 </template>
   
 <script setup lang="ts">
+import NewspaperIcon from 'vue-material-design-icons/Newspaper.vue';
+
 import dayjs from "dayjs";
 import { getComputedServerTime as serverTime } from "~~/src/utils/datetime";
 import { isNewsFormValid, useWatchNewsDateTimes } from "~~/src/utils/news"
@@ -70,7 +72,7 @@ const i18n = useI18n();
 const localePathOf = useLocalePath();
 
 useHead({
-  title: `${i18n.t('appName', 'Dga E-Voting')} - ${i18n.t('news.create.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('news.create.title')}`
 });
 
 const showConfirmModal = ref(false);

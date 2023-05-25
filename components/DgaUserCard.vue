@@ -4,6 +4,11 @@
       <div class="userid"><slot name="userid"></slot></div>
       <div class="role"><slot name="role"></slot></div>
       <div class="content"><slot></slot></div>
+      <div class="status">
+        <button v-if="props.editable" @click="emit('change')">
+          {{ $t('admin.user.changePermissions') }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -11,8 +16,12 @@
 <script setup lang="ts">
 const props = defineProps<{
   role?: string,
+  editable?: boolean,
 }>();
 
+const emit = defineEmits<{
+  (e: 'change') : void,
+}>();
 </script>
 
 <style scoped>
@@ -28,13 +37,13 @@ const props = defineProps<{
 
 .dga-user-card > .inner {
   @apply rounded-lg bg-white grid items-center p-2 md:p-4 gap-2 md:gap-y-0 overflow-auto;
-  grid-template-areas: "userid" "role" "content";
+  grid-template-areas: "userid" "role" "content" "status";
   grid-template-columns: auto;
 }
 
 @media (min-width: 768px) {
   .dga-user-card > .inner {
-    grid-template-areas: "userid userid userid"  "role content content" "role content content";
+    grid-template-areas: "userid userid userid"  "role content status" "role content status";
     grid-template-columns: 150px auto 120px;
   }
 }
@@ -60,4 +69,14 @@ const props = defineProps<{
   grid-area: content;
   @apply flex flex-col gap-y-2 gap-x-4
 }
+
+
+.dga-user-card > .inner > .status {
+  grid-area: status;
+  @apply flex flex-col justify-center gap-2
+}
+.dga-user-card > .inner > .status > * {
+  @apply rounded-full w-full max-w-[160px] sm:max-w-none mx-auto px-3 py-1 text-center text-sm text-white bg-dga-orange;
+}
+
 </style>
