@@ -1,13 +1,13 @@
 <template>
   <div class="relative" @click.stop>
     <button type="button" @click="toggleShowOption" :title="$t('navbar.notification.title')">
-      <MaterialIcon icon="mail"></MaterialIcon>
+      <EmailOutlineIcon />
       <div v-if="isUnread" class="absolute top-0 right-0">
         <div class="absolute bg-red-500 w-2 h-2 rounded-full animate-ping"></div>
         <div class="absolute bg-red-700 w-2 h-2 rounded-full"></div>
       </div>
     </button>
-    <div v-if="showOption" class="z-[401] bg-white border rounded-md rounded-b-3xl shadow fixed right-0 top-16 md:top-20 w-72 max-h-[400px] overflow-y-auto" @click.stop>
+    <div v-if="showOption" class="z-[401] bg-white border rounded-md rounded-b-3xl shadow fixed right-0 top-16 lg:top-20 w-72 max-h-[400px] overflow-y-auto" @click.stop>
       <div class="flex-1 flex flex-col gap-2 px-4 py-2">
         <DgaHead>{{ $t('navbar.notification.title') }}</DgaHead>
         <div v-for="notification of loadedNotifications">
@@ -38,6 +38,8 @@
 </template>
 
 <script setup lang="ts">
+import EmailOutlineIcon from 'vue-material-design-icons/EmailOutline.vue';
+
 import dayjs from 'dayjs';
 const i18t = useI18n();
 

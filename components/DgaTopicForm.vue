@@ -58,14 +58,15 @@
     </template>
     <template v-else>
       <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('topic.description.add')" @click="showDescription = true">
-        <MaterialIcon icon="add"></MaterialIcon> {{ $t('topic.description.add') }}
+        <PlusIcon /> {{ $t('topic.description.add') }}
       </button>
     </template>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.addChoice.title') }}</h3>
     <div v-for="choice, i of topicData.choices.choices" class="col-span-12 flex justify-center items-center">
       <div class="w-full max-w-xl flex flex-row gap-2 justify-center items-center">
-        <MaterialIcon :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
-          icon="priority_high" class="text-red-500"
+        <ExclamationIcon
+          :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
+          class="text-red-500"
           :title="getChoiceErrorReason(choice.name)"
         />
         <div class="flex-1 inline-flex flex-row">
@@ -73,7 +74,7 @@
           <button class="px-2 py-1 inline-flex items-center"
             :title="`${$t('topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
           >
-            <MaterialIcon icon="remove" />
+            <MinusIcon />
           </button>
         </div>
       </div>
@@ -82,7 +83,7 @@
       <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('topic.addChoice.add')" 
         @click="addOption"
       >
-        {{ $t('topic.addChoice.add') }} <MaterialIcon icon="add" />
+        {{ $t('topic.addChoice.add') }} <PlusIcon />
       </DgaButton>
     </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.voterList.title') }}</h3>
@@ -102,8 +103,9 @@
           <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
           <template v-for="voter of voterAllows">
             <div>
-              <MaterialIcon
-                :class="[isVoterValid(voter) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
+              <ExclamationIcon 
+                :class="[isVoterValid(voter) ? 'invisible' : '']"
+                class="text-red-500" 
                 :title="getVoterErrorReason(voter)"
               />
             </div>
@@ -117,7 +119,7 @@
               <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
                 :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter)"
               >
-                <MaterialIcon icon="remove" />
+                <MinusIcon/>
               </button>
             </div>
           </template>
@@ -139,8 +141,9 @@
           <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
           <template v-for="admin of coadmins">
             <div>
-              <MaterialIcon
-                :class="[isCoadminValid(admin) ? 'invisible' : '']" icon="priority_high" class="text-red-500" 
+              <ExclamationIcon
+                :class="[isCoadminValid(admin) ? 'invisible' : '']"
+                class="text-red-500" 
                 :title="getCoadminErrorReason(admin)"
               />
             </div>
@@ -151,7 +154,7 @@
               <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
                 :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
               >
-                <MaterialIcon icon="remove" />
+                <MinusIcon />
               </button>
             </div>
           </template>
@@ -182,7 +185,7 @@
       <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
         color="dga-orange" :title="$t('topic.create.action')" :disabled="!isFormValid" @click="emit('submit')"
       >
-        <MaterialIcon icon="ballot" />
+        <BallotIcon />
         <span class="truncate">{{ $t('topic.create.action') }}</span>
       </DgaButton>
     </DgaButtonGroup>
@@ -192,6 +195,11 @@
 </template>
 
 <script setup lang="ts">
+import PlusIcon from 'vue-material-design-icons/Plus.vue';
+import BallotIcon from 'vue-material-design-icons/Ballot.vue';
+import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
+import MinusIcon from 'vue-material-design-icons/Minus.vue';
+
 import dayjs from 'dayjs';
 import { choiceCounts, coadminCounts, getPresetChoices, isTopicFormValid, voterCounts } from '~~/src/utils/topic';
 import { getCoadminName, getVoterName } from '~~/src/utils/utils';

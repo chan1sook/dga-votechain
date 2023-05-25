@@ -40,7 +40,7 @@
         <div class="flex flex-row gap-2 items-center p-2">
           <DgaInput v-model="searchKeyword" type="search" class="flex-1" :placeholder="$t('admin.blockchain.txhash')"></DgaInput>
           <DgaButton class="flex-row gap-2 items-center !px-4 !py-1" color="dga-orange" @click="toTxPage(searchKeyword)">
-            <MaterialIcon icon="search"></MaterialIcon>
+            <MagnifyIcon />
           </DgaButton>
         </div>
       </div>
@@ -70,6 +70,8 @@
 </template>
 
 <script setup lang="ts">
+import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
+
 import dayjs from 'dayjs';
 import { getComputedServerTime } from '~~/src/utils/datetime';
 

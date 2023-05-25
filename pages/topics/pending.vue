@@ -20,7 +20,7 @@
         :title="$t('voting.avaliableTopic')"
         :href="localePathOf('/topics')"
       >
-        <MaterialIcon icon="ballot"></MaterialIcon>
+        <BallotOutlineIcon />
         {{ $t('voting.avaliableTopic') }}
       </DgaButton>
     </div>
@@ -49,6 +49,8 @@
 </template>
 
 <script setup lang="ts">
+import BallotOutlineIcon from 'vue-material-design-icons/BallotOutline.vue';
+
 import dayjs from "dayjs";
 import { getComputedServerTime as serverTime } from "~~/src/utils/datetime"
 

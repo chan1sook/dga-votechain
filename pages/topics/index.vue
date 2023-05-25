@@ -21,7 +21,7 @@
         :title="$t('voting.requestTopic')"
         :href="localePathOf('/topic/request')"
       >
-        <MaterialIcon icon="add_circle"></MaterialIcon>
+        <PlusCircleOutlineIcon />
         {{ $t('voting.requestTopic') }}
       </DgaButton>
       <div v-else-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
@@ -30,7 +30,7 @@
           :title="$t('voting.pendingTopic')"
           :href="localePathOf('/topics/pending')"
         >
-          <MaterialIcon icon="check"></MaterialIcon>
+          <CheckIcon />
           {{ $t('voting.pendingTopic') }}
         </DgaButton>
         <DgaButton 
@@ -38,7 +38,7 @@
           :title="$t('voting.createTopic')"
           :href="localePathOf('/topic/create')"
         >
-          <MaterialIcon icon="add_circle"></MaterialIcon>
+          <PlusCircleOutlineIcon />
           {{ $t('voting.createTopic') }}
         </DgaButton>
       </div>
@@ -68,6 +68,9 @@
 </template>
 
 <script setup lang="ts">
+import CheckIcon from 'vue-material-design-icons/Check.vue';
+import PlusCircleOutlineIcon from 'vue-material-design-icons/PlusCircleOutline.vue';
+
 import dayjs from "dayjs";
 import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime"
 import { isAdminRole } from "~~/src/utils/role";

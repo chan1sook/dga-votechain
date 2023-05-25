@@ -8,7 +8,7 @@
         <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('login.loginDigitalId')"
         >
-          <MaterialIcon icon="fingerprint"/>
+          <FingerprintIcon />
           <span class="truncate">
             {{ $t("login.loginDigitalId") }}
           </span>
@@ -20,7 +20,7 @@
         <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           :title="$t('login.loginWithGoogle')" @click="loginWithGoogle"
         >
-          <MaterialIcon icon="fingerprint"/>
+          <FingerprintIcon />
           <span class="truncate">
             {{ $t("login.loginWithGoogle") }}
           </span>
@@ -32,7 +32,7 @@
         <DgaButton theme="hollow" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           :title="$t('login.registerDigitalId')"
         >
-          <MaterialIcon icon="how_to_reg"/>
+          <AccountPlusOutlineIcon />
           <span class="truncate">
             {{ $t("login.registerDigitalId") }}
           </span>
@@ -43,6 +43,9 @@
 </template>
 
 <script setup lang="ts">
+import FingerprintIcon from 'vue-material-design-icons/Fingerprint.vue';
+import AccountPlusOutlineIcon from 'vue-material-design-icons/AccountPlusOutline.vue';
+
 import { GoogleAuthProvider, useDeviceLanguage, signInWithPopup } from 'firebase/auth'
 
 const i18n = useI18n();

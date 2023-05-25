@@ -18,7 +18,7 @@
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('register.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
         >
-          <MaterialIcon icon="how_to_reg" />
+          <AccountPlusOutlineIcon />
           <span class="truncate">{{ $t('register.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
@@ -35,6 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import AccountPlusOutlineIcon from 'vue-material-design-icons/AccountPlusOutline.vue';
+
 import { isThaiCitizenId } from '~~/src/utils/utils';
 
 const i18n = useI18n();

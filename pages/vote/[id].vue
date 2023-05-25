@@ -2,7 +2,7 @@
   <div v-if="topic">
     <div class="relative flex flex-col md:flex-row gap-x-2 gap-y-1 justify-center items-center">
       <button class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
-        <MaterialIcon icon="arrow_left" /> {{ $t("voting.back") }}
+        <ArrowLeftIcon /> {{ $t("voting.back") }}
       </button>
       <div v-if="!isAdminMode" class="font-bold text-xl md:text-2xl" @click="showLocaltime = !showLocaltime">
         <div class="text-center flex flex-row justify-center items-center gap-2">{{ $t("voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
@@ -37,13 +37,13 @@
         <button v-if="!isPaused" class="w-16 text-white bg-red-700 rounded-l-lg order-3 flex flex-col items-center justify-center px-2 py-2"
           :title="$t('voting.pause')" @click="emitPause"
         >
-          <div><MaterialIcon icon="pause" class="text-4xl"></MaterialIcon></div>
+          <div><PauseIcon size="28" /></div>
           <div>{{ $t("voting.pause") }}</div>
         </button>
         <button v-else class="w-16 bg-green-700 text-white rounded-r-lg order-1 flex flex-col items-center justify-center px-2 py-2"
         :title="$t('voting.resume')" @click="emitResume"
         >
-          <div><MaterialIcon icon="play_arrow" class="text-4xl"></MaterialIcon></div>
+          <div><PlayIcon size="28" /></div>
           <div>{{ $t("voting.resume") }}</div>
         </button>
       </div>
@@ -98,7 +98,7 @@
                     <span class="hidden sm:block">VOTE</span>
                   </div>
                   <div v-else class="w-full text-white bg-green-700 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
-                    <MaterialIcon icon="check"/> <span class="hidden sm:block">VOTED</span>
+                    <CheckIcon /> <span class="hidden sm:block">VOTED</span>
                   </div>
                 </template>
                 <template v-else>
@@ -106,7 +106,7 @@
                     <span class="hidden sm:block">VOTE</span>
                   </div>
                   <div v-else class="w-full text-white bg-green-700 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
-                    <MaterialIcon icon="check"/> <span class="hidden sm:block">VOTED</span>
+                    <CheckIcon /> <span class="hidden sm:block">VOTED</span>
                   </div>
                 </template>
               </div>
@@ -158,6 +158,11 @@
 </template>
 
 <script setup lang="ts">
+import CheckIcon from 'vue-material-design-icons/Check.vue';
+import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
+import PauseIcon from 'vue-material-design-icons/Pause.vue';
+import PlayIcon from 'vue-material-design-icons/Play.vue';
+
 import dayjs from "dayjs";
 import { formatDateTime, getComputedServerTime as serverTime, perttyDuration, isServerTimeSync, getComputedServerTime } from '~~/src/utils/datetime';
 import { isTopicExpired } from "~~/src/utils/topic";

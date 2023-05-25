@@ -1,7 +1,7 @@
 <template>
   <div class="dga-toast">
     <button class="absolute top-2 right-2" @click="emit('close')">
-      <MaterialIcon icon="close"></MaterialIcon>
+      <CloseIcon />
     </button>
     <slot>
       Hello World
@@ -10,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import CloseIcon from 'vue-material-design-icons/Close.vue';
+
 const emit = defineEmits<{
   (e: 'close') : void,
 }>();

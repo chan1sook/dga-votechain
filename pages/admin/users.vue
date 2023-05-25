@@ -7,7 +7,7 @@
         class="flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
         :href="localePathOf('/permissions/approve')"
       >
-      <MaterialIcon icon="how_to_reg"></MaterialIcon>
+        <AccountPlusOutlineIcon />
         {{ $t('requestPermissions.manageApproveList') }}
       </DgaButton>
     </div>
@@ -56,6 +56,8 @@
 </template>
 
 <script setup lang="ts">
+import AccountPlusOutlineIcon from 'vue-material-design-icons/AccountPlusOutline.vue';
+
 const i18n = useI18n();
 const localePathOf = useLocalePath();
 

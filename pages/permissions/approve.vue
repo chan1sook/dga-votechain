@@ -6,10 +6,10 @@
         <div class="flex flex-row gap-2 items-center">
           <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.approve')"
             @click="setApprovePermissions(request._id, 'approved')">
-            <MaterialIcon icon="check" />
+            <CheckIcon />
           </button>
           <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.reject')" @click="setApprovePermissions(request._id, 'rejected')">
-            <MaterialIcon icon="close" />
+            <CloseIcon/>
           </button>
         </div>
         <div class="border-l border-dga-orange pl-2 overflow-x-auto">
@@ -53,6 +53,9 @@
 </template>
   
 <script setup lang="ts">
+import CheckIcon from 'vue-material-design-icons/Check.vue';
+import CloseIcon from 'vue-material-design-icons/Close.vue';
+
 const i18n = useI18n();
 
 definePageMeta({

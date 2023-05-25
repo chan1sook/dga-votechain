@@ -26,7 +26,7 @@
     </div>
 
     <div class="inline-flex lg:hidden">
-      <MaterialIcon icon="menu" class="cursor-pointer" @click.stop="toggleShowOption"></MaterialIcon>
+      <MenuIcon class="cursor-pointer" @click.stop="toggleShowOption" />
     </div>
     <div v-if="showOption" class="collasped-menu">
       <NuxtLink :href="localePathOf('/')" class="dga-menu-item-small">{{ $t("navbar.home") }}</NuxtLink>
@@ -48,6 +48,7 @@
 </template>
 
 <script setup lang="ts">
+import MenuIcon from 'vue-material-design-icons/Menu.vue';
 import { isAdminRole } from '~~/src/utils/role';
 
 const i18n = useI18n();

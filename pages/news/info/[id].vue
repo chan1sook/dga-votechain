@@ -27,7 +27,7 @@
         <DgaButton class="!flex flex-row gap-x-2 mx-auto items-center justify-center truncate"
           color="dga-orange" :title="$t('news.edit.title')"
         >
-        <MaterialIcon icon="edit" />
+          <PencilIcon />
           <span class="truncate">{{ $t('news.edit.title') }}</span>
         </DgaButton>
       </NuxtLink>
@@ -36,6 +36,8 @@
 </template>
   
 <script setup lang="ts">
+import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+
 import dayjs from "dayjs";
 
 definePageMeta({
