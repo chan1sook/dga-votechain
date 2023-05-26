@@ -40,7 +40,7 @@ useHead({
   ],
 });
 
-const cookieName = "ccShow"
+const cookieName = "cc"
 onMounted(async () => {
   document.body.addEventListener("click", () => {
     useVisibleMenuGroup().value = undefined;
