@@ -9,6 +9,18 @@
         <DgaInput :value="token" disabled class="w-full" :placeholder="$t('register.firebase.token')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3">
+        {{ $t('register.firstName') }}
+      </div>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput v-model="firstName" class="w-full" :placeholder="$t('register.firstName')"></DgaInput>
+      </div>
+      <div class="col-span-12 md:col-span-3">
+        {{ $t('register.lastName') }}
+      </div>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput v-model="lastName" class="w-full" :placeholder="$t('register.lastName')"></DgaInput>
+      </div>
+      <div class="col-span-12 md:col-span-3">
         {{ $t('register.citizenid') }}
       </div>
       <div class="col-span-12 md:col-span-9">
@@ -50,11 +62,13 @@ useHead({
 });
 
 const token = ref(useRoute().query.token);
+const firstName = ref("");
+const lastName = ref("");
 const citizenid = ref("");
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
-const isFormValid = computed(() => token.value && isThaiCitizenId(citizenid.value));
+const isFormValid = computed(() => token.value && firstName.value && lastName.value && isThaiCitizenId(citizenid.value));
 
 if(!token.value) {
   showError("Token not found");
@@ -71,8 +85,10 @@ async function registerGoogleAccount() {
   const { error } = await useFetch("/api/register/firebase", {
     method: "POST",
     body: {
-      token: token,
-      citizenid: citizenid,
+      token: token.value,
+      firstName: firstName.value,
+      lastName: lastName.value,
+      citizenid: citizenid.value,
     },
   });
 

@@ -9,9 +9,9 @@ import { USER_SESSION_KEY } from "~~/server/session-handler";
 import { getUserByAuthSource, getUserByEmail } from "~~/server/utils";
 
 export default defineEventHandler(async (event) => {
-  const { token, citizenid } : { token? :string, citizenid?: string} = await readBody(event);
+  const { token, firstName, lastName, citizenid } : { token? :string, firstName?: string, lastName?: string, citizenid?: string} = await readBody(event);
 
-  if(typeof token === "string" && typeof citizenid === "string") {
+  if(typeof token === "string" && typeof firstName === "string" && typeof lastName === "string" && typeof citizenid === "string") {
     const hashedCitizenId = bcrypt.hashSync(citizenid, 12);
     const decodedFirebaseUserdata = await getAuth(getApp()).verifyIdToken(token, true).catch((err) => {
       throw createError({
@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
       firebaseUid: decodedFirebaseUserdata.uid,
     };
     let userDoc = await getUserByAuthSource(authSource);
+
     if(!userDoc) {
       userDoc = await getUserByEmail(decodedFirebaseUserdata.email);
       if(!userDoc) {
@@ -32,21 +33,39 @@ export default defineEventHandler(async (event) => {
           authSources: [
             { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
           ],
+          firstName: firstName,
+          lastName: lastName,
           email: decodedFirebaseUserdata.email,
           hashedCitizenId,
         });
         await userDoc.save();
       } else {
+        if(!userDoc.firstName) {
+          userDoc.firstName = lastName;
+        }
+        if(!userDoc.lastName) {
+          userDoc.lastName = lastName;
+        }
         userDoc.authSources.push({ authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid });
         userDoc.markModified("authSources");
         await userDoc.save();
       }
     } else {
-      // already register error
-      return createError({
-        statusCode: 500,
-        statusMessage: "Already Registered",
-      })
+      if(!bcrypt.compareSync(citizenid, userDoc.hashedCitizenId)) {
+        // already register error
+        return createError({
+          statusCode: 403,
+          statusMessage: "Forbidden",
+        })
+      }
+      
+      if(!userDoc.firstName) {
+        userDoc.firstName = lastName;
+      }
+      if(!userDoc.lastName) {
+        userDoc.lastName = lastName;
+      }
+      await userDoc.save();
     }
 
     let defaultRoleMode : UserRole = "voter";

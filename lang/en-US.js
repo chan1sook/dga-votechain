@@ -80,6 +80,8 @@ export default {
       title: "Register with google account",
       token: "Token"
     },
+    firstName: "First Name",
+    lastName: "Last Name",
     citizenid: "Citizen ID",
     action: "Register",
     confirm: "Confirm your data?",
