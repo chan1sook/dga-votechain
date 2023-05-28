@@ -40,6 +40,9 @@ export default defineEventHandler(async (event) => {
         });
         await userDoc.save();
       } else {
+        if(!userDoc.hashedCitizenId) {
+          userDoc.hashedCitizenId = hashedCitizenId;
+        }
         if(!userDoc.firstName) {
           userDoc.firstName = firstName;
         }
