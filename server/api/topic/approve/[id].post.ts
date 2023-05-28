@@ -1,9 +1,12 @@
 import dayjs from "dayjs";
 
 import TopicModel from "~~/server/models/topic"
+import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicPauseModel from "~~/server/models/topic-pause"
+import TopicNotificationData from "~~/server/models/topic-notifications"
+
 import { checkPermissionSelections } from "~~/src/utils/permissions";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -40,11 +43,25 @@ export default defineEventHandler(async (event) => {
   topicDoc.status = approve ? "approved" : "rejected";
   topicDoc.admin = userData._id;
   topicDoc.updatedAt = today;
-  
+
   if(dayjs().diff(topicDoc.voteStartAt) > 0) {
     const diff = dayjs().diff(topicDoc.voteStartAt);
     topicDoc.voteStartAt = new Date();
     topicDoc.voteExpiredAt = dayjs().add(diff).toDate();
+  }
+
+  if(topicDoc.notifyVoter &&  topicDoc.status === "approved") {
+    const voterAllows : Array<TopicVoterAllowData> = await TopicVoterAllowsModel.find({ topicid: topicDoc._id });
+    const topicNotifications : Array<TopicNotificationData> = voterAllows.map((ele) => {
+      return {
+        userid: new Types.ObjectId(ele.userid),
+        topicid: topicDoc._id,
+        createdAt: today,
+        updatedAt: today,
+        notifyAt: topicDoc.voteStartAt,
+      }
+    });
+    await TopicNotificationData.insertMany(topicNotifications);
   }
 
   await topicDoc.save();
