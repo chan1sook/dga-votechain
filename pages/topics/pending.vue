@@ -119,14 +119,16 @@ const isWaitAction = ref(false);
 async function toApproveTopic(topic: TopicResponseDataExtended, isApprove:boolean) {
   isWaitAction.value = true;
 
-  const data = await useFetch(`/api/topic/approve/${topic._id}`, {
+  const { error } = await useFetch(`/api/topic/approve/${topic._id}`, {
     method: "POST",
     body: {
       approve: isApprove
     }
   })
 
-  if (data.error) {
+  console.log(error)
+
+  if (error) {
     showError("Can't approve topic");
   } else {
     loadedTopics.value = loadedTopics.value.filter((ele) => ele._id !== topic._id);
