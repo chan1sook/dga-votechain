@@ -55,7 +55,7 @@ onMounted(async () => {
   enforceCookie(cc.value);
 })
 
-function enforceCookie(value: string | null) {
+function enforceCookie(value: string | null | undefined) {
   if(value === "all") {
     // all
   } else {

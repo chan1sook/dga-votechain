@@ -1,6 +1,6 @@
 <template>
   <input :type="props.type" :value="props.modelValue" :placeholder="props.placeholder" :required="props.required" :disabled="props.disabled"
-    class="dga-input" @input="event => emit('update:modelValue', event.target.value)"/>
+    class="dga-input" @input="event => emit('update:modelValue', event.target?.value)"/>
 </template>
 
 <script setup lang="ts">
