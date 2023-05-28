@@ -60,7 +60,6 @@ export async function migrateToNewUserFormat2() {
     if(userDoc.citizenId) {
       userDoc.hashedCitizenId = bcrypt.hashSync(userDoc.citizenId, 12);
       userDoc.citizenId = undefined;
-      userDocsToSave.push(userDoc);
     }
 
     userDoc.permissions = removePermissions(userDoc.permissions, ...unusedPermissions);
@@ -70,6 +69,7 @@ export async function migrateToNewUserFormat2() {
     }
     
     userDoc.markModified("permissions");
+    userDocsToSave.push(userDoc);
   }
 
   const result = await EVoteUserModel.bulkSave(userDocsToSave);
