@@ -3,7 +3,7 @@ import { isAdminRole, isDeveloperRole, isVoterRole } from "./role";
 export function legacyRoleToPermissionsExcludes(role: UserRole) : Array<EVotePermission> {
   switch(role) {
     case "voter":
-      return ["request-permissions", "voter-mode", "vote-topic"];
+      return ["request-permissions", "voter-mode", "vote-topic", "request-topic"];
     case "admin":
       return ["admin-mode", "create-topic", "change-topic", "create-news", "change-news", "change-permissions:basic"];
     case "developer":
