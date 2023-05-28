@@ -44,6 +44,10 @@ export default defineEventHandler(async (event) => {
         });
         await userDoc.save();
       } else {
+        if(!userDoc.hashedCitizenId) {
+          userDoc.hashedCitizenId = hashedCitizenID;
+        }
+        
         userDoc.authSources.push({ authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id });
         userDoc.markModified("authSources");
         await userDoc.save();
