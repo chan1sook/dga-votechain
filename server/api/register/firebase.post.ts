@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
         await userDoc.save();
       }
     } else {
-      if(!bcrypt.compareSync(citizenid, userDoc.hashedCitizenId)) {
+      if(userDoc.hashedCitizenId && !bcrypt.compareSync(citizenid, userDoc.hashedCitizenId)) {
         // already register error
         return createError({
           statusCode: 403,
@@ -59,6 +59,9 @@ export default defineEventHandler(async (event) => {
         })
       }
 
+      if(!userDoc.hashedCitizenId) {
+        userDoc.hashedCitizenId = hashedCitizenId;
+      }
       if(!userDoc.firstName) {
         userDoc.firstName = firstName;
       }
