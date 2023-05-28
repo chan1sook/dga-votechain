@@ -55,15 +55,21 @@ export async function migrateToNewUserFormat2() {
   const userDocsToSave = [];
 
   const unusedPermissions = getUnusedPermissions();
+
   for(const userDoc of userDocs) {
     if(userDoc.citizenId) {
       userDoc.hashedCitizenId = bcrypt.hashSync(userDoc.citizenId, 12);
       userDoc.citizenId = undefined;
-      userDocsToSave.push(userDoc);
     }
 
     userDoc.permissions = removePermissions(userDoc.permissions, ...unusedPermissions);
+    
+    if(userDoc.permissions.includes("voter-mode")) {
+      userDoc.permissions = combinePermissions(userDoc.permissions, "request-topic");
+    }
+    
     userDoc.markModified("permissions");
+    userDocsToSave.push(userDoc);
   }
 
   const result = await EVoteUserModel.bulkSave(userDocsToSave);

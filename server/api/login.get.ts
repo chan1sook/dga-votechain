@@ -45,6 +45,10 @@ export default defineEventHandler(async (event) => {
 
     const userDoc = await getUserByAuthSource(authSource);
     if(userDoc) {
+      if(!userDoc.firstName || !userDoc.lastName) {
+        return sendRedirect(event, `/register/firebase?token=${query.token}`);
+      }
+
       let defaultRoleMode : UserRole = "voter";
       if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
         defaultRoleMode = "admin";

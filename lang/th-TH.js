@@ -81,6 +81,8 @@ export default {
       title: "ลงทะเบียนด้วยบัญชี Google",
       token: "Token"
     },
+    firstName: "ชื่อ",
+    lastName: "นามสกุล",
     citizenid: "รหัสบัตรประชาชน",
     action: "ลงทะเบียน",
     confirm: "ยืนยันข้อมูล?",
