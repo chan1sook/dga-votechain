@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
         await userDoc.save();
       } else {
         if(!userDoc.firstName) {
-          userDoc.firstName = lastName;
+          userDoc.firstName = firstName;
         }
         if(!userDoc.lastName) {
           userDoc.lastName = lastName;
@@ -58,9 +58,9 @@ export default defineEventHandler(async (event) => {
           statusMessage: "Forbidden",
         })
       }
-      
+
       if(!userDoc.firstName) {
-        userDoc.firstName = lastName;
+        userDoc.firstName = firstName;
       }
       if(!userDoc.lastName) {
         userDoc.lastName = lastName;
