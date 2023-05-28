@@ -46,8 +46,8 @@ export default defineEventHandler(async (event) => {
 
   if(dayjs().diff(topicDoc.voteStartAt) > 0) {
     const diff = dayjs().diff(topicDoc.voteStartAt);
-    topicDoc.voteStartAt = new Date();
-    topicDoc.voteExpiredAt = dayjs().add(diff).toDate();
+    topicDoc.voteStartAt = dayjs().add(1, "hours").toDate();
+    topicDoc.voteExpiredAt = dayjs(topicDoc.voteStartAt).add(diff).toDate();
   }
 
   if(topicDoc.notifyVoter &&  topicDoc.status === "approved") {
