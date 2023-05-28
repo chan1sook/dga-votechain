@@ -40,6 +40,12 @@ export default defineEventHandler(async (event) => {
   topicDoc.status = approve ? "approved" : "rejected";
   topicDoc.admin = userData._id;
   topicDoc.updatedAt = today;
+  
+  if(dayjs().diff(topicDoc.voteStartAt) > 0) {
+    const diff = dayjs().diff(topicDoc.voteStartAt);
+    topicDoc.voteStartAt = new Date();
+    topicDoc.voteExpiredAt = dayjs().add(diff).toDate();
+  }
 
   await topicDoc.save();
   await topicDoc.populate("createdBy");
