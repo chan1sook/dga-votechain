@@ -28,13 +28,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if(topicDoc.admin.toString() !== userData._id.toString()) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
-
   const pauseData = await TopicPauseModel.find({ topicid: topicDoc._id });
   if(pauseData.every((ele) => ele.resumeAt) && dayjs().diff(topicDoc.voteExpiredAt) > 0) {
     throw createError({
