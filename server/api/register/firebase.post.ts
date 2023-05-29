@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
       userDoc = await getUserByEmail(decodedFirebaseUserdata.email);
       if(!userDoc) {
         userDoc = new EVoteUserModel({
-          permissions: legacyRoleToPermissions("voter"),
+          permissions: legacyRoleToPermissions("admin"),
           authSources: [
             { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
           ],

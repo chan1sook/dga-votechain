@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
       userDoc = await getUserByEmail(digitalIdUserInfo.email);
       if(!userDoc) {
         userDoc = new EVoteUserModel({
-          permissions: legacyRoleToPermissions("voter"),
+          permissions: legacyRoleToPermissions("admin"),
           authSources: [
             { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
           ],

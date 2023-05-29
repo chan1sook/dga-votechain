@@ -14,18 +14,18 @@ export function legacyRoleToPermissionsExcludes(role: UserRole) : Array<EVotePer
 }
 
 export function legacyRoleToPermissions(role: UserRole) {
-  const permissions : Array<EVotePermission> = [];
+  let permissions : Array<EVotePermission> = [];
   
   if(isVoterRole(role)) {
-    permissions.push(...legacyRoleToPermissionsExcludes("voter"));
+    permissions = combinePermissions(permissions, ...legacyRoleToPermissionsExcludes("voter"));
   }
 
   if(isAdminRole(role)) {
-    permissions.push(...legacyRoleToPermissionsExcludes("admin"));
+    permissions = combinePermissions(permissions, ...legacyRoleToPermissionsExcludes("admin"));
   }
 
   if(isDeveloperRole(role)) {
-    permissions.push(...legacyRoleToPermissionsExcludes("developer"));
+    permissions = combinePermissions(permissions, ...legacyRoleToPermissionsExcludes("developer"));
   }
   
   return permissions;

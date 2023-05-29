@@ -63,10 +63,7 @@ export async function migrateToNewUserFormat2() {
     }
 
     userDoc.permissions = removePermissions(userDoc.permissions, ...unusedPermissions);
-    
-    if(userDoc.permissions.includes("voter-mode")) {
-      userDoc.permissions = combinePermissions(userDoc.permissions, "request-topic");
-    }
+    userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("admin"))
     
     userDoc.markModified("permissions");
     userDocsToSave.push(userDoc);
