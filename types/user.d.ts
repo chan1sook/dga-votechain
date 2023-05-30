@@ -2,12 +2,6 @@ import { Model, Query, Types } from "mongoose";
 
 declare global {
   type UserRole = "guest" | "voter" | "admin" | "developer";
-
-  interface UserAuthSource {
-    authSource: "digitalId" | "firebase",
-    digitalIdUserId?: DigitalIDUserId,
-    firebaseUid?: string,
-  }
   
   interface UserData {
     permissions: Array<EVotePermission>,
@@ -15,11 +9,25 @@ declare global {
     firstName?: string,
     lastName?: string,
     email?: string,
+    ministry?: string,
+    department?: string,
+    division?: string,
     citizenId?: string,
     hashedCitizenId: string,
     createdAt: Date,
     updatedAt: Date,
     group: Array<string>,
+    preferences: UserPreference,
+  }
+  
+  interface UserAuthSource {
+    authSource: "digitalId" | "firebase",
+    digitalIdUserId?: DigitalIDUserId,
+    firebaseUid?: string,
+  }
+  
+  interface UserPreference {
+    topMenus: Array<string>,
   }
   
   interface UserSessionSavedData {

@@ -23,6 +23,15 @@ const schema = new Schema<UserData>({
   email: {
     type: String,
   },
+  ministry: {
+    type: String,
+  },
+  department: {
+    type: String,
+  },
+  division: {
+    type: String,
+  },
   hashedCitizenId: {
     type: String,
   },
@@ -30,6 +39,9 @@ const schema = new Schema<UserData>({
     type: String,
   },
   group: [String],
+  preferences: new Schema({
+    topMenus: [String],
+  })
 }, {
   timestamps: true,
   query: {

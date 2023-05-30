@@ -1,5 +1,13 @@
 export default {
   appName: "DGA E-Voting",
+  app: {
+    firstName: "ชื่อ",
+    lastName: "นามสกุล",
+    citizenid: "รหัสบัตรประชาชน",
+    ministry: "กระทรวง",
+    department: "สังกัด/กรม",
+    division: "กอง/หน่วยงาน",
+  },
   navbar: {
     home: "หน้าแรก",
     voting: "ร่วมโหวต",
@@ -81,9 +89,6 @@ export default {
       title: "ลงทะเบียนด้วยบัญชี Google",
       token: "Token"
     },
-    firstName: "ชื่อ",
-    lastName: "นามสกุล",
-    citizenid: "รหัสบัตรประชาชน",
     action: "ลงทะเบียน",
     confirm: "ยืนยันข้อมูล?",
     success: "ลงทะเบียนสำเร็จ",
@@ -345,6 +350,7 @@ export default {
   permissions: {
     "request-permissions": "ขอสิทธิ์เพิ่มเติม",
     "voter-mode": "เข้าโหมดผู้โหวต",
+    "request-topic": "ขอเปิดโหวต",
     "admin-mode": "เข้าโหมดผู้ดูแล",
     "dev-mode": "เข้าโหมดผู้พัฒนา",
     "vote-topic": "โหวตคำถาม",

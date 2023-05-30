@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')">
+    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')" @click="beforeLogout">
       <LogoutIcon class="!text-lg" />
       {{ $t('navbar.logout') }}
     </a>
@@ -40,6 +40,7 @@ import LogoutIcon from 'vue-material-design-icons/Logout.vue';
 import dayjs from 'dayjs';
 import { checkPermissionNeeds } from '~~/src/utils/permissions';
 import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
+import { signOut } from 'firebase/auth';
 
 const i18n = useI18n();
 
@@ -93,6 +94,13 @@ onMounted(() => {
   timeId = setInterval(updateTime, 1000);
   updateTime();
 })
+
+const nuxtApp = useNuxtApp()
+async function beforeLogout() {
+  await signOut(nuxtApp.$auth);
+
+  return true;
+}
 
 onUnmounted(() => {
   clearInterval(timeId);

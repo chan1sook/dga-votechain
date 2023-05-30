@@ -9,23 +9,43 @@
         <DgaInput :value="token" disabled class="w-full" :placeholder="$t('register.firebase.token')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3">
-        {{ $t('register.firstName') }}
+        {{ $t('app.firstName') }}
       </div>
       <div class="col-span-12 md:col-span-9">
-        <DgaInput v-model="firstName" class="w-full" :placeholder="$t('register.firstName')"></DgaInput>
+        <DgaInput v-model="userRegisterFormData.firstName" class="w-full" :placeholder="$t('app.firstName')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3">
-        {{ $t('register.lastName') }}
+        {{ $t('app.lastName') }}
       </div>
       <div class="col-span-12 md:col-span-9">
-        <DgaInput v-model="lastName" class="w-full" :placeholder="$t('register.lastName')"></DgaInput>
+        <DgaInput v-model="userRegisterFormData.lastName" class="w-full" :placeholder="$t('app.lastName')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3">
-        {{ $t('register.citizenid') }}
+        {{ $t('app.citizenid') }}
       </div>
       <div class="col-span-12 md:col-span-9">
-        <DgaInput v-model="citizenid" class="w-full" :placeholder="$t('register.citizenid')"></DgaInput>
+        <DgaInput v-model="userRegisterFormData.citizenid" class="w-full" :placeholder="$t('app.citizenid')"></DgaInput>
       </div>
+      <template v-if="false">
+      <div class="col-span-12 md:col-span-3">
+        {{ $t('app.ministry') }}
+      </div>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput v-model="userRegisterFormData.ministry" class="w-full" :placeholder="$t('app.ministry')"></DgaInput>
+      </div>
+      <div class="col-span-12 md:col-span-3">
+        {{ $t('app.department') }}
+      </div>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput v-model="userRegisterFormData.department" class="w-full" :placeholder="$t('app.department')"></DgaInput>
+      </div>
+      <div class="col-span-12 md:col-span-3">
+        {{ $t('app.division') }}
+      </div>
+      <div class="col-span-12 md:col-span-9">
+        <DgaInput v-model="userRegisterFormData.division" class="w-full" :placeholder="$t('app.division')"></DgaInput>
+      </div>
+      </template>
       <DgaButtonGroup class="col-span-12 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('register.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
@@ -47,6 +67,15 @@
 </template>
 
 <script setup lang="ts">
+interface UserRegisterFormData {
+  firstName: string,
+  lastName: string,
+  citizenid: string,
+  ministry: string,
+  department: string,
+  division: string,
+}
+
 import AccountPlusOutlineIcon from 'vue-material-design-icons/AccountPlusOutline.vue';
 
 import { isThaiCitizenId } from '~~/src/utils/utils';
@@ -62,13 +91,27 @@ useHead({
 });
 
 const token = ref(useRoute().query.token);
-const firstName = ref("");
-const lastName = ref("");
-const citizenid = ref("");
+
+const userRegisterFormData : Ref<UserRegisterFormData> = ref({
+  firstName: "",
+  lastName: "",
+  citizenid: "",
+  ministry: "",
+  department: "",
+  division: "",
+})
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
-const isFormValid = computed(() => token.value && firstName.value && lastName.value && isThaiCitizenId(citizenid.value));
+function isUserDataValid(userData: UserRegisterFormData) {
+  return userData.firstName !== "" && 
+    userData.lastName !== "" &&
+    isThaiCitizenId(userData.citizenid) &&
+    userData.ministry !== "" &&
+    userData.department !== "" &&
+    userData.division !== "";
+}
+const isFormValid = computed(() => token.value && isUserDataValid(userRegisterFormData.value));
 
 if(!token.value) {
   showError("Token not found");
@@ -86,9 +129,7 @@ async function registerGoogleAccount() {
     method: "POST",
     body: {
       token: token.value,
-      firstName: firstName.value,
-      lastName: lastName.value,
-      citizenid: citizenid.value,
+      ...userRegisterFormData.value,
     },
   });
 

@@ -5,7 +5,7 @@ import TopicPauseData from "~~/server/models/topic-pause"
 import VoteModel from "~~/server/models/vote"
 
 export default defineEventHandler(async (event) => {
-  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
+  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,

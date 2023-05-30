@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
+  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,

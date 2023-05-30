@@ -26,11 +26,19 @@ export function init() {
 }
 
 export async function getVoteOnBlockchain(voteid: string) : Promise<VoteDataBlockchainResponse> {
+  if(!isProduction) {
+    throw new Error("Is not production");
+  }
+
   const response = await DgaEvoteContract.methods.votes(voteid).call();
   return response;
 }
 
 export async function addVoteOnBlockchain(voteid: string, topicid: string, userid: string, choice: string | null) {
+  if(!isProduction) {
+    throw new Error("Is not production");
+  }
+  
   const txResponse = await DgaEvoteContract.methods.addVoteData(voteid, topicid, userid, choice || "").send({
     from: provider.getAddress()
   })
@@ -39,6 +47,10 @@ export async function addVoteOnBlockchain(voteid: string, topicid: string, useri
 }
 
 export async function getTransactionByHash(txhash: string) {
+  if(!isProduction) {
+    throw new Error("Is not production");
+  }
+  
   const result = await axios.post(rpcURL, {
     "jsonrpc": "2.0",
     "method": "eth_getTransactionByHash",

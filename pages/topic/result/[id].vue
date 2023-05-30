@@ -87,14 +87,10 @@
             <div class="flex-1 flex flex-row gap-2 items-center">
               <div class="flex-1">{{ $t('result.noVoted')}}</div>
               <template v-if="scores">
-                <div>{{ getPercentOf(getScore(null)).toFixed(2) }}% |</div>
                 <div>
                   {{ getScore(null).count }} {{ $t('voting.vote' , { count: totalVotes - getScore(null).count })}}
                 </div>
               </template>
-            </div>
-            <div v-if="scores" class="absolute z-[-1] left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-              :style="{ width: (getScore(null).count * 100 / totalVotes).toFixed(2) + '%'}">
             </div>
           </div>
         </div>

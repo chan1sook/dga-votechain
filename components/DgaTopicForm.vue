@@ -11,14 +11,12 @@
     </div>
     <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.start') }}</div>
     <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-      <DgaInput v-model="voteStart.dateStr" type="date" class="w-full" :placeholder="$t('topic.voteDuration.startDate')"></DgaInput> 
-      <DgaInput v-model="voteStart.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.startTime')"></DgaInput>
+      <VueDatePicker v-model="voteStart" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
     </div>
     <template v-if="topicData.durationMode === 'startEnd'">
       <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.end')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-        <DgaInput v-model="voteEnd.dateStr" type="date" class="w-full" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
-        <DgaInput v-model="voteEnd.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
+        <VueDatePicker v-model="voteEnd" :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
       </div>
     </template>
     <template v-else>
@@ -190,6 +188,9 @@ import PlusIcon from 'vue-material-design-icons/Plus.vue';
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import MinusIcon from 'vue-material-design-icons/Minus.vue';
 
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
 import dayjs from 'dayjs';
 import { choiceCounts, coadminCounts, getPresetChoices, isTopicFormValid, voterCounts } from '~~/src/utils/topic';
 import { getCoadminName, getVoterName } from '~~/src/utils/utils';
@@ -210,20 +211,14 @@ const i18n = useI18n();
 const startDate = dayjs().minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
-const voteStart = ref({
-  dateStr: dayjs(startDate).format("YYYY-MM-DD"),
-  timeStr: dayjs(startDate).format("HH:mm"),
-});
-const voteEnd = ref({
-  dateStr: dayjs(expiredDate).format("YYYY-MM-DD"),
-  timeStr: dayjs(expiredDate).format("HH:mm"),
-});
+const voteStart = ref(dayjs(startDate).format("YYYY-MM-DD HH:mm"));
+const voteEnd = ref(dayjs(expiredDate).format("YYYY-MM-DD HH:mm"));
 const voteDuration = ref({
   durationDays: dayjs(expiredDate).diff(startDate, "days"),
   durationHours: dayjs(expiredDate).diff(startDate, "hours") % 24,
   durationMinutes: dayjs(expiredDate).diff(startDate, "minutes") % 60,
 });
-const startExpiredDateStr = computed(() => dayjs(voteStart.value.dateStr, "YYYY-MM-DD").format("YYYY-MM-DD"));
+const startExpiredDateStr = computed(() => dayjs(voteStart.value, "YYYY-MM-DD").format("YYYY-MM-DD"));
 
 const skipBlockchain = ref(false);
 const showDescription = ref(false);
@@ -252,7 +247,6 @@ const voterAllowsRef = computed(() => props.voterAllows);
 const coadminsRef = computed(() => props.coadmins);
 
 watch(modelValue, (value) => {
-  console.log(value)
   if(value) {
     topicData.value = value;
 
@@ -261,10 +255,8 @@ watch(modelValue, (value) => {
     const startDate = dayjs(value.voteStartAt);
     const expiredDate = dayjs(value.voteExpiredAt);
 
-    voteStart.value.dateStr = startDate.format("YYYY-MM-DD");
-    voteStart.value.timeStr = startDate.format("HH:mm");
-    voteEnd.value.dateStr = expiredDate.format("YYYY-MM-DD");
-    voteEnd.value.timeStr = expiredDate.format("HH:mm");
+    voteStart.value = startDate.format("YYYY-MM-DD HH:mm");
+    voteEnd.value = expiredDate.format("YYYY-MM-DD HH:mm");
     voteDuration.value.durationDays = expiredDate.diff(startDate, "days"),
     voteDuration.value.durationHours = expiredDate.diff(startDate, "hours") % 24;
     voteDuration.value.durationMinutes = expiredDate.diff(startDate, "minutes") % 60;
@@ -319,7 +311,7 @@ watch(coadmins, (value) => {
 }, { immediate: true, deep: true })
 
 watch(voteStart, (value) => {
-  topicData.value.voteStartAt = dayjs(`${value.dateStr} ${value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+  topicData.value.voteStartAt = dayjs(value, "YYYY-MM-DD HH:mm").toDate();
 
   if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -327,12 +319,12 @@ watch(voteStart, (value) => {
       .add(voteDuration.value.durationHours, "hours")
       .add(voteDuration.value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteExpiredAt = dayjs(voteEnd.value, "YYYY-MM-DD HH:mm").toDate();
   }
 }, { deep: true });
 
 watch(voteEnd, (value) => {
-  topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+  topicData.value.voteStartAt = dayjs(voteStart.value, "YYYY-MM-DD HH:mm").toDate();
 
   if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -340,12 +332,12 @@ watch(voteEnd, (value) => {
       .add(voteDuration.value.durationHours, "hours")
       .add(voteDuration.value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${value.dateStr} ${value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteExpiredAt = dayjs(value, "YYYY-MM-DD HH:mm").toDate();
   }
 }, { deep: true });
 
 watch(voteDuration, (value) => {
-  topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+  topicData.value.voteStartAt = dayjs(voteStart.value, "YYYY-MM-DD HH:mm").toDate();
 
   if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -353,7 +345,7 @@ watch(voteDuration, (value) => {
       .add(value.durationHours, "hours")
       .add(value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteExpiredAt = dayjs(voteEnd.value, "YYYY-MM-DD HH:mm").toDate();
   }
 }, { deep: true });
 

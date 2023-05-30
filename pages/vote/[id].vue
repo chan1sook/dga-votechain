@@ -249,8 +249,11 @@ if (!data.value) {
   } else {
     topic.value = _topic;
     voted.value = votes;
-    totalVotes.value = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
-    remainVotes.value = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
+    const _remainVotes = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
+    const _totalVotes = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
+    remainVotes.value = _remainVotes;
+    totalVotes.value = _totalVotes - _remainVotes;
+
     if(_adminVoterAllows) {
       adminVoterAllows.value = _adminVoterAllows;
     }
@@ -294,6 +297,8 @@ async function submitVotes() {
   waitVote.value = true;
 
   const votes = noVoteLocked.value ? new Array(remainVotes.value).fill(null) : currentVotes.value.slice();
+  console.log(votes.length);
+  
   const voteFormData: VoteFormData = {
     topicid,
     votes,
@@ -306,9 +311,14 @@ async function submitVotes() {
   
   remainVotes.value -= votes.length;
   totalVotes.value -= votes.length;
+  
+  if(topic.value && topic.value.voterAllow) {
+    topic.value.voterAllow.remainVotes -= votes.length;
+  }
+
   clearVotes();
 
-  if(remainVotes.value === 0 && roleMode.value === "voter") {
+  if(topic.value && topic.value.voterAllow && topic.value.voterAllow.remainVotes === 0 && roleMode.value === "voter") {
     navigateTo(localePathOf("/topics"))
   } else {
     waitVote.value = false;
@@ -380,6 +390,9 @@ const socket = useSocketIO();
 
 socket.on("voted", (votes: Array<VoteResponseData>) => {
   if(topic.value) {
+
+    console.log("voted", votes);
+
     for(const vote of votes) {
       if(vote.topicid !== topicid) {
         continue;
@@ -387,14 +400,11 @@ socket.on("voted", (votes: Array<VoteResponseData>) => {
 
       if(vote.userid === useSessionData().value.userid) {
         voted.value.push(vote);
-      }
-      
-      if(topic.value.voterAllow && vote.userid === topic.value.voterAllow.userid) {
-        topic.value.voterAllow.remainVotes -= 1;
+        remainVotes.value -= 1;
       }
       
       const target = adminVoterAllows.value.find((ele) => ele.userid === vote.userid);
-      if(target) {
+      if(target && target.remainVotes > 0) {
         target.remainVotes -= 1;
       }
     }

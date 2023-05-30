@@ -6,6 +6,9 @@ export default defineEventHandler<UserResponseData>(async (event) => {
     return {
       sid: event.context.session.sid,
       permissions: [],
+      preferences: {
+        topMenus: [],
+      }
     }
   } else {
     return {
@@ -16,6 +19,10 @@ export default defineEventHandler<UserResponseData>(async (event) => {
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,
+      ministry: userData.ministry,
+      department: userData.department,
+      division: userData.division,
+      preferences: userData.preferences,
     }
   }
 });

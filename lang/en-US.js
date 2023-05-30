@@ -1,5 +1,13 @@
 export default {
   appName: "DGA E-Voting",
+  app: {
+    firstName: "First Name",
+    lastName: "Last Name",
+    citizenid: "Citizen ID",
+    ministry: "Ministry",
+    department: "Department",
+    division: "Division",
+  },
   navbar: {
     home: "Home",
     voting: "Voting",
@@ -80,9 +88,6 @@ export default {
       title: "Register with google account",
       token: "Token"
     },
-    firstName: "First Name",
-    lastName: "Last Name",
-    citizenid: "Citizen ID",
     action: "Register",
     confirm: "Confirm your data?",
     success: "Register Successful",
@@ -342,6 +347,7 @@ export default {
   permissions: {
     "request-permissions": "Request More Permissions",
     "voter-mode": "Access Voter Mode",
+    "request-topic": "Request New Topic",
     "admin-mode": "Access Admin Mode",
     "dev-mode": "Access Developer Mode",
     "vote-topic": "Vote Topics",
