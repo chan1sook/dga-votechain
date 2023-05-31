@@ -106,7 +106,7 @@ function isUserDataValid(userData: UserEditFormData) {
   return userData.firstName !== "" && 
     userData.lastName !== "" &&
     (userData.citizenid !== "" ? isThaiCitizenId(userData.citizenid) : hasCitizenId.value) &&
-    userData.isGovOfficer ? (userData.ministry !== "" && userData.department !== "" && userData.division !== "") : true;
+    (userData.isGovOfficer ? (userData.ministry !== "" && userData.department !== "" && userData.division !== "") : true);
 }
 const isFormValid = computed(() => isUserDataValid(userEditFormData.value));
 
