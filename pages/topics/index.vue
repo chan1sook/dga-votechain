@@ -79,9 +79,6 @@ import { isTopicExpired, isTopicReadyToVote } from "~~/src/utils/topic";
 const localePathOf = useLocalePath();
 const i18n = useI18n();
 
-definePageMeta({
-  middleware: ["auth"]
-})
 const roleMode = computed(() => useSessionData().value.roleMode);
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('voting.title')}`

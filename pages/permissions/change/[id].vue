@@ -62,7 +62,7 @@ function getFullPermissionTitle(permission: EVotePermission) {
 const { id: userid } = useRoute().params;
 const { data } = await useFetch(`/api/user/info/${userid}`);
 
-const userData : Ref<UserPermissionsFormData | undefined> = ref(undefined);
+const userData : Ref<UserPermissionsResponseData | undefined> = ref(undefined);
 const isWaitAction = ref(false);
 const showConfirmModal = ref(false);
 
@@ -76,7 +76,7 @@ if (!data.value) {
 
 const isDeveloper = computed(() => useSessionData().value.roleMode === "developer");
 
-function userNameOf(userData: UserPermissionsFormData) {
+function userNameOf(userData: UserPermissionsResponseData) {
   let name = "";
   if(userData.firstName) {
     name = userData.firstName;

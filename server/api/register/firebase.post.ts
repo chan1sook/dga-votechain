@@ -10,16 +10,17 @@ import { getUserByAuthSource, getUserByEmail } from "~~/server/utils";
 
 export default defineEventHandler(async (event) => {
   const { token, firstName, lastName, citizenid } : { token? :string, firstName?: string, lastName?: string, citizenid?: string} = await readBody(event);
+  const { BCRYPT_SALT_ROUND } = useRuntimeConfig();
 
   if(typeof token === "string" && typeof firstName === "string" && typeof lastName === "string" && typeof citizenid === "string") {
-    const hashedCitizenId = bcrypt.hashSync(citizenid, 12);
+    const hashedCitizenId = bcrypt.hashSync(citizenid, BCRYPT_SALT_ROUND);
     const decodedFirebaseUserdata = await getAuth(getApp()).verifyIdToken(token, true).catch((err) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Invalid Token'
       })
     })
-    const authSource: UserAuthSource = {
+    const authSource: UserAuthSourceData = {
       authSource: "firebase",
       firebaseUid: decodedFirebaseUserdata.uid,
     };
@@ -82,7 +83,10 @@ export default defineEventHandler(async (event) => {
     await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
       userid: userDoc._id.toString(),
       roleMode: defaultRoleMode,
-      authFrom: authSource,
+      authFrom: {
+        ...authSource,
+        userToken: token,
+      },
     });
 
     return {

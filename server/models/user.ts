@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-const schema = new Schema<UserData>({
+const schema = new Schema<UserModelData>({
   permissions: [String],
   authSources: [new Schema({
     authSource: {
@@ -23,6 +23,9 @@ const schema = new Schema<UserData>({
   email: {
     type: String,
   },
+  isGovOfficer: {
+    type: Boolean,
+  },
   ministry: {
     type: String,
   },
@@ -35,22 +38,12 @@ const schema = new Schema<UserData>({
   hashedCitizenId: {
     type: String,
   },
-  citizenId: {
-    type: String,
-  },
   group: [String],
   preferences: new Schema({
     topMenus: [String],
   })
 }, {
   timestamps: true,
-  query: {
-    byDigitalIdUserId(digitalIdUserId: DigitalIDUserId) {
-      return this.where("authSources")
-        .elemMatch("authSource").equals("digitalId")
-        .elemMatch("digitalIdUserId").equals(digitalIdUserId)
-    }
-  }
 });
 
 export default model('dga-user', schema);

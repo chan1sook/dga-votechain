@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     notifyVoter: topicDoc.notifyVoter,
   };
 
-  const [voterAllowDocs, coadminDocs, pauseDataDocs] : [Array<TopicVoterAllowDataPopulated>, Array<UserData & { _id: Types.ObjectId}>, Array<TopicPauseData>] = await Promise.all([
+  const [voterAllowDocs, coadminDocs, pauseDataDocs] : [Array<TopicVoterAllowDataPopulated>, Array<UserModelData & { _id: Types.ObjectId}>, Array<TopicPauseData>] = await Promise.all([
     TopicVoterAllowsModel.find({ topicid: topicDoc._id }).populate("userid"),
     UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) }}),
     TopicPauseModel.find({ topicid: topicDoc._id }),

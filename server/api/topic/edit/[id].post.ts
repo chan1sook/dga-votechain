@@ -32,7 +32,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if(topicDoc.admin.toString() !== userData._id.toString()) {
+  const admins = topicDoc.coadmins.slice()
+  admins.push(topicDoc.admin);
+
+  if(admins.findIndex((ele) => ele.toString() === userData._id.toString()) === -1) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

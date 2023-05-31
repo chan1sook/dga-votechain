@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Invalid Token'
       })
     })
-    const authSource: UserAuthSource = {
+    const authSource: UserAuthSourceData = {
       authSource: "firebase",
       firebaseUid: decodedFirebaseUserdata.uid,
     };

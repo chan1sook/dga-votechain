@@ -30,7 +30,7 @@ declare global {
 
   type TopicDataWithId = TopicData & { _id: Types.ObjectId };
   type TopicDataWithIdPopulated = Omit<TopicDataWithId, "createdBy"> & {
-    createdBy: UserResponseFilterData;
+    createdBy: UserBasicDataWithId;
   };
 
   type TopicDataWithIdAndVoterAllow = TopicDataWithId & { voterAllow?: TopicVoterAllowData };
@@ -73,12 +73,7 @@ declare global {
     _id: string,
     createdAt: DateString,
     updatedAt: DateString,
-    createdBy: {
-      _id: string,
-      firstName?: string,
-      lastName?: string,
-      email?: string,
-    },
+    createdBy: UserBasicResponseDataWithId,
     updatedBy: string,
     admin: string,
     coadmins: Array<string>,

@@ -1,12 +1,22 @@
 export default {
   appName: "DGA E-Voting",
   app: {
+    userInfoEdit: {
+      title: "Edit User Info",
+      typeToEdit: "Type to edit",
+      isGovOfficer: "Government Officer",
+      confirm: "Confirm to Edit User Info?",
+      success: "Edit User Info Successful",
+      failed: "Edit User Info Failed",
+    },
     firstName: "First Name",
     lastName: "Last Name",
+    email: "Email",
     citizenid: "Citizen ID",
     ministry: "Ministry",
     department: "Department",
     division: "Division",
+    edit: "Edit",
   },
   navbar: {
     home: "Home",

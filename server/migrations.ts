@@ -57,11 +57,6 @@ export async function migrateToNewUserFormat2() {
   const unusedPermissions = getUnusedPermissions();
 
   for(const userDoc of userDocs) {
-    if(userDoc.citizenId) {
-      userDoc.hashedCitizenId = bcrypt.hashSync(userDoc.citizenId, 12);
-      userDoc.citizenId = undefined;
-    }
-
     userDoc.permissions = removePermissions(userDoc.permissions, ...unusedPermissions);
     userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("admin"))
     

@@ -91,7 +91,7 @@ const prettyStartAt = computed(() => {
   return i18n.d(dayjs(props.topic.voteStartAt).toDate(), "long");
 })
 
-function getCreatedByName(createdBy?: UserResponseFilterData) {
+function getCreatedByName(createdBy?: UserBasicResponseDataWithId) {
   if(createdBy && createdBy.firstName) {
     return createdBy.lastName ? `${createdBy.firstName} ${createdBy.lastName}` : createdBy.firstName;
   }

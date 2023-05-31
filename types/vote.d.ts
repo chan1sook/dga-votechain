@@ -24,7 +24,7 @@ declare global {
   
   type VoteUserData = {
     _id: Types.ObjectId,
-  } & Pick<UserData, "firstName" | "lastName" | "email">;
+  } & Pick<UserModelData, "firstName" | "lastName" | "email">;
 
   type VoteDataWithPopulated = Omit<VoteData, "userid"> & {
     userid: VoteUserData

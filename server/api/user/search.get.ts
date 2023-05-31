@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     notSelf = true;
   }
   
-  const docQuery : FilterQuery<UserData> = keyword ? {
+  const docQuery : FilterQuery<UserModelData> = keyword ? {
     $or: [
       { firstName: new RegExp(escapeRegExp(keyword)) },
       { lastName: new RegExp(escapeRegExp(keyword)) },

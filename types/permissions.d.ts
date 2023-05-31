@@ -40,7 +40,7 @@ declare global {
 
   type RequestPermissionsDataWithPopulated = Omit<RequestPermissionsData, "_id" | "userid"> & {
     _id: Types.ObjectId;
-    userid: UserData & { _id: Types.ObjectId };
+    userid: UserModelData & { _id: Types.ObjectId };
     preset: RequestPermissionPreset;
     note: string;
     permissions: Array<EVotePermission>;
@@ -64,6 +64,6 @@ declare global {
   type RequestPermissionsAddFormData = Pick<RequestPermissionsData, "permissions">;
   type RequestPermissionsWithdrawFormData = RequestPermissionsAddFormData ;
 
-  type RequestPermissionsAddResponseData = Pick<UserData, "userid" | "permissions">;
+  type RequestPermissionsAddResponseData = Pick<UserModelData, "userid" | "permissions">;
   type RequestPermissionsWithdrawResponseData = RequestPermissionsAddResponseData;
 }

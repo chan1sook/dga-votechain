@@ -1,12 +1,22 @@
 export default {
   appName: "DGA E-Voting",
   app: {
+    userInfoEdit: {
+      title: "แก้ไขข้อมูลผู้ใช้",
+      typeToEdit: "พิมพ์เพื่อแก้ไข",
+      isGovOfficer: "ข้าราชการ/บุคลากรของรัฐ",
+      confirm: "ยีนยันการแก้ไขข้อมูลผู้ใช้?",
+      success: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
+      failed: "แก้ไขข้อมูลผู้ใช้ล้มเหลว",
+    },
     firstName: "ชื่อ",
     lastName: "นามสกุล",
+    email: "อีเมล",
     citizenid: "รหัสบัตรประชาชน",
     ministry: "กระทรวง",
     department: "สังกัด/กรม",
     division: "กอง/หน่วยงาน",
+    edit: "แก้ไข",
   },
   navbar: {
     home: "หน้าแรก",

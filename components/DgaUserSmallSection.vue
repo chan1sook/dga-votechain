@@ -2,7 +2,12 @@
   <div @click.stop>
     <div class="flex flex-row gap-2 px-2 py-1">
       <div class="flex-1 flex flex-col gap-y-1 justify-center items-center whitespace-nowrap">
-        <div>{{ userName }} ({{ $t(`role.${roleMode}`, $t("role.guest")) }})</div>
+        <div class="flex flex-row gap-2">
+          <div>{{ userName }} ({{ $t(`role.${roleMode}`, $t("role.guest")) }})</div>
+          <NuxtLink href="/user/edit" @click="useVisibleMenuGroup().value = undefined">
+            <SquareEditOutlineIcon />
+          </NuxtLink>
+        </div>
         <div class="font-bold flex flex-row gap-2 items-center">
           {{ perttyTime }}
           <ExclamationIcon v-if="!isSync" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')"/>
@@ -36,6 +41,7 @@
 <script setup lang="ts">
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import LogoutIcon from 'vue-material-design-icons/Logout.vue';
+import SquareEditOutlineIcon from 'vue-material-design-icons/SquareEditOutline.vue';
 
 import dayjs from 'dayjs';
 import { checkPermissionNeeds } from '~~/src/utils/permissions';

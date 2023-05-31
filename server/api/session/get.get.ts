@@ -1,28 +1,25 @@
 
-export default defineEventHandler<UserResponseData>(async (event) => {
+export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData) {
-    return {
-      sid: event.context.session.sid,
-      permissions: [],
-      preferences: {
-        topMenus: [],
-      }
-    }
-  } else {
-    return {
-      sid: event.context.session.sid,
-      userid: userData._id.toString(),
-      roleMode: userData.roleMode,
-      permissions: userData.permissions,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      email: userData.email,
-      ministry: userData.ministry,
-      department: userData.department,
-      division: userData.division,
-      preferences: userData.preferences,
-    }
+  const userSessionResponseData : UserResponseData = {
+    roleMode: "guest",
+  };
+
+  if(userData) {
+    userSessionResponseData.userid = userData._id.toString();
+    userSessionResponseData.hasCitizenId = userData.hasCitizenId;
+    userSessionResponseData.roleMode = userData.roleMode;
+    userSessionResponseData.isGovOfficer = userData.isGovOfficer;
+    userSessionResponseData.permissions = userData.permissions;
+    userSessionResponseData.firstName = userData.firstName;
+    userSessionResponseData.lastName = userData.lastName;
+    userSessionResponseData.email = userData.email;
+    userSessionResponseData.ministry = userData.ministry;
+    userSessionResponseData.department = userData.department;
+    userSessionResponseData.division = userData.division;
+    userSessionResponseData.preferences = userData.preferences;
   }
+  
+  return userSessionResponseData;
 });

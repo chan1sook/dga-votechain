@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
       statusMessage: "User not found",
     });
   }
-  const user : UserPermissionsFormData = {
+  const user : UserPermissionsResponseData = {
     _id: `${userDoc._id}`,
     firstName: userDoc.firstName,
     lastName: userDoc.lastName,

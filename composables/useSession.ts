@@ -1,21 +1,24 @@
 export const useSessionData = () => {
   return useState<{
-    sid: string | undefined
-    userid: DigitalIDUserId | undefined,
-    permissions: Array<EVotePermission>,
-    roleMode: UserRole | undefined,
-    firstName: string | undefined,
-    lastName: string | undefined,
-    email: string | undefined,
+    userid?: string,
+    hasCitizenId?: Boolean,
+    roleMode: UserRole,
+    permissions: EVotePermission[],
+    isGovOfficer?: boolean,
+    preferences?: UserPreferences,
+    firstName?: string,
+    lastName?: string,
+    email?: string,
+    ministry?: string,
+    department?: string,
+    division?: string,
   }>('useSessionData', () => {
     return {
-      sid: undefined,
-      userid: undefined,
+      roleMode: "guest",
       permissions: [],
-      roleMode: undefined,
-      firstName: undefined,
-      lastName: undefined,
-      email: undefined,
+      preferences: {
+        topMenus: [],
+      }
     }
   })
 }

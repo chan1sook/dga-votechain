@@ -48,7 +48,7 @@ export async function getTxCounts() {
   return result;
 }
 
-export async function getUserByAuthSource(authSource: UserAuthSource) {
+export async function getUserByAuthSource(authSource: UserAuthSourceData) {
   const userDoc = await EVoteUserModel.findOne({
     authSources: { $elemMatch: authSource }
   })

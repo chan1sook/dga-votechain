@@ -25,7 +25,7 @@ declare global {
     userid?: string,
   }
 
-  type TopicVoterAllowDataPopulated = Omit<TopicVoterAllowData, "userid"> & { userid?: UserData & { _id: Types.ObjectId } }
+  type TopicVoterAllowDataPopulated = Omit<TopicVoterAllowData, "userid"> & { userid?: UserModelData & { _id: Types.ObjectId } }
 
   interface TopicVoterAllowFormData {
     userid?: string,

@@ -3,23 +3,35 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   if(data.value) {
     useSessionData().value = {
-      sid: data.value.sid,
       userid: data.value.userid,
-      permissions: data.value.permissions,
+      hasCitizenId: data.value.hasCitizenId,
+      permissions: data.value.permissions || [],
+      isGovOfficer: data.value.isGovOfficer,
+      preferences: data.value.preferences,
       roleMode: data.value.roleMode,
       firstName: data.value.firstName,
       lastName: data.value.lastName,
       email: data.value.email,
+      ministry: data.value.ministry,
+      department: data.value.department,
+      division: data.value.division,
     };
   } else {
     useSessionData().value = {
-      sid: undefined,
       userid: undefined,
+      hasCitizenId: undefined,
       permissions: [],
-      roleMode: undefined,
+      preferences: {
+        topMenus: [],
+      },
+      isGovOfficer: undefined,
+      roleMode: "guest",
       firstName: undefined,
       lastName: undefined,
       email: undefined,
+      ministry: undefined,
+      department: undefined,
+      division: undefined,
     };
   }
 })

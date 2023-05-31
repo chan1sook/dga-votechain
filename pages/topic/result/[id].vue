@@ -124,10 +124,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 
-definePageMeta({
-  middleware: ["auth"]
-})
-
 const i18n = useI18n();
 
 const { id } = useRoute().params;
