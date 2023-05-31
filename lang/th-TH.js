@@ -92,7 +92,7 @@ export default {
     title: "เข้าสู่ระบบ",
     loginDigitalId: "เข้าสู่ระบบด้วย Digital ID",
     loginWithGoogle: "เข้าสู่ระบบด้วย Google",
-    registerDigitalId: "ลงทะเบียน",
+    registerDigitalId: "ลงทะเบียนด้วย Digital ID",
   },
   register: {
     firebase: {

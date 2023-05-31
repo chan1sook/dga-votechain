@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import io from "~~/server/socketio"
 import smartContract from '../smart-contract';
-import { setPredefinedDevs, setPredefinedBlockchainServers, migrateTopicsDefaultAdmin, migrateToNewUserFormat2 } from '../migrations';
+import { setPredefinedDevs, setPredefinedBlockchainServers } from '../migrations';
 import { initFirebase } from '../firebase';
 import initHbCheck from '../blockchain-server-hb';
 
@@ -27,8 +27,6 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   await setPredefinedBlockchainServers();
   await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
-  await migrateToNewUserFormat2();
-  await migrateTopicsDefaultAdmin();
 
   initHbCheck();
   console.log('[BlockchainServerHB] Started!');

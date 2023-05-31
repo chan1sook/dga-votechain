@@ -15,16 +15,7 @@
       <DgaButton color="dga-orange" class="flex-0" :title="$t('voting.filters.search')" @click="resetTopics">
         {{ $t("voting.filters.search") }}
       </DgaButton>
-      <DgaButton 
-        v-if="roleMode === 'voter'"
-        class="ml-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
-        :title="$t('voting.requestTopic')"
-        :href="localePathOf('/topic/request')"
-      >
-        <PlusCircleOutlineIcon />
-        {{ $t('voting.requestTopic') }}
-      </DgaButton>
-      <div v-else-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
+      <div v-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
           class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
           :title="$t('voting.pendingTopic')"

@@ -46,47 +46,6 @@ export async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
   console.log(`[Migration] Add Predefined Dev Users (Inserted: ${result.insertedCount})`);
 }
 
-export async function migrateToNewUserFormat2() {
-  migrationSeq +=1 ;
-
-  console.log(`[Migration] ${migrationSeq}. migrateToNewUserFormat2`);
-  
-  const userDocs = await EVoteUserModel.find({});
-  const userDocsToSave = [];
-
-  const unusedPermissions = getUnusedPermissions();
-
-  for(const userDoc of userDocs) {
-    userDoc.permissions = removePermissions(userDoc.permissions, ...unusedPermissions);
-    userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("admin"))
-    
-    userDoc.markModified("permissions");
-    userDocsToSave.push(userDoc);
-  }
-
-  const result = await EVoteUserModel.bulkSave(userDocsToSave);
-  console.log(`[Migration] migrateToNewUserFormat2 (Modified: ${result.modifiedCount})`);
-}
-
-export async function migrateTopicsDefaultAdmin() {
-  migrationSeq +=1 ;
-
-  console.log(`[Migration] ${migrationSeq}. Add default admin to topics`);
-  
-  const topicDocs = await TopicModel.find({
-    admin: { $exists: false }
-  });
-  const topicDocsToSave = [];
-
-  for(const topicDoc of topicDocs) {
-    topicDoc.admin = topicDoc.createdBy;
-    topicDocsToSave.push(topicDoc);
-  }
-
-  const result = await TopicModel.bulkSave(topicDocsToSave);
-  console.log(`[Migration] migrateTopicsDefaultAdmin (Modified: ${result.modifiedCount})`);
-}
-
 export async function setPredefinedBlockchainServers() {
   migrationSeq +=1 ;
 

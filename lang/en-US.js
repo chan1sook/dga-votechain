@@ -91,17 +91,7 @@ export default {
     title: "Login",
     loginDigitalId: "Login with Digital ID",
     loginWithGoogle: "Login with Google",
-    registerDigitalId: "Register",
-  },
-  register: {
-    firebase: {
-      title: "Register with google account",
-      token: "Token"
-    },
-    action: "Register",
-    confirm: "Confirm your data?",
-    success: "Register Successful",
-    failed: "Register Failed",
+    registerDigitalId: "Register with Digital ID",
   },
   role: {
     guest: "Guest",

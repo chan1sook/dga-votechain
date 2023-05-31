@@ -2,7 +2,6 @@ import UserModel from "~~/server/models/user"
 
 import mongoose from "mongoose";
 import { hashSync } from "bcrypt";
-import { USER_SESSION_KEY } from "~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
