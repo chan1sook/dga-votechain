@@ -18,14 +18,6 @@
       <div v-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
           class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
-          :title="$t('voting.pendingTopic')"
-          :href="localePathOf('/topics/pending')"
-        >
-          <CheckIcon />
-          {{ $t('voting.pendingTopic') }}
-        </DgaButton>
-        <DgaButton 
-          class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
           :title="$t('voting.createTopic')"
           :href="localePathOf('/topic/create')"
         >
