@@ -58,7 +58,7 @@ import { getCoadminName } from '~~/src/utils/utils';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
-  coadmins?: Array<CoadminFormData>,
+  coadmins?: CoadminFormData[],
 }>(), {});
 
 const emit = defineEmits<{
@@ -70,7 +70,7 @@ const i18n = useI18n();
 const startDate = dayjs().minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
-const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -83,8 +83,7 @@ const topicData = ref<TopicFormData>({
   multipleVotes: false,
   publicVote: true,
   notifyVoter: true,
-  showVotersChoicesPublic: false,
-  showScores: true,
+  defaultVotes: 1,
   voterAllows: [],
   recoredToBlockchain: true,
 });
@@ -105,7 +104,7 @@ watch(coadminsRef, (value) => {
 }, { deep: true, immediate: true });
 
 watch(coadmins, (value) => {
-  const result : Array<string> = [];
+  const result : string[] = [];
   for(const ele of value) {
     if(ele.userid) {
       result.push(ele.userid)

@@ -20,7 +20,7 @@ const schema = new Schema<TopicNotificationData, TopicNotificationModel>({
 }, { timestamps: true });
 
 schema.post('save', async function (doc) {
-  const promises : Array<Promise<void>> = [];
+  const promises : Promise<void>[] = [];
   promises.push(
     clearNotifyData(doc.userid.toString())
   );

@@ -1,17 +1,17 @@
-import { checkPermissionSelections } from "~~/src/utils/permissions";
 import dayjs from "dayjs";
 
-import EVoteUserModel from "~~/server/models/user"
-import VoteModel from "~~/server/models/vote"
+import UserModel from "~/src/models/user"
+import VoteModel from "~/src/models/vote"
+import { getLastestVotes } from "~/src/services/fetch/vote";
 
 export async function getTxArr(pagesize: number, startid: string) {
-  let txDocs : Array<TxResponseData> = [];
-  const _txDocs : Array<VoteData> = await VoteModel.getLastestVotes(pagesize, startid);
+  let txDocs : TxResponseData[] = [];
+  const _txDocs : VoteModelDataWithId[] = await getLastestVotes(pagesize, startid);
   for(const fakeTx of _txDocs) {
     txDocs.push({
-      voteId: `${fakeTx._id}`,
+      voteId: fakeTx._id.toString(),
       topicId: fakeTx.topicid.toString(),
-      userId: fakeTx.userid.toString(),
+      userId: fakeTx.userid ? fakeTx.userid.toString() : "",
       choice: fakeTx.choice === "" ? null : fakeTx.choice,
       createdAt: dayjs(fakeTx.createdAt).toString(),
       txhash: fakeTx.tx,
@@ -49,7 +49,7 @@ export async function getTxCounts() {
 }
 
 export async function getUserByAuthSource(authSource: UserAuthSourceData) {
-  const userDoc = await EVoteUserModel.findOne({
+  const userDoc = await UserModel.findOne({
     authSources: { $elemMatch: authSource }
   })
 
@@ -60,7 +60,7 @@ export async function getUserByEmail(email?: string) {
     return null;
   }
   
-  const userDoc = await EVoteUserModel.findOne({
+  const userDoc = await UserModel.findOne({
     email,
   });
 

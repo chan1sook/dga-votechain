@@ -6,8 +6,8 @@ import TopicNotificationModel from "~~/server/models/topic-notifications"
 export default defineEventHandler(async (event) => {
   const { type, pagesize, startid } : NotificationQueryParams = getQuery(event);
   
-  let notificationsData: Array<NotificationData> = [];
-  let topicNotificationsData: Array<TopicNotificationDataWithPopulate> = [];
+  let notificationsData: NotificationData[] = [];
+  let topicNotificationsData: TopicNotificationDataWithPopulate[] = [];
 
   const userData = event.context.userData;
   if(!userData) {

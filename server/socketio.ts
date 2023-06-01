@@ -4,16 +4,16 @@ import { createClient } from "redis";
 
 import { getSessionData } from "~~/server/session-handler";
 
-import UserModel from "~~/server/models/user";
-import TopicModel from "~~/server/models/topic";
+import UserModel from "~/src/models/user";
+import TopicModel from "~/src/models/topic";
 import TopicPauseModel from "~~/server/models/topic-pause";
 import NotificationModel from "~~/server/models/notification";
 import TopicNotificationModel from "~~/server/models/topic-notifications";
 import dayjs from "dayjs";
-import { checkPermissionNeeds } from "../src/utils/permissions";
-import { getNotifyData, setNotifyData } from "./notify-storage";
-import { getEventEmitter } from "./global-emitter";
-import mongoose from "mongoose";
+import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import { getNotifyData, setNotifyData } from "~~/server/notify-storage";
+import { getEventEmitter } from "~~/server/global-emitter";
+import mongoose, { Types } from "mongoose";
 
 export default async () => {
   const { SOCKETIO_ORIGIN_URL, REDIS_URI } = useRuntimeConfig();
@@ -24,13 +24,13 @@ export default async () => {
     }
   });
   const eventEmitter = getEventEmitter();
-  eventEmitter.on("voted", async (votes : Array<VoteResponseData>) => {
+  eventEmitter.on("voted", async (votes : VoteResponseData[]) => {
     io.emit("voted", votes);
-    const txChain : Array<TxResponseData> = votes.map((tx) => {
+    const txChain : TxResponseData[] = votes.map((tx) => {
       return {
         voteId: `${tx._id}`,
         topicId: tx.topicid.toString(),
-        userId: tx.userid.toString(),
+        userId: tx.userid ? tx.userid.toString() : "",
         choice: tx.choice === "" ? null : tx.choice,
         createdAt: dayjs(tx.createdAt).toString(),
         txhash: tx.tx,
@@ -64,17 +64,13 @@ export default async () => {
     
     socket.on("syncTime", emitServerTime);
     
-    socket.on("hasNotify", async ({sid} : {sid: string}) => {
-      const userData = await getSessionData(sid);
-      if(!userData) {
-        return;
-      }
-      let notifyData = await getNotifyData(userData._id.toString());
+    socket.on("hasNotify", async ({userid} : {userid: string}) => {
+      let notifyData = await getNotifyData(userid);
       
       if(notifyData === undefined || Date.now() - notifyData.lastChecked >= 60000) {
         const [unreadNoti, unreadTopicNoti] = await Promise.all([
-          NotificationModel.getLastestUnreadNotifications(userData._id, 1),
-          TopicNotificationModel.getLastestUnreadNotifications(userData._id, 1)
+          NotificationModel.getLastestUnreadNotifications(new Types.ObjectId(userid), 1),
+          TopicNotificationModel.getLastestUnreadNotifications(new Types.ObjectId(userid), 1)
         ]);
         
         notifyData = {
@@ -82,10 +78,10 @@ export default async () => {
           lastChecked: Date.now(),
         };
         
-        await setNotifyData(userData._id.toString(), notifyData);
+        await setNotifyData(userid, notifyData);
       }
       
-      socket.emit(`hasNotify/${sid}`, notifyData);
+      socket.emit(`hasNotify/${userid}`, notifyData);
     });
 
     socket.on("pauseVote", async ({userid, topicId} : {userid: string, topicId?: string}) => {

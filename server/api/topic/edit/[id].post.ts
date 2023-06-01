@@ -1,13 +1,14 @@
 import dayjs from "dayjs";
 
-import UserModel from "~~/server/models/user"
-import TopicModel from "~~/server/models/topic"
+import UserModel from "~/src/models/user"
+import TopicModel from "~/src/models/topic"
 import TopicPauseModel from "~~/server/models/topic-pause"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicNotificationData from "~~/server/models/topic-notifications"
-import { isTopicFormValid, isTopicReadyToVote } from "~~/src/utils/topic";
+import { isTopicReadyToVote } from "~~/src/utils/topic";
 import { checkPermissionSelections } from "~~/src/utils/permissions";
 import mongoose, { Types } from "mongoose";
+import { isTopicFormValid } from "~/src/services/validations/topic";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -77,7 +78,7 @@ export default defineEventHandler(async (event) => {
     }
   
     if(topicFormData.durationMode !== undefined) {
-      topicDoc.durationMode =topicFormData.durationMode;
+      topicDoc.durationMode = topicFormData.durationMode;
     }
   
     if(topicFormData.voteStartAt !== undefined) {
@@ -92,21 +93,17 @@ export default defineEventHandler(async (event) => {
       topicDoc.publicVote = topicFormData.publicVote;
     }
   
-    if(topicFormData.showScores !== undefined) {
-      topicDoc.showScores = topicFormData.showScores;
-    }
-  
-    if(topicFormData.showVotersChoicesPublic !== undefined) {
-      topicDoc.showVotersChoicesPublic = topicFormData.showVotersChoicesPublic;
-    }
-  
     if(topicFormData.recoredToBlockchain !== undefined) {
       topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
+    }
+
+    if(topicFormData.defaultVotes !== undefined) {
+      topicDoc.defaultVotes = topicFormData.defaultVotes;
     }
     
     if(topicFormData.voterAllows !== undefined) {
       await TopicVoterAllowsModel.deleteMany({ topicid: topicDoc._id })
-      const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
+      const voterAllows : TopicVoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {
         return {
           topicid: topicDoc._id,
           userid: new Types.ObjectId(ele.userid),
@@ -133,7 +130,7 @@ export default defineEventHandler(async (event) => {
 
   await TopicNotificationData.deleteMany({ topicid: topicDoc._id });
   if(topicFormData.notifyVoter) {
-    const topicNotifications : Array<TopicNotificationData> = [];
+    const topicNotifications : TopicNotificationData[] = [];
     for(const voteAllow of voterAllowDocs) {
       if(voteAllow.userid) {
         topicNotifications.push({

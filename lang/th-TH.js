@@ -5,9 +5,48 @@ export default {
       title: "แก้ไขข้อมูลผู้ใช้",
       typeToEdit: "พิมพ์เพื่อแก้ไข",
       isGovOfficer: "ข้าราชการ/บุคลากรของรัฐ",
+      action: "แก้ไขข้อมูล",
       confirm: "ยีนยันการแก้ไขข้อมูลผู้ใช้?",
       success: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
       failed: "แก้ไขข้อมูลผู้ใช้ล้มเหลว",
+    },
+    topic: {
+      create: {
+        title: "สร้างโหวต",
+        action: "ตั้งโหวต",
+        confirm: "ยืนยันการตั้งโหวต",
+        success: 'ตั้งโหวตสำเร็จ',
+        failed: 'ตั้งโหวตล้มเหลว',
+      },
+      recreate: {
+        title: "สร้างโหวตใหม่",
+      },
+      edit: {
+        title: "แก้ไขโหวต",
+        action: "แก้ไขโหวต",
+        confirm: "ยืนยันการแก้ไขโหวต",
+        success: 'แก้ไขโหวตสำเร็จ',
+        failed: 'แก้ไขโหวตล้มเหลว',
+      },
+      defaultVotes: "จำนวนโหวตตั้งต้น",
+    },
+    result: {
+      title: "ผลการโหวต",
+      winners: "ผู้ชนะ",
+      stats: "สถิติ",
+      totalVoters: "จำนวนผู้มีสิทธิ์ลงคะแนน",
+      votedVoters: "ใช้สิทธิ์",
+      noVotedVoters: "ไม่ใช้สิทธิ์",
+      totalVotes: "จำนวนเสียงที่มี",
+      actualVotes: "โหวตจริง",
+      remainVotes: "ไม่ได้ลงโหวต",
+      scores: "ผลคะแนน",
+      total: "รวมทั้งหมด",
+      noVoted: "ไม่ประสงค์ลงคะแนน",
+      yourChoice: "คุณเลือก",
+      winner: "ผู้ชนะ",
+      votersList: "รายชื่อผู้มีสิทธิ์โหวต",
+      export: "ส่งออกผลโหวต",
     },
     firstName: "ชื่อ",
     lastName: "นามสกุล",
@@ -16,6 +55,17 @@ export default {
     ministry: "กระทรวง",
     department: "สังกัด/กรม",
     division: "กอง/หน่วยงาน",
+    ticketid: "Ticket ID",
+    description: {
+      description: "รายละเอียด",
+      add: "เพิ่มรายละเอียด",
+      hide: "ซ่อนรายละเอียด",
+      show: "แสดงรายละเอียด",
+    },
+    countable: {
+      vote: "โหวต",
+      voter: "คน"
+    },
     edit: "แก้ไข",
   },
   navbar: {
@@ -131,10 +181,9 @@ export default {
     loadMoreTopic: "โหลดคำถามเพิ่มเติม",
     noMoreTopic: "ไม่พบคำถาม",
     createTopic: "ตั้งโหวต",
-    requestTopic: "ขอตั้งโหวต",
     avaliableTopic: "โหวตที่เปิดอยู่",
-    pendingTopic: "รับรองโหวต",
     editTopic: "แก้ไข",
+    recreateTopic: "สร้างใหม่",
     status: {
       waiting: "รอเปิดโหวต",
       result: "ผลโหวต",
@@ -175,27 +224,6 @@ export default {
     confirm: "ยืนยันการเลือกโหวตนี้?"
   },
   topic: {
-    create: {
-      title: "สร้างโหวต",
-      action: "ตั้งโหวต",
-      confirm: "ยืนยันการตั้งโหวต",
-      success: 'ตั้งโหวตสำเร็จ',
-      failed: 'ตั้งโหวตล้มเหลว',
-    },
-    request: {
-      title: "ขอตั้งโหวต",
-      action: "ขอตั้งโหวต",
-      confirm: "ยืนยันการขอตั้งโหวต?",
-      success: 'ขอตั้งโหวตสำเร็จ',
-      failed: 'ขอตั้งโหวตล้มเหลว',
-    },
-    edit: {
-      title: "แก้ไขโหวต",
-      action: "แก้ไขโหวต",
-      confirm: "ยืนยันการแก้ไขโหวต",
-      success: 'แก้ไขโหวตสำเร็จ',
-      failed: 'แก้ไขโหวตล้มเหลว',
-    },
     error: {
       notFound: "ไม่พบกระทู้โหวต",
       notEditable: "ไม่สามารถแก้ไขกระทู้โหวต"
@@ -219,11 +247,6 @@ export default {
       endTime: "เวลาสิ้นสุด",
     },
     topicQuestion: "คำถาม",
-    description: {
-      title: "รายละเอียด",
-      add: "เพิ่มรายละเอียด",
-      hide: "ซ่อนรายละเอียด"
-    },
     addChoice: {
       title: "เพิ่มตัวเลือก",
       add: "เพิ่มตัวเลือก",
@@ -260,30 +283,10 @@ export default {
       }
     },
     notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
-    showScores: "แสดงจำนวนหลังโหวตเสร็จ",
     skipBlockchain: "ไม่บันทึกลง Blockchain",
     voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
     allow: "อนุญาต",
     deny: "ปฏิเสธ",
-  },
-  result: {
-    title: "ผลการโหวต",
-    ticketid: "Ticket ID",
-    description: {
-      title: "รายละเอียด",
-      show: "แสดงรายละเอียด",
-      hide: "ซ่อนรายละเอียด",
-    },
-    winners: "ผู้ชนะ",
-    stats: "สถิติ",
-    yourChoice: "คุณเลือก",
-    notIncludeNoVote: "ไม่รวมไม่ประสงค์ลงคะแนน",
-    winner: "ผู้ชนะ",
-    noVoted: "ไม่ประสงค์ลงคะแนน",
-    total: "รวมทั้งหมด",
-    showVoteLogs: "แสดงบันทึกการโหวต",
-    voteLogs: "บันทึกการโหวต",
-    export: "ส่งออกผลโหวต",
   },
   news: {
     title: "ข่าว",

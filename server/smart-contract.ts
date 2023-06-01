@@ -34,7 +34,7 @@ export async function getVoteOnBlockchain(voteid: string) : Promise<VoteDataBloc
   return response;
 }
 
-export async function addVoteOnBlockchain(voteid: string, topicid: string, userid: string, choice: string | null) {
+export async function addVoteOnBlockchain(voteid: string, topicid: string, userid: string, choice: ChoiceDataType) {
   if(!isProduction) {
     throw new Error("Is not production");
   }

@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const isAdvanceMode = userData.roleMode === "developer" && checkPermissionSelections(userData.permissions, "change-permissions:advance");
   const reqPermissionData = await RequestPermissionsModel.getPendingRequestPermissionsData(pagesize, startid, isAdvanceMode);
   
-  const requestPermissions : Array<RequestPermissionsListData> = reqPermissionData.map((doc) => {
+  const requestPermissions : RequestPermissionsListData[] = reqPermissionData.map((doc) => {
     return {
       _id: `${doc._id}`,
       status: doc.status,

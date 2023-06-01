@@ -1,5 +1,5 @@
 import { Storage, prefixStorage } from "unstorage";
-import EVoteUserModel from "~~/server/models/user";
+import UserModel from "~/src/models/user";
 
 export const USER_SESSION_KEY = "dgaUserData";
 
@@ -65,7 +65,7 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
 
   if(userSessionData) {
     try {
-      const userData = await EVoteUserModel.findById(userSessionData.userid);
+      const userData = await UserModel.findById(userSessionData.userid);
       if(userData) {
         return {
           _id: userData._id,

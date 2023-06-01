@@ -44,7 +44,7 @@ import dayjs from 'dayjs';
 const i18t = useI18n();
 
 const showOption = computed(() => useVisibleMenuGroup().value === 'notification');
-const loadedNotifications : Ref<Array<NotificationUserResponseData>> = ref([]);
+const loadedNotifications : Ref<NotificationUserResponseData[]> = ref([]);
 
 const pagesize = ref(50);
 const startid = computed(() => {
@@ -121,7 +121,7 @@ let notifyID : NodeJS.Timer | undefined;
 
 const socket = useSocketIO();
 
-socket.on(`hasNotify/${useSessionData().value.sid}`, (notifyData: NotificationStorageData | undefined) => {
+socket.on(`hasNotify/${useSessionData().value.userid}`, (notifyData: NotificationStorageData | undefined) => {
   if(notifyData) {
     isUnread.value = notifyData.unread;
   }
@@ -129,15 +129,15 @@ socket.on(`hasNotify/${useSessionData().value.sid}`, (notifyData: NotificationSt
 
 onMounted(() => {
   notifyID = setInterval(() => {
-    socket.volatile.emit("hasNotify", { sid: useSessionData().value.sid });
+    socket.volatile.emit("hasNotify", { sid: useSessionData().value.userid });
   }, 1000);
   
-  socket.volatile.emit("hasNotify", { sid: useSessionData().value.sid });
+  socket.volatile.emit("hasNotify", { sid: useSessionData().value.userid });
 })
 
 onUnmounted(() => {
   clearInterval(notifyID);
-  socket.off(`hasNotify/${useSessionData().value.sid}`);
+  socket.off(`hasNotify/${useSessionData().value.userid}`);
 });
 
 </script>

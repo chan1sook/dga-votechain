@@ -13,22 +13,17 @@
         <div class="createdby">{{ $t('voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
       </div>
       <div class="status">
-        <template v-if="props.approvable" >
-          <button :title="$t('topic.allow')" @click="emit('approve', true)">
-            {{ $t('topic.allow') }}
-          </button>
-          <button :title="$t('topic.deny')" @click="emit('approve', false)">
-            {{ $t('topic.deny') }}
-          </button>
-        </template>
-        <template v-else>
-          <button v-if="props.editable" :title="$t('voting.editTopic')" @click="emit('edit')">
+        <template v-if="props.editable">
+          <button :title="$t('voting.editTopic')" @click="emit('edit')">
             {{ $t('voting.editTopic') }}
           </button>
-          <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
-            {{ actualStatusStr }}
-          </button>
         </template>
+        <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
+          {{ actualStatusStr }}
+        </button>
+        <button :title="$t('voting.recreateTopic')" class="recreate" @click="emit('recreate')">
+          {{ $t('voting.recreateTopic') }}
+        </button>
       </div>
 
       <div v-if="status === 'result'" class="duration expired">
@@ -47,7 +42,6 @@ const i18n = useI18n();
 const props = withDefaults(defineProps<{
   topic: TopicResponseData,
   editable?: boolean,
-  approvable?: boolean,
   status?: TopicCardStatus,
 }>(), {
   status: "access",
@@ -55,6 +49,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'edit') : void,
+  (e: 'recreate') : void,
   (e: 'action', v:TopicCardStatus) : void,
   (e: 'approve', v:boolean) : void,
 }>();
@@ -130,7 +125,6 @@ function getCreatedByName(createdBy?: UserBasicResponseDataWithId) {
     grid-template-columns: 150px auto 120px;
   }
 }
-
 
 .dga-topic-card > .inner > .private {
   grid-area: public;

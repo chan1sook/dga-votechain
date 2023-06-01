@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
-import TopicModel from "~~/server/models/topic"
+import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicPauseData from "~~/server/models/topic-pause"
-import VoteModel from "~~/server/models/vote"
+import VoteModel from "~/src/models/vote"
 
 export default defineEventHandler(async (event) => {
   const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
@@ -16,8 +16,8 @@ export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
   let voterAllow;
-  let votes : Array<VoteResponseData> = [];
-  let adminVoterAllows : Array<TopicVoterAllowResponseData> | undefined;
+  let votes : VoteResponseData[] = [];
+  let adminVoterAllows : TopicVoterAllowResponseData[] | undefined;
 
   const topicPauseData = await TopicPauseData.find({
     topicid: topicDoc._id,
@@ -104,10 +104,9 @@ export default defineEventHandler(async (event) => {
       return ele.toString()
     }),
     publicVote: topicDoc.publicVote,
-    showScores: topicDoc.showScores,
-    showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     voterAllow,
+    notifyVoter: topicDoc.notifyVoter,
     pauseData: topicPauseData.map((ele) => {
       return {
         topicid: topicDoc._id.toString(),

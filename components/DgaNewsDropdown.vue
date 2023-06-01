@@ -45,7 +45,7 @@ const i18t = useI18n();
 const localePathOf = useLocalePath();
 
 const showOption = computed(() => useVisibleMenuGroup().value === 'news');
-const loadedNews : Ref<Array<NewsResponseData>> = ref([]);
+const loadedNews : Ref<NewsResponseData[]> = ref([]);
 
 const pagesize = ref(50);
 const startid = computed(() => {

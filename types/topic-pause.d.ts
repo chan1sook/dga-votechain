@@ -4,6 +4,7 @@ declare global {
   interface TopicPauseData {
     topicid: Types.ObjectId;
     pauseAt: Date;
+    cause?: string,
     resumeAt?: Date;
   }
 
@@ -14,6 +15,7 @@ declare global {
   type TopicPauseResponseData = Omit<TopicPauseData, "topicid" | "pauseAt" | "resumeAt"> & {
     topicid: string;
     pauseAt: DateString;
+    cause?: string,
     resumeAt?: DateString;
   }
 }

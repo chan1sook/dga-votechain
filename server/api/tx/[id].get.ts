@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { ObjectId } from "mongodb";
 import { Types } from "mongoose";
 
-import VoteModel from "~~/server/models/vote"
+import VoteModel from "~/src/models/vote"
 import { getVoteOnBlockchain, getTransactionByHash } from "~~/server/smart-contract";
 
 export default defineEventHandler(async (event) => {
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   }
   
   let txData: TxResponseDataFull | undefined;
-  const voteDoc : VoteData & { _id: Types.ObjectId } | null = await VoteModel.findById(event.context.params?.id);
+  const voteDoc : VoteModelDataWithId | null = await VoteModel.findById(event.context.params?.id);
   if(!voteDoc) {
     throw createError({
       statusCode: 404,
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
     txData = {
       voteId: `${voteDoc._id}`,
       topicId: voteDoc.topicid.toString(),
-      userId: voteDoc.userid.toString(),
+      userId: voteDoc.userid ? voteDoc.userid.toString() : "",
       choice: voteDoc.choice === "" ? null : voteDoc.choice,
       createdAt: dayjs(voteDoc.createdAt).toString(),
       txhash: voteDoc.tx,

@@ -1,14 +1,14 @@
 <template>
   <div v-if="editable">
-    <DgaHead>{{ $t('topic.edit.title')  }}</DgaHead>
+    <DgaHead>{{ $t('app.topic.edit.title')  }}</DgaHead>
     <DgaTopicForm v-if="!isTopicStartVote" v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins"></DgaTopicForm>
     <DgaTopicFormCoadminOnly v-else v-model="topicData" :coadmins="coadmins"></DgaTopicFormCoadminOnly>
     <DgaButtonGroup class="col-span-12 mt-4">
       <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-        color="dga-orange" :title="$t('topic.edit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+        color="dga-orange" :title="$t('app.topic.edit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
       >
         <PencilIcon />
-        <span class="truncate">{{ $t('topic.edit.action') }}</span>
+        <span class="truncate">{{ $t('app.topic.edit.action') }}</span>
       </DgaButton>
     </DgaButtonGroup>
     <DgaModal :show="showConfirmModal" cancel-backdrop
@@ -16,7 +16,7 @@
       @close="showConfirmModal = false"
       @cancel="showConfirmModal = false"
     >
-      {{ $t('topic.edit.confirm') }}
+      {{ $t('app.topic.edit.confirm') }}
     </DgaModal>
     <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>
@@ -27,7 +27,8 @@ import PencilIcon from 'vue-material-design-icons/Pencil.vue';
 
 import dayjs from "dayjs";
 import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime";
-import { getPresetChoices, isTopicFormValid, isTopicReadyToVote } from "~~/src/utils/topic";
+import { getPresetChoices, isTopicReadyToVote } from "~~/src/utils/topic";
+import { isTopicFormValid } from '~/src/services/validations/topic';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -37,7 +38,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('topic.edit.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.topic.edit.title')}`
 });
 
 const { id: topicid } = useRoute().params;
@@ -49,8 +50,8 @@ const waitEdit = ref(false);
 const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
-const voterAllows : Ref<Array<TopicVoterAllowFormData>> = ref([]);
-const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+const voterAllows : Ref<TopicVoterAllowFormData[]> = ref([]);
+const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -62,8 +63,7 @@ const topicData = ref<TopicFormData>({
   voteExpiredAt: expiredDate,
   publicVote: true,
   notifyVoter: true,
-  showVotersChoicesPublic: false,
-  showScores: true,
+  defaultVotes: 1,
   coadmins: [],
   voterAllows: [],
   recoredToBlockchain: true,
@@ -76,7 +76,13 @@ if (!data.value) {
   showError(i18n.t('topic.error.notFound'));
 } else {
   const { topic, voterAllows: _voteAllows, coadmins: _coadmins, pauseData } = data.value;
-  if(pauseData.every((ele) => ele.resumeAt) && dayjs(getComputedServerTime()).diff(topic.voteExpiredAt) > 0) {
+  
+  const admins = topic.coadmins.slice()
+  admins.push(topic.admin);
+
+  if(admins.findIndex((ele) => useSessionData().value.userid === ele) === -1) {
+    showError(i18n.t('topic.error.notEditable'));
+  } else if(pauseData.every((ele) => ele.resumeAt) && dayjs(getComputedServerTime()).diff(topic.voteExpiredAt) > 0) {
     showError(i18n.t('topic.error.notEditable'));
   } else {
     isTopicStartVote.value = isTopicReadyToVote(topic);
@@ -84,13 +90,11 @@ if (!data.value) {
     topicData.value.name = topic.name;
     topicData.value.description = topic.description;
     topicData.value.choices = topic.choices;
-    topicData.value.durationMode = topic.durationMode || "startDuration";
-    topicData.value.voteStartAt = startDate;
-    topicData.value.voteExpiredAt = expiredDate;
+    topicData.value.durationMode = topic.durationMode;
+    topicData.value.voteStartAt = dayjs(topic.voteStartAt).toDate();
+    topicData.value.voteExpiredAt = dayjs(topic.voteExpiredAt).toDate();
     topicData.value.publicVote = topic.publicVote;
-    topicData.value.showVotersChoicesPublic = topic.showVotersChoicesPublic;
-    topicData.value.showScores = topic.showScores;
-    topicData.value.notifyVoter = topic.notifyVoter === true;
+    topicData.value.notifyVoter = topic.notifyVoter;
     topicData.value.multipleVotes = topic.multipleVotes;
 
     voterAllows.value = _voteAllows;
@@ -116,16 +120,16 @@ async function editTopic() {
 
   if(error.value) {
     useShowToast({
-      title: i18n.t('topic.edit.action'),
-      content: i18n.t('topic.edit.failed'),
+      title: i18n.t('app.topic.edit.action'),
+      content: i18n.t('app.topic.edit.failed'),
       autoCloseDelay: 5000,
     });
   
     waitEdit.value = false;
   } else {
     useShowToast({
-      title: i18n.t('topic.edit.action'),
-      content: i18n.t('topic.edit.success') ,
+      title: i18n.t('app.topic.edit.action'),
+      content: i18n.t('app.topic.edit.success') ,
       autoCloseDelay: 5000,
     });
     navigateTo(localePathOf("/topics"))

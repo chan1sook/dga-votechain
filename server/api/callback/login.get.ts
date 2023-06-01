@@ -2,7 +2,7 @@
 import bcrypt from "bcrypt";
 
 import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~~/src/utils/digitalid-protocol";
-import EVoteUserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
 import { USER_SESSION_KEY } from "~~/server/session-handler";
 import { getUserByAuthSource, getUserByEmail } from "~~/server/utils";
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       if(!userDoc) {
         const hashedCitizenID = bcrypt.hashSync(digitalIdUserInfo.citizen_id, BCRYPT_SALT_ROUND);
         
-        userDoc = new EVoteUserModel({
+        userDoc = new UserModel({
           permissions: legacyRoleToPermissions("admin"),
           authSources: [
             { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }

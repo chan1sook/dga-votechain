@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { nanoid } from 'nanoid';
   
-const toastArr : Ref<Array<ToastData>> = ref([]);
+const toastArr : Ref<ToastData[]> = ref([]);
 
 function watchToastData() {
   const toastData = useToastData().value;
@@ -70,7 +70,7 @@ function showSingleToast(params:ToastParams) {
   toastArr.value.push(data);
 }
 
-function showToast(...params:Array<ToastParams>) {
+function showToast(...params: ToastParams[]) {
   params.forEach(showSingleToast);
 }
 

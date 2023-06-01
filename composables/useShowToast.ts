@@ -1,3 +1,3 @@
-export const useShowToast = (...params:Array<ToastParams>) => {
+export const useShowToast = (...params: ToastParams[]) => {
   useToastData().value.push(...params);
 }

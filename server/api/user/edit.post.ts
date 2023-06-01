@@ -1,4 +1,4 @@
-import UserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 
 import mongoose from "mongoose";
 import { hashSync } from "bcrypt";

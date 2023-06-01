@@ -1,7 +1,5 @@
-import { FilterQuery } from "mongoose";
-import EVoteUserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 import { isAdminRole } from "~~/src/utils/role";
-import { escapeRegExp } from "~~/src/utils/utils";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -13,14 +11,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userDoc = await EVoteUserModel.findById(event.context.params?.id);
+  const userDoc = await UserModel.findById(event.context.params?.id);
   if(!userDoc) {
     throw createError({
       statusCode: 404,
       statusMessage: "User not found",
     });
   }
-  const user : UserPermissionsResponseData = {
+  const user : UserResponseDataWithIdAndPermissions = {
     _id: `${userDoc._id}`,
     firstName: userDoc.firstName,
     lastName: userDoc.lastName,

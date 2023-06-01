@@ -1,4 +1,4 @@
-import UserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 import RequestPermissionsModel from "~~/server/models/request-permission"
 import NotificationModel from "~~/server/models/notification";
 import { checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";

@@ -206,9 +206,9 @@ const showLocaltime = ref(false);
 const isSync = ref(false);
 const roleMode = computed(() => useSessionData().value.roleMode);
 const isAdminMode = computed(() => roleMode.value !== 'voter');
-const currentVotes : Ref<Array<string | null>> = ref([]);
-const voted: Ref<Array<VoteResponseData>> = ref([]);
-const adminVoterAllows: Ref<Array<TopicVoterAllowResponseData>> = ref([]);
+const currentVotes : Ref<ChoiceDataType[]> = ref([]);
+const voted: Ref<VoteResponseData[]> = ref([]);
+const adminVoterAllows: Ref<TopicVoterAllowResponseData[]> = ref([]);
 
 const totalVoters = computed(() => {
   if(topic.value) {
@@ -260,7 +260,7 @@ if (!data.value) {
   }
 }
 
-function voteCount(choice: string | null) {
+function voteCount(choice: ChoiceDataType) {
   return currentVotes.value.reduce((prev, current) => {
     if(current === choice) {
       return prev + 1;
@@ -268,11 +268,11 @@ function voteCount(choice: string | null) {
     return prev;
   }, 0)
 }
-function votedCount(choice: string | null) {
+function votedCount(choice: ChoiceDataType) {
   return voted.value.filter((ele) => ele.choice === choice).length;
 }
 
-function addVote(choice: string | null) {
+function addVote(choice: ChoiceDataType) {
   if(!canVote.value || remainVotes.value <= 0) { return; }
   currentVotes.value.push(choice);
   remainVotes.value -= 1;
@@ -388,7 +388,7 @@ function getTotalMinutes(d: number) {
 
 const socket = useSocketIO();
 
-socket.on("voted", (votes: Array<VoteResponseData>) => {
+socket.on("voted", (votes: VoteResponseData[]) => {
   if(topic.value) {
 
     console.log("voted", votes);

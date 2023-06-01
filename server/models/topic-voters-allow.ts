@@ -7,7 +7,7 @@ import { FilterQuery, model, Schema, Types } from "mongoose";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const schema = new Schema<TopicVoterAllowData, TopicVoterAllowModel>({
+const schema = new Schema<TopicVoterAllowModelData, TopicVoterAllowModel>({
   topicid: {
     type: Schema.Types.ObjectId,
     ref: "topic",
@@ -15,15 +15,6 @@ const schema = new Schema<TopicVoterAllowData, TopicVoterAllowModel>({
   userid: {
     type: Schema.Types.ObjectId,
     ref: "dga-user",
-  },
-  firstName: {
-    type: String,
-  },
-  lastName: {
-    type: String,
-  },
-  email: {
-    type: String,
   },
   remainVotes: {
     type: Number,
@@ -36,7 +27,7 @@ const schema = new Schema<TopicVoterAllowData, TopicVoterAllowModel>({
 }, { timestamps: true });
 
 schema.statics.getVoterAllowForTopicsFilters = function(userid: Types.ObjectId, pagesize?: number, startTopicid?: string) {
-  const query : FilterQuery<TopicVoterAllowData> = {
+  const query : FilterQuery<TopicVoterAllowModelData> = {
     userid: userid,
   };
 
@@ -46,4 +37,4 @@ schema.statics.getVoterAllowForTopicsFilters = function(userid: Types.ObjectId, 
   
   return this.find(query).limit(pagesize || 50).sort({topicId: -1 });
 }
-export default model<TopicVoterAllowData, TopicVoterAllowModel>('topic-voter-allow', schema);
+export default model<TopicVoterAllowModelData, TopicVoterAllowModel>('topic-voter-allow', schema);

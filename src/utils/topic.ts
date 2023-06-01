@@ -80,7 +80,7 @@ export function getPresetChoices(value?: string) {
   }
 }
 
-export function choiceCounts(choices: ChoicesData, choice: string) {
+export function choiceCounts(choices: ChoicesInfo, choice: string) {
   return choices.choices.reduce((prev, current) => {
     if(current.name === choice) {
       return prev + 1;
@@ -89,7 +89,7 @@ export function choiceCounts(choices: ChoicesData, choice: string) {
   }, 0);
 }
 
-export function voterCounts(voterAllows: Array<TopicVoterAllowFormData>, user: TopicVoterAllowFormData) {
+export function voterCounts(voterAllows: TopicVoterAllowFormData[], user: TopicVoterAllowFormData) {
   return voterAllows.reduce((prev, current) => {
     if(user.userid && current.userid === user.userid) {
       return prev + 1;
@@ -98,7 +98,7 @@ export function voterCounts(voterAllows: Array<TopicVoterAllowFormData>, user: T
   }, 0);
 }
 
-export function coadminCounts(coadmins: Array<CoadminFormData>, user: CoadminFormData) {
+export function coadminCounts(coadmins: CoadminFormData[], user: CoadminFormData) {
   return coadmins.reduce((prev, current) => {
     if(user.userid && current.userid === user.userid) {
       return prev + 1;
@@ -107,35 +107,10 @@ export function coadminCounts(coadmins: Array<CoadminFormData>, user: CoadminFor
   }, 0);
 }
 
-function isVoteDateTimeValid(voteStartAt: Date | DateString, voteExpiredAt: Date | DateString) {
-  const startAt = dayjs(voteStartAt);
-  const expiredAt = dayjs(voteExpiredAt);
-  return startAt.isValid() && expiredAt.isValid() && startAt.valueOf() < expiredAt.valueOf();
-}
-function isChoicesValid(choices: Array<{name: string}>) {
-  return choices.length > 0 && choices.every(
-    (ele, i, arr) => ele.name !== "" && 
-      arr.findIndex((ele2) => ele2.name === ele.name) === i
-  );
-}
-
-function isVoterAllowsValid(voterAllows: Array<TopicVoterAllowFormData>) {
-  return voterAllows.length > 0 && voterAllows.every(
-    (ele, i, arr) => arr.findIndex((ele2) => ele2.userid === ele.userid) === i
-  );
-}
-
-export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
-  return topicData.name !== "" && 
-    isVoteDateTimeValid(topicData.voteStartAt, topicData.voteExpiredAt) && 
-    isChoicesValid(topicData.choices.choices) &&
-    isVoterAllowsValid(topicData.voterAllows);
-}
-
 export function isTopicExpired(topic: TopicResponseDataExtended, now = Date.now()) {
   return now >= dayjs(topic.voteExpiredAt).valueOf() && (topic.pauseData.every((ele) => ele.resumeAt));
 }
 
-export function isTopicReadyToVote(topic: TopicData | TopicResponseData, now = Date.now()) {
+export function isTopicReadyToVote(topic: TopicModelData | TopicResponseData, now = Date.now()) {
   return topic.status === "approved" && now >= dayjs(topic.voteStartAt).valueOf();
 }

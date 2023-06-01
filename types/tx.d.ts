@@ -24,7 +24,7 @@ declare global {
   type TxStatus = "valid" | "invalid" | "pending";
   type TxResponseData = Omit<VoteDataBlockchainResponse, "choice"> & {
     txhash: string | null,
-    choice: string | null,
+    choice: ChoiceDataType,
     createdAt: DateString | undefined,
     txStatus: TxStatus,
   }
@@ -34,7 +34,7 @@ declare global {
   }
 
   interface TxInfoResponseData {
-    servers: Array<BlockchainServerDataResponse>,
+    servers: BlockchainServerDataResponse[],
     blocks: {
       mined: number,
       total: number,

@@ -52,10 +52,10 @@
       </div>
       <DgaButtonGroup class="col-span-12 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-          color="dga-orange" :title="$t('app.edit')" :disabled="!isFormValid" @click="showConfirmModal = true"
+          color="dga-orange" :title="$t('app.userInfoEdit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
         >
           <PencilIcon />
-          <span class="truncate">{{ $t('app.edit') }}</span>
+          <span class="truncate">{{ $t('app.userInfoEdit.action') }}</span>
         </DgaButton>
       </DgaButtonGroup>
     </div>

@@ -1,18 +1,16 @@
-import bcrypt from "bcrypt";
-
-import EVoteUserModel from "~~/server/models/user"
-import TopicModel from "~~/server/models/topic"
+import UserModel from "~/src/models/user"
+import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~~/server/models/blockchain-server"
-import { combinePermissions, getUnusedPermissions, legacyRoleToPermissions, removePermissions } from '~~/src/utils/permissions';
+import { combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
 
 let migrationSeq = 0;
 
-export async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
+export async function setPredefinedDevs(ids: DigitalIDUserId[]) {
   migrationSeq +=1 ;
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);
   
-  const userDocs = await EVoteUserModel.find({
+  const userDocs = await UserModel.find({
     authSources: { $elemMatch: 
       {
         authSource: "digitalId",
@@ -32,7 +30,7 @@ export async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
       targetDoc.permissions = combinePermissions(targetDoc.permissions, ...legacyRoleToPermissions("developer"));
       userDocsToSave.push(targetDoc);
     } else {
-      const userDoc = new EVoteUserModel({
+      const userDoc = new UserModel({
         permissions: legacyRoleToPermissions("developer"),
         authSources: [
           { authSource: "digitalId", digitalIdUserId: id }
@@ -42,7 +40,7 @@ export async function setPredefinedDevs(ids: Array<DigitalIDUserId>) {
     }
   }
 
-  const result = await EVoteUserModel.bulkSave(userDocsToSave);
+  const result = await UserModel.bulkSave(userDocsToSave);
   console.log(`[Migration] Add Predefined Dev Users (Inserted: ${result.insertedCount})`);
 }
 
@@ -76,4 +74,31 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
+}
+
+export async function addTopicFields() {
+  migrationSeq +=1 ;
+
+  console.log(`[Migration] ${migrationSeq}. Add Topic Fields`);
+  
+  const topics = await TopicModel.find({ 
+    $or: [
+      { durationMode: { $exists: false } },
+      { defaultVotes: { $exists: false } }
+    ]
+  });
+
+  const topicsToSave = [];
+  for(const topic of topics) {
+    if(!topic.durationMode) {
+      topic.durationMode = "startDuration";
+    }
+    if(!topic.defaultVotes) {
+      topic.defaultVotes = 1;
+    }
+    topicsToSave.push(topic)
+  }
+  
+  const result = await TopicModel.bulkSave(topicsToSave);
+  console.log(`[Migration] Add Topic Fields (Updated: ${result.modifiedCount})`);
 }

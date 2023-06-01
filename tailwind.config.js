@@ -12,14 +12,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "dga-blue": {
-          lighter: "hsl(250, 57%, 45%)",
-          DEFAULT: "#1E154C",
-        },
-        'dga-orange': {
-          lighter: "hsl(14, 86%, 62%)",
-          DEFAULT: "#EE5020",
-        }
+        "dga-blue": "#1E154C",
+        'dga-orange': "#EE5020",
       }
     },
   },

@@ -1,4 +1,4 @@
-import UserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 import { checkPermissionSelections, combinePermissions, getNotSelfEditablePermissions, isContainsAdvancePermissions, removePermissions } from "~~/src/utils/permissions";
 import { isAdminRole } from "~~/src/utils/role";
 import mongoose from "mongoose";
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
 
-  const { permissions } : { permissions: Array<EVotePermission> } = await readBody(event);
+  const { permissions } : { permissions: EVotePermission[] } = await readBody(event);
   const userDoc = await UserModel.findById(event.context.params?.id);
   if(!userDoc) {
     throw createError({

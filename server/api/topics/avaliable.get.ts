@@ -1,12 +1,12 @@
 import dayjs from "dayjs";
 
-import TopicModel from "~~/server/models/topic"
 import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
 import TopicPauseModel from "~~/server/models/topic-pause"
+import { getLastestAdminTopics, getLastestFinishedPublicVoteTopics, getLastestVoterTopicsWithIds } from "~/src/services/fetch/topics";
 
 export default defineEventHandler(async (event) => {
   const { filter } = getQuery(event);
-  let topicsData: Array<TopicDataWithIdPopulated> = [];
+  let topicsData: TopicDataWithIdPopulated[] = [];
   let filterParams : TopicFilterParams = { type: "all" };
   if(typeof filter === "string") {
     try {
@@ -21,12 +21,12 @@ export default defineEventHandler(async (event) => {
   
   let filterIds;
   if(!userData || userData.roleMode === "guest") {
-    topicsData = await TopicModel.getLastestFinishedPublicVoteTopics(filterParams);
+    topicsData = await getLastestFinishedPublicVoteTopics(filterParams).populate("createdBy");
   } else if(userData.roleMode === "voter") {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
-    topicsData = await TopicModel.getLastestVoterTopicsWithIds(filterIds, filterParams);
+    topicsData = await getLastestVoterTopicsWithIds(filterIds, filterParams).populate("createdBy");
   } else {
-    topicsData = await TopicModel.getLastestAdminTopics(userData._id, filterParams);
+    topicsData = await getLastestAdminTopics(userData._id, filterParams).populate("createdBy");
   }
 
   const topicPauseDocs = await TopicPauseModel.find({ topicid: { $in: topicsData.map((ele) => ele._id)} });
@@ -59,8 +59,6 @@ export default defineEventHandler(async (event) => {
       voteStartAt: dayjs(topicData.voteStartAt).toISOString(),
       voteExpiredAt: dayjs(topicData.voteExpiredAt).toISOString(),
       publicVote: topicData.publicVote,
-      showScores: topicData.showScores,
-      showVotersChoicesPublic: topicData.showVotersChoicesPublic,
       recoredToBlockchain: topicData.recoredToBlockchain,
       voterAllow: topicAllowDoc ? {
         topicid: topicData._id.toString(),
@@ -76,6 +74,7 @@ export default defineEventHandler(async (event) => {
         }
       }),
       notifyVoter: topicData.notifyVoter,
+      defaultVotes: topicData.defaultVotes,
     }
   })
   

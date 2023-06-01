@@ -1,4 +1,4 @@
-import EVoteUserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 import { isAdminRole } from "~~/src/utils/role";
 
 export default defineEventHandler(async (event) => {
@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userDocs = await EVoteUserModel.find({});
+  const userDocs = await UserModel.find({});
 
-  const users : Array<UserSearchResponseData> = userDocs.map((data) => {
+  const users : UserSearchResponseData[] = userDocs.map((data) => {
     const role : UserRole = data.permissions.includes("dev-mode") ? "developer" : (data.permissions.includes("admin-mode") ? "admin" : "voter");
     return {
       _id: `${data._id}`,

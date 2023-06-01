@@ -68,15 +68,6 @@ if (!data.value) {
   news.value = _news;
 }
 
-function newToLists(news: NewsResponseData) : Array<BasicListableItem<string, NewsResponseData>> {
-  return [
-    { key: "Author", value: news },
-    { key: "Published At", value: news},
-    { key: "Content", value: news},
-    { key: "References", value: news },
-  ];
-}
-
 </script>
 
 <style scoped>

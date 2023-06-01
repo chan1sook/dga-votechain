@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const existsRequests : Array<RequestPermissionsDataWithPopulated> = await RequestPermissionsModel.getExistsRequestPermissionsData(userData._id);
+  const existsRequests : RequestPermissionsDataWithPopulated[] = await RequestPermissionsModel.getExistsRequestPermissionsData(userData._id);
   const requestPermissions : RequestPermissionsListData | null = existsRequests[0] ? {
     _id: `${existsRequests[0]._id}`,
     status: existsRequests[0].status,

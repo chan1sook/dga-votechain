@@ -31,6 +31,7 @@
         :editable="isAdminMode && !isTopicExpired(topic, getComputedServerTime().getTime())"
         :status="getStatusOf(topic)"
         @edit="toEditTopic(topic)"
+        @recreate="toRecreateTopic(topic)"
         @action="handleStatusAction(topic, $event)"
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
@@ -101,7 +102,7 @@ const yearOptions = ref(new Array(dayjs(serverTime()).year() - startDate.year() 
   }
 }))
 
-const loadedTopics : Ref<Array<TopicResponseDataExtended>> = ref([]);
+const loadedTopics : Ref<TopicResponseDataExtended[]> = ref([]);
 
 const pagesize = ref(50);
 const startid = computed(() => {
@@ -125,7 +126,7 @@ function isTopicEditable(topic: TopicResponseDataExtended) {
 function toEditTopic(topic: TopicResponseDataExtended) {
   if(!isTopicEditable(topic)) {
     useShowToast({
-      title: i18n.t('topic.edit.title'),
+      title: i18n.t('app.topic.edit.title'),
       content: i18n.t('topic.error.notEditable') ,
       autoCloseDelay: 5000,
     })
@@ -133,6 +134,10 @@ function toEditTopic(topic: TopicResponseDataExtended) {
   }
 
   navigateTo(localePathOf(`/topic/edit/${topic._id}`));
+}
+
+function toRecreateTopic(topic: TopicResponseDataExtended) {
+  navigateTo(localePathOf(`/topic/recreate/${topic._id}`));
 }
 
 function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {

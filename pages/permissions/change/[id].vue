@@ -87,7 +87,7 @@ function userNameOf(userData: UserPermissionsResponseData) {
   return name;
 }
 
-const notSelfForbiddenPermissions : Array<EVotePermission> = getNotSelfEditablePermissions();
+const notSelfForbiddenPermissions : EVotePermission[] = getNotSelfEditablePermissions();
 
 async function changePermissions() {
   if(!userData.value) {

@@ -46,17 +46,17 @@
       </DgaInput>
     </div>
     <template v-if="showDescription">
-      <div class="col-span-12 md:col-span-2 self-start">{{ $t('topic.description.title') }}</div>
+      <div class="col-span-12 md:col-span-2 self-start">{{ $t('app.description.title') }}</div>
       <div class="col-span-12 md:col-span-10">
-        <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('topic.description.title')"></DgaTextArea>
+        <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('app.description.title')"></DgaTextArea>
       </div>
-      <button  @click="showDescription = false" :title="$t('topic.description.hide')" class="col-span-12 ml-auto">
-        {{ $t('topic.description.hide')}}
+      <button  @click="showDescription = false" :title="$t('app.description.hide')" class="col-span-12 ml-auto">
+        {{ $t('app.description.hide')}}
       </button>
     </template>
     <template v-else>
-      <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('topic.description.add')" @click="showDescription = true">
-        <PlusIcon /> {{ $t('topic.description.add') }}
+      <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('app.description.add')" @click="showDescription = true">
+        <PlusIcon /> {{ $t('app.description.add') }}
       </button>
     </template>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.addChoice.title') }}</h3>
@@ -90,6 +90,8 @@
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
       </div>
+      <div>{{ $t('app.topic.defaultVotes') }}</div>
+      <DgaInput v-model.number="topicData.defaultVotes" type="number" min="1"></DgaInput>
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
           <div class="font-bold"></div>
@@ -169,16 +171,8 @@
       <label class="flex-none"> {{ $t('topic.notifyUsers') }}</label>
     </div>
     <div class="col-span-12 flex flex-row items-center gap-2">
-      <DgaCheckbox v-model="topicData.showScores"></DgaCheckbox> 
-      <label class="flex-none"> {{ $t('topic.showScores') }}</label>
-    </div>
-    <div class="col-span-12 flex flex-row items-center gap-2">
       <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
       <label class="flex-none"> {{ $t('topic.skipBlockchain') }}</label>
-    </div>
-    <div class="col-span-12 flex flex-row items-center gap-2">
-      <DgaCheckbox v-model="topicData.showVotersChoicesPublic" :disabled="!topicData.showScores"></DgaCheckbox> 
-      <label class="flex-none">{{ $t('topic.voterScorePublic') }}</label>
     </div>
   </div>
 </template>
@@ -192,14 +186,15 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 import dayjs from 'dayjs';
-import { choiceCounts, coadminCounts, getPresetChoices, isTopicFormValid, voterCounts } from '~~/src/utils/topic';
-import { getCoadminName, getVoterName } from '~~/src/utils/utils';
+import { choiceCounts, coadminCounts, getPresetChoices, voterCounts } from '~~/src/utils/topic';
+import { getCoadminName } from '~~/src/utils/utils';
+import { getPrettyFullName } from '~/src/services/formatter/user';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
   noCoadmin?: boolean,
-  voterAllows?: Array<TopicVoterAllowFormData>,
-  coadmins?: Array<CoadminFormData>,
+  voterAllows?: TopicVoterAllowFormData[],
+  coadmins?: CoadminFormData[],
 }>(), {});
 
 const emit = defineEmits<{
@@ -222,8 +217,8 @@ const startExpiredDateStr = computed(() => dayjs(voteStart.value, "YYYY-MM-DD").
 
 const skipBlockchain = ref(false);
 const showDescription = ref(false);
-const voterAllows : Ref<Array<TopicVoterAllowFormData>> = ref([]);
-const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+const voterAllows : Ref<TopicVoterAllowFormData[]> = ref([]);
+const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -236,8 +231,7 @@ const topicData = ref<TopicFormData>({
   multipleVotes: false,
   publicVote: true,
   notifyVoter: true,
-  showVotersChoicesPublic: false,
-  showScores: true,
+  defaultVotes: 1,
   voterAllows: [],
   recoredToBlockchain: true,
 });
@@ -248,6 +242,7 @@ const coadminsRef = computed(() => props.coadmins);
 
 watch(modelValue, (value) => {
   if(value) {
+
     topicData.value = value;
 
     skipBlockchain.value = !value.recoredToBlockchain;
@@ -301,7 +296,7 @@ watch(voterAllows, (value) => {
 }, { immediate: true, deep: true })
   
 watch(coadmins, (value) => {
-  const result : Array<string> = [];
+  const result : string[] = [];
   for(const ele of value) {
     if(ele.userid) {
       result.push(ele.userid)
@@ -353,6 +348,13 @@ watch(topicData, (value) => {
   emit('update:modelValue', value)
 }, { deep: true });
 
+function getVoterName(voter: TopicVoterAllowFormData) {
+  return getPrettyFullName({
+    ...voter,
+    _id: voter.userid || "-",
+  });
+}
+
 function isChoiceValid(choice: string) {
   return choice !== "" && choiceCounts(topicData.value.choices, choice) === 1;
 }
@@ -395,7 +397,7 @@ function addVoter(user: UserSearchResponseData) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      totalVotes: 1,
+      totalVotes: topicData.value.defaultVotes,
     });
   }
 }
@@ -436,5 +438,32 @@ function addCoadmin(user: UserSearchResponseData) {
 }
 .user-grid.multichoice {
   grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
+}
+
+.dp__theme_light {
+  --dp-font-family: "Mitr", system-ui, sans-serif;
+  --dp-border-radius: theme("borderRadius.2xl");
+  --dp-background-color: #ffffff;
+  --dp-text-color: theme('colors.dga-orange');
+  --dp-hover-color: #f3f3f3;
+  --dp-hover-text-color: #212121;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #1976d2;
+  --dp-primary-text-color: #f8f5f5;
+  --dp-secondary-color: #c0c4cc;
+  --dp-border-color: theme('colors.dga-orange');
+  --dp-menu-border-color: #ddd;
+  --dp-border-color-hover: theme('colors.dga-orange');
+  --dp-disabled-color: #f6f6f6;
+  --dp-scroll-bar-background: #f3f3f3;
+  --dp-scroll-bar-color: #959595;
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #ff6f60;
+  --dp-highlight-color: rgba(25, 118, 210, 0.1);
+}
+.dp__theme_light:deep(.dp__input)  {
+  border-width: 2px !important;
 }
 </style>

@@ -86,7 +86,7 @@ useHead({
 });
 
 const txInfo : Ref<TxInfoResponseData | undefined> = ref(undefined);
-const txData : Ref<Array<TxResponseData>> = ref([]);
+const txData : Ref<TxResponseData[]> = ref([]);
 const searchKeyword = ref("");
 const { data: stats } = await useFetch("/api/txinfo");
 const { data: tx } = await useFetch("/api/txchain");
@@ -102,7 +102,7 @@ function toTxPage(id : string) {
   navigateTo(localePathOf(`/tx/${id}`));
 }
 
-function countServerOnlines(servers: Array<BlockchainServerDataResponse>) {
+function countServerOnlines(servers: BlockchainServerDataResponse[]) {
   const onlineThershold = useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if(current.lastActiveAt) {
@@ -117,7 +117,7 @@ function countServerOnlines(servers: Array<BlockchainServerDataResponse>) {
 }
 
 const socket = useSocketIO();
-socket.on("tx", (txArr: Array<TxResponseData>) => {
+socket.on("tx", (txArr: TxResponseData[]) => {
   for(const tx of txArr) {
     const index = txData.value.findIndex((ele) => ele.voteId === tx.voteId);
     if(index === -1) {

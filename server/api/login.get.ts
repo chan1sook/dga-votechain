@@ -3,7 +3,7 @@ import { getApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getUserByAuthSource, getUserByEmail } from "../utils";
 import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
-import EVoteUserModel from "~~/server/models/user"
+import UserModel from "~/src/models/user"
 import { USER_SESSION_KEY } from "../session-handler";
 
 export default defineEventHandler(async (event) => {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     urlParams.set("client_id", DID_CLIENT_KEY);
     urlParams.set("redirect_uri", DID_LOGIN_CALLBACK);
   
-    const scopes : Array<DigitalIDScope> = [
+    const scopes : DigitalIDScope[] = [
       "openid", "email", "user_id", "citizen_id", "given_name", "email", "middle_name","family_name"
     ];
   
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
     } else {
       userDoc = await getUserByEmail(decodedFirebaseUserdata.email);
       if(!userDoc) {
-        userDoc = new EVoteUserModel({
+        userDoc = new UserModel({
           permissions: legacyRoleToPermissions("admin"),
           authSources: [
             { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
