@@ -90,8 +90,10 @@
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
       </div>
-      <div>{{ $t('app.topic.defaultVotes') }}</div>
-      <DgaInput v-model.number="topicData.defaultVotes" type="number" min="1"></DgaInput>
+      <div v-if="topicData.multipleVotes" class="grid grid-cols-12 gap-2 items-center">
+        <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
+        <DgaInput v-model.number="topicData.defaultVotes" type="number" min="1" class="col-span-12 md:col-span-10"></DgaInput>
+      </div>
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
           <div class="font-bold"></div>
