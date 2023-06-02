@@ -11,14 +11,12 @@
     </div>
     <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.start') }}</div>
     <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-      <DgaInput v-model="voteStart.dateStr" type="date" class="w-full" :placeholder="$t('topic.voteDuration.startDate')"></DgaInput> 
-      <DgaInput v-model="voteStart.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.startTime')"></DgaInput>
+      <VueDatePicker v-model="voteStart" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
     </div>
     <template v-if="topicData.durationMode === 'startEnd'">
       <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.end')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-        <DgaInput v-model="voteEnd.dateStr" type="date" class="w-full" :min="startExpiredDateStr" :placeholder="$t('topic.voteDuration.endDate')"></DgaInput>
-        <DgaInput v-model="voteEnd.timeStr" type="time" class="w-full" :placeholder="$t('topic.voteDuration.endTime')"></DgaInput>
+        <VueDatePicker v-model="voteEnd" :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
       </div>
     </template>
     <template v-else>
@@ -48,17 +46,17 @@
       </DgaInput>
     </div>
     <template v-if="showDescription">
-      <div class="col-span-12 md:col-span-2 self-start">{{ $t('topic.description.title') }}</div>
+      <div class="col-span-12 md:col-span-2 self-start">{{ $t('app.description.title') }}</div>
       <div class="col-span-12 md:col-span-10">
-        <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('topic.description.title')"></DgaTextArea>
+        <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('app.description.title')"></DgaTextArea>
       </div>
-      <button  @click="showDescription = false" :title="$t('topic.description.hide')" class="col-span-12 ml-auto">
-        {{ $t('topic.description.hide')}}
+      <button  @click="showDescription = false" :title="$t('app.description.hide')" class="col-span-12 ml-auto">
+        {{ $t('app.description.hide')}}
       </button>
     </template>
     <template v-else>
-      <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('topic.description.add')" @click="showDescription = true">
-        <PlusIcon /> {{ $t('topic.description.add') }}
+      <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('app.description.add')" @click="showDescription = true">
+        <PlusIcon /> {{ $t('app.description.add') }}
       </button>
     </template>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.addChoice.title') }}</h3>
@@ -91,6 +89,10 @@
       <div class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
+      </div>
+      <div v-if="topicData.multipleVotes" class="grid grid-cols-12 gap-2 items-center">
+        <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
+        <DgaInput v-model.number="topicData.defaultVotes" type="number" min="1" class="col-span-12 md:col-span-10"></DgaInput>
       </div>
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
@@ -143,17 +145,17 @@
             <template v-for="admin of coadmins">
               <div>
                 <ExclamationIcon
-                  :class="[isCoadminValid(admin) ? 'invisible' : '']"
+                  :class="[isCoadminValid(coadmins, admin) ? 'invisible' : '']"
                   class="text-red-500" 
                   :title="getCoadminErrorReason(admin)"
                 />
               </div>
               <div>{{ admin.userid }}</div>
-              <div>{{ admin.firstName ? getCoadminName(admin) : "-" }}</div>
+              <div>{{ admin.firstName ? getPrettyFullName(admin) : "-" }}</div>
               <div>{{ admin.email || "-" }}</div>
               <div>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                  :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
+                  :title="`${$t('topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
                 >
                   <MinusIcon />
                 </button>
@@ -171,16 +173,8 @@
       <label class="flex-none"> {{ $t('topic.notifyUsers') }}</label>
     </div>
     <div class="col-span-12 flex flex-row items-center gap-2">
-      <DgaCheckbox v-model="topicData.showScores"></DgaCheckbox> 
-      <label class="flex-none"> {{ $t('topic.showScores') }}</label>
-    </div>
-    <div class="col-span-12 flex flex-row items-center gap-2">
       <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
       <label class="flex-none"> {{ $t('topic.skipBlockchain') }}</label>
-    </div>
-    <div class="col-span-12 flex flex-row items-center gap-2">
-      <DgaCheckbox v-model="topicData.showVotersChoicesPublic" :disabled="!topicData.showScores"></DgaCheckbox> 
-      <label class="flex-none">{{ $t('topic.voterScorePublic') }}</label>
     </div>
   </div>
 </template>
@@ -190,15 +184,20 @@ import PlusIcon from 'vue-material-design-icons/Plus.vue';
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import MinusIcon from 'vue-material-design-icons/Minus.vue';
 
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
 import dayjs from 'dayjs';
-import { choiceCounts, coadminCounts, getPresetChoices, isTopicFormValid, voterCounts } from '~~/src/utils/topic';
-import { getCoadminName, getVoterName } from '~~/src/utils/utils';
+import { getPrettyFullName } from '~/src/services/formatter/user';
+import { getPresetChoices } from '~/src/services/form/topic';
+import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
+import { voterCountOf } from '~/src/services/validations/user';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
   noCoadmin?: boolean,
-  voterAllows?: Array<TopicVoterAllowFormData>,
-  coadmins?: Array<CoadminFormData>,
+  voterAllows?: VoterAllowFormData[],
+  coadmins?: CoadminFormData[],
 }>(), {});
 
 const emit = defineEmits<{
@@ -210,25 +209,19 @@ const i18n = useI18n();
 const startDate = dayjs().minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
-const voteStart = ref({
-  dateStr: dayjs(startDate).format("YYYY-MM-DD"),
-  timeStr: dayjs(startDate).format("HH:mm"),
-});
-const voteEnd = ref({
-  dateStr: dayjs(expiredDate).format("YYYY-MM-DD"),
-  timeStr: dayjs(expiredDate).format("HH:mm"),
-});
+const voteStart = ref(dayjs(startDate).format("YYYY-MM-DD HH:mm"));
+const voteEnd = ref(dayjs(expiredDate).format("YYYY-MM-DD HH:mm"));
 const voteDuration = ref({
   durationDays: dayjs(expiredDate).diff(startDate, "days"),
   durationHours: dayjs(expiredDate).diff(startDate, "hours") % 24,
   durationMinutes: dayjs(expiredDate).diff(startDate, "minutes") % 60,
 });
-const startExpiredDateStr = computed(() => dayjs(voteStart.value.dateStr, "YYYY-MM-DD").format("YYYY-MM-DD"));
+const startExpiredDateStr = computed(() => dayjs(voteStart.value, "YYYY-MM-DD").format("YYYY-MM-DD"));
 
 const skipBlockchain = ref(false);
 const showDescription = ref(false);
-const voterAllows : Ref<Array<TopicVoterAllowFormData>> = ref([]);
-const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
+const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -241,8 +234,7 @@ const topicData = ref<TopicFormData>({
   multipleVotes: false,
   publicVote: true,
   notifyVoter: true,
-  showVotersChoicesPublic: false,
-  showScores: true,
+  defaultVotes: 1,
   voterAllows: [],
   recoredToBlockchain: true,
 });
@@ -252,8 +244,8 @@ const voterAllowsRef = computed(() => props.voterAllows);
 const coadminsRef = computed(() => props.coadmins);
 
 watch(modelValue, (value) => {
-  console.log(value)
   if(value) {
+
     topicData.value = value;
 
     skipBlockchain.value = !value.recoredToBlockchain;
@@ -261,10 +253,8 @@ watch(modelValue, (value) => {
     const startDate = dayjs(value.voteStartAt);
     const expiredDate = dayjs(value.voteExpiredAt);
 
-    voteStart.value.dateStr = startDate.format("YYYY-MM-DD");
-    voteStart.value.timeStr = startDate.format("HH:mm");
-    voteEnd.value.dateStr = expiredDate.format("YYYY-MM-DD");
-    voteEnd.value.timeStr = expiredDate.format("HH:mm");
+    voteStart.value = startDate.format("YYYY-MM-DD HH:mm");
+    voteEnd.value = expiredDate.format("YYYY-MM-DD HH:mm");
     voteDuration.value.durationDays = expiredDate.diff(startDate, "days"),
     voteDuration.value.durationHours = expiredDate.diff(startDate, "hours") % 24;
     voteDuration.value.durationMinutes = expiredDate.diff(startDate, "minutes") % 60;
@@ -309,7 +299,7 @@ watch(voterAllows, (value) => {
 }, { immediate: true, deep: true })
   
 watch(coadmins, (value) => {
-  const result : Array<string> = [];
+  const result : string[] = [];
   for(const ele of value) {
     if(ele.userid) {
       result.push(ele.userid)
@@ -319,7 +309,7 @@ watch(coadmins, (value) => {
 }, { immediate: true, deep: true })
 
 watch(voteStart, (value) => {
-  topicData.value.voteStartAt = dayjs(`${value.dateStr} ${value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+  topicData.value.voteStartAt = dayjs(value, "YYYY-MM-DD HH:mm").toDate();
 
   if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -327,12 +317,12 @@ watch(voteStart, (value) => {
       .add(voteDuration.value.durationHours, "hours")
       .add(voteDuration.value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteExpiredAt = dayjs(voteEnd.value, "YYYY-MM-DD HH:mm").toDate();
   }
 }, { deep: true });
 
 watch(voteEnd, (value) => {
-  topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+  topicData.value.voteStartAt = dayjs(voteStart.value, "YYYY-MM-DD HH:mm").toDate();
 
   if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -340,12 +330,12 @@ watch(voteEnd, (value) => {
       .add(voteDuration.value.durationHours, "hours")
       .add(voteDuration.value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${value.dateStr} ${value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteExpiredAt = dayjs(value, "YYYY-MM-DD HH:mm").toDate();
   }
 }, { deep: true });
 
 watch(voteDuration, (value) => {
-  topicData.value.voteStartAt = dayjs(`${voteStart.value.dateStr} ${voteStart.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+  topicData.value.voteStartAt = dayjs(voteStart.value, "YYYY-MM-DD HH:mm").toDate();
 
   if(topicData.value.durationMode === "startDuration") {
     topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -353,7 +343,7 @@ watch(voteDuration, (value) => {
       .add(value.durationHours, "hours")
       .add(value.durationMinutes, "minutes").toDate();
   } else {
-    topicData.value.voteExpiredAt = dayjs(`${voteEnd.value.dateStr} ${voteEnd.value.timeStr}`, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteExpiredAt = dayjs(voteEnd.value, "YYYY-MM-DD HH:mm").toDate();
   }
 }, { deep: true });
 
@@ -361,8 +351,15 @@ watch(topicData, (value) => {
   emit('update:modelValue', value)
 }, { deep: true });
 
+function getVoterName(voter: VoterAllowFormData) {
+  return getPrettyFullName({
+    ...voter,
+    _id: voter.userid || "-",
+  });
+}
+
 function isChoiceValid(choice: string) {
-  return choice !== "" && choiceCounts(topicData.value.choices, choice) === 1;
+  return choice !== "" && choiceCountOf(topicData.value.choices, choice) === 1;
 }
 
 function getChoiceErrorReason(choice: string) {
@@ -381,15 +378,15 @@ function addOption() {
   topicData.value.choices.choices.push({ name: "" });
 }
 
-function isVoterValid(voter: TopicVoterAllowFormData) {
-  return voterCounts(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
+function isVoterValid(voter: VoterAllowFormData) {
+  return voterCountOf(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
 }
 
-function getVoterErrorReason(voter: TopicVoterAllowFormData) {
+function getVoterErrorReason(voter: VoterAllowFormData) {
   return i18n.t('topic.voterList.error.duplicated');
 }
 
-function removeVoter(user: TopicVoterAllowFormData) {
+function removeVoter(user: VoterAllowFormData) {
   const compareData = JSON.stringify(user);
   voterAllows.value = voterAllows.value.filter((ele) => {
     return compareData !== JSON.stringify(ele);
@@ -403,14 +400,11 @@ function addVoter(user: UserSearchResponseData) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      totalVotes: 1,
+      totalVotes: topicData.value.defaultVotes,
     });
   }
 }
 
-function isCoadminValid(coadmin: CoadminFormData) {
-  return coadminCounts(coadmins.value, coadmin) < 2;
-}
 function getCoadminErrorReason(coadmin: CoadminFormData) {
   return i18n.t('topic.coadminList.error.duplicated');
 }
@@ -444,5 +438,32 @@ function addCoadmin(user: UserSearchResponseData) {
 }
 .user-grid.multichoice {
   grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
+}
+
+.dp__theme_light {
+  --dp-font-family: "Mitr", system-ui, sans-serif;
+  --dp-border-radius: theme("borderRadius.2xl");
+  --dp-background-color: #ffffff;
+  --dp-text-color: theme('colors.dga-orange');
+  --dp-hover-color: #f3f3f3;
+  --dp-hover-text-color: #212121;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #1976d2;
+  --dp-primary-text-color: #f8f5f5;
+  --dp-secondary-color: #c0c4cc;
+  --dp-border-color: theme('colors.dga-orange');
+  --dp-menu-border-color: #ddd;
+  --dp-border-color-hover: theme('colors.dga-orange');
+  --dp-disabled-color: #f6f6f6;
+  --dp-scroll-bar-background: #f3f3f3;
+  --dp-scroll-bar-color: #959595;
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #ff6f60;
+  --dp-highlight-color: rgba(25, 118, 210, 0.1);
+}
+.dp__theme_light:deep(.dp__input)  {
+  border-width: 2px !important;
 }
 </style>

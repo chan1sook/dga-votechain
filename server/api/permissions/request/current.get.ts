@@ -1,4 +1,4 @@
-import RequestPermissionsModel from "~~/server/models/request-permission"
+import { getExistsRequestPermissionsData } from "~/src/services/fetch/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const existsRequests : Array<RequestPermissionsDataWithPopulated> = await RequestPermissionsModel.getExistsRequestPermissionsData(userData._id);
+  const existsRequests : RequestPermissionsModelDataWithPopulated[] = await getExistsRequestPermissionsData(userData._id).populate("userid");
   const requestPermissions : RequestPermissionsListData | null = existsRequests[0] ? {
     _id: `${existsRequests[0]._id}`,
     status: existsRequests[0].status,

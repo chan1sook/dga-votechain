@@ -2,7 +2,12 @@
   <div @click.stop>
     <div class="flex flex-row gap-2 px-2 py-1">
       <div class="flex-1 flex flex-col gap-y-1 justify-center items-center whitespace-nowrap">
-        <div>{{ userName }} ({{ $t(`role.${roleMode}`, $t("role.guest")) }})</div>
+        <div class="flex flex-row gap-2">
+          <div>{{ userName }} ({{ $t(`role.${roleMode}`, $t("role.guest")) }})</div>
+          <NuxtLink href="/user/edit" @click="useVisibleMenuGroup().value = undefined">
+            <SquareEditOutlineIcon />
+          </NuxtLink>
+        </div>
         <div class="font-bold flex flex-row gap-2 items-center">
           {{ perttyTime }}
           <ExclamationIcon v-if="!isSync" class="text-red-700 !text-base" :title="$t('navbar.user.desyncTime')"/>
@@ -26,7 +31,7 @@
         </div>
       </div>
     </div>
-    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')">
+    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')" @click="beforeLogout">
       <LogoutIcon class="!text-lg" />
       {{ $t('navbar.logout') }}
     </a>
@@ -36,10 +41,11 @@
 <script setup lang="ts">
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import LogoutIcon from 'vue-material-design-icons/Logout.vue';
+import SquareEditOutlineIcon from 'vue-material-design-icons/SquareEditOutline.vue';
 
 import dayjs from 'dayjs';
-import { checkPermissionNeeds } from '~~/src/utils/permissions';
-import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
+import { signOut } from 'firebase/auth';
+import { checkPermissionNeeds } from '~/src/services/validations/permission';
 
 const i18n = useI18n();
 
@@ -69,8 +75,8 @@ const isDeveloper = computed(() => checkPermissionNeeds(useSessionData().value.p
 const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permissions, 'admin-mode'));
 
 function updateTime() {
-  todayTime.value = serverTime().getTime();
-  isSync.value = isServerTimeSync(SYNCTIME_THERSOLD);
+  todayTime.value = useComputedServerTime().value.getTime();
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
 }
 
 const roleMode = computed(() => useSessionData().value.roleMode);
@@ -93,6 +99,13 @@ onMounted(() => {
   timeId = setInterval(updateTime, 1000);
   updateTime();
 })
+
+const nuxtApp = useNuxtApp()
+async function beforeLogout() {
+  await signOut(nuxtApp.$auth);
+
+  return true;
+}
 
 onUnmounted(() => {
   clearInterval(timeId);

@@ -1,9 +1,11 @@
 import crypto from "crypto"
 import { getApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { getUserByAuthSource } from "../utils";
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import { getUserByAuthSource, getUserByEmail } from "../utils";
+import { legacyRoleToPermissions } from "~/src/services/transform/permission";
+import UserModel from "~/src/models/user"
 import { USER_SESSION_KEY } from "../session-handler";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -16,7 +18,7 @@ export default defineEventHandler(async (event) => {
     urlParams.set("client_id", DID_CLIENT_KEY);
     urlParams.set("redirect_uri", DID_LOGIN_CALLBACK);
   
-    const scopes : Array<DigitalIDScope> = [
+    const scopes : DigitalIdScope[] = [
       "openid", "email", "user_id", "citizen_id", "given_name", "email", "middle_name","family_name"
     ];
   
@@ -38,36 +40,50 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Invalid Token'
       })
     })
-    const authSource: UserAuthSource = {
+    const authSource: UserAuthSourceData = {
       authSource: "firebase",
       firebaseUid: decodedFirebaseUserdata.uid,
     };
 
-    const userDoc = await getUserByAuthSource(authSource);
+    let userDoc = await getUserByAuthSource(authSource);
     if(userDoc) {
-      if(!userDoc.firstName || !userDoc.lastName) {
-        return sendRedirect(event, `/register/firebase?token=${query.token}`);
-      }
-
-      let defaultRoleMode : UserRole = "voter";
-      if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
-        defaultRoleMode = "admin";
-      }
-      
       if(!userDoc.email) {
         userDoc.email = decodedFirebaseUserdata.email;
         await userDoc.save();
       }
-
-      await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
-        userid: userDoc._id.toString(),
-        roleMode: defaultRoleMode,
-        authFrom: authSource,
-      });
-      return sendRedirect(event, "/topics");
     } else {
-      return sendRedirect(event, `/register/firebase?token=${query.token}`);
+      userDoc = await getUserByEmail(decodedFirebaseUserdata.email);
+      if(!userDoc) {
+        userDoc = new UserModel({
+          permissions: legacyRoleToPermissions("admin"),
+          authSources: [
+            { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
+          ],
+          email: decodedFirebaseUserdata.email,
+        });
+        await userDoc.save();
+      } else {
+        userDoc.authSources.push({ authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid });
+        userDoc.markModified("authSources");
+        await userDoc.save();
+      }
     }
+    
+    let defaultRoleMode : UserRole = "voter";
+    if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
+      defaultRoleMode = "admin";
+    }
+
+    await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
+      userid: userDoc._id.toString(),
+      roleMode: defaultRoleMode,
+      authFrom: {
+        ...authSource,
+        userToken: query.token?.toString(),
+      },
+    });
+
+    return sendRedirect(event, "/topics");
   }
 
   throw createError({

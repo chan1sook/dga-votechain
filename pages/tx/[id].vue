@@ -65,7 +65,7 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.blockchain.txInfo')} ${voteid}`
 });
 
-const txData: Ref<TxResponseDataFull | undefined> = ref(undefined);
+const txData: Ref<TxResponseDataWithRaw | undefined> = ref(undefined);
 const { data } = await useFetch(`/api/tx/${voteid}`);
 if(!data.value) {
   showError("VoteID not found")
@@ -73,8 +73,8 @@ if(!data.value) {
   txData.value = data.value;
 }
 
-function filterTxData(tx: TxResponseDataFull) {
-  const result: Partial<TxResponseDataFull> = {
+function filterTxData(tx: TxResponseDataWithRaw) {
+  const result: Partial<TxResponseDataWithRaw> = {
     ...tx,
   }
   delete result.txStatus;

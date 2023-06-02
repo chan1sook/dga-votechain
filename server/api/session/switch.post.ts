@@ -1,5 +1,5 @@
-import { USER_SESSION_KEY } from "~~/server/session-handler";
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { USER_SESSION_KEY } from "~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;

@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
-import { getTxCounts } from "../utils";
-import BlockchainServerModel from "~~/server/models/blockchain-server"
+import { getTxStats } from "~/src/services/fetch/tx";
+import BlockchainServerModel from "~/src/models/blockchain-server"
 
 export default defineEventHandler(async (event) => {
-  const [txCounts, blockchainServerDocs] = await Promise.all([
-    getTxCounts(),
+  const [txStats, blockchainServerDocs] = await Promise.all([
+    getTxStats(),
     BlockchainServerModel.find(),
   ]);
 
@@ -18,6 +18,6 @@ export default defineEventHandler(async (event) => {
         lastActiveAt: ele.lastActiveAt ? dayjs(ele.lastActiveAt).toString() : undefined,
       }
     }),
-    blocks: txCounts,
+    blocks: txStats,
   }
 })

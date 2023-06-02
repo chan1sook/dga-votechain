@@ -18,8 +18,8 @@ declare global {
   }
 
   interface NewsModel extends Model<NewsData> {
-    getLastestAvaliableNews(pagesize?: number, startid?: string) : Query<Array<NewsData>, NewsData>;
-    getLastestAllNews(pagesize?: number, startid?: string) : Query<Array<NewsData>, NewsData>;
+    getLastestAvaliableNews(pagesize?: number, startid?: string) : Query<NewsData[], NewsData>;
+    getLastestAllNews(pagesize?: number, startid?: string) : Query<NewsData[], NewsData>;
   }
 
   type NewsFormData = Omit<NewsData, "_id"  | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">;

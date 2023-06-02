@@ -1,9 +1,9 @@
 interface SimpleFormatterParagraph {
-  textlines: Array<SimpleFormatterTextLine>
+  textlines: SimpleFormatterTextLine[]
 }
 
 interface SimpleFormatterTextLine {
-  texts: Array<SimpleFormatterText>
+  texts: SimpleFormatterText[]
 }
 interface SimpleFormatterText {
   content: string,
@@ -27,7 +27,7 @@ function eatParagraph(content: string) : SimpleFormatterParagraphToken {
     remain = content.substring(endPos);
   }
   
-  let textlines : Array<SimpleFormatterTextLineToken> = [];
+  let textlines : SimpleFormatterTextLineToken[] = [];
   while(paragraph.length > 0) {
     const token = eatTextLine(paragraph);
     textlines.push({
@@ -60,7 +60,7 @@ function eatTextLine(content: string) : SimpleFormatterTextLineToken {
     remain = content.substring(breakLineIndex).trim();
   }
 
-  let texts : Array<SimpleFormatterTextToken> = [];
+  let texts : SimpleFormatterTextToken[] = [];
   while(textlineContent.length > 0) {
     const token = eatText(textlineContent);
     texts.push({
@@ -109,9 +109,9 @@ function eatText(content: string) : SimpleFormatterTextToken {
 }
 
 
-export function toSimpleForamtterTokenize(content: string) : Array<SimpleFormatterParagraph> {
+export function toSimpleForamtterTokenize(content: string) : SimpleFormatterParagraph[] {
   let subContent = content;
-  let nodes : Array<SimpleFormatterParagraph> = [];
+  let nodes : SimpleFormatterParagraph[] = [];
   while(subContent.length > 0) {
     const token = eatParagraph(subContent);
     nodes.push({

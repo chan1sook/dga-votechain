@@ -42,7 +42,8 @@
 </template>
   
 <script setup lang="ts">
-import { getBasicPermissions, getAdvancePermissions, removePermissions, getNotSelfEditablePermissions } from '~~/src/utils/permissions';
+import { getBasicPermissions, getAdvancePermissions, getNotSelfEditablePermissions } from '~/src/services/form/permission';
+import { removePermissions } from '~/src/services/transform/permission';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -62,7 +63,7 @@ function getFullPermissionTitle(permission: EVotePermission) {
 const { id: userid } = useRoute().params;
 const { data } = await useFetch(`/api/user/info/${userid}`);
 
-const userData : Ref<UserPermissionsFormData | undefined> = ref(undefined);
+const userData : Ref<UserResponseDataWithIdAndPermissions | undefined> = ref(undefined);
 const isWaitAction = ref(false);
 const showConfirmModal = ref(false);
 
@@ -76,7 +77,7 @@ if (!data.value) {
 
 const isDeveloper = computed(() => useSessionData().value.roleMode === "developer");
 
-function userNameOf(userData: UserPermissionsFormData) {
+function userNameOf(userData: UserResponseDataWithIdAndPermissions) {
   let name = "";
   if(userData.firstName) {
     name = userData.firstName;
@@ -87,7 +88,7 @@ function userNameOf(userData: UserPermissionsFormData) {
   return name;
 }
 
-const notSelfForbiddenPermissions : Array<EVotePermission> = getNotSelfEditablePermissions();
+const notSelfForbiddenPermissions : EVotePermission[] = getNotSelfEditablePermissions();
 
 async function changePermissions() {
   if(!userData.value) {

@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
-import RequestPermissionsModel from "~~/server/models/request-permission"
-import { checkPermissionSelections } from "~~/src/utils/permissions";
-import { isAdminRole } from "~~/src/utils/role";
+import { getPendingRequestPermissionsData } from "~/src/services/fetch/permission";
+import { checkPermissionSelections } from "~/src/services/validations/permission";
+import { isAdminRole } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -14,9 +14,9 @@ export default defineEventHandler(async (event) => {
   }
   const { startid, pagesize } : PaginationParams = getQuery(event);
   const isAdvanceMode = userData.roleMode === "developer" && checkPermissionSelections(userData.permissions, "change-permissions:advance");
-  const reqPermissionData = await RequestPermissionsModel.getPendingRequestPermissionsData(pagesize, startid, isAdvanceMode);
+  const reqPermissionData : RequestPermissionsModelDataWithPopulated[] = await getPendingRequestPermissionsData(pagesize, startid, isAdvanceMode).populate("userid");
   
-  const requestPermissions : Array<RequestPermissionsListData> = reqPermissionData.map((doc) => {
+  const requestPermissions : RequestPermissionsListData[] = reqPermissionData.map((doc) => {
     return {
       _id: `${doc._id}`,
       status: doc.status,

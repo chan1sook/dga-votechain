@@ -72,7 +72,7 @@ function getFullPermissionTitle(permission: EVotePermission) {
 
 const { data } = await useFetch("/api/permissions/request/lists");
 
-const permissionsList: Ref<Array<RequestPermissionsListData>> = ref([]);
+const permissionsList: Ref<RequestPermissionsListData[]> = ref([]);
 const isWaitAction = ref(false);
 
 if (!data.value) {

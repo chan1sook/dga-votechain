@@ -15,24 +15,7 @@
       <DgaButton color="dga-orange" class="flex-0" :title="$t('voting.filters.search')" @click="resetTopics">
         {{ $t("voting.filters.search") }}
       </DgaButton>
-      <DgaButton 
-        v-if="roleMode === 'voter'"
-        class="ml-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
-        :title="$t('voting.requestTopic')"
-        :href="localePathOf('/topic/request')"
-      >
-        <PlusCircleOutlineIcon />
-        {{ $t('voting.requestTopic') }}
-      </DgaButton>
-      <div v-else-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
-        <DgaButton 
-          class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
-          :title="$t('voting.pendingTopic')"
-          :href="localePathOf('/topics/pending')"
-        >
-          <CheckIcon />
-          {{ $t('voting.pendingTopic') }}
-        </DgaButton>
+      <div v-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
           class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
           :title="$t('voting.createTopic')"
@@ -45,9 +28,10 @@
     </div>
     <div class="my-4 flex flex-col gap-4 mx-auto max-w-6xl">
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
-        :editable="isAdminMode && !isTopicExpired(topic, getComputedServerTime().getTime())"
+        :editable="isAdminMode && !isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime())"
         :status="getStatusOf(topic)"
         @edit="toEditTopic(topic)"
+        @recreate="toRecreateTopic(topic)"
         @action="handleStatusAction(topic, $event)"
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
@@ -68,20 +52,15 @@
 </template>
 
 <script setup lang="ts">
-import CheckIcon from 'vue-material-design-icons/Check.vue';
 import PlusCircleOutlineIcon from 'vue-material-design-icons/PlusCircleOutline.vue';
 
 import dayjs from "dayjs";
-import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime"
-import { isAdminRole } from "~~/src/utils/role";
-import { isTopicExpired, isTopicReadyToVote } from "~~/src/utils/topic";
+import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
+import { isAdminRole } from '~/src/services/validations/role';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
 
-definePageMeta({
-  middleware: ["auth"]
-})
 const roleMode = computed(() => useSessionData().value.roleMode);
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('voting.title')}`
@@ -89,8 +68,8 @@ useHead({
 
 const filter = ref({
   type: "all",
-  month: dayjs(serverTime()).month(),
-  year: dayjs(serverTime()).year(),
+  month: dayjs(useComputedServerTime().value).month(),
+  year: dayjs(useComputedServerTime().value).year(),
   ticketId: "",
   keyword: "",
 });
@@ -113,15 +92,15 @@ const monthOptions = ref(new Array(12).fill(undefined).map((ele, i) => {
   }
 }))
 
-const yearOptions = ref(new Array(dayjs(serverTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
-  const year = dayjs(serverTime()).year() - i;
+const yearOptions = ref(new Array(dayjs(useComputedServerTime().value).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
+  const year = dayjs(useComputedServerTime().value).year() - i;
   return {
-    label: dayjs(serverTime()).year(year).format("YYYY"),
+    label: dayjs(useComputedServerTime().value).year(year).format("YYYY"),
     value: year,
   }
 }))
 
-const loadedTopics : Ref<Array<TopicResponseDataExtended>> = ref([]);
+const loadedTopics : Ref<TopicResponseDataExtended[]> = ref([]);
 
 const pagesize = ref(50);
 const startid = computed(() => {
@@ -139,13 +118,13 @@ function resetTopics() {
 const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return isAdminMode.value && 
-    !isTopicExpired(topic, getComputedServerTime().getTime());
+    !isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime());
 }
 
 function toEditTopic(topic: TopicResponseDataExtended) {
   if(!isTopicEditable(topic)) {
     useShowToast({
-      title: i18n.t('topic.edit.title'),
+      title: i18n.t('app.topic.edit.title'),
       content: i18n.t('topic.error.notEditable') ,
       autoCloseDelay: 5000,
     })
@@ -155,10 +134,14 @@ function toEditTopic(topic: TopicResponseDataExtended) {
   navigateTo(localePathOf(`/topic/edit/${topic._id}`));
 }
 
+function toRecreateTopic(topic: TopicResponseDataExtended) {
+  navigateTo(localePathOf(`/topic/recreate/${topic._id}`));
+}
+
 function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
-  if(isTopicExpired(topic, getComputedServerTime().getTime())) {
+  if(isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime())) {
     return "result";
-  } else if(!isTopicReadyToVote(topic, getComputedServerTime().getTime())) {
+  } else if(!isTopicReadyToVote(topic, useComputedServerTime().value.getTime())) {
     return "waiting";
   } else if(!useSessionData().value.userid) {
     return "voting";

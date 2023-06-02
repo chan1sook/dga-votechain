@@ -26,14 +26,14 @@
 </template>
 
 <script setup lang="ts">
-interface ISelect {
+interface SelectOption {
   label: string,
   value: any
 }
 
 const props = withDefaults(defineProps<{
   modelValue?: any, 
-  options?: Array<string | ISelect>
+  options?: (string | SelectOption)[],
 }>(), {
   options: () => [],
 });
@@ -48,7 +48,7 @@ const emit = defineEmits<{
   (e: "update:modelValue", v: any) : void,
 }>();
 
-function labelOf(option: string | ISelect) {
+function labelOf(option: string | SelectOption) {
   return (typeof option === "object") ? option.label : option;
 }
 
@@ -61,7 +61,7 @@ const selectionLabel = computed(() => {
   return ""
 });
 
-function emitData(data: string | ISelect) {
+function emitData(data: string | SelectOption) {
   if(typeof data === "object") {
     emit("update:modelValue", data.value)
   } else {

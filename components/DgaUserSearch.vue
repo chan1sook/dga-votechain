@@ -9,6 +9,8 @@
 </template>
 
 <script setup lang="ts">
+import { getPrettyFullName } from '~/src/services/formatter/user';
+
 const props = withDefaults(defineProps<{
   placeholder?: string,
   adminOnly? : boolean,
@@ -19,7 +21,7 @@ const props = withDefaults(defineProps<{
 const keyword = ref("");
 const isSearching = ref(false);
 const popupShow = ref(false);
-const searchedUsers : Ref<Array<UserSearchResponseData>> = ref([]);
+const searchedUsers : Ref<UserSearchResponseData[]> = ref([]);
 
 async function searchUsers() {
   if(isSearching.value) {
@@ -53,10 +55,7 @@ const emit = defineEmits<{
 
   
 function getVoterName(voter: UserSearchResponseData) {
-  if(voter.firstName) {
-    return voter.lastName ? `${voter.firstName} ${voter.lastName}` : voter.firstName;
-  }
-  return voter._id
+  return getPrettyFullName(voter);
 }
 
 onMounted(() => {

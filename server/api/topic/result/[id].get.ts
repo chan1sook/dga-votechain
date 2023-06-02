@@ -1,9 +1,10 @@
 import dayjs from "dayjs"
 
-import TopicModel from "~~/server/models/topic"
-import TopicPauseModel from "~~/server/models/topic-pause"
-import TopicVoterAllowModel from "~~/server/models/topic-voters-allow"
-import VoteModel from "~~/server/models/vote"
+import TopicModel from "~/src/models/topic"
+import { getVotesByTopicId } from "~/src/services/fetch/vote"
+import { getVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
+import { isAdminRole } from "~/src/services/validations/role"
+import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause"
 
 export default defineEventHandler(async (event) => {  
   const topicDoc = await TopicModel.findById(event.context.params?.id);
@@ -14,17 +15,14 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  const topicPauseData = await TopicPauseModel.findOne({
-    topicid: topicDoc._id, resumeAt: { $exists: false }
-  })
-
+  const topicPauseFlag = await isTopicPause(topicDoc._id);
 
   if(topicDoc.status !== "approved") {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not approved",
     });
-  } else if(topicPauseData || topicDoc.voteExpiredAt.getTime() >= Date.now()) {
+  } else if(topicPauseFlag || topicDoc.voteExpiredAt.getTime() >= Date.now()) {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not expired",
@@ -32,6 +30,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const userData = event.context.userData;
+  const [votersData, votes] = await Promise.all([
+    getVoterAllowByTopicId(topicDoc._id).populate("userid"),
+    getVotesByTopicId(topicDoc._id)
+  ]);
     
   if(!topicDoc.publicVote) {
     if(!userData) {
@@ -41,11 +43,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const topicAllowDoc = await TopicVoterAllowModel.findOne({
-      userid: userData._id,
-      topicid: topicDoc._id
-    })
-
+    const topicAllowDoc = votersData.find((ele) => ele.userid && ele.userid.toString() === userData._id.toString())
     if(!topicAllowDoc) {
       throw createError({
         statusCode: 403,
@@ -54,33 +52,27 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const allVotes : Array<VoteDataWithPopulated> = await VoteModel.find({ topicid: topicDoc._id }).populate("userid");
-  const voteRecords : Array<TopicVoteCountRecord> = [];
-
-  for(const vote of allVotes) {
-    const target = voteRecords.find((ele) => ele.choice === vote.choice);
+  const scores : TopicVoteCountRecord[] = [];
+  for(const vote of votes) {
+    const target = scores.find((ele) => ele.choice === vote.choice);
     if(target) {
       target.count += 1;
     } else {
-      voteRecords.push({ choice: vote.choice, count: 1 })
+      scores.push({ choice: vote.choice, count: 1 })
     }
   }
-  voteRecords.sort((a, b) => b.count - a.count);
+  scores.sort((a, b) => b.count - a.count);
   
-  let yourVotes: Array<{
-    choice: string | null,
-    createdAt: DateString
-  }> = [];
+  let yourVotes: ChoiceDataType[] = [];
   if(userData) {
-    yourVotes = allVotes.filter((ele) => ele.userid._id.toString() === userData._id.toString()).map((ele) => {
-      return {
-        choice: ele.choice,
-        createdAt: dayjs(ele.createdAt).toString(),
-      }
-    })
+    const _yourVotes = votes.filter((ele) =>  ele.userid && ele.userid.toString() === userData._id.toString());
+    yourVotes = _yourVotes.map((ele) => ele.choice)
   }
 
-  const voteResult : TopicVoteCountResponse = {
+  const voterTotal = votersData.length + votes.filter((ele) => !ele.userid).length;
+  const voterVoted =  voterTotal - votersData.filter((ele) => ele.remainVotes >= ele.totalVotes).length;
+  
+  const voteResult : TopicResultResponse = {
     _id: `${topicDoc._id}`,
     name: topicDoc.name,
     description: topicDoc.description,
@@ -89,43 +81,35 @@ export default defineEventHandler(async (event) => {
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toString(),
     createdAt: dayjs(topicDoc.createdAt).toString(),
     updatedAt: dayjs(topicDoc.updatedAt).toString(),
-    winners: [],
     yourVotes: userData ? yourVotes : undefined,
-  }
-
-  if(topicDoc.showScores) {
-    if(topicDoc.showVotersChoicesPublic) {
-      voteResult.votes = allVotes.map((ele) => {
-        return {
-          userid: {
-            _id: ele.userid._id.toString(),
-            firstName: ele.userid.firstName,
-            lastName: ele.userid.lastName,
-            email: ele.userid.email,
-          },
-          createdAt: dayjs(ele.createdAt).toISOString(),
-          choice: ele.choice,
-          tx: ele.tx,
-        };
-      })
-    }
-    voteResult.scores = voteRecords;
-  }
-
-  voteResult.winners = voteRecords.map((ele, i, arr) => {
-    let rank = i + 1;
-    for(let j = i - 1; j >= 0; j--) {
-      if(arr[j].count === ele.count) {
-        rank -= 1;
-      } else {
-        break;
+    stats: {
+      voters: {
+        total: voterTotal,
+        voted: voterVoted,
+      },
+      votes: {
+        quota: votersData.reduce((prev, current) => current.totalVotes + prev, 0),
+        actual: votes.length,
       }
-    }
-    return {
-      choice: ele.choice,
-      rank,
-    }
-  });
+    },
+    scores,
+  }
+
+  if(isAdminRole(userData?.roleMode)) {
+    voteResult.voters = votersData.map((ele) => {
+      const user = (ele.userid as unknown as UserModelDataWithId);
+      return {
+        user: {
+          _id: user._id.toString(),
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+        },
+        totalVotes: ele.totalVotes,
+        remainVotes: ele.remainVotes,
+      };
+    });
+  }
 
   return {
     voteResult,

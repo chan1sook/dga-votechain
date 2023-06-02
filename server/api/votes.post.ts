@@ -1,14 +1,14 @@
 import dayjs from "dayjs";
 
-import TopicModel from "~~/server/models/topic"
-import TopicVoterAllowModel from "~~/server/models/topic-voters-allow"
-import TopicPauseModel from "~~/server/models/topic-pause"
-import VoteModel from "~~/server/models/vote"
+import TopicModel from "~/src/models/topic"
+import VoterAllowModel from "~/src/models/voters-allow"
+import VoteModel from "~/src/models/vote"
 
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { getEventEmitter } from "../global-emitter";
+import { votedEventEmitter } from "../event-emitter";
 import mongoose from "mongoose";
 import { addVoteOnBlockchain } from "../smart-contract";
+import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
 
-  const voteFormData : VoteFormData = await readBody(event);
+  const voteFormData : VotesFormData = await readBody(event);
 
   const topicDoc = await TopicModel.findById(voteFormData.topicid);
   if(!topicDoc) {
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  const voterAllowData = await TopicVoterAllowModel.findOne({
+  const voterAllowData = await VoterAllowModel.findOne({
     userid: userData._id,
     topicid: topicDoc._id,
   });
@@ -45,12 +45,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const votePauseData = await TopicPauseModel.findOne({
-    topicid: topicDoc._id,
-    resumeAt: { $exists: false }
-  });
+  const topicPauseFlag = await isTopicPause(topicDoc._id);
 
-  if(votePauseData) {
+  if(topicPauseFlag) {
     throw createError({
       statusCode: 400,
       statusMessage: "Voting Pause",
@@ -77,7 +74,7 @@ export default defineEventHandler(async (event) => {
 
 
   const today = new Date();
-  const voteDatas : Array<VoteData> = voteFormData.votes.map((choice) => {
+  const voteDatas : VoteModelData[] = voteFormData.votes.map((choice) => {
     return {
       userid: userData._id,
       topicid: topicDoc._id,
@@ -93,7 +90,7 @@ export default defineEventHandler(async (event) => {
     voterAllowData.save(),
   ]);
   
-  const votes : Array<VoteResponseData> = voteDocs.map((newVoteDoc) => {
+  const votes : VoteResponseData[] = voteDocs.map((newVoteDoc) => {
     return {
       _id: `${newVoteDoc._id}`,
       userid: `${newVoteDoc.userid}`,
@@ -106,7 +103,7 @@ export default defineEventHandler(async (event) => {
   if(topicDoc.recoredToBlockchain) {
     await Promise.all(
       voteDocs.map(async (vote) => {
-        return addVoteOnBlockchain(vote._id.toString(), vote.topicid.toString(), vote.userid.toString(), vote.choice)
+        return addVoteOnBlockchain(vote._id.toString(), vote.topicid.toString(), vote.userid ? vote.userid.toString() : "", vote.choice)
           .then((txResponse) => {
             vote.tx = txResponse.transactionHash;
             return vote.save();
@@ -119,9 +116,7 @@ export default defineEventHandler(async (event) => {
   await dbSession.commitTransaction();
   await dbSession.endSession();
 
-  const eventEmitter = getEventEmitter();
-
-  eventEmitter.emit("voted", votes);
+  votedEventEmitter.emit("voted", votes);
   
   return {
     votes,

@@ -39,8 +39,8 @@
   
 <script setup lang="ts">
 import BallotOutlineIcon from 'vue-material-design-icons/BallotOutline.vue';
+import { getRequestablePermissions, getPresetPermissions } from '~/src/services/form/permission';
 
-import { getRequestablePermissions, getPresetPermissions } from "~~/src/utils/permissions";
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();

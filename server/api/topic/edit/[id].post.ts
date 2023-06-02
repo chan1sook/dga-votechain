@@ -1,13 +1,13 @@
 import dayjs from "dayjs";
 
-import UserModel from "~~/server/models/user"
-import TopicModel from "~~/server/models/topic"
-import TopicPauseModel from "~~/server/models/topic-pause"
-import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
-import TopicNotificationData from "~~/server/models/topic-notifications"
-import { isTopicFormValid, isTopicReadyToVote } from "~~/src/utils/topic";
-import { checkPermissionSelections } from "~~/src/utils/permissions";
+import UserModel from "~/src/models/user"
+import TopicModel from "~/src/models/topic"
+import TopicVoterAllowsModel from "~/src/models/voters-allow"
+import TopicNotificationData from "~/server/models/topic-notifications"
 import mongoose, { Types } from "mongoose";
+import { isTopicFormValid, isTopicReadyToVote } from "~/src/services/validations/topic";
+import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
+import { checkPermissionSelections } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -32,15 +32,18 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if(topicDoc.admin.toString() !== userData._id.toString()) {
+  const admins = topicDoc.coadmins.slice()
+  admins.push(topicDoc.admin);
+
+  if(admins.findIndex((ele) => ele.toString() === userData._id.toString()) === -1) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
 
-  const pauseData = await TopicPauseModel.find({ topicid: topicDoc._id });
-  if(pauseData.every((ele) => ele.resumeAt) && dayjs().diff(topicDoc.voteExpiredAt) > 0) {
+  const topicPauseFlag = await isTopicPause(topicDoc._id);
+  if(!topicPauseFlag && dayjs().diff(topicDoc.voteExpiredAt) > 0) {
     throw createError({
       statusCode: 400,
       statusMessage: "Topic Expired",
@@ -74,7 +77,7 @@ export default defineEventHandler(async (event) => {
     }
   
     if(topicFormData.durationMode !== undefined) {
-      topicDoc.durationMode =topicFormData.durationMode;
+      topicDoc.durationMode = topicFormData.durationMode;
     }
   
     if(topicFormData.voteStartAt !== undefined) {
@@ -89,21 +92,17 @@ export default defineEventHandler(async (event) => {
       topicDoc.publicVote = topicFormData.publicVote;
     }
   
-    if(topicFormData.showScores !== undefined) {
-      topicDoc.showScores = topicFormData.showScores;
-    }
-  
-    if(topicFormData.showVotersChoicesPublic !== undefined) {
-      topicDoc.showVotersChoicesPublic = topicFormData.showVotersChoicesPublic;
-    }
-  
     if(topicFormData.recoredToBlockchain !== undefined) {
       topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
+    }
+
+    if(topicFormData.defaultVotes !== undefined) {
+      topicDoc.defaultVotes = topicFormData.defaultVotes;
     }
     
     if(topicFormData.voterAllows !== undefined) {
       await TopicVoterAllowsModel.deleteMany({ topicid: topicDoc._id })
-      const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
+      const voterAllows : VoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {
         return {
           topicid: topicDoc._id,
           userid: new Types.ObjectId(ele.userid),
@@ -130,7 +129,7 @@ export default defineEventHandler(async (event) => {
 
   await TopicNotificationData.deleteMany({ topicid: topicDoc._id });
   if(topicFormData.notifyVoter) {
-    const topicNotifications : Array<TopicNotificationData> = [];
+    const topicNotifications : TopicNotificationData[] = [];
     for(const voteAllow of voterAllowDocs) {
       if(voteAllow.userid) {
         topicNotifications.push({

@@ -1,11 +1,11 @@
 import dayjs from "dayjs";
-import TopicModel from "~~/server/models/topic"
-import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
-import TopicPauseData from "~~/server/models/topic-pause"
-import VoteModel from "~~/server/models/vote"
+import TopicModel from "~/src/models/topic"
+import TopicVoterAllowsModel from "~/src/models/voters-allow"
+import TopicPauseData from "~/src/models/topic-ctrl-pause"
+import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 
 export default defineEventHandler(async (event) => {
-  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy updatedBy");
+  const topicDoc : TopicModelDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,
@@ -16,8 +16,8 @@ export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
   let voterAllow;
-  let votes : Array<VoteResponseData> = [];
-  let adminVoterAllows : Array<TopicVoterAllowResponseData> | undefined;
+  let votes : VoteResponseData[] = [];
+  let adminVoterAllows : VoterAllowResponseData[] | undefined;
 
   const topicPauseData = await TopicPauseData.find({
     topicid: topicDoc._id,
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         topicid: topicDoc._id,
         userid: userData._id
       }),
-      VoteModel.find({ topicid: topicDoc._id, userid: userData._id })
+      getVotesByTopicIdAndUserId(topicDoc._id, userData._id),
     ])
 
     if(_voterAllow) {
@@ -104,13 +104,14 @@ export default defineEventHandler(async (event) => {
       return ele.toString()
     }),
     publicVote: topicDoc.publicVote,
-    showScores: topicDoc.showScores,
-    showVotersChoicesPublic: topicDoc.showVotersChoicesPublic,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     voterAllow,
+    defaultVotes: topicDoc.defaultVotes,
+    notifyVoter: topicDoc.notifyVoter,
     pauseData: topicPauseData.map((ele) => {
       return {
         topicid: topicDoc._id.toString(),
+        cause: ele.cause || "",
         pauseAt: dayjs(ele.pauseAt).toISOString(),
         resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toISOString() : undefined,
       }

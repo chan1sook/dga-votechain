@@ -1,6 +1,7 @@
-import RequestPermissionsModel from "~~/server/models/request-permission"
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import NotificationModel from "~~/server/models/notification";
+import RequestPermissionsModel from "~/src/models/request-permission"
+import NotificationModel from "~/server/models/notification";
+import { getExistsRequestPermissionsData } from "~/src/services/fetch/permission";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const existsRequests = await RequestPermissionsModel.getExistsRequestPermissionsData(userData._id);
+  const existsRequests = await getExistsRequestPermissionsData(userData._id);
   if(existsRequests.length > 0) {
     throw createError({
       statusCode: 400,
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
   const reqPermissionsData : RequestPermissionsFormData = await readBody(event);
 
   const today = new Date();
-  const reqPermissions: RequestPermissionsData = {
+  const reqPermissions: RequestPermissionsModelData = {
     userid: userData._id.toString(),
     status: "pending",
     permissions: reqPermissionsData.permissions,

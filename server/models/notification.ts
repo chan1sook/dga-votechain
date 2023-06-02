@@ -34,7 +34,7 @@ const schema = new Schema<NotificationData, NotificationModel>({
 }, { timestamps: true });
 
 schema.post('save', async function (doc) {
-  const promises : Array<Promise<void>> = [];
+  const promises : Promise<void>[] = [];
   for(const target of doc.target) {
     promises.push(
       clearNotifyData(target.userid.toString())

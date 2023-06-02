@@ -1,6 +1,4 @@
-import { FilterQuery } from "mongoose";
-import EVoteUserModel from "~~/server/models/user"
-import { escapeRegExp } from "~~/src/utils/utils";
+import { searchUsers } from "~/src/services/fetch/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -13,44 +11,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const query = getQuery(event);
-
-  let keyword = "";
-  if(typeof query.keyword === "string") {
-    keyword = query.keyword;
-  }
-
-  let adminOnly = false;
-  let notSelf = false;
-
-  if(query.adminOnly === "1") {
-    adminOnly = true;
-  }
-  if(query.notSelf === "1") {
-    notSelf = true;
-  }
   
-  const docQuery : FilterQuery<UserData> = keyword ? {
-    $or: [
-      { firstName: new RegExp(escapeRegExp(keyword)) },
-      { lastName: new RegExp(escapeRegExp(keyword)) },
-      { email: new RegExp(escapeRegExp(keyword)) }
-    ]
-  } : {};
+  const userDocs = await searchUsers({
+    userid: userData._id,
+    keyword: typeof query.keyword === "string" ? query.keyword : "",
+    adminOnly: query.adminOnly === "1",
+    notSelf: query.notSelf === "1",
+  }).limit(20);
 
-  if(adminOnly) {
-    docQuery.permissions = "admin-mode";
-  }
-
-  if(notSelf) {
-    docQuery._id = { $ne : userData._id };
-  }
-
-  console.log(docQuery);
-  
-  const userDocs = await EVoteUserModel.find(docQuery).limit(20);
-
-  const users : Array<UserSearchResponseData> = userDocs.map((data) => {
+  const users : UserSearchResponseData[] = userDocs.map((data) => {
     const role : UserRole = data.permissions.includes("dev-mode") ? "developer" : (data.permissions.includes("admin-mode") ? "admin" : "voter");
+    
     return {
       _id: `${data._id}`,
       firstName: data.firstName,

@@ -19,11 +19,7 @@
 
 <script setup lang="ts">
 import VuePdfEmbed from 'vue-pdf-embed'
-const i18n = useI18n()
-
-definePageMeta({
-  middleware: ["auth"]
-})
+const i18n = useI18n();
 
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('help.title')}`

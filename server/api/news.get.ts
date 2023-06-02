@@ -1,11 +1,11 @@
 import dayjs from "dayjs"
 
-import NewsModel from "~~/server/models/news"
+import NewsModel from "~/server/models/news"
 
 export default defineEventHandler(async (event) => {
   const { type, pagesize, startid } : NewsQueryParams = getQuery(event);
 
-  let newsData: Array<NewsData> = [];
+  let newsData: NewsData[] = [];
 
   switch(type) {
     case "available":
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
       break;
   }
 
-  const news : Array<NewsResponseData> = newsData.map((data) => {
+  const news : NewsResponseData[] = newsData.map((data) => {
     return {
       _id: `${data._id}`,
       visibility: data.visibility,

@@ -4,19 +4,19 @@ declare global {
   interface NotificationData {
     _id?: string,
     from: "system" | string,
-    target: Array<NotificationTargetData>;
+    target: NotificationTargetData[];
     title: string;
     content: string;
     createdAt: Date;
     updatedAt: Date;
     notifyAt: Date;
-    tags: Array<string>;
+    tags: string[];
   }
   
   interface NotificationModel extends Model<NotificationData> {
-    getLastestUnreadNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) : Query<Array<NotificationData>, NotificationData>;
-    getLastestReadNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) : Query<Array<NotificationData>, NotificationData>;
-    getLastestAllNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) : Query<Array<NotificationData>, NotificationData>;
+    getLastestUnreadNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) : Query<NotificationData[], NotificationData>;
+    getLastestReadNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) : Query<NotificationData[], NotificationData>;
+    getLastestAllNotifications(userid: Types.ObjectId, pagesize?: number, startid?: string) : Query<NotificationData[], NotificationData>;
   }
 
   interface NotificationTargetData {

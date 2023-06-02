@@ -1,5 +1,73 @@
 export default {
   appName: "DGA E-Voting",
+  app: {
+    userInfoEdit: {
+      title: "Edit User Info",
+      typeToEdit: "Type to edit",
+      isGovOfficer: "Government Officer",
+      action: "Edit",
+      confirm: "Confirm to Edit User Info?",
+      success: "Edit User Info Successful",
+      failed: "Edit User Info Failed",
+    },
+    topic: {
+      create: {
+        title: "Create Topic",
+        action: "Add topic",
+        confirm: "Confirm data to add?",
+        success: 'Add topic successful',
+        failed: 'Add topic failed',
+      },
+      recreate: {
+        title: "Recreate Topic",
+      },
+      edit: {
+        title: "Edit Topic",
+        action: "Edit topic",
+        confirm: "Confirm data to edit?",
+        success: 'Edit topic successful',
+        failed: 'Edit topic failed',
+      },
+      defaultVotes: "Default Vote for Voters",
+    },
+    result: {
+      title: "Voting Result",
+      winners: "Winners",
+      stats: "Stats",
+      totalVoters: "Total Voters",
+      votedVoters: "Voted",
+      noVotedVoters: "Not Voted",
+      totalVotes: "Total Votes",
+      actualVotes: "Voted",
+      remainVotes: "Not Voted",
+      scores: "Scores",
+      total: "Total",
+      noVoted: "No Voted",
+      yourChoice: "Your Choice",
+      winner: "Winner",
+      votersList: "Voters List",
+      export: "Export Result",
+    },
+    firstName: "First Name",
+    lastName: "Last Name",
+    email: "Email",
+    citizenid: "Citizen ID",
+    ministry: "Ministry",
+    department: "Department",
+    division: "Division",
+    ticketid: "Ticket ID",
+    description: {
+      title: "Description",
+      add: "Add Description",
+      hide: "Hide Description",
+      show: "Show Description",
+    },
+    countable: {
+      vote: "Vote | Votes",
+      voter: "Voter | Voters"
+    },
+    edit: "Edit",
+  },
   navbar: {
     home: "Home",
     voting: "Voting",
@@ -73,20 +141,7 @@ export default {
     title: "Login",
     loginDigitalId: "Login with Digital ID",
     loginWithGoogle: "Login with Google",
-    registerDigitalId: "Register",
-  },
-  register: {
-    firebase: {
-      title: "Register with google account",
-      token: "Token"
-    },
-    firstName: "First Name",
-    lastName: "Last Name",
-    citizenid: "Citizen ID",
-    action: "Register",
-    confirm: "Confirm your data?",
-    success: "Register Successful",
-    failed: "Register Failed",
+    registerDigitalId: "Register with Digital ID",
   },
   role: {
     guest: "Guest",
@@ -115,10 +170,9 @@ export default {
     loadMoreTopic: "Load more topics",
     noMoreTopic: "No more topic",
     createTopic: "Create",
-    requestTopic: "Request",
     avaliableTopic: "All Avaliable",
-    pendingTopic: "Check Pending",
     editTopic: "Edit",
+    recreateTopic: "Recreate",
     status: {
       waiting: "Waiting",
       result: "Result",
@@ -159,27 +213,6 @@ export default {
     confirm: "Confirm voting choices?"
   },
   topic: {
-    request: {
-      title: "Request Topic",
-      action: "Request topic",
-      confirm: "Confirm data to add?",
-      success: 'Request topic successful',
-      failed: 'Request topic failed',
-    },
-    create: {
-      title: "Create Topic",
-      action: "Add topic",
-      confirm: "Confirm data to add?",
-      success: 'Add topic successful',
-      failed: 'Add topic failed',
-    },
-    edit: {
-      title: "Edit Topic",
-      action: "Edit topic",
-      confirm: "Confirm data to edit?",
-      success: 'Edit topic successful',
-      failed: 'Edit topic failed',
-    },
     error: {
       notFound: "Topic not found",
       notEditable: "Topic not editable"
@@ -203,11 +236,6 @@ export default {
       endTime: "Start Time",
     },
     topicQuestion: "Topic Question",
-    description: {
-      title: "Description",
-      add: "Add Description",
-      hide: "Hide Description"
-    },
     addChoice: {
       title: "Add Choice",
       add: "Add Choice",
@@ -242,30 +270,10 @@ export default {
       }
     },
     notifyUsers: "Send notice to users",
-    showScores: "Show Scores on result",
     skipBlockchain: "Not record to Blockchain",
     scorePublic: "Display voter choice(s) for public",
     allow: "Allow",
     deny: "Deny",
-  },
-  result: {
-    title: "Voting Result",
-    ticketid: "Ticket ID",
-    description: {
-      title: "Description",
-      show: "Show Description",
-      hide: "Hide Description",
-    },
-    winners: "Winners",
-    stats: "Stats",
-    noVoted: "No Voted",
-    total: "Total",
-    notIncludeNoVote: "Not include No Vote",
-    winner: "Winner",
-    yourChoice: "Your Choice",
-    showVoteLogs: "Show Vote Logs",
-    voteLogs: "Vote Logs",
-    export: "Export Result",
   },
   news: {
     title: "News",
@@ -342,6 +350,7 @@ export default {
   permissions: {
     "request-permissions": "Request More Permissions",
     "voter-mode": "Access Voter Mode",
+    "request-topic": "Request New Topic",
     "admin-mode": "Access Admin Mode",
     "dev-mode": "Access Developer Mode",
     "vote-topic": "Vote Topics",

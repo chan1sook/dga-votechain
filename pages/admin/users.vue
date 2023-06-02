@@ -68,7 +68,7 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.user.title')}`
 });
 
-const userList : Ref<Array<UserSearchResponseData> | undefined> = ref(undefined);
+const userList : Ref<UserSearchResponseData[] | undefined> = ref(undefined);
 const selectedUser : Ref<UserSearchResponseData | undefined> = ref(undefined);
 
 const { data: users } = await useFetch("/api/user/showall");

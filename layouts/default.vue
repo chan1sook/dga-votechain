@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import DgaToastController from '~~/components/DgaToastController.vue';
+import DgaToastController from '~/components/DgaToastController.vue';
 const i18n = useI18n();
 const langLoaded = ref(false);
 const cookieConsentShow = ref(false);

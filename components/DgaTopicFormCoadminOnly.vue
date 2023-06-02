@@ -23,17 +23,17 @@
           <template v-for="admin of coadmins">
             <div>
               <ExclamationIcon
-                :class="[isCoadminValid(admin) ? 'invisible' : '']"
+                :class="[isCoadminValid(coadmins, admin) ? 'invisible' : '']"
                 class="text-red-500" 
                 :title="getCoadminErrorReason(admin)"
               />
             </div>
             <div>{{ admin.userid }}</div>
-            <div>{{ admin.firstName ? getCoadminName(admin) : "-" }}</div>
+            <div>{{ admin.firstName ? getPrettyFullName(admin) : "-" }}</div>
             <div>{{ admin.email || "-" }}</div>
             <div>
               <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
+                :title="`${$t('topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
               >
                 <MinusIcon />
               </button>
@@ -53,12 +53,13 @@ import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import MinusIcon from 'vue-material-design-icons/Minus.vue';
 
 import dayjs from 'dayjs';
-import { choiceCounts, coadminCounts, getPresetChoices, voterCounts } from '~~/src/utils/topic';
-import { getCoadminName } from '~~/src/utils/utils';
+import { getPrettyFullName } from '~/src/services/formatter/user';
+import { getPresetChoices } from '~/src/services/form/topic';
+import { isCoadminValid } from '~/src/services/validations/topic';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
-  coadmins?: Array<CoadminFormData>,
+  coadmins?: CoadminFormData[],
 }>(), {});
 
 const emit = defineEmits<{
@@ -70,7 +71,7 @@ const i18n = useI18n();
 const startDate = dayjs().minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
-const coadmins : Ref<Array<CoadminFormData>> = ref([]);
+const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -83,8 +84,7 @@ const topicData = ref<TopicFormData>({
   multipleVotes: false,
   publicVote: true,
   notifyVoter: true,
-  showVotersChoicesPublic: false,
-  showScores: true,
+  defaultVotes: 1,
   voterAllows: [],
   recoredToBlockchain: true,
 });
@@ -105,7 +105,7 @@ watch(coadminsRef, (value) => {
 }, { deep: true, immediate: true });
 
 watch(coadmins, (value) => {
-  const result : Array<string> = [];
+  const result : string[] = [];
   for(const ele of value) {
     if(ele.userid) {
       result.push(ele.userid)
@@ -119,9 +119,6 @@ watch(topicData, (value) => {
 }, { deep: true });
 
 
-function isCoadminValid(coadmin: CoadminFormData) {
-  return coadminCounts(coadmins.value, coadmin) < 2;
-}
 function getCoadminErrorReason(coadmin: CoadminFormData) {
   return i18n.t('topic.coadminList.error.duplicated');
 }

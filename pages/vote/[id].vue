@@ -84,7 +84,7 @@
             <DgaButton 
               class="relative w-full max-w-md mx-auto flex flex-row gap-x-4 items-center justify-center !px-4 !rounded-3xl"
               :theme="getBtnThemeOfChoice(choice)"
-              :color="(canVote && noVoteLocked) ? 'gray' : 'dga-blue'"
+              :color="(noVoteLocked || isNoVote) ? 'gray' : 'dga-blue'"
               :disabled="!canVote || noVoteLocked"
               :disabled-vivid="!canVote"
               @click="addVote(choice.name)"
@@ -102,7 +102,10 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div v-if="votedCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
+                  <div v-if="isNoVote" class="w-full text-white bg-gray-500 rounded-full px-4 sm:px-8 py-1 text-sm">
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div v-else-if="votedCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
                     <span class="hidden sm:block">VOTE</span>
                   </div>
                   <div v-else class="w-full text-white bg-green-700 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
@@ -164,8 +167,8 @@ import PauseIcon from 'vue-material-design-icons/Pause.vue';
 import PlayIcon from 'vue-material-design-icons/Play.vue';
 
 import dayjs from "dayjs";
-import { formatDateTime, getComputedServerTime as serverTime, perttyDuration, isServerTimeSync, getComputedServerTime } from '~~/src/utils/datetime';
-import { isTopicExpired } from "~~/src/utils/topic";
+import { formatDateTime, perttyDuration } from '~/src/services/formatter/datetime';
+import { isTopicExpired } from '~/src/services/validations/topic';
 
 definePageMeta({
   middleware: ["auth-voter"]
@@ -206,10 +209,10 @@ const showLocaltime = ref(false);
 const isSync = ref(false);
 const roleMode = computed(() => useSessionData().value.roleMode);
 const isAdminMode = computed(() => roleMode.value !== 'voter');
-const currentVotes : Ref<Array<string | null>> = ref([]);
-const voted: Ref<Array<VoteResponseData>> = ref([]);
-const adminVoterAllows: Ref<Array<TopicVoterAllowResponseData>> = ref([]);
-
+const currentVotes : Ref<ChoiceDataType[]> = ref([]);
+const voted: Ref<VoteResponseData[]> = ref([]);
+const adminVoterAllows: Ref<VoterAllowResponseData[]> = ref([]);
+const isNoVote = computed(() => !canVote.value && voted.value.every((ele) => ele.choice === null))
 const totalVoters = computed(() => {
   if(topic.value) {
     return adminVoterAllows.value.length
@@ -244,20 +247,23 @@ if (!data.value) {
 } else {
   const { topic: _topic, votes, adminVoterAllows: _adminVoterAllows } = data.value;
 
-  if(isTopicExpired(_topic, getComputedServerTime().getTime())) {
+  if(isTopicExpired(_topic, _topic.pauseData, useComputedServerTime().value.getTime())) {
     navigateTo(`/topic/result/${_topic._id}`);
   } else {
     topic.value = _topic;
     voted.value = votes;
-    totalVotes.value = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
-    remainVotes.value = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
+    const _remainVotes = topic.value.voterAllow ? topic.value.voterAllow.remainVotes : 0;
+    const _totalVotes = topic.value.voterAllow ? topic.value.voterAllow.totalVotes : 0;
+    remainVotes.value = _remainVotes;
+    totalVotes.value = _totalVotes - _remainVotes;
+
     if(_adminVoterAllows) {
       adminVoterAllows.value = _adminVoterAllows;
     }
   }
 }
 
-function voteCount(choice: string | null) {
+function voteCount(choice: ChoiceDataType) {
   return currentVotes.value.reduce((prev, current) => {
     if(current === choice) {
       return prev + 1;
@@ -265,11 +271,11 @@ function voteCount(choice: string | null) {
     return prev;
   }, 0)
 }
-function votedCount(choice: string | null) {
+function votedCount(choice: ChoiceDataType) {
   return voted.value.filter((ele) => ele.choice === choice).length;
 }
 
-function addVote(choice: string | null) {
+function addVote(choice: ChoiceDataType) {
   if(!canVote.value || remainVotes.value <= 0) { return; }
   currentVotes.value.push(choice);
   remainVotes.value -= 1;
@@ -294,7 +300,9 @@ async function submitVotes() {
   waitVote.value = true;
 
   const votes = noVoteLocked.value ? new Array(remainVotes.value).fill(null) : currentVotes.value.slice();
-  const voteFormData: VoteFormData = {
+  console.log(votes.length);
+  
+  const voteFormData: VotesFormData = {
     topicid,
     votes,
   }
@@ -306,9 +314,14 @@ async function submitVotes() {
   
   remainVotes.value -= votes.length;
   totalVotes.value -= votes.length;
+  
+  if(topic.value && topic.value.voterAllow) {
+    topic.value.voterAllow.remainVotes -= votes.length;
+  }
+
   clearVotes();
 
-  if(remainVotes.value === 0 && roleMode.value === "voter") {
+  if(topic.value && topic.value.voterAllow && topic.value.voterAllow.remainVotes === 0 && roleMode.value === "voter") {
     navigateTo(localePathOf("/topics"))
   } else {
     waitVote.value = false;
@@ -320,7 +333,7 @@ const durationDiff = computed(() => {
     return 0;
   }
 
-  return dayjs(topic.value.voteExpiredAt).diff(getComputedServerTime());
+  return dayjs(topic.value.voteExpiredAt).diff(useComputedServerTime().value);
 });
 
 function computeRemainTime() {
@@ -328,7 +341,7 @@ function computeRemainTime() {
     remainTime.value = 0;
   } else {
     if(topic.value.pauseData.length === 0 || topic.value.pauseData.every((ele) => ele.resumeAt)) {
-      remainTime.value = dayjs(topic.value.voteExpiredAt).diff(serverTime());
+      remainTime.value = dayjs(topic.value.voteExpiredAt).diff(useComputedServerTime().value);
     } else {
       const lastestTime = dayjs(topic.value.pauseData[topic.value.pauseData.length - 1].pauseAt);
       remainTime.value = dayjs(topic.value.voteExpiredAt).diff(lastestTime);
@@ -344,15 +357,15 @@ function computePauseTime() {
       if(current.resumeAt) {
         return prev + dayjs(current.resumeAt).diff(current.pauseAt);
       }
-      return prev + dayjs(serverTime()).diff(current.pauseAt);
+      return prev + dayjs(useComputedServerTime().value).diff(current.pauseAt);
     }, 0);
   }
 }
 
 function updateTime() {
-  todayTime.value = serverTime().getTime();
+  todayTime.value = useComputedServerTime().value.getTime();
   localTime.value = Date.now();
-  isSync.value = isServerTimeSync(SYNCTIME_THERSOLD);
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
   
   computeRemainTime();
   computePauseTime();
@@ -378,8 +391,11 @@ function getTotalMinutes(d: number) {
 
 const socket = useSocketIO();
 
-socket.on("voted", (votes: Array<VoteResponseData>) => {
+socket.on("voted", (votes: VoteResponseData[]) => {
   if(topic.value) {
+
+    console.log("voted", votes);
+
     for(const vote of votes) {
       if(vote.topicid !== topicid) {
         continue;
@@ -387,32 +403,30 @@ socket.on("voted", (votes: Array<VoteResponseData>) => {
 
       if(vote.userid === useSessionData().value.userid) {
         voted.value.push(vote);
-      }
-      
-      if(topic.value.voterAllow && vote.userid === topic.value.voterAllow.userid) {
-        topic.value.voterAllow.remainVotes -= 1;
+        remainVotes.value -= 1;
       }
       
       const target = adminVoterAllows.value.find((ele) => ele.userid === vote.userid);
-      if(target) {
+      if(target && target.remainVotes > 0) {
         target.remainVotes -= 1;
       }
     }
   }
 });
 
-socket.on(`pauseVote/${topicid}`, (pauseData: TopicPauseResponseData) => {
+socket.on(`pauseVote/${topicid}`, (pauseData: TopicCtrlPauseResponseData) => {
   if(topic.value) {
     topic.value.pauseData.push(pauseData);
     clearVotes();
   }
 });
-socket.on(`resumeVote/${topicid}`, (pauseData: TopicPauseResponseData & { voteExpiredAt: DateString }) => {
+socket.on(`resumeVote/${topicid}`, (pauseData: TopicCtrlPauseResponseData & { voteExpiredAt: DateString }) => {
   if(topic.value) {
     topic.value.pauseData = topic.value.pauseData.filter((ele) => ele.resumeAt);
     topic.value.pauseData.push({
       topicid: pauseData.topicid,
       pauseAt: pauseData.pauseAt,
+      cause: pauseData.cause,
       resumeAt: pauseData.resumeAt,
     });
     

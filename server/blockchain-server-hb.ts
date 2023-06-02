@@ -2,10 +2,9 @@
 import nodeCron from 'node-cron';
 import axios from "axios";
 
-import BlockchainServerModel from "~~/server/models/blockchain-server"
-import { getEventEmitter } from './global-emitter';
+import BlockchainServerModel from "~/src/models/blockchain-server"
+import { blockchainHbEventEmitter } from './event-emitter';
 
-const eventEmitter = getEventEmitter();
 async function checkHBs() {
   const allServerDocs = await BlockchainServerModel.find();
   for(const doc of allServerDocs) {
@@ -23,7 +22,7 @@ async function checkHBs() {
       return doc.save()
     }).then((res) => {
       console.log(`[BlockchainServerHB] HB Saved: ${doc.host}`);
-      eventEmitter.emit("blockchain-server-hb", doc);
+      blockchainHbEventEmitter.emit("blockchainHb", doc);
     }).catch((res) => {
       console.log(`[BlockchainServerHB] HB Failed: ${doc.host}`);
     })

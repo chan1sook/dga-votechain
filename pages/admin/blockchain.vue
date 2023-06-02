@@ -73,7 +73,6 @@
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
 
 import dayjs from 'dayjs';
-import { getComputedServerTime } from '~~/src/utils/datetime';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -85,14 +84,14 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.blockchain.title')}`
 });
 
-const txInfo : Ref<TxInfoResponseData | undefined> = ref(undefined);
-const txData : Ref<Array<TxResponseData>> = ref([]);
+const blockchainStats : Ref<BlockchainStatsResponseData | undefined> = ref(undefined);
+const txData : Ref<TxResponseData[]> = ref([]);
 const searchKeyword = ref("");
 const { data: stats } = await useFetch("/api/txinfo");
 const { data: tx } = await useFetch("/api/txchain");
 
 if(stats.value && tx.value) {
-  txInfo.value = stats.value;
+  blockchainStats.value = stats.value;
   txData.value = tx.value;
 } else {
   showError("Can't get tx data")
@@ -102,11 +101,11 @@ function toTxPage(id : string) {
   navigateTo(localePathOf(`/tx/${id}`));
 }
 
-function countServerOnlines(servers: Array<BlockchainServerDataResponse>) {
+function countServerOnlines(servers: BlockchainServerDataResponse[]) {
   const onlineThershold = useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if(current.lastActiveAt) {
-      const diff = dayjs(getComputedServerTime()).diff(current.lastActiveAt);
+      const diff = dayjs(useComputedServerTime().value).diff(current.lastActiveAt);
       if(diff <= onlineThershold) {
         return prev + 1;
       }
@@ -117,35 +116,24 @@ function countServerOnlines(servers: Array<BlockchainServerDataResponse>) {
 }
 
 const socket = useSocketIO();
-socket.on("tx", (txArr: Array<TxResponseData>) => {
+socket.on("tx", (txArr: TxResponseData[]) => {
   for(const tx of txArr) {
     const index = txData.value.findIndex((ele) => ele.voteId === tx.voteId);
     if(index === -1) {
       txData.value.unshift(tx);
-      if(txInfo.value) {
-        txInfo.value.blocks.total += 1;
+      if(blockchainStats.value) {
+        blockchainStats.value.blocks.total += 1;
       }
     }
   }
 });
 
-socket.on("txmined", (tx: TxResponseData) => {
-  const index = txData.value.findIndex((ele) => ele.voteId === tx.voteId);
-  if(index !== -1) {
-    txData.value[index] = tx;
-    if(txInfo.value) {
-      txInfo.value.blocks.mined += 1;
-    }
-  }
-});
-
-socket.on("blockchain-server-hb", (data: BlockchainServerDataResponse) => {
+socket.on("blockchainHb", (data: BlockchainServerDataResponse) => {
   // update
-  if(txInfo.value) {
-    const targetIndex = txInfo.value.servers.findIndex((ele) => ele._id === data._id);
-    console.log("blockchain-server-hb", data, targetIndex);
+  if(blockchainStats.value) {
+    const targetIndex = blockchainStats.value.servers.findIndex((ele) => ele._id === data._id);
     if(targetIndex !== -1) {
-      txInfo.value.servers[targetIndex] = data;
+      blockchainStats.value.servers[targetIndex] = data;
     }
   }
 });

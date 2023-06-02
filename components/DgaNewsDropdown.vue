@@ -40,12 +40,13 @@ import NewspaperIcon from 'vue-material-design-icons/Newspaper.vue';
 import PlusIcon from 'vue-material-design-icons/Plus.vue';
 
 import dayjs from 'dayjs';
-import { isAdminRole } from '~~/src/utils/role';
+import { isAdminRole } from '~/src/services/validations/role';
+
 const i18t = useI18n();
 const localePathOf = useLocalePath();
 
 const showOption = computed(() => useVisibleMenuGroup().value === 'news');
-const loadedNews : Ref<Array<NewsResponseData>> = ref([]);
+const loadedNews : Ref<NewsResponseData[]> = ref([]);
 
 const pagesize = ref(50);
 const startid = computed(() => {

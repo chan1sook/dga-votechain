@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import MenuIcon from 'vue-material-design-icons/Menu.vue';
-import { isAdminRole } from '~~/src/utils/role';
+import { isAdminRole } from '~/src/services/validations/role';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();

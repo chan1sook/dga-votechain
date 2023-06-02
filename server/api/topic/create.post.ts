@@ -1,12 +1,12 @@
 import dayjs from "dayjs";
 
-import UserModel from "~~/server/models/user"
-import TopicModel from "~~/server/models/topic"
-import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
-import TopicNotificationData from "~~/server/models/topic-notifications"
-import { isTopicFormValid } from "~~/src/utils/topic";
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
+import UserModel from "~/src/models/user"
+import TopicModel from "~/src/models/topic"
+import TopicVoterAllowsModel from "~/src/models/voters-allow"
+import TopicNotificationData from "~/server/models/topic-notifications"
 import mongoose, { Types } from "mongoose";
+import { isTopicFormValid } from "~/src/services/validations/topic";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
   }
   
   const topicFormData: TopicFormBodyData = await readBody(event);
+  
   if(!isTopicFormValid(topicFormData)) {
     throw createError({
       statusCode: 400,
@@ -53,14 +54,13 @@ export default defineEventHandler(async (event) => {
     voteStartAt: dayjs(topicFormData.voteStartAt).toDate(),
     voteExpiredAt: dayjs(topicFormData.voteExpiredAt).toDate(),
     publicVote: topicFormData.publicVote,
-    showScores: topicFormData.showScores,
-    showVotersChoicesPublic: topicFormData.showVotersChoicesPublic,
     recoredToBlockchain: topicFormData.recoredToBlockchain,
     notifyVoter: topicFormData.notifyVoter,
+    defaultVotes: topicFormData.defaultVotes,
     multipleVotes: topicFormData.multipleVotes,
   });
   
-  const voterAllows : Array<TopicVoterAllowData> = topicFormData.voterAllows.map((ele) => {
+  const voterAllows : VoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {
     return {
       topicid: newTopicDoc._id,
       userid: new Types.ObjectId(ele.userid),
@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
   ]);
 
   if(topicFormData.notifyVoter) {
-    const topicNotifications : Array<TopicNotificationData> = topicFormData.voterAllows.map((ele) => {
+    const topicNotifications : TopicNotificationData[] = topicFormData.voterAllows.map((ele) => {
       return {
         userid: new Types.ObjectId(ele.userid),
         topicid: newTopicDoc._id,

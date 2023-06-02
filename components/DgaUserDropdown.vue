@@ -16,7 +16,12 @@
         <div class="font-bold">
           {{ $t('navbar.user.welcome') }}
         </div>
-        <div>{{ userName }}</div>
+        <div class="flex flex-row gap-2">
+          <div>{{ userName }}</div>
+          <NuxtLink href="/user/edit" @click="useVisibleMenuGroup().value = undefined">
+            <SquareEditOutlineIcon />
+          </NuxtLink>
+        </div>
         <DgaButton v-if="isAdmin || isDeveloper" color="dga-orange" :theme="roleMode !== 'voter' ? 'hollow' : undefined" 
           class="!py-1 !text-sm" :title="switchRoleStrOf('voter')" @click="switchRoleMode('voter')"
         >
@@ -45,10 +50,10 @@
 import AccountCircleOutlineIcon from 'vue-material-design-icons/AccountCircleOutline.vue';
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import LogoutIcon from 'vue-material-design-icons/Logout.vue';
+import SquareEditOutlineIcon from 'vue-material-design-icons/SquareEditOutline.vue';
 
 import dayjs from 'dayjs';
-import { checkPermissionNeeds } from '~~/src/utils/permissions';
-import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
+import { checkPermissionNeeds } from '~/src/services/validations/permission';
 
 const i18n = useI18n();
 const showOption = computed(() => useVisibleMenuGroup().value === 'user');
@@ -87,8 +92,8 @@ const isDeveloper = computed(() => checkPermissionNeeds(useSessionData().value.p
 const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permissions, 'admin-mode'));
 
 function updateTime() {
-  todayTime.value = serverTime().getTime();
-  isSync.value = isServerTimeSync(SYNCTIME_THERSOLD);
+  todayTime.value = useComputedServerTime().value.getTime();
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
 }
 
 const roleMode = computed(() => useSessionData().value.roleMode);
