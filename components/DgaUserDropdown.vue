@@ -93,7 +93,7 @@ const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permi
 
 function updateTime() {
   todayTime.value = useComputedServerTime().value.getTime();
-  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).va;
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
 }
 
 const roleMode = computed(() => useSessionData().value.roleMode);
