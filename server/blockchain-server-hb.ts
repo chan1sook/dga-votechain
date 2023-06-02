@@ -2,7 +2,7 @@
 import nodeCron from 'node-cron';
 import axios from "axios";
 
-import BlockchainServerModel from "~~/server/models/blockchain-server"
+import BlockchainServerModel from "~/src/models/blockchain-server"
 import { blockchainHbEventEmitter } from './event-emitter';
 
 async function checkHBs() {

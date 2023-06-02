@@ -3,12 +3,11 @@ import dayjs from "dayjs";
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
-import TopicNotificationData from "~~/server/models/topic-notifications"
-import { isTopicReadyToVote } from "~~/src/utils/topic";
-import { checkPermissionSelections } from "~~/src/utils/permissions";
+import TopicNotificationData from "~/server/models/topic-notifications"
 import mongoose, { Types } from "mongoose";
-import { isTopicFormValid } from "~/src/services/validations/topic";
+import { isTopicFormValid, isTopicReadyToVote } from "~/src/services/validations/topic";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
+import { checkPermissionSelections } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;

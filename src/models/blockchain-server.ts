@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-const schema = new Schema<BlockchainServerData, BlockchainServerModel>({
+const schema = new Schema<BlockchainServerData>({
   host: {
     type: String,
     required: true,
@@ -10,4 +10,4 @@ const schema = new Schema<BlockchainServerData, BlockchainServerModel>({
   },
 }, { timestamps: true });
 
-export default model<BlockchainServerData, BlockchainServerModel>('blockchain-server', schema);
+export default model<BlockchainServerData>('blockchain-server', schema);

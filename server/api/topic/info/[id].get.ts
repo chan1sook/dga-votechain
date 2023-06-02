@@ -106,6 +106,7 @@ export default defineEventHandler(async (event) => {
     publicVote: topicDoc.publicVote,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     voterAllow,
+    defaultVotes: topicDoc.defaultVotes,
     notifyVoter: topicDoc.notifyVoter,
     pauseData: topicPauseData.map((ele) => {
       return {

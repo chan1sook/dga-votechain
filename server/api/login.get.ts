@@ -2,9 +2,10 @@ import crypto from "crypto"
 import { getApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getUserByAuthSource, getUserByEmail } from "../utils";
-import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
+import { legacyRoleToPermissions } from "~/src/services/transform/permission";
 import UserModel from "~/src/models/user"
 import { USER_SESSION_KEY } from "../session-handler";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -17,7 +18,7 @@ export default defineEventHandler(async (event) => {
     urlParams.set("client_id", DID_CLIENT_KEY);
     urlParams.set("redirect_uri", DID_LOGIN_CALLBACK);
   
-    const scopes : DigitalIDScope[] = [
+    const scopes : DigitalIdScope[] = [
       "openid", "email", "user_id", "citizen_id", "given_name", "email", "middle_name","family_name"
     ];
   

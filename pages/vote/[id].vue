@@ -167,8 +167,8 @@ import PauseIcon from 'vue-material-design-icons/Pause.vue';
 import PlayIcon from 'vue-material-design-icons/Play.vue';
 
 import dayjs from "dayjs";
-import { formatDateTime, getComputedServerTime as serverTime, perttyDuration, isServerTimeSync, getComputedServerTime } from '~~/src/utils/datetime';
-import { isTopicExpired } from "~~/src/utils/topic";
+import { formatDateTime, perttyDuration } from '~/src/services/formatter/datetime';
+import { isTopicExpired } from '~/src/services/validations/topic';
 
 definePageMeta({
   middleware: ["auth-voter"]
@@ -247,7 +247,7 @@ if (!data.value) {
 } else {
   const { topic: _topic, votes, adminVoterAllows: _adminVoterAllows } = data.value;
 
-  if(isTopicExpired(_topic, getComputedServerTime().getTime())) {
+  if(isTopicExpired(_topic, _topic.pauseData, useComputedServerTime().value.getTime())) {
     navigateTo(`/topic/result/${_topic._id}`);
   } else {
     topic.value = _topic;
@@ -333,7 +333,7 @@ const durationDiff = computed(() => {
     return 0;
   }
 
-  return dayjs(topic.value.voteExpiredAt).diff(getComputedServerTime());
+  return dayjs(topic.value.voteExpiredAt).diff(useComputedServerTime().value);
 });
 
 function computeRemainTime() {
@@ -341,7 +341,7 @@ function computeRemainTime() {
     remainTime.value = 0;
   } else {
     if(topic.value.pauseData.length === 0 || topic.value.pauseData.every((ele) => ele.resumeAt)) {
-      remainTime.value = dayjs(topic.value.voteExpiredAt).diff(serverTime());
+      remainTime.value = dayjs(topic.value.voteExpiredAt).diff(useComputedServerTime().value);
     } else {
       const lastestTime = dayjs(topic.value.pauseData[topic.value.pauseData.length - 1].pauseAt);
       remainTime.value = dayjs(topic.value.voteExpiredAt).diff(lastestTime);
@@ -357,15 +357,15 @@ function computePauseTime() {
       if(current.resumeAt) {
         return prev + dayjs(current.resumeAt).diff(current.pauseAt);
       }
-      return prev + dayjs(serverTime()).diff(current.pauseAt);
+      return prev + dayjs(useComputedServerTime().value).diff(current.pauseAt);
     }, 0);
   }
 }
 
 function updateTime() {
-  todayTime.value = serverTime().getTime();
+  todayTime.value = useComputedServerTime().value.getTime();
   localTime.value = Date.now();
-  isSync.value = isServerTimeSync(SYNCTIME_THERSOLD);
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
   
   computeRemainTime();
   computePauseTime();

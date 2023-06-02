@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export async function authorizationCodeDigitalID(code: string, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE }: DigitalIDAuthorizationCodeParam) {
+export async function authorizationCodeDigitalID(code: string, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE }: DigitalIdAuthorizationCodeParam) {
   const urlParams = new URLSearchParams();
   urlParams.set("grant_type", "authorization_code");
   urlParams.set("code", code);
@@ -16,10 +16,10 @@ export async function authorizationCodeDigitalID(code: string, { DID_API_URL, DI
     },
   });
 
-  return data as DigitalIDAuthResponse;
+  return data as DigitalIdAuthResponse;
 }
 
-export async function getUserInfoDigitalID(accessToken: string, { DID_API_URL } : DigitalIDGetUserInfoParam) {
+export async function getUserInfoDigitalID(accessToken: string, { DID_API_URL } : DigitalIdGetUserInfoParam) {
   const url = new URL("/connect/userinfo", DID_API_URL);
 
   const { data } = await axios.get(url.toString(), {
@@ -28,10 +28,5 @@ export async function getUserInfoDigitalID(accessToken: string, { DID_API_URL } 
     },
   });
 
-  return data as DigitalIDUserDataResponse;
-}
-
-export function getDigitalIdName(data: DigitalIDUserDataResponse) {
-  const { given_name } = data;
-  return `${given_name}`;
+  return data as DigitalIdUserDataResponse;
 }

@@ -4,11 +4,11 @@ import TopicModel from "~/src/models/topic"
 import VoterAllowModel from "~/src/models/voters-allow"
 import VoteModel from "~/src/models/vote"
 
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
 import { votedEventEmitter } from "../event-emitter";
 import mongoose from "mongoose";
 import { addVoteOnBlockchain } from "../smart-contract";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;

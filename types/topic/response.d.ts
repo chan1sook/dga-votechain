@@ -25,7 +25,7 @@ type TopicResultResponse = Pick<TopicResponseData, "_id" | "name" | "description
     }
   },
   scores: TopicVoteCountRecord[],
-  voters?: VoterAllowUserPopulatedData[],
+  voters?: VoterAllowModelDataUserPopulated[],
   yourVotes?: ChoiceDataType[],
 };
 

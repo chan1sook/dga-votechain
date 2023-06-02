@@ -1,8 +1,9 @@
 import UserModel from "~/src/models/user"
-import RequestPermissionsModel from "~~/server/models/request-permission"
-import NotificationModel from "~~/server/models/notification";
-import { checkPermissionSelections, combinePermissions, isContainsAdvancePermissions } from "~~/src/utils/permissions";
-import { isAdminRole } from "~~/src/utils/role";
+import RequestPermissionsModel from "~/src/models/request-permission"
+import NotificationModel from "~/server/models/notification";
+import { combinePermissions, isContainsAdvancePermissions } from "~/src/services/transform/permission";
+import { isAdminRole } from "~/src/services/validations/role";
+import { checkPermissionSelections } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -93,16 +94,7 @@ export default defineEventHandler(async (event) => {
     userData.permissions = userDoc.permissions;
   }
 
-  const requestPermissions : RequestPermissionsApproveResponseData = {
-    _id: `${reqData._id}`,
-    status: reqData.status,
-    userid: reqData.userid,
-    permissions: reqData.permissions,
-    newPermissions: userDoc.permissions,
-    note: reqData.note,
-    preset: reqData.preset,
-  }
   return {
-    requestPermissions,
+    status: "OK",
   }
 })

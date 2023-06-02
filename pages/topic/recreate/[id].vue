@@ -25,9 +25,8 @@
 import BallotIcon from 'vue-material-design-icons/Ballot.vue';
 
 import dayjs from "dayjs";
-import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime";
-import { getPresetChoices } from "~~/src/utils/topic";
 import { isTopicFormValid } from '~/src/services/validations/topic';
+import { getPresetChoices } from '~/src/services/form/topic';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -46,7 +45,7 @@ const editable = ref(false);
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
-const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
+const startDate = dayjs(useComputedServerTime().value).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
 const voterAllows : Ref<VoterAllowFormData[]> = ref([]);

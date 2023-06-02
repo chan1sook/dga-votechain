@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import TopicModel from "~/src/models/topic"
 import { getVotesByTopicId } from "~/src/services/fetch/vote"
 import { getVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
-import { isAdminRole } from "~/src/utils/role"
+import { isAdminRole } from "~/src/services/validations/role"
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause"
 
 export default defineEventHandler(async (event) => {  

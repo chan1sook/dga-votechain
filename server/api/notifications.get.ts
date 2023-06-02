@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
-import NotificationModel from "~~/server/models/notification"
-import TopicNotificationModel from "~~/server/models/topic-notifications"
+import NotificationModel from "~/server/models/notification"
+import TopicNotificationModel from "~/server/models/topic-notifications"
 
 export default defineEventHandler(async (event) => {
   const { type, pagesize, startid } : NotificationQueryParams = getQuery(event);

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import NewsModel from "~~/server/models/news"
+import NewsModel from "~/server/models/news"
 
 export default defineEventHandler(async (event) => {
   const newsDoc = await NewsModel.findById(event.context.params?.id);

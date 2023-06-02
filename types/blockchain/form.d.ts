@@ -1,3 +1,3 @@
-type TxChainQueryParams = PaginationParams & {
+type TxQueryParams = PaginationParams & {
   keyword?: string,
 }

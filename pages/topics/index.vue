@@ -28,7 +28,7 @@
     </div>
     <div class="my-4 flex flex-col gap-4 mx-auto max-w-6xl">
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
-        :editable="isAdminMode && !isTopicExpired(topic, getComputedServerTime().getTime())"
+        :editable="isAdminMode && !isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime())"
         :status="getStatusOf(topic)"
         @edit="toEditTopic(topic)"
         @recreate="toRecreateTopic(topic)"
@@ -52,13 +52,11 @@
 </template>
 
 <script setup lang="ts">
-import CheckIcon from 'vue-material-design-icons/Check.vue';
 import PlusCircleOutlineIcon from 'vue-material-design-icons/PlusCircleOutline.vue';
 
 import dayjs from "dayjs";
-import { getComputedServerTime, getComputedServerTime as serverTime } from "~~/src/utils/datetime"
-import { isAdminRole } from "~~/src/utils/role";
-import { isTopicExpired, isTopicReadyToVote } from "~~/src/utils/topic";
+import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
+import { isAdminRole } from '~/src/services/validations/role';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -70,8 +68,8 @@ useHead({
 
 const filter = ref({
   type: "all",
-  month: dayjs(serverTime()).month(),
-  year: dayjs(serverTime()).year(),
+  month: dayjs(useComputedServerTime().value).month(),
+  year: dayjs(useComputedServerTime().value).year(),
   ticketId: "",
   keyword: "",
 });
@@ -94,10 +92,10 @@ const monthOptions = ref(new Array(12).fill(undefined).map((ele, i) => {
   }
 }))
 
-const yearOptions = ref(new Array(dayjs(serverTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
-  const year = dayjs(serverTime()).year() - i;
+const yearOptions = ref(new Array(dayjs(useComputedServerTime().value).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
+  const year = dayjs(useComputedServerTime().value).year() - i;
   return {
-    label: dayjs(serverTime()).year(year).format("YYYY"),
+    label: dayjs(useComputedServerTime().value).year(year).format("YYYY"),
     value: year,
   }
 }))
@@ -120,7 +118,7 @@ function resetTopics() {
 const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return isAdminMode.value && 
-    !isTopicExpired(topic, getComputedServerTime().getTime());
+    !isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime());
 }
 
 function toEditTopic(topic: TopicResponseDataExtended) {
@@ -141,9 +139,9 @@ function toRecreateTopic(topic: TopicResponseDataExtended) {
 }
 
 function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
-  if(isTopicExpired(topic, getComputedServerTime().getTime())) {
+  if(isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime())) {
     return "result";
-  } else if(!isTopicReadyToVote(topic, getComputedServerTime().getTime())) {
+  } else if(!isTopicReadyToVote(topic, useComputedServerTime().value.getTime())) {
     return "waiting";
   } else if(!useSessionData().value.userid) {
     return "voting";

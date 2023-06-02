@@ -1,5 +1,5 @@
 import UserModel from "~/src/models/user"
-import { isAdminRole } from "~~/src/utils/role";
+import { isAdminRole } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;

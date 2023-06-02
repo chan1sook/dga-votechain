@@ -73,7 +73,6 @@
 import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
 
 import dayjs from 'dayjs';
-import { getComputedServerTime } from '~~/src/utils/datetime';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -106,7 +105,7 @@ function countServerOnlines(servers: BlockchainServerDataResponse[]) {
   const onlineThershold = useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if(current.lastActiveAt) {
-      const diff = dayjs(getComputedServerTime()).diff(current.lastActiveAt);
+      const diff = dayjs(useComputedServerTime().value).diff(current.lastActiveAt);
       if(diff <= onlineThershold) {
         return prev + 1;
       }

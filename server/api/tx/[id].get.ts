@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { Types } from "mongoose";
 
 import VoteModel from "~/src/models/vote"
-import { getVoteOnBlockchain, getTransactionByHash } from "~~/server/smart-contract";
+import { getVoteOnBlockchain, getTransactionByHash } from "~/server/smart-contract";
 
 export default defineEventHandler(async (event) => {
   if(!event.context.params?.id) {

@@ -10,7 +10,7 @@ declare global {
   
   type VoterAllowModelDataWithId = VoterAllowModelData & { _id: Types.ObjectId };
   
-  interface VoterAllowUserPopulatedData {
+  interface VoterAllowModelDataUserPopulated {
     user: UserBasicResponseDataWithId,
     remainVotes: number,
     totalVotes: number

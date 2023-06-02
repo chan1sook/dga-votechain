@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-  import { toSimpleForamtterTokenize } from "~~/src/simple-formatter/tokenizer";
+  import { toSimpleForamtterTokenize } from "~/src/simple-formatter/tokenizer";
 
   const props = withDefaults(defineProps<{
     content?: string,

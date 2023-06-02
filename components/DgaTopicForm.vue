@@ -145,17 +145,17 @@
             <template v-for="admin of coadmins">
               <div>
                 <ExclamationIcon
-                  :class="[isCoadminValid(admin) ? 'invisible' : '']"
+                  :class="[isCoadminValid(coadmins, admin) ? 'invisible' : '']"
                   class="text-red-500" 
                   :title="getCoadminErrorReason(admin)"
                 />
               </div>
               <div>{{ admin.userid }}</div>
-              <div>{{ admin.firstName ? getCoadminName(admin) : "-" }}</div>
+              <div>{{ admin.firstName ? getPrettyFullName(admin) : "-" }}</div>
               <div>{{ admin.email || "-" }}</div>
               <div>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                  :title="`${$t('topic.coadminList.remove')} [${getCoadminName(admin)}]`"  @click="removeCoadmin(admin)"
+                  :title="`${$t('topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
                 >
                   <MinusIcon />
                 </button>
@@ -188,9 +188,10 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 import dayjs from 'dayjs';
-import { choiceCounts, coadminCounts, getPresetChoices, voterCounts } from '~~/src/utils/topic';
-import { getCoadminName } from '~~/src/utils/utils';
 import { getPrettyFullName } from '~/src/services/formatter/user';
+import { getPresetChoices } from '~/src/services/form/topic';
+import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
+import { voterCountOf } from '~/src/services/validations/user';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
@@ -358,7 +359,7 @@ function getVoterName(voter: VoterAllowFormData) {
 }
 
 function isChoiceValid(choice: string) {
-  return choice !== "" && choiceCounts(topicData.value.choices, choice) === 1;
+  return choice !== "" && choiceCountOf(topicData.value.choices, choice) === 1;
 }
 
 function getChoiceErrorReason(choice: string) {
@@ -378,7 +379,7 @@ function addOption() {
 }
 
 function isVoterValid(voter: VoterAllowFormData) {
-  return voterCounts(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
+  return voterCountOf(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
 }
 
 function getVoterErrorReason(voter: VoterAllowFormData) {
@@ -404,9 +405,6 @@ function addVoter(user: UserSearchResponseData) {
   }
 }
 
-function isCoadminValid(coadmin: CoadminFormData) {
-  return coadminCounts(coadmins.value, coadmin) < 2;
-}
 function getCoadminErrorReason(coadmin: CoadminFormData) {
   return i18n.t('topic.coadminList.error.duplicated');
 }

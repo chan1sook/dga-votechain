@@ -44,9 +44,8 @@ import LogoutIcon from 'vue-material-design-icons/Logout.vue';
 import SquareEditOutlineIcon from 'vue-material-design-icons/SquareEditOutline.vue';
 
 import dayjs from 'dayjs';
-import { checkPermissionNeeds } from '~~/src/utils/permissions';
-import { getComputedServerTime as serverTime, isServerTimeSync } from '~~/src/utils/datetime';
 import { signOut } from 'firebase/auth';
+import { checkPermissionNeeds } from '~/src/services/validations/permission';
 
 const i18n = useI18n();
 
@@ -76,8 +75,8 @@ const isDeveloper = computed(() => checkPermissionNeeds(useSessionData().value.p
 const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permissions, 'admin-mode'));
 
 function updateTime() {
-  todayTime.value = serverTime().getTime();
-  isSync.value = isServerTimeSync(SYNCTIME_THERSOLD);
+  todayTime.value = useComputedServerTime().value.getTime();
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
 }
 
 const roleMode = computed(() => useSessionData().value.roleMode);

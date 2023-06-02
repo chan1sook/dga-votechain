@@ -1,5 +1,6 @@
-type DigitalIDUserId = string;
-type DigitalIDScope =
+type DigitalIdUserId = string;
+
+type DigitalIdScope =
   "openid" |
   "phone" |
   "profile" |
@@ -36,27 +37,16 @@ type DigitalIDScope =
   "roles" |
   "offline_access";
 
-interface DigitalIDAuthorizationCodeParam {
-  DID_API_URL: string,
-  DID_CLIENT_KEY: string,
-  DID_LOGIN_CALLBACK: string,
-  DID_VERIFY_CODE: string,
-}
-
-interface DigitalIDGetUserInfoParam {
-  DID_API_URL: string,
-}
-
-interface DigitalIDAuthResponse {
+interface DigitalIdAuthResponse {
   id_token: string,
   access_token: string,
   expires_in: number,
   token_type: string,
   scope: string,
 }
-
-type DigitalIDUserDataResponse = {
-  user_id: DigitalIDUserId,
+  
+type DigitalIdUserDataResponse = {
+  user_id: DigitalIdUserId,
   citizen_id: string,
   given_name: string,
   middle_name: string,

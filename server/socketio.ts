@@ -5,14 +5,14 @@ import { createClient } from "redis";
 import UserModel from "~/src/models/user";
 import TopicModel from "~/src/models/topic";
 import TopicCtrlPauseModel from "~/src/models/topic-ctrl-pause";
-import NotificationModel from "~~/server/models/notification";
-import TopicNotificationModel from "~~/server/models/topic-notifications";
+import NotificationModel from "~/server/models/notification";
+import TopicNotificationModel from "~/server/models/topic-notifications";
 import dayjs from "dayjs";
-import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { getNotifyData, setNotifyData } from "~~/server/notify-storage";
+import { getNotifyData, setNotifyData } from "~/server/notify-storage";
 import { blockchainHbEventEmitter, votedEventEmitter } from "~/server/event-emitter";
 import mongoose, { Types } from "mongoose";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default async () => {
   const { SOCKETIO_ORIGIN_URL, REDIS_URI } = useRuntimeConfig();

@@ -1,8 +1,8 @@
 import dayjs from "dayjs"
 import { nanoid } from "nanoid"
 import { Storage, prefixStorage } from "unstorage"
-import { getNtpTime } from "~~/server/ntp";
-import { SessionHandler, getSessionData } from "~~/server/session-handler";
+import { getNtpTime } from "~/server/ntp";
+import { SessionHandler, getSessionData } from "~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
   let sid = getCookie(event, "sid");

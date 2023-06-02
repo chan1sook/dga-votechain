@@ -1,4 +1,4 @@
-export function getPrettyFullName(params: UserBasicResponseDataWithId) {
+export function getPrettyFullName(params: UserBasicData & { _id?: string}) {
   if(params.firstName) {
     return params.lastName ? `${params.firstName} ${params.lastName}` : params.firstName;
   }
@@ -7,5 +7,9 @@ export function getPrettyFullName(params: UserBasicResponseDataWithId) {
     return params.email;
   }
   
-  return params._id;
+  if(typeof params._id === "string") {
+    return params._id;
+  }
+
+  return "";
 }

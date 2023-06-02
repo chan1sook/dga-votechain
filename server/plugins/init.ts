@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import io from "~~/server/socketio"
+import io from "~/server/socketio"
 import smartContract from '../smart-contract';
 import { setPredefinedDevs, setPredefinedBlockchainServers, addTopicFields } from '../migrations';
 import { initFirebase } from '../firebase';

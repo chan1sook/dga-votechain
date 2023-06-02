@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
-import NotificationModel from "~~/server/models/notification"
-import TopicNotificationModel from "~~/server/models/topic-notifications"
-import { clearNotifyData } from "~~/server/notify-storage";
+import NotificationModel from "~/server/models/notification"
+import TopicNotificationModel from "~/server/models/topic-notifications"
+import { clearNotifyData } from "~/server/notify-storage";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;

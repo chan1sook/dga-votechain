@@ -1,11 +1,12 @@
 
 import bcrypt from "bcrypt";
 
-import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~~/src/utils/digitalid-protocol";
+import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~/src/services/fetch/digital-id";
 import UserModel from "~/src/models/user"
-import { checkPermissionNeeds, legacyRoleToPermissions } from "~~/src/utils/permissions";
-import { USER_SESSION_KEY } from "~~/server/session-handler";
-import { getUserByAuthSource, getUserByEmail } from "~~/server/utils";
+import { legacyRoleToPermissions } from "~/src/services/transform/permission";
+import { USER_SESSION_KEY } from "~/server/session-handler";
+import { getUserByAuthSource, getUserByEmail } from "~/server/utils";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)

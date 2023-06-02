@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { getTxStats } from "~/src/services/fetch/tx";
-import BlockchainServerModel from "~~/server/models/blockchain-server"
+import BlockchainServerModel from "~/src/models/blockchain-server"
 
 export default defineEventHandler(async (event) => {
   const [txStats, blockchainServerDocs] = await Promise.all([

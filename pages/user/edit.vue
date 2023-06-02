@@ -72,8 +72,7 @@
 
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
-
-import { isThaiCitizenId } from '~~/src/utils/utils';
+import { isThaiCitizenId } from '~/src/services/validations/user';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();

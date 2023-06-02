@@ -1,11 +1,11 @@
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
-import BlockchainServerModel from "~~/server/models/blockchain-server"
-import { combinePermissions, legacyRoleToPermissions } from '~~/src/utils/permissions';
+import BlockchainServerModel from "~/src/models/blockchain-server"
+import { combinePermissions, legacyRoleToPermissions } from '~/src/services/transform/permission';
 
 let migrationSeq = 0;
 
-export async function setPredefinedDevs(ids: DigitalIDUserId[]) {
+export async function setPredefinedDevs(ids: DigitalIdUserId[]) {
   migrationSeq +=1 ;
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);

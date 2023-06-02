@@ -3,7 +3,7 @@ import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 import { FilterQuery, Types } from "mongoose";
 import TopicModel from "~/src/models/topic"
-import { escapeRegExp } from "~/src/utils/utils";
+import { escapeRegExp } from "../formatter/regexp";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
