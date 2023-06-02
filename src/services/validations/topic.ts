@@ -13,7 +13,7 @@ function isChoicesValid(choices: {name: string}[]) {
   );
 }
 
-function isVoterAllowsValid(voterAllows: TopicVoterAllowFormData[]) {
+function isVoterAllowsValid(voterAllows: VoterAllowFormData[]) {
   return voterAllows.length > 0 && voterAllows.every(
     (ele, i, arr) => arr.findIndex((ele2) => ele2.userid === ele.userid) === i
   );

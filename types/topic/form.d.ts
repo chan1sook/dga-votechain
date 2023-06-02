@@ -1,5 +1,7 @@
+type TopicCardStatus = "waiting" | "access" | "voting" | "voted" | "finished" | "result";
+
 type TopicFormData = Omit<TopicModelData, "status" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "votePauseAt" | "pauseDuration" | "admin" | "coadmins"> & {
-  voterAllows: TopicVoterAllowFormData[],
+  voterAllows: VoterAllowFormData[],
   coadmins: string[],
 };
 

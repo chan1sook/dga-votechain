@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  let txData: TxResponseDataFull | undefined;
+  let txData: TxResponseDataWithRaw | undefined;
   const voteDoc : VoteModelDataWithId | null = await VoteModel.findById(event.context.params?.id);
   if(!voteDoc) {
     throw createError({

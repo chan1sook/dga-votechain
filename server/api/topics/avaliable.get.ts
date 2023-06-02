@@ -1,12 +1,12 @@
 import dayjs from "dayjs";
 
-import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
-import TopicPauseModel from "~~/server/models/topic-pause"
 import { getLastestAdminTopics, getLastestFinishedPublicVoteTopics, getLastestVoterTopicsWithIds } from "~/src/services/fetch/topics";
+import { getVoterAllowByUserId } from "~/src/services/fetch/vote-allow";
+import { getTopicCtrlPauseListByTopicIds } from "~/src/services/fetch/topic-ctrl-pause";
 
 export default defineEventHandler(async (event) => {
   const { filter } = getQuery(event);
-  let topicsData: TopicDataWithIdPopulated[] = [];
+  let topicsData: TopicModelDataWithIdPopulated[] = [];
   let filterParams : TopicFilterParams = { type: "all" };
   if(typeof filter === "string") {
     try {
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
   }
   
   const userData = event.context.userData;
-  const topicVoterAllowsDocs = userData ? await TopicVoterAllowsModel.getVoterAllowForTopicsFilters(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
+  const topicVoterAllowsDocs = userData ? await getVoterAllowByUserId(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
   
   let filterIds;
   if(!userData || userData.roleMode === "guest") {
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     topicsData = await getLastestAdminTopics(userData._id, filterParams).populate("createdBy");
   }
 
-  const topicPauseDocs = await TopicPauseModel.find({ topicid: { $in: topicsData.map((ele) => ele._id)} });
+  const topicPauseDocs = await getTopicCtrlPauseListByTopicIds(topicsData.map((ele) => ele._id));
   
   const topics = topicsData.map<TopicResponseDataExtended>((topicData, i) => {
     const topicAllowDoc = topicVoterAllowsDocs.find((voterAllow) => `${voterAllow.topicid._id}` === `${topicData._id}`);

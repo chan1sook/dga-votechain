@@ -84,7 +84,7 @@
             <DgaButton 
               class="relative w-full max-w-md mx-auto flex flex-row gap-x-4 items-center justify-center !px-4 !rounded-3xl"
               :theme="getBtnThemeOfChoice(choice)"
-              :color="(canVote && noVoteLocked) ? 'gray' : 'dga-blue'"
+              :color="(noVoteLocked || isNoVote) ? 'gray' : 'dga-blue'"
               :disabled="!canVote || noVoteLocked"
               :disabled-vivid="!canVote"
               @click="addVote(choice.name)"
@@ -102,7 +102,10 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div v-if="votedCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
+                  <div v-if="isNoVote" class="w-full text-white bg-gray-500 rounded-full px-4 sm:px-8 py-1 text-sm">
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div v-else-if="votedCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
                     <span class="hidden sm:block">VOTE</span>
                   </div>
                   <div v-else class="w-full text-white bg-green-700 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
@@ -208,8 +211,8 @@ const roleMode = computed(() => useSessionData().value.roleMode);
 const isAdminMode = computed(() => roleMode.value !== 'voter');
 const currentVotes : Ref<ChoiceDataType[]> = ref([]);
 const voted: Ref<VoteResponseData[]> = ref([]);
-const adminVoterAllows: Ref<TopicVoterAllowResponseData[]> = ref([]);
-
+const adminVoterAllows: Ref<VoterAllowResponseData[]> = ref([]);
+const isNoVote = computed(() => !canVote.value && voted.value.every((ele) => ele.choice === null))
 const totalVoters = computed(() => {
   if(topic.value) {
     return adminVoterAllows.value.length
@@ -299,7 +302,7 @@ async function submitVotes() {
   const votes = noVoteLocked.value ? new Array(remainVotes.value).fill(null) : currentVotes.value.slice();
   console.log(votes.length);
   
-  const voteFormData: VoteFormData = {
+  const voteFormData: VotesFormData = {
     topicid,
     votes,
   }
@@ -411,18 +414,19 @@ socket.on("voted", (votes: VoteResponseData[]) => {
   }
 });
 
-socket.on(`pauseVote/${topicid}`, (pauseData: TopicPauseResponseData) => {
+socket.on(`pauseVote/${topicid}`, (pauseData: TopicCtrlPauseResponseData) => {
   if(topic.value) {
     topic.value.pauseData.push(pauseData);
     clearVotes();
   }
 });
-socket.on(`resumeVote/${topicid}`, (pauseData: TopicPauseResponseData & { voteExpiredAt: DateString }) => {
+socket.on(`resumeVote/${topicid}`, (pauseData: TopicCtrlPauseResponseData & { voteExpiredAt: DateString }) => {
   if(topic.value) {
     topic.value.pauseData = topic.value.pauseData.filter((ele) => ele.resumeAt);
     topic.value.pauseData.push({
       topicid: pauseData.topicid,
       pauseAt: pauseData.pauseAt,
+      cause: pauseData.cause,
       resumeAt: pauseData.resumeAt,
     });
     

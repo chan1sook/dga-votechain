@@ -89,7 +89,7 @@ export function choiceCounts(choices: ChoicesInfo, choice: string) {
   }, 0);
 }
 
-export function voterCounts(voterAllows: TopicVoterAllowFormData[], user: TopicVoterAllowFormData) {
+export function voterCounts(voterAllows: VoterAllowFormData[], user: VoterAllowFormData) {
   return voterAllows.reduce((prev, current) => {
     if(user.userid && current.userid === user.userid) {
       return prev + 1;

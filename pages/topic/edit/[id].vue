@@ -50,7 +50,7 @@ const waitEdit = ref(false);
 const startDate = dayjs(serverTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
-const voterAllows : Ref<TopicVoterAllowFormData[]> = ref([]);
+const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
 const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({

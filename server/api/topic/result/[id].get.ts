@@ -2,9 +2,9 @@ import dayjs from "dayjs"
 
 import TopicModel from "~/src/models/topic"
 import { getVotesByTopicId } from "~/src/services/fetch/vote"
-import { getTopicVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
+import { getVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
 import { isAdminRole } from "~/src/utils/role"
-import TopicPauseModel from "~~/server/models/topic-pause"
+import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause"
 
 export default defineEventHandler(async (event) => {  
   const topicDoc = await TopicModel.findById(event.context.params?.id);
@@ -15,16 +15,14 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  const topicPauseData = await TopicPauseModel.findOne({
-    topicid: topicDoc._id, resumeAt: { $exists: false }
-  })
+  const topicPauseFlag = await isTopicPause(topicDoc._id);
 
   if(topicDoc.status !== "approved") {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not approved",
     });
-  } else if(topicPauseData || topicDoc.voteExpiredAt.getTime() >= Date.now()) {
+  } else if(topicPauseFlag || topicDoc.voteExpiredAt.getTime() >= Date.now()) {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not expired",
@@ -33,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
   const userData = event.context.userData;
   const [votersData, votes] = await Promise.all([
-    getTopicVoterAllowByTopicId(topicDoc._id).populate("userid"),
+    getVoterAllowByTopicId(topicDoc._id).populate("userid"),
     getVotesByTopicId(topicDoc._id)
   ]);
     
@@ -74,7 +72,7 @@ export default defineEventHandler(async (event) => {
   const voterTotal = votersData.length + votes.filter((ele) => !ele.userid).length;
   const voterVoted =  voterTotal - votersData.filter((ele) => ele.remainVotes >= ele.totalVotes).length;
   
-  const voteResult : TopicVoteCountResponse = {
+  const voteResult : TopicResultResponse = {
     _id: `${topicDoc._id}`,
     name: topicDoc.name,
     description: topicDoc.description,

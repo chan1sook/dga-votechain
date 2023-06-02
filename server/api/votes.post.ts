@@ -1,14 +1,14 @@
 import dayjs from "dayjs";
 
 import TopicModel from "~/src/models/topic"
-import TopicVoterAllowModel from "~~/server/models/topic-voters-allow"
-import TopicPauseModel from "~~/server/models/topic-pause"
+import VoterAllowModel from "~/src/models/voters-allow"
 import VoteModel from "~/src/models/vote"
 
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
-import { getEventEmitter } from "../global-emitter";
+import { votedEventEmitter } from "../event-emitter";
 import mongoose from "mongoose";
 import { addVoteOnBlockchain } from "../smart-contract";
+import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  const voterAllowData = await TopicVoterAllowModel.findOne({
+  const voterAllowData = await VoterAllowModel.findOne({
     userid: userData._id,
     topicid: topicDoc._id,
   });
@@ -45,12 +45,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const votePauseData = await TopicPauseModel.findOne({
-    topicid: topicDoc._id,
-    resumeAt: { $exists: false }
-  });
+  const topicPauseFlag = await isTopicPause(topicDoc._id);
 
-  if(votePauseData) {
+  if(topicPauseFlag) {
     throw createError({
       statusCode: 400,
       statusMessage: "Voting Pause",
@@ -119,9 +116,7 @@ export default defineEventHandler(async (event) => {
   await dbSession.commitTransaction();
   await dbSession.endSession();
 
-  const eventEmitter = getEventEmitter();
-
-  eventEmitter.emit("voted", votes);
+  votedEventEmitter.emit("voted", votes);
   
   return {
     votes,

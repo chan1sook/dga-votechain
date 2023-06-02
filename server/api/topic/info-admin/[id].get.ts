@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
-import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
-import TopicPauseModel from "~~/server/models/topic-pause"
+import TopicVoterAllowsModel from "~/src/models/voters-allow"
+import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-pause";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const topicDoc : TopicDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
+  const topicDoc : TopicModelDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
   if(!topicDoc) {
     throw createError({
       statusCode: 404,
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const topic : TopicResponseData & { notifyVoter: boolean } = {
+  const topic : TopicResponseData = {
     _id: topicDoc._id.toString(),
     status: topicDoc.status,
     name: topicDoc.name,
@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
       return ele.toString()
     }),
     publicVote: topicDoc.publicVote,
+    defaultVotes: topicDoc.defaultVotes,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     notifyVoter: topicDoc.notifyVoter,
   };
@@ -53,10 +54,10 @@ export default defineEventHandler(async (event) => {
   const [voterAllowDocs, coadminDocs, pauseDataDocs] = await Promise.all([
     TopicVoterAllowsModel.find({ topicid: topicDoc._id }).populate("userid"),
     UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) }}),
-    TopicPauseModel.find({ topicid: topicDoc._id }),
+    getTopicCtrlPauseListByTopicId(topicDoc._id),
   ]);
   
-  const voterAllows : TopicVoterAllowFormData[] = voterAllowDocs.map((ele) => {
+  const voterAllows : VoterAllowFormData[] = voterAllowDocs.map((ele) => {
     return ele.userid ? {
       userid: (ele.userid as unknown as UserModelDataWithId)._id.toString(),
       firstName: (ele.userid as unknown as UserModelDataWithId).firstName,
@@ -80,10 +81,11 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  const pauseData : TopicPauseResponseData[] = pauseDataDocs.map((ele) => {
+  const pauseData : TopicCtrlPauseResponseData[] = pauseDataDocs.map((ele) => {
     return {
       topicid: ele.topicid.toString(),
       pauseAt: dayjs(ele.pauseAt).toString(),
+      cause: ele.cause,
       resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toString() : undefined,
     }
   });

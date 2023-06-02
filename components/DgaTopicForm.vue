@@ -195,7 +195,7 @@ import { getPrettyFullName } from '~/src/services/formatter/user';
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
   noCoadmin?: boolean,
-  voterAllows?: TopicVoterAllowFormData[],
+  voterAllows?: VoterAllowFormData[],
   coadmins?: CoadminFormData[],
 }>(), {});
 
@@ -219,7 +219,7 @@ const startExpiredDateStr = computed(() => dayjs(voteStart.value, "YYYY-MM-DD").
 
 const skipBlockchain = ref(false);
 const showDescription = ref(false);
-const voterAllows : Ref<TopicVoterAllowFormData[]> = ref([]);
+const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
 const coadmins : Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
@@ -350,7 +350,7 @@ watch(topicData, (value) => {
   emit('update:modelValue', value)
 }, { deep: true });
 
-function getVoterName(voter: TopicVoterAllowFormData) {
+function getVoterName(voter: VoterAllowFormData) {
   return getPrettyFullName({
     ...voter,
     _id: voter.userid || "-",
@@ -377,15 +377,15 @@ function addOption() {
   topicData.value.choices.choices.push({ name: "" });
 }
 
-function isVoterValid(voter: TopicVoterAllowFormData) {
+function isVoterValid(voter: VoterAllowFormData) {
   return voterCounts(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
 }
 
-function getVoterErrorReason(voter: TopicVoterAllowFormData) {
+function getVoterErrorReason(voter: VoterAllowFormData) {
   return i18n.t('topic.voterList.error.duplicated');
 }
 
-function removeVoter(user: TopicVoterAllowFormData) {
+function removeVoter(user: VoterAllowFormData) {
   const compareData = JSON.stringify(user);
   voterAllows.value = voterAllows.value.filter((ele) => {
     return compareData !== JSON.stringify(ele);

@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
-import TopicVoterAllowsModel from "~~/server/models/topic-voters-allow"
+import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import TopicNotificationData from "~~/server/models/topic-notifications"
 import { checkPermissionNeeds } from "~~/src/utils/permissions";
 import mongoose, { Types } from "mongoose";
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
     multipleVotes: topicFormData.multipleVotes,
   });
   
-  const voterAllows : TopicVoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {
+  const voterAllows : VoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {
     return {
       topicid: newTopicDoc._id,
       userid: new Types.ObjectId(ele.userid),

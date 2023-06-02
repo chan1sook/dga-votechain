@@ -36,4 +36,9 @@ declare global {
   };
   
   type TopicModelDataWithId = TopicModelData & { _id: Types.ObjectId };
+  
+  type TopicModelDataWithIdPopulated = Omit<TopicModelDataWithId, "createdBy"> & {
+    createdBy: UserBasicDataWithId;
+  };
+
 }

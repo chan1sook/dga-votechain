@@ -7,6 +7,10 @@ export function getVotesByTopicId(topicid: Types.ObjectId) {
   });
 }
 
+export function getVotesByTopicIdAndUserId(topicid: Types.ObjectId, userid: Types.ObjectId) {
+  return VoteModel.find({ topicid: topicid, userid: userid })
+}
+
 export function getLastestVotes(pagesize?: number, startid?: string, filterKeyword?: string) {
   const query : FilterQuery<VoteModelData> = {
     $and: []

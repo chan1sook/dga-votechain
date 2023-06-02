@@ -7,7 +7,7 @@ import { model, Schema } from "mongoose";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const schema = new Schema<TopicPauseData, TopicPauseModel>({
+const schema = new Schema<TopicCtrlPauseModelData>({
   topicid: {
     type: Schema.Types.ObjectId,
     ref: "topic"
@@ -16,9 +16,13 @@ const schema = new Schema<TopicPauseData, TopicPauseModel>({
     type: Date,
     default: Date.now
   },
+  cause: {
+    type: String,
+    default: ""
+  },
   resumeAt: {
     type: Date,
   }
 });
 
-export default model<TopicPauseData, TopicPauseModel>('topic-pause', schema);
+export default model<TopicCtrlPauseModelData>('topic-pause', schema);

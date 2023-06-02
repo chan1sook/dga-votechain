@@ -25,7 +25,7 @@ export function init() {
   }
 }
 
-export async function getVoteOnBlockchain(voteid: string) : Promise<VoteDataBlockchainResponse> {
+export async function getVoteOnBlockchain(voteid: string) : Promise<VoteDataBlockchainResponseData> {
   if(!isProduction) {
     throw new Error("Is not production");
   }
