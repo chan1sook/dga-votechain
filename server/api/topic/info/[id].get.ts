@@ -15,9 +15,13 @@ export default defineEventHandler(async (event) => {
   
   const userData = event.context.userData;
 
-  let voterAllow;
+  let voterAllow: VoterAllowResponseData = {
+    topicid: topicDoc._id.toString(),
+    userid: "",
+    remainVotes: 1,
+    totalVotes: 1,
+  };
   let votes : VoteResponseData[] = [];
-  let adminVoterAllows : VoterAllowResponseData[] | undefined;
 
   const topicPauseData = await TopicPauseData.find({
     topicid: topicDoc._id,
@@ -58,29 +62,9 @@ export default defineEventHandler(async (event) => {
         tx: vote.tx,
       }
     })
-
-    if(userData.roleMode === "admin" || userData.roleMode === "developer") {
-      const voterAllowsDocs = await TopicVoterAllowsModel.find({
-        topicid: topicDoc._id,
-      })
-      
-      adminVoterAllows = voterAllowsDocs.map((ele) => {
-        return ele.userid ? {
-          topicid: topicDoc._id.toString(),
-          userid: ele.userid._id.toString(),
-          totalVotes: ele.totalVotes,
-          remainVotes: ele.remainVotes
-        } : {
-          topicid: topicDoc._id.toString(),
-          userid: `${ele.userid}`,
-          totalVotes: ele.totalVotes,
-          remainVotes: ele.remainVotes
-        }
-      })
-    }
   }
   
-  const topic : TopicResponseDataExtended = {
+  const topic : TopicResponseData = {
     _id: topicDoc._id.toString(),
     status: topicDoc.status,
     name: topicDoc.name,
@@ -105,22 +89,23 @@ export default defineEventHandler(async (event) => {
     }),
     publicVote: topicDoc.publicVote,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
-    voterAllow,
     defaultVotes: topicDoc.defaultVotes,
-    notifyVoter: topicDoc.notifyVoter,
-    pauseData: topicPauseData.map((ele) => {
-      return {
-        topicid: topicDoc._id.toString(),
-        cause: ele.cause || "",
-        pauseAt: dayjs(ele.pauseAt).toISOString(),
-        resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toISOString() : undefined,
-      }
-    })
+    notifyVoter: topicDoc.notifyVoter
   };
+
+  const pauseData : TopicCtrlPauseResponseData[] = topicPauseData.map((ele) => {
+    return {
+      topicid: ele.topicid.toString(),
+      pauseAt: dayjs(ele.pauseAt).toString(),
+      cause: ele.cause,
+      resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toString() : undefined,
+    }
+  });
 
   return {
     topic,
     votes,
-    adminVoterAllows
+    voterAllow,
+    pauseData,
   };
 })

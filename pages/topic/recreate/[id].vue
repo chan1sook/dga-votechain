@@ -45,7 +45,7 @@ const editable = ref(false);
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
-const startDate = dayjs(useComputedServerTime().value).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
+const startDate = dayjs(useComputedServerTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
 const voterAllows : Ref<VoterAllowFormData[]> = ref([]);

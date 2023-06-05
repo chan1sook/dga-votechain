@@ -82,8 +82,8 @@ const { data } = await useFetch(`/api/news/info/${newsid}`);
 const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
-const publishDate = dayjs(useComputedServerTime().value).millisecond(0).toDate();
-const expiredDate = dayjs(useComputedServerTime().value).add(1, "year").hour(0).minute(0).second(0).millisecond(0).toDate();
+const publishDate = dayjs(useComputedServerTime()).millisecond(0).toDate();
+const expiredDate = dayjs(useComputedServerTime()).add(1, "year").hour(0).minute(0).second(0).millisecond(0).toDate();
 
 const publishDateStr = ref(dayjs(publishDate).format("YYYY-MM-DD"))
 const publishTimeStr = ref(dayjs(publishDate).format("HH:mm"))

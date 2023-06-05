@@ -2,34 +2,34 @@
   <div class="dga-topic-card" :class="[isPublicVote ? 'public' : 'private']">
     <div class="inner">
       <div v-if="isPublicVote" class="public">
-        {{ $t('voting.publicVote') }}
+        {{ $t('app.publicVote') }}
       </div>
       <div v-else class="private" >
-        {{ $t('voting.privateVote') }}
+        {{ $t('app.privateVote') }}
       </div>
       <div class="content">
         <div class="name">{{ props.topic.name }}</div>
-        <div class="time">{{ $t('voting.voteOn') }} {{ prettyStartAt }}</div>
-        <div class="createdby">{{ $t('voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
+        <div class="time">{{ $t('app.voting.voteOn') }} {{ prettyStartAt }}</div>
+        <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
       </div>
       <div class="status">
         <template v-if="props.editable">
-          <button :title="$t('voting.editTopic')" @click="emit('edit')">
-            {{ $t('voting.editTopic') }}
+          <button :title="$t('app.voting.editTopic')" @click="emit('edit')">
+            {{ $t('app.voting.editTopic') }}
           </button>
         </template>
         <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
           {{ actualStatusStr }}
         </button>
-        <button :title="$t('voting.recreateTopic')" class="recreate" @click="emit('recreate')">
-          {{ $t('voting.recreateTopic') }}
+        <button :title="$t('app.voting.recreateTopic')" class="recreate" @click="emit('recreate')">
+          {{ $t('app.voting.recreateTopic') }}
         </button>
       </div>
 
       <div v-if="status === 'result'" class="duration expired">
-      {{ $t('voting.expired') }}
+      {{ $t('app.voting.expired') }}
       </div>
-      <div v-else class="duration">{{ $t('voting.period')}} : {{ prettyDuation }}</div>
+      <div v-else class="duration">{{ $t('app.voting.period')}} : {{ prettyDuation }}</div>
     </div>
   </div>
 </template>
@@ -55,7 +55,7 @@ const emit = defineEmits<{
 }>();
 
 const actualStatusStr = computed(() => {
-  return i18n.t(`voting.status.${props.status}`, i18n.t('voting.status.access'))
+  return i18n.t(`app.voting.status.${props.status}`, i18n.t('app.voting.status.access'))
 })
 
 const isPublicVote = computed(() => {

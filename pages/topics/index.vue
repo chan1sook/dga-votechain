@@ -7,28 +7,28 @@
         <DgaSelect v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
       </template>
       <template v-else-if="filter.type === 'ticketId'">
-        <DgaInput v-model="filter.ticketId" :placeholder="$t('voting.filters.ticketIdPlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
+        <DgaInput v-model="filter.ticketId" :placeholder="$t('app.voting.filters.ticketIdPlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
       <template v-else-if="filter.type === 'topicName'">
-        <DgaInput v-model="filter.keyword" :placeholder="$t('voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
+        <DgaInput v-model="filter.keyword" :placeholder="$t('app.voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
-      <DgaButton color="dga-orange" class="flex-0" :title="$t('voting.filters.search')" @click="resetTopics">
-        {{ $t("voting.filters.search") }}
+      <DgaButton color="dga-orange" class="flex-0" :title="$t('app.voting.filters.search')" @click="resetTopics">
+        {{ $t("app.voting.filters.search") }}
       </DgaButton>
       <div v-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
           class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
-          :title="$t('voting.createTopic')"
+          :title="$t('app.voting.createTopic')"
           :href="localePathOf('/topic/create')"
         >
           <PlusCircleOutlineIcon />
-          {{ $t('voting.createTopic') }}
+          {{ $t('app.voting.createTopic') }}
         </DgaButton>
       </div>
     </div>
     <div class="my-4 flex flex-col gap-4 mx-auto max-w-6xl">
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
-        :editable="isAdminMode && !isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime())"
+        :editable="isAdminMode && !isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime())"
         :status="getStatusOf(topic)"
         @edit="toEditTopic(topic)"
         @recreate="toRecreateTopic(topic)"
@@ -36,15 +36,15 @@
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
         <div class="text-center text-xl italic">
-          {{ $t("voting.loadingTopic") }}
+          {{ $t("app.voting.loadingTopic") }}
         </div>
       </template>
       <template v-else>
         <div v-if="loadedTopics.length === 0 && !hasMoreTopics" class="text-center text-xl italic">
-          {{ $t("voting.noMoreTopic") }}
+          {{ $t("app.voting.noMoreTopic") }}
         </div>
-        <DgaButton v-if="hasMoreTopics && isLoadMoreTopics" color="dga-orange" class="mx-auto" :title="$t('voting.loadMoreTopic')" @click="loadMoreTopics">
-          {{ $t('voting.loadMoreTopic') }}
+        <DgaButton v-if="hasMoreTopics && isLoadMoreTopics" color="dga-orange" class="mx-auto" :title="$t('app.voting.loadMoreTopic')" @click="loadMoreTopics">
+          {{ $t('app.voting.loadMoreTopic') }}
         </DgaButton>
       </template>
     </div>
@@ -63,13 +63,13 @@ const i18n = useI18n();
 
 const roleMode = computed(() => useSessionData().value.roleMode);
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('voting.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.voting.title')}`
 });
 
 const filter = ref({
   type: "all",
-  month: dayjs(useComputedServerTime().value).month(),
-  year: dayjs(useComputedServerTime().value).year(),
+  month: dayjs(useComputedServerTime()).month(),
+  year: dayjs(useComputedServerTime()).year(),
   ticketId: "",
   keyword: "",
 });
@@ -77,7 +77,7 @@ const filter = ref({
 const topicFilterOptions = computed(() => 
   ["all", "date", "ticketId", "topicName"].map((value) => {
     return {
-      label: i18n.t(`voting.filters.${value}`),
+      label: i18n.t(`app.voting.filters.${value}`),
       value: value
     }
   })
@@ -92,10 +92,10 @@ const monthOptions = ref(new Array(12).fill(undefined).map((ele, i) => {
   }
 }))
 
-const yearOptions = ref(new Array(dayjs(useComputedServerTime().value).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
-  const year = dayjs(useComputedServerTime().value).year() - i;
+const yearOptions = ref(new Array(dayjs(useComputedServerTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
+  const year = dayjs(useComputedServerTime()).year() - i;
   return {
-    label: dayjs(useComputedServerTime().value).year(year).format("YYYY"),
+    label: dayjs(useComputedServerTime()).year(year).format("YYYY"),
     value: year,
   }
 }))
@@ -118,7 +118,7 @@ function resetTopics() {
 const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return isAdminMode.value && 
-    !isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime());
+    !isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime());
 }
 
 function toEditTopic(topic: TopicResponseDataExtended) {
@@ -139,9 +139,9 @@ function toRecreateTopic(topic: TopicResponseDataExtended) {
 }
 
 function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
-  if(isTopicExpired(topic, topic.pauseData, useComputedServerTime().value.getTime())) {
+  if(isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime())) {
     return "result";
-  } else if(!isTopicReadyToVote(topic, useComputedServerTime().value.getTime())) {
+  } else if(!isTopicReadyToVote(topic, useComputedServerTime().getTime())) {
     return "waiting";
   } else if(!useSessionData().value.userid) {
     return "voting";
@@ -167,15 +167,15 @@ function handleStatusAction(topic: TopicResponseDataExtended, status: TopicCardS
       break;
     case "voting":
       useShowToast({
-        title: i18n.t('voting.error.title'),
-        content: i18n.t('voting.error.notVoteable') ,
+        title: i18n.t('app.voting.error.title'),
+        content: i18n.t('app.voting.error.notVoteable') ,
         autoCloseDelay: 5000,
       })
       break;
     case "waiting":
       useShowToast({
-        title: i18n.t('voting.error.title'),
-        content: i18n.t('voting.error.waiting') ,
+        title: i18n.t('app.voting.error.title'),
+        content: i18n.t('app.voting.error.waiting') ,
         autoCloseDelay: 5000,
       });
       break;

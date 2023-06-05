@@ -31,7 +31,7 @@
           <div class="font-bold whitespace-nowrap">{{ key }} :</div>
           <div v-if="key === 'choice'" class="flex-1">
             <template v-if="val">{{ val }}</template> 
-            <i v-else-if="txData.txhash">{{ $t('voting.noVote')}}</i>
+            <i v-else-if="txData.txhash">{{ $t('app.voting.noVote')}}</i>
           </div>
           <div v-else class="flex-1">{{ val }}</div>
         </div>

@@ -117,7 +117,7 @@
           <div class="flex-1">{{ $t('app.result.total')}}</div>
           <div>100.00% |</div>
           <div>
-            {{ totalVotes }}  {{ $t('voting.vote' , { count: totalVotes })}}
+            {{ totalVotes }}  {{ $t('app.voting.vote' , { count: totalVotes })}}
           </div>
         </div>
       </div>
@@ -138,7 +138,7 @@
               <template v-if="getScoreOf(choice.name)">
                 <div>{{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}% |</div>
                 <div>
-                  {{ getScoreOf(choice.name)?.count }} {{ $t('voting.vote' , { count: getScoreOf(choice.name).count })}}
+                  {{ getScoreOf(choice.name)?.count }} {{ $t('app.voting.vote' , { count: getScoreOf(choice.name).count })}}
                 </div>
               </template>
             </div>
@@ -167,7 +167,7 @@
             <div class="flex-1 flex flex-row gap-2 items-center">
               <div class="flex-1">{{ $t('app.result.noVoted')}}</div>
               <div>
-                {{ getScoreOf(null).count }} {{ $t('voting.vote' , { count: totalVotes - getScoreOf(null).count })}}
+                {{ getScoreOf(null).count }} {{ $t('app.voting.vote' , { count: totalVotes - getScoreOf(null).count })}}
               </div>
             </div>
           </div>
@@ -178,7 +178,7 @@
     </div>
     <template v-if="voters">
       <div class="max-w-4xl mx-auto grid grid-cols-12 items-center gap-y-1 gap-x-2">
-        <h3 class="col-span-12 font-bold text-xl">{{ $t('app.result.votersList')}}</h3>
+        <h3 class="col-span-12 font-bold text-xl">{{ $t('app.votersList')}}</h3>
         <template v-for="voter of voters">
           <div class="hidden sm:block sm:col-span-2 my-2"></div>
           <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1">
@@ -204,7 +204,7 @@ const i18n = useI18n();
 const { id } = useRoute().params;
 let topicid = Array.isArray(id) ? id[id.length - 1] : id;
 
-const voteResult: Ref<TopicVoteCountResponse | undefined> = ref(undefined);
+const voteResult: Ref<TopicResultResponse | undefined> = ref(undefined);
 
 const title = computed(() => {
   if(voteResult.value) {

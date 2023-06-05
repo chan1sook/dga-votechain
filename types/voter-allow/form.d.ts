@@ -5,5 +5,4 @@ interface VoterAllowFormData {
   lastName?: string,
   totalVotes: number,
 }
-
 type CoadminFormData = Omit<VoterAllowFormData, "totalVotes">

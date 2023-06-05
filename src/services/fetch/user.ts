@@ -1,6 +1,6 @@
 import { FilterQuery } from "mongoose";
-import { escapeRegExp } from "~/src/utils/utils";
 import UserModel from "~/src/models/user";
+import { escapeRegExp } from "~/src/services/formatter/regexp";
 
 export function searchUsers(params: UserSearchParams) {
   let docQuery : FilterQuery<UserModelData> = {};

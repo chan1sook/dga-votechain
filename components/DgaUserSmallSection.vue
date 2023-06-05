@@ -31,9 +31,8 @@
         </div>
       </div>
     </div>
-    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue-lighter text-white" :title="$t('navbar.logout')" @click="beforeLogout">
+    <a href="/api/logout" class="flex flex-row gap-2 items-center text-sm px-2 py-1 justify-center bg-dga-blue text-white" :title="$t('navbar.logout')" @click="beforeLogout">
       <LogoutIcon class="!text-lg" />
-      {{ $t('navbar.logout') }}
     </a>
   </div>
 </template>
@@ -75,7 +74,7 @@ const isDeveloper = computed(() => checkPermissionNeeds(useSessionData().value.p
 const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permissions, 'admin-mode'));
 
 function updateTime() {
-  todayTime.value = useComputedServerTime().value.getTime();
+  todayTime.value = useComputedServerTime().getTime();
   isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
 }
 

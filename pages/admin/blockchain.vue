@@ -59,7 +59,7 @@
               <span>
                 {{ ele.topicId }} : {{ ele.userId }} =>
                 <template v-if="ele.choice">{{ ele.choice }}</template> 
-                <i v-else>{{ $t('voting.noVote')}}</i>
+                <i v-else>{{ $t('app.voting.noVote')}}</i>
               </span>
             </DgaTxCard>
           </div>
@@ -105,7 +105,7 @@ function countServerOnlines(servers: BlockchainServerDataResponse[]) {
   const onlineThershold = useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if(current.lastActiveAt) {
-      const diff = dayjs(useComputedServerTime().value).diff(current.lastActiveAt);
+      const diff = dayjs(useComputedServerTime()).diff(current.lastActiveAt);
       if(diff <= onlineThershold) {
         return prev + 1;
       }

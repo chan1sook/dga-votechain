@@ -274,8 +274,8 @@ watch(coadminsRef, (value) => {
 }, { deep: true, immediate: true });
 
 const votePublicOptions = computed(() => [
-  { label: i18n.t('topic.publicVoteAccess'), value: true },
-  { label: i18n.t('topic.privateVoteAccess'), value: false }
+  { label: i18n.t('app.publicVote'), value: true },
+  { label: i18n.t('app.privateVote'), value: false }
 ]);
 
 const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mode) => {

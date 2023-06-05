@@ -46,7 +46,7 @@ const editable = ref(false);
 const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
-const startDate = dayjs(useComputedServerTime().value).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
+const startDate = dayjs(useComputedServerTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
 
 const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
@@ -81,7 +81,7 @@ if (!data.value) {
 
   if(admins.findIndex((ele) => useSessionData().value.userid === ele) === -1) {
     showError(i18n.t('topic.error.notEditable'));
-  } else if(pauseData.every((ele) => ele.resumeAt) && dayjs(useComputedServerTime().value).diff(topic.voteExpiredAt) > 0) {
+  } else if(pauseData.every((ele) => ele.resumeAt) && dayjs(useComputedServerTime()).diff(topic.voteExpiredAt) > 0) {
     showError(i18n.t('topic.error.notEditable'));
   } else {
     isTopicStartVote.value = isTopicReadyToVote(topic);

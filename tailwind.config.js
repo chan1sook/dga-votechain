@@ -12,7 +12,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "dga-blue": "#1E154C",
+        "dga-blue": {
+          lighter: "hsl(250, 57%, 45%)",
+          DEFAULT: "#1E154C",
+        },
         'dga-orange': "#EE5020",
       }
     },

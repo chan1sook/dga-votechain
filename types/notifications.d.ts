@@ -1,6 +1,35 @@
 import { Model, Query, Types } from "mongoose";
 
 declare global {
+  type NotificationGroup = "request-permission" | "topic";
+  interface ReadNotificationModelData {
+    userid: Types.ObjectId,
+    group: NotificationGroup,
+    notifyAt: Date,
+  }
+
+  type NotificationRequestGroup = {
+    group: "request-permission",
+    extra: {
+      id: string,
+      status: RequestPermissionStatus
+    }
+  }
+  type NotificationTopicGroup = {
+    group: "topic",
+    extra: {
+      id: string,
+      name: string,
+      status: "pending" | "voting" | "finished"
+    }
+  }
+  type NotificationGroups = NotificationRequestGroup | NotificationTopicGroup;
+
+  type NotificationModelData = {
+    userid: Types.ObjectId,
+    notifyAt?: Date,
+  } & NotificationGroups;
+
   interface NotificationData {
     _id?: string,
     from: "system" | string,

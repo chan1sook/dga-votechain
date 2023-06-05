@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     getTopicCtrlPauseListByTopicId(topicDoc._id),
   ]);
   
-  const voterAllows : VoterAllowFormData[] = voterAllowDocs.map((ele) => {
+  const voterAllows : VoterAllowVoteData[] = voterAllowDocs.map((ele) => {
     return ele.userid ? {
       userid: (ele.userid as unknown as UserModelDataWithId)._id.toString(),
       firstName: (ele.userid as unknown as UserModelDataWithId).firstName,

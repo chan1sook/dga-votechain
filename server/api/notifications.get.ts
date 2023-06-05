@@ -2,11 +2,12 @@ import dayjs from "dayjs";
 
 import NotificationModel from "~/server/models/notification"
 import TopicNotificationModel from "~/server/models/topic-notifications"
+import { getNotificationByUser } from "~/src/services/fetch/notification";
 
 export default defineEventHandler(async (event) => {
   const { type, pagesize, startid } : NotificationQueryParams = getQuery(event);
   
-  let notificationsData: NotificationData[] = [];
+  let _notificationsData: NotificationData[] = [];
   let topicNotificationsData: TopicNotificationDataWithPopulate[] = [];
 
   const userData = event.context.userData;
@@ -17,29 +18,32 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  let notificationsData: NotificationModelData[] = await getNotificationByUser(userData._id, pagesize, startid);
+  console.log(notificationsData);
+
   switch(type) {
     case "unread":
-      [notificationsData, topicNotificationsData] = await Promise.all([
+      [_notificationsData, topicNotificationsData] = await Promise.all([
         NotificationModel.getLastestUnreadNotifications(userData._id, pagesize, startid),
         TopicNotificationModel.getLastestUnreadNotifications(userData._id, pagesize, startid)
       ]);
       break;
     case "read":
-      [notificationsData, topicNotificationsData] = await Promise.all([
+      [_notificationsData, topicNotificationsData] = await Promise.all([
         NotificationModel.getLastestReadNotifications(userData._id, pagesize, startid),
         TopicNotificationModel.getLastestReadNotifications(userData._id, pagesize, startid)
       ]);
       break;
     case "all":
     default:
-      [notificationsData, topicNotificationsData] = await Promise.all([
+      [_notificationsData, topicNotificationsData] = await Promise.all([
         NotificationModel.getLastestAllNotifications(userData._id, pagesize, startid),
         TopicNotificationModel.getLastestAllNotifications(userData._id, pagesize, startid)
       ]);
       break;
   }
 
-  const _notiResData = notificationsData.map<NotificationUserResponseData>((notification, i) => {
+  const _notiResData = _notificationsData.map<NotificationUserResponseData>((notification, i) => {
     const target = notification.target.find((ele) => ele.userid.toString() === userData._id.toString());
     return {
       _id: `${notification._id}`,

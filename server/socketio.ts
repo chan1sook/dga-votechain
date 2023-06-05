@@ -78,7 +78,7 @@ export default async () => {
       socket.emit(`hasNotify/${userid}`, notifyData);
     });
 
-    socket.on("pauseVote", async ({userid, topicId} : {userid: string, topicId?: string}) => {
+    socket.on("pauseVote", async ({userid, topicId, cause} : {userid: string, topicId?: string, cause: string}) => {
       const [userData, targetTopic] = await Promise.all([
         UserModel.findById(userid),
         TopicModel.findById(topicId)
@@ -92,6 +92,7 @@ export default async () => {
         const topicCtrlPauseDoc = new TopicCtrlPauseModel({
           topicid: targetTopic._id,
           pauseAt: new Date(),
+          cause: cause,
         });
         
         await topicCtrlPauseDoc.save()
