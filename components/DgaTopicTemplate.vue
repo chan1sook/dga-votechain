@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
     <div class="col-span-12 md:col-span-2">
-      {{ $t('app.topic.useTemplate') }}
+      {{ $t('app.topic.templateTitle') }}
     </div>
     <DgaSelect v-model="templateName" class="col-span-12 md:col-span-10" :options="templateOptions"></DgaSelect>
     <DgaButtonGroup class="col-span-12 mt-4">
