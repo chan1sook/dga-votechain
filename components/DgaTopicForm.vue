@@ -1,26 +1,32 @@
 <template>
   <div class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
     <div class="col-span-12 md:col-span-2">
-      {{ $t('topic.accessModifier') }}
+      {{ $t('app.topic.templateTitle') }}
+    </div>
+    <div class="col-span-12 md:col-span-10">
+      <DgaButton color="dga-orange" @click="emit('template')">{{ $t('app.topic.useTemplate')}}</DgaButton>
+    </div>
+    <div class="col-span-12 md:col-span-2">
+      {{ $t('app.topic.accessModifier') }}
     </div>
     <DgaSelect v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"></DgaSelect>
-    <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.voteDuration.title')}}</h3>
-    <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.inputMode')}}</div>
+    <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.voteDuration.title')}}</h3>
+    <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.inputMode')}}</div>
     <div class="col-span-12 md:col-span-10">
       <DgaSelect v-model="topicData.durationMode" :options="durationModeOptions"></DgaSelect>
     </div>
-    <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.start') }}</div>
+    <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.start') }}</div>
     <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-      <VueDatePicker v-model="voteStart" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
+      <VueDatePicker v-model="voteStart" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
     </div>
     <template v-if="topicData.durationMode === 'startEnd'">
-      <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.end')}}</div>
+      <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.end')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-        <VueDatePicker v-model="voteEnd" :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
+        <VueDatePicker v-model="voteEnd" :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
       </div>
     </template>
     <template v-else>
-      <div class="col-span-12 md:col-span-2">{{ $t('topic.voteDuration.duration')}}</div>
+      <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.duration')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col sm:flex-row gap-2">
         <div class="w-full flex flex-row items-center gap-2">
           <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
@@ -36,11 +42,11 @@
         </div>
       </div>
     </template>
-    <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.topicQuestion')}}</h3>
+    <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.topicQuestion')}}</h3>
     <div class="col-span-12">
       <DgaInput
         v-model="topicData.name" type="text" 
-        class="dga-evote-input w-full" :placeholder="$t('topic.topicQuestion')" 
+        class="dga-evote-input w-full" :placeholder="$t('app.topic.topicQuestion')" 
         required
       >
       </DgaInput>
@@ -59,7 +65,7 @@
         <PlusIcon /> {{ $t('app.description.add') }}
       </button>
     </template>
-    <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.addChoice.title') }}</h3>
+    <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.addChoice.title') }}</h3>
     <div v-for="choice, i of topicData.choices.choices" class="col-span-12 flex justify-center items-center">
       <div class="w-full max-w-xl flex flex-row gap-2 justify-center items-center">
         <ExclamationIcon
@@ -70,7 +76,7 @@
         <div class="flex-1 inline-flex flex-row">
           <DgaInput v-model="choice.name" type="text" class="flex-1"></DgaInput>
           <button class="px-2 py-1 inline-flex items-center"
-            :title="`${$t('topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
+            :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
           >
             <MinusIcon />
           </button>
@@ -78,17 +84,17 @@
       </div>
     </div>
     <div class="col-span-12 flex justify-center items-center">
-      <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('topic.addChoice.add')" 
+      <DgaButton color="dga-orange" class="flex flex-row gap-2 items-center" :title="$t('app.topic.addChoice.add')" 
         @click="addOption"
       >
-        {{ $t('topic.addChoice.add') }} <PlusIcon />
+        {{ $t('app.topic.addChoice.add') }} <PlusIcon />
       </DgaButton>
     </div>
-    <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.voterList.title') }}</h3>
+    <h3 class="col-span-12 font-bold mt-2">{{ $t('app.voterList.title') }}</h3>
     <div class="col-span-12 flex flex-col gap-2">
       <div class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
-        <label class="flex-none">{{ $t('topic.voterList.multipleVotes') }}</label>
+        <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
       </div>
       <div v-if="topicData.multipleVotes" class="grid grid-cols-12 gap-2 items-center">
         <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
@@ -97,10 +103,10 @@
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
           <div class="font-bold"></div>
-          <div class="font-bold">{{ $t('topic.voterList.userId') }}</div>
-          <div class="font-bold">{{ $t('topic.voterList.name') }}</div>
-          <div class="font-bold">{{ $t('topic.voterList.email') }}</div>
-          <div v-if="topicData.multipleVotes" class="font-bold">{{ $t('topic.voterList.totalVotes')}}</div>
+          <div class="font-bold">{{ $t('app.userid') }}</div>
+          <div class="font-bold">{{ $t('app.userName') }}</div>
+          <div class="font-bold">{{ $t('app.email') }}</div>
+          <div v-if="topicData.multipleVotes" class="font-bold">{{ $t('app.voterList.totalVotes')}}</div>
           <div></div>
           <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
           <template v-for="voter of voterAllows">
@@ -115,11 +121,11 @@
             <div>{{ voter.firstName ? getVoterName(voter) : "-" }}</div>
             <div>{{ voter.email || "-" }}</div>
             <div v-if="topicData.multipleVotes">
-              <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full min-w-[100px]" :placeholder="$t('topic.voterList.totalVotes')"></DgaInput>
+              <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full min-w-[100px]" :placeholder="$t('app.voterList.totalVotes')"></DgaInput>
             </div>
             <div>
               <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                :title="`${$t('topic.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter)"
+                :title="`${$t('app.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter)"
               >
                 <MinusIcon/>
               </button>
@@ -128,18 +134,18 @@
         </div>
       </div>
       <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
-        <DgaUserSearch class="flex-1 max-w-xl" :placeholder="$t('topic.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
+        <DgaUserSearch class="flex-1 max-w-xl" :placeholder="$t('app.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
       </div>
     </div>
     <template v-if="!noCoadmin">
-      <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.coadminList.title') }}</h3>
+      <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.coadminList.title') }}</h3>
       <div class="col-span-12 flex flex-col gap-2">
         <div class="overflow-auto max-h-[50vh]">
           <div class="user-grid">
             <div class="font-bold"></div>
-            <div class="font-bold">{{ $t('topic.coadminList.userId') }}</div>
-            <div class="font-bold">{{ $t('topic.coadminList.name') }}</div>
-            <div class="font-bold">{{ $t('topic.coadminList.email') }}</div>
+            <div class="font-bold">{{ $t('app.userid') }}</div>
+            <div class="font-bold">{{ $t('app.userName') }}</div>
+            <div class="font-bold">{{ $t('app.email') }}</div>
             <div></div>
             <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
             <template v-for="admin of coadmins">
@@ -155,7 +161,7 @@
               <div>{{ admin.email || "-" }}</div>
               <div>
                 <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                  :title="`${$t('topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
+                  :title="`${$t('app.topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
                 >
                   <MinusIcon />
                 </button>
@@ -164,17 +170,17 @@
           </div>
         </div>
         <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
-          <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
+          <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('app.topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
         </div>
       </div>
     </template>
     <div class="col-span-12 flex flex-row items-center gap-2">
       <DgaCheckbox v-model="topicData.notifyVoter"></DgaCheckbox> 
-      <label class="flex-none"> {{ $t('topic.notifyUsers') }}</label>
+      <label class="flex-none"> {{ $t('app.topic.notifyUsers') }}</label>
     </div>
     <div class="col-span-12 flex flex-row items-center gap-2">
       <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
-      <label class="flex-none"> {{ $t('topic.skipBlockchain') }}</label>
+      <label class="flex-none"> {{ $t('app.topic.skipBlockchain') }}</label>
     </div>
   </div>
 </template>
@@ -189,7 +195,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 
 import dayjs from 'dayjs';
 import { getPrettyFullName } from '~/src/services/formatter/user';
-import { getPresetChoices } from '~/src/services/form/topic';
+import { getDefaultChoices } from '~/src/services/form/topic';
 import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
 import { voterCountOf } from '~/src/services/validations/user';
 
@@ -202,6 +208,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: "update:modelValue", v: TopicFormData) : void,
+  (e: "template", v: void): void,
 }>();
 
 const i18n = useI18n();
@@ -226,7 +233,7 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
-  choices: getPresetChoices(),
+  choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
@@ -280,7 +287,7 @@ const votePublicOptions = computed(() => [
 
 const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mode) => {
   return {
-    label: i18n.t(`topic.voteDuration.mode.${mode}`),
+    label: i18n.t(`app.topic.voteDuration.mode.${mode}`),
     value: mode
   }
 }));
@@ -364,10 +371,10 @@ function isChoiceValid(choice: string) {
 
 function getChoiceErrorReason(choice: string) {
   if(choice === '') {
-    return i18n.t('topic.addChoice.error.empty');
+    return i18n.t('app.topic.addChoice.error.empty');
   }
 
-  return i18n.t('topic.addChoice.error.duplicated');
+  return i18n.t('app.topic.addChoice.error.duplicated');
 }
 
 function removeOption(nth: number) {
@@ -383,7 +390,7 @@ function isVoterValid(voter: VoterAllowFormData) {
 }
 
 function getVoterErrorReason(voter: VoterAllowFormData) {
-  return i18n.t('topic.voterList.error.duplicated');
+  return i18n.t('app.voterList.error.duplicated');
 }
 
 function removeVoter(user: VoterAllowFormData) {
@@ -406,7 +413,7 @@ function addVoter(user: UserSearchResponseData) {
 }
 
 function getCoadminErrorReason(coadmin: CoadminFormData) {
-  return i18n.t('topic.coadminList.error.duplicated');
+  return i18n.t('app.topic.coadminList.error.duplicated');
 }
 
 function removeCoadmin(user: CoadminFormData) {

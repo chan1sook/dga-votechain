@@ -29,6 +29,72 @@ export default {
         failed: 'Edit topic failed',
       },
       defaultVotes: "Default Vote for Voters",
+      template: {
+        yesno: {
+          label: "Yes/No",
+          choice1: "Yes",
+          choice2: "No",
+        },
+        option2: {
+          label: "2 Options",
+          choice1: "Option 1",
+          choice2: "Option 2",
+        },
+        option3: {
+          label: "3 Options",
+          choice1: "Option 1",
+          choice2: "Option 2",
+          choice3: "Option 3",
+        }
+      },
+      templateTitle: "Topic Template",
+      useTemplate: "Use Topic Template",
+      applyTemplate: "Apply Template",
+      error: {
+        notFound: "Topic not found",
+        notEditable: "Topic not editable"
+      },
+      accessModifier: "Access Type",
+      voteDuration: {
+        title: "Vote Duration",
+        inputMode: "Input Mode",
+        mode: {
+          startDuration: "Start/Duration",
+          startEnd: "Start/End",
+        },
+        start: "Start Vote",
+        duration: "Duration",
+        end: "End Vote",
+        startDate: "Start Date",
+        endDate: "End Date",
+        startTime: "Start Time",
+        endTime: "Start Time",
+      },
+      topicQuestion: "Topic Question",
+      addChoice: {
+        title: "Add Choice",
+        add: "Add Choice",
+        remove: "Remove Choice",
+        error: {
+          empty: "Choice must not empty",
+          duplicated: "Choice Duplicated"
+        }
+      },
+      coadminList: {
+        title: "Co-Admin Lists",
+        name: "Name",
+        add: "Add User",
+        remove: "Remove User",
+        searchUser: "Search User",
+        error: {
+          duplicated: "Duplicated User"
+        }
+      },
+      notifyUsers: "Send notice to users",
+      skipBlockchain: "Not record to Blockchain",
+      scorePublic: "Display voter choice(s) for public",
+      allow: "Allow",
+      deny: "Deny",
     },
     voting: {
       title: "Voting",
@@ -66,7 +132,6 @@ export default {
         notVoteable: "In progress. Wait until voting finished",
         waitResult: "Counting scores. Wait until finished",
       },
-      back: "Back",
       now: "Now",
       localtime: "Local Time",
       remainVotes: "Remain",
@@ -78,10 +143,8 @@ export default {
       startVoteOn: "Start vote on",
       timeRemain: "Time Remaining",
       timePaused: "Time Paused",
-      evoteState: {
-        running: "E-voting is Running",
-        paused: "E-voting is Paused",
-      },
+      running: "E-voting is Running",
+      paused: "E-voting is Paused",
       adminWarning: "Please change mode to Voter for voting topic.",
       cannotVote: "Can't vote",
       pause: "Paused",
@@ -90,10 +153,8 @@ export default {
       noVote: "No Vote",
       submit: "Submit",
       confirm: "Confirm voting choices?",
-      pauseForm: {
-        title: "Enter Cause",
-        cause: "Cause",
-      }
+      pauseCause: "Reason",
+      pasueCauseTitle: "Enter Reason of Pause",
     },
     result: {
       title: "Voting Result",
@@ -112,6 +173,18 @@ export default {
       winner: "Winner",
       export: "Export Result",
     },
+    voterList: {
+      title: "Voter Lists",
+      multipleVotes: "Multiple Votes",
+      totalVotes: "Total Votes",
+      remove: "Remove User",
+      searchUser: "Search User",
+      error: {
+        duplicated: "Duplicated User"
+      }
+    },
+    userid: "User ID",
+    userName: "Name",
     firstName: "First Name",
     lastName: "Last Name",
     email: "Email",
@@ -132,6 +205,11 @@ export default {
     countable: {
       vote: "Vote | Votes",
       voter: "Voter | Voters"
+    },
+    modal: {
+      back: "Back",
+      cancel: "Cancel",
+      confirm: "Confirm"
     },
     edit: "Edit",
   },
@@ -215,67 +293,6 @@ export default {
     voter: "Voter",
     admin: "Admin",
     developer: "Developer",
-  },
-  topic: {
-    error: {
-      notFound: "Topic not found",
-      notEditable: "Topic not editable"
-    },
-    accessModifier: "Access Type",
-    voteDuration: {
-      title: "Vote Duration",
-      inputMode: "Input Mode",
-      mode: {
-        startDuration: "Start/Duration",
-        startEnd: "Start/End",
-      },
-      start: "Start Vote",
-      duration: "Duration",
-      end: "End Vote",
-      startDate: "Start Date",
-      endDate: "End Date",
-      startTime: "Start Time",
-      endTime: "Start Time",
-    },
-    topicQuestion: "Topic Question",
-    addChoice: {
-      title: "Add Choice",
-      add: "Add Choice",
-      remove: "Remove Choice",
-      error: {
-        empty: "Choice must not empty",
-        duplicated: "Choice Duplicated"
-      }
-    },
-    voterList: {
-      title: "Voter Lists",
-      multipleVotes: "Multiple Votes",
-      totalVotes: "Total Votes",
-      userId: "User ID",
-      name: "Name",
-      add: "Add User",
-      remove: "Remove User",
-      searchUser: "Search User",
-      error: {
-        duplicated: "Duplicated User"
-      }
-    },
-    coadminList: {
-      title: "Co-Admin Lists",
-      userId: "User ID",
-      name: "Name",
-      add: "Add User",
-      remove: "Remove User",
-      searchUser: "Search User",
-      error: {
-        duplicated: "Duplicated User"
-      }
-    },
-    notifyUsers: "Send notice to users",
-    skipBlockchain: "Not record to Blockchain",
-    scorePublic: "Display voter choice(s) for public",
-    allow: "Allow",
-    deny: "Deny",
   },
   news: {
     title: "News",
@@ -404,10 +421,6 @@ export default {
     minute: "Mins",
     hour: "Hours",
     day: "Days",
-  },
-  modal: {
-    cancel: "Cancel",
-    confirm: "Confirm"
   },
   error: {
     title: "Error",

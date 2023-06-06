@@ -1,15 +1,20 @@
 <template>
   <div>
     <DgaHead>{{ $t('app.topic.create.title')  }}</DgaHead>
-    <DgaTopicForm v-model="topicData"></DgaTopicForm>
-    <DgaButtonGroup class="mt-4">
-      <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-        color="dga-orange" :title="$t('app.topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
-      >
-        <BallotIcon />
-        <span class="truncate">{{ $t('app.topic.create.action') }}</span>
-      </DgaButton>
-    </DgaButtonGroup>
+    <template v-if="!useTemplate">
+      <DgaTopicForm v-model="topicData" @template="useTemplate = true"></DgaTopicForm>
+      <DgaButtonGroup class="mt-4">
+        <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
+          color="dga-orange" :title="$t('app.topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+        >
+          <BallotIcon />
+          <span class="truncate">{{ $t('app.topic.create.action') }}</span>
+        </DgaButton>
+      </DgaButtonGroup>
+    </template>
+    <template v-else>
+      <DgaTopicTemplate @use-template="applyTemplate" @cancel="useTemplate = false"></DgaTopicTemplate>
+    </template>
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="createTopic"
       @close="showConfirmModal = false"
@@ -26,7 +31,7 @@ import BallotIcon from 'vue-material-design-icons/Ballot.vue';
 
 import dayjs from "dayjs";
 import { isTopicFormValid } from '~/src/services/validations/topic';
-import { getPresetChoices } from '~/src/services/form/topic';
+import { getDefaultChoices, getPresetTemplate } from '~/src/services/form/topic';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -39,6 +44,7 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.topic.create.title')}`
 });
 
+const useTemplate = ref(false);
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
 
@@ -48,7 +54,7 @@ const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisec
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
-  choices: getPresetChoices(),
+  choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
@@ -62,6 +68,26 @@ const topicData = ref<TopicFormData>({
 });
 
 const isFormValid = computed(() => isTopicFormValid(topicData.value))
+
+function applyTemplate(name: string) {
+  const template = getPresetTemplate(name);
+  if(template.name) {
+    topicData.value.name = i18n.t(template.name, template.name);
+  }
+  if(template.choices) {
+    topicData.value.choices = {
+      choices: template.choices.choices.map((ele) => {
+        return {
+          name: i18n.t(ele.name, ele.name),
+          image: ele.image,
+        }
+      }),
+      customable: template.choices.customable,
+    } ;
+  }
+  
+  useTemplate.value = false;
+}
 
 async function createTopic() {
   if(!isFormValid.value) {

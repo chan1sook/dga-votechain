@@ -2,7 +2,7 @@
   <div v-if="topic">
     <div class="relative flex flex-col md:flex-row gap-x-2 gap-y-1 justify-center items-center">
       <button class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
-        <ArrowLeftIcon /> {{ $t("app.voting.back") }}
+        <ArrowLeftIcon /> {{ $t("app.modal.back") }}
       </button>
     </div>
     <div class="flex flex-col md:flex-row gap-2 my-4">
@@ -24,10 +24,10 @@
           <div>{{ $t("app.voting.timeRemain") }}: {{ perttyDuration(remainTime) }}</div>
           <div>{{ $t("app.voting.timePaused") }}: {{ perttyDuration(pauseTime) }}</div>
           <div v-if="!isPaused" class="text-green-700 text-center">
-            {{ $t("app.voting.evoteState.running") }}
+            {{ $t("app.voting.running") }}
           </div>
           <div v-else class="text-red-700 text-center">
-            {{ $t("app.voting.evoteState.paused") }}...
+            {{ $t("app.voting.paused") }}...
           </div>
         </div> 
         <button v-if="!isPaused" class="w-16 text-white bg-red-700 rounded-l-lg order-3 flex flex-col items-center justify-center px-2 py-2"
@@ -47,13 +47,11 @@
     <h2 class="text-2xl md:text-4xl font-bold text-center my-4">
       {{ topic.name }}
     </h2>
-    <!-- <div v-if="canVote" class="text-center text-2xl">{{ $t("app.voting.adminWarning") }}</div>
-    <div v-else class="text-center text-2xl">{{ $t("app.voting.cannotVote") }}</div> -->
     <div class="mx-auto max-w-2xl">
       <div class="font-bold text-xl mb-2">{{ $t('app.votersList') }}</div>
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-12 sm:col-span-8 font-bold">
-          {{ $t('topic.voterList.name')}}
+          {{ $t('app.topic.voterList.name')}}
         </div>
         <div class="hidden sm:block col-span-2 text-right font-bold">
           {{ $t('app.voting.remainVotes') }}
@@ -87,8 +85,8 @@
       @close="showConfirmModal = false"
       @cancel="showConfirmModal = false"
     >
-      <div>{{ $t('app.voting.pauseForm.title') }}</div>
-      <DgaInput v-model="pauseCause" :placeholder="$t('app.voting.pauseForm.cause')" />
+      <div>{{ $t('app.voting.pauseCauseTitle') }}</div>
+      <DgaInput v-model="pauseCause" :placeholder="$t('app.voting.pauseCause')" />
     </DgaModal>
     <DgaLoadingModal :show="waitPause"></DgaLoadingModal>
   </div>
