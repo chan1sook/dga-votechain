@@ -265,7 +265,7 @@ function popupPauseModal() {
 function emitPause() {
   showConfirmModal.value = false;
   waitPause.value = true;
-  socket.volatile.emit('pauseVote', { userid: useSessionData().value.userid, topicId: topic.value?._id, cause: pauseCause });
+  socket.volatile.emit('pauseVote', { userid: useSessionData().value.userid, topicId: topic.value?._id, cause: pauseCause.value });
   waitPause.value = false;
 }
 
