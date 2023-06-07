@@ -13,15 +13,15 @@
         <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
       </div>
       <div class="status">
-        <template v-if="props.editable">
-          <button :title="$t('app.voting.editTopic')" @click="emit('edit')">
+        <template >
+          <button v-if="props.editable" :title="$t('app.voting.editTopic')" @click="emit('edit')">
             {{ $t('app.voting.editTopic') }}
           </button>
         </template>
         <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
           {{ actualStatusStr }}
         </button>
-        <button :title="$t('app.voting.recreateTopic')" class="recreate" @click="emit('recreate')">
+        <button v-if="props.isAdmin" :title="$t('app.voting.recreateTopic')" class="recreate" @click="emit('recreate')">
           {{ $t('app.voting.recreateTopic') }}
         </button>
       </div>
@@ -42,6 +42,7 @@ const i18n = useI18n();
 const props = withDefaults(defineProps<{
   topic: TopicResponseData,
   editable?: boolean,
+  isAdmin?: boolean,
   status?: TopicCardStatus,
 }>(), {
   status: "access",
