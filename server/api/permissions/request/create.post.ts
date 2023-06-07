@@ -1,5 +1,5 @@
 import RequestPermissionsModel from "~/src/models/request-permission"
-import NotificationModel from "~/server/models/notification";
+import NotificationModel from "~/src/models/notification";
 import { getExistsRequestPermissionsData } from "~/src/services/fetch/permission";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
@@ -35,17 +35,15 @@ export default defineEventHandler(async (event) => {
   }
   const reqPermissionsDoc = await new RequestPermissionsModel(reqPermissions).save();
   
-  const content = `{{notification.requestPermission.title}} #${reqPermissionsDoc.id} {{notification.requestPermission.inProgress}}`
   await new NotificationModel(
     {
-      from: "system",
-      target: [{ userid: userData._id }],
-      title: content,
-      content: content,
+      userid: userData._id,
+      group: "request-permission",
+      extra: {
+        id: reqPermissionsDoc._id.toString(),
+        status: "pending",
+      },
       notifyAt: today,
-      createdAt: today,
-      updatedAt: today,
-      tags: [`request-${reqPermissionsDoc._id}-pending`],
     }
   ).save();
 

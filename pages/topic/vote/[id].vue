@@ -2,7 +2,7 @@
   <div v-if="topic">
     <div class="relative flex flex-col md:flex-row gap-x-2 gap-y-1 justify-center items-center">
       <button class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
-        <ArrowLeftIcon /> {{ $t("app.voting.back") }}
+        <ArrowLeftIcon /> {{ $t("app.modal.back") }}
       </button>
       <div class="font-bold text-xl md:text-2xl" @click="showLocaltime = !showLocaltime">
         <div class="text-center flex flex-row justify-center items-center gap-2">{{ $t("app.voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
@@ -102,9 +102,9 @@
       </div>
     </template>
     <template v-else>
-      <div class="text-center text-2xl">{{ $t("app.voting.evoteState.paused") }}</div>
+      <div class="text-center text-2xl">{{ $t("app.voting.paused") }}</div>
       <div v-if="getPauseCause()">
-        <b>{{ $t('app.voting.pauseForm.cause') }}:</b> {{ getPauseCause() }}
+        <b>{{ $t('app.voting.pauseCause') }}:</b> {{ getPauseCause() }}
       </div>
     </template>
     <DgaModal :show="showConfirmModal" cancel-backdrop

@@ -1,23 +1,23 @@
 <template>
   <div class="grid grid-cols-12 items-center gap-x-4 gap-y-2 max-w-4xl mx-auto my-4">
-    <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.topicQuestion')}}</h3>
+    <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.topicQuestion')}}</h3>
     <div class="col-span-12">
       <DgaInput
         :value="topicData.name" type="text" 
         readonly
-        class="dga-evote-input w-full" :placeholder="$t('topic.topicQuestion')" 
+        class="dga-evote-input w-full" :placeholder="$t('app.topic.topicQuestion')" 
         required
       >
       </DgaInput>
     </div>
-    <h3 class="col-span-12 font-bold mt-2">{{ $t('topic.coadminList.title') }}</h3>
+    <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.coadminList.title') }}</h3>
     <div class="col-span-12 flex flex-col gap-2">
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid">
           <div class="font-bold"></div>
-          <div class="font-bold">{{ $t('topic.coadminList.userId') }}</div>
-          <div class="font-bold">{{ $t('topic.coadminList.name') }}</div>
-          <div class="font-bold">{{ $t('topic.coadminList.email') }}</div>
+          <div class="font-bold">{{ $t('app.userid') }}</div>
+          <div class="font-bold">{{ $t('app.userName') }}</div>
+          <div class="font-bold">{{ $t('app.email') }}</div>
           <div></div>
           <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
           <template v-for="admin of coadmins">
@@ -33,7 +33,7 @@
             <div>{{ admin.email || "-" }}</div>
             <div>
               <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                :title="`${$t('topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
+                :title="`${$t('app.topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
               >
                 <MinusIcon />
               </button>
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
-        <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
+        <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('app.topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
       </div>
     </div>
   </div>
@@ -54,7 +54,7 @@ import MinusIcon from 'vue-material-design-icons/Minus.vue';
 
 import dayjs from 'dayjs';
 import { getPrettyFullName } from '~/src/services/formatter/user';
-import { getPresetChoices } from '~/src/services/form/topic';
+import { getDefaultChoices } from '~/src/services/form/topic';
 import { isCoadminValid } from '~/src/services/validations/topic';
 
 const props = withDefaults(defineProps<{
@@ -76,7 +76,7 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
-  choices: getPresetChoices(),
+  choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
@@ -120,7 +120,7 @@ watch(topicData, (value) => {
 
 
 function getCoadminErrorReason(coadmin: CoadminFormData) {
-  return i18n.t('topic.coadminList.error.duplicated');
+  return i18n.t('app.topic.coadminList.error.duplicated');
 }
 
 function removeCoadmin(user: CoadminFormData) {

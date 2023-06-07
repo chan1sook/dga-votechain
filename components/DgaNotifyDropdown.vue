@@ -13,10 +13,10 @@
         <div v-for="notification of loadedNotifications">
           <h3 class="font-bold">
             <div v-if="!notification.readAt" class="inline-block bg-red-700 w-2 h-2 rounded-full"></div>
-            {{ translated(notification.title) }}
+            {{ getGeneratedHeaderOf(notification) }}
           </h3>
           <div class="text-xs">
-            {{ prettyDateTime(notification.notifyAt) }} - <b>{{ notification.from }}</b>
+            {{ prettyDateTime(notification.notifyAt) }} - <b>System</b>
           </div>
         </div>
         <template v-if="isLoadMoreNotifications">
@@ -62,11 +62,16 @@ function checkIsUnread() {
   return loadedNotifications.value.length > 0 && loadedNotifications.value.some((ele) => ele.readAt === undefined);
 }
 
-function translated(str: string) {
-  return str.replace(/\{\{[.a-zA-Z0-9_]+\}\}/g, (substr) => {
-    const rawStr = substr.replace(/[\{\}]/g, "");
-    return i18t.t(rawStr, rawStr);
-  })
+function getGeneratedHeaderOf(notification: NotificationUserResponseData) {
+  let status;
+  switch(notification.group) {
+    case "request-permission":
+      status = i18t.t(`notification.${notification.group}.${notification.extra.status}`, notification.extra.status)
+      return `${i18t.t(`notification.${notification.group}.title`)} #${notification.extra.id} ${status}`;
+    case "topic":
+      status = i18t.t(`notification.${notification.group}.${notification.extra.status}`, notification.extra.status)
+      return `${i18t.t(`notification.${notification.group}.title`)} "${notification.extra.name}" ${status}`;
+  }
 }
 
 async function toggleShowOption() {
@@ -110,8 +115,8 @@ async function loadMoreNotifications() {
   
   const notifications = await fetchNotifications(pagesize.value, startid.value);
   if(notifications) {
-    loadedNotifications.value.push(...notifications.notifications);
-    hasMoreNotifications.value = notifications.notifications.length === pagesize.value;
+    loadedNotifications.value.push(...notifications);
+    hasMoreNotifications.value = notifications.length === pagesize.value;
     isUnread.value = checkIsUnread();
   }
   isLoadMoreNotifications.value = false;
@@ -129,10 +134,10 @@ socket.on(`hasNotify/${useSessionData().value.userid}`, (notifyData: Notificatio
 
 onMounted(() => {
   notifyID = setInterval(() => {
-    socket.volatile.emit("hasNotify", { sid: useSessionData().value.userid });
+    socket.volatile.emit("hasNotify", { userid: useSessionData().value.userid });
   }, 1000);
   
-  socket.volatile.emit("hasNotify", { sid: useSessionData().value.userid });
+  socket.volatile.emit("hasNotify", { userid: useSessionData().value.userid });
 })
 
 onUnmounted(() => {

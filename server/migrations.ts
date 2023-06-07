@@ -1,5 +1,4 @@
 import UserModel from "~/src/models/user"
-import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~/src/models/blockchain-server"
 import { combinePermissions, legacyRoleToPermissions } from '~/src/services/transform/permission';
 
@@ -74,31 +73,4 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
-}
-
-export async function addTopicFields() {
-  migrationSeq +=1 ;
-
-  console.log(`[Migration] ${migrationSeq}. Add Topic Fields`);
-  
-  const topics = await TopicModel.find({ 
-    $or: [
-      { durationMode: { $exists: false } },
-      { defaultVotes: { $exists: false } }
-    ]
-  });
-
-  const topicsToSave = [];
-  for(const topic of topics) {
-    if(!topic.durationMode) {
-      topic.durationMode = "startDuration";
-    }
-    if(!topic.defaultVotes) {
-      topic.defaultVotes = 1;
-    }
-    topicsToSave.push(topic)
-  }
-  
-  const result = await TopicModel.bulkSave(topicsToSave);
-  console.log(`[Migration] Add Topic Fields (Updated: ${result.modifiedCount})`);
 }

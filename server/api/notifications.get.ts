@@ -1,15 +1,10 @@
 import dayjs from "dayjs";
 
-import NotificationModel from "~/server/models/notification"
-import TopicNotificationModel from "~/server/models/topic-notifications"
 import { getNotificationByUser } from "~/src/services/fetch/notification";
 
 export default defineEventHandler(async (event) => {
-  const { type, pagesize, startid } : NotificationQueryParams = getQuery(event);
+  const { pagesize, startid } : NotificationQueryParams = getQuery(event);
   
-  let _notificationsData: NotificationData[] = [];
-  let topicNotificationsData: TopicNotificationDataWithPopulate[] = [];
-
   const userData = event.context.userData;
   if(!userData) {
     throw createError({
@@ -18,64 +13,16 @@ export default defineEventHandler(async (event) => {
     });
   }
   
-  let notificationsData: NotificationModelData[] = await getNotificationByUser(userData._id, pagesize, startid);
-  console.log(notificationsData);
-
-  switch(type) {
-    case "unread":
-      [_notificationsData, topicNotificationsData] = await Promise.all([
-        NotificationModel.getLastestUnreadNotifications(userData._id, pagesize, startid),
-        TopicNotificationModel.getLastestUnreadNotifications(userData._id, pagesize, startid)
-      ]);
-      break;
-    case "read":
-      [_notificationsData, topicNotificationsData] = await Promise.all([
-        NotificationModel.getLastestReadNotifications(userData._id, pagesize, startid),
-        TopicNotificationModel.getLastestReadNotifications(userData._id, pagesize, startid)
-      ]);
-      break;
-    case "all":
-    default:
-      [_notificationsData, topicNotificationsData] = await Promise.all([
-        NotificationModel.getLastestAllNotifications(userData._id, pagesize, startid),
-        TopicNotificationModel.getLastestAllNotifications(userData._id, pagesize, startid)
-      ]);
-      break;
-  }
-
-  const _notiResData = _notificationsData.map<NotificationUserResponseData>((notification, i) => {
-    const target = notification.target.find((ele) => ele.userid.toString() === userData._id.toString());
+  const notificationsData: NotificationModelDataWithId[] = await getNotificationByUser(userData._id, pagesize, startid);
+  const notificationsResData = notificationsData.map<NotificationUserResponseData>((notification) => {
     return {
-      _id: `${notification._id}`,
-      from: notification.from,
-      title: notification.title,
-      content: notification.content,
-      createdAt: dayjs(notification.createdAt).toISOString(),
-      notifyAt: dayjs(notification.notifyAt).toISOString(),
-      tags: notification.tags,
-      readAt: target && target.readAt ? dayjs(target.readAt).toISOString() : undefined,
+      _id: notification._id.toString(),
+      group: notification.group,
+      extra: notification.extra,
+      notifyAt: dayjs(notification.notifyAt).toString(),
+      readAt: notification.readAt ? dayjs(notification.readAt).toString() : undefined,
     }
   })
   
-  const _topicNotiResData = topicNotificationsData.map<NotificationUserResponseData>((notification, i) => {
-    const topicName = notification.topicid ? notification.topicid.name : notification.topicid;
-    const content = `{{notification.topicStart}} [${topicName}]`;
-    return {
-      _id: `${notification._id}`,
-      from: "system",
-      title: content,
-      content: content,
-      createdAt: dayjs(notification.createdAt).toISOString(),
-      notifyAt: dayjs(notification.notifyAt).toISOString(),
-      tags: [],
-      readAt: notification.readAt ? dayjs(notification.readAt).toISOString() : undefined,
-    }
-  })
-  let notifications = _notiResData.concat(_topicNotiResData);
-  notifications.sort((a, b) => b._id.localeCompare(a._id))
-  notifications = notifications.slice(0, pagesize || 50);
-  
-  return {
-    notifications,
-  }
+  return notificationsResData;
 })

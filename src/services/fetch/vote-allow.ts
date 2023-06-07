@@ -19,16 +19,3 @@ export function getVoterAllowByUserId(userid: Types.ObjectId, pagesize?: number,
   
   return VoterAllowModel.find(query).limit(pagesize || 50).sort({topicId: -1 });
 }
-
-
-export function getVoterAllowByUserIdNotification(userid: Types.ObjectId, pagesize?: number, startid?: string) {
-  const query : FilterQuery<VoterAllowModelData> = {
-    userid: userid,
-  };
-
-  if(startid) {
-    query._id = { $lt: new Types.ObjectId(startid) }
-  }
-  
-  return VoterAllowModel.find(query).limit(pagesize || 50).sort({_id: -1 });
-}

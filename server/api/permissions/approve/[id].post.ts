@@ -1,6 +1,6 @@
 import UserModel from "~/src/models/user"
 import RequestPermissionsModel from "~/src/models/request-permission"
-import NotificationModel from "~/server/models/notification";
+import NotificationModel from "~/src/models/notification";
 import { combinePermissions, isContainsAdvancePermissions } from "~/src/services/transform/permission";
 import { isAdminRole } from "~/src/services/validations/role";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
@@ -54,37 +54,33 @@ export default defineEventHandler(async (event) => {
   const today = new Date();
 
   if(status === "approved") {
-    const content = `{{notification.requestPermission.title}} #${reqData.id} {{notification.requestPermission.approved}}`
     await Promise.all([
       userDoc.save(),
       reqData.save(),
       new NotificationModel(
         {
-          from: "system",
-          target: [{ userid: userData._id }],
-          title: content,
-          content: content,
+          userid: userData._id,
+          group: "request-permission",
+          extra: {
+            id: reqData._id.toString(),
+            status: "approved",
+          },
           notifyAt: today,
-          createdAt: today,
-          updatedAt: today,
-          tags: [`request-${reqData._id}-approved`],
         }
       ).save(),
     ]);
   } else {
-    const content = `{{notification.requestPermission.title}} #${reqData.id} {{notification.requestPermission.rejected}}`
     await Promise.all([
       reqData.save(),
       new NotificationModel(
         {
-          from: "system",
-          target: [{ userid: userData._id }],
-          title: content,
-          content: content,
+          userid: userData._id,
+          group: "request-permission",
+          extra: {
+            id: reqData._id.toString(),
+            status: "rejected",
+          },
           notifyAt: today,
-          createdAt: today,
-          updatedAt: today,
-          tags: [`request-${reqData._id}-rejected`],
         }
       ).save()
     ]);

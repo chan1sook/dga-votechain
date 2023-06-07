@@ -1,15 +1,21 @@
 <template>
   <div v-if="editable">
     <DgaHead>{{ $t('app.topic.recreate.title')  }}</DgaHead>
-    <DgaTopicForm v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins"></DgaTopicForm>
-    <DgaButtonGroup class="col-span-12 mt-4">
-      <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-        color="dga-orange" :title="$t('app.topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
-      >
-        <BallotIcon />
-        <span class="truncate">{{ $t('app.topic.create.action') }}</span>
-      </DgaButton>
-    </DgaButtonGroup>
+    <template v-if="!useTemplate">
+      <DgaTopicForm v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins" @template="useTemplate = true"></DgaTopicForm>
+      <DgaButtonGroup class="col-span-12 mt-4">
+        <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
+          color="dga-orange" :title="$t('app.topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+        >
+          <BallotIcon />
+          <span class="truncate">{{ $t('app.topic.create.action') }}</span>
+        </DgaButton>
+      </DgaButtonGroup>
+      </template>
+    <template v-else>
+      <DgaTopicTemplate @use-template="applyTemplate" @cancel="useTemplate = false"></DgaTopicTemplate>
+    </template>
+    
     <DgaModal :show="showConfirmModal" cancel-backdrop
       @confirm="createTopic"
       @close="showConfirmModal = false"
@@ -26,7 +32,7 @@ import BallotIcon from 'vue-material-design-icons/Ballot.vue';
 
 import dayjs from "dayjs";
 import { isTopicFormValid } from '~/src/services/validations/topic';
-import { getPresetChoices } from '~/src/services/form/topic';
+import { getDefaultChoices, getPresetTemplate } from '~/src/services/form/topic';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -41,6 +47,7 @@ useHead({
 
 const { id: topicid } = useRoute().params;
 
+const useTemplate = ref(false);
 const editable = ref(false);
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
@@ -55,7 +62,7 @@ const topicData = ref<TopicFormData>({
   name: "",
   description: "",
   multipleVotes: false,
-  choices: getPresetChoices(),
+  choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
@@ -69,7 +76,7 @@ const topicData = ref<TopicFormData>({
 
 const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 if (!data.value) {
-  showError(i18n.t('topic.error.notFound'));
+  showError(i18n.t('app.topic.error.notFound'));
 } else {
   const { topic, voterAllows: _voteAllows, coadmins: _coadmins } = data.value;
    
@@ -87,6 +94,26 @@ if (!data.value) {
 }
 
 const isFormValid = computed(() => isTopicFormValid(topicData.value))
+
+function applyTemplate(name: string) {
+  const template = getPresetTemplate(name);
+  if(template.name) {
+    topicData.value.name = i18n.t(template.name, template.name);
+  }
+  if(template.choices) {
+    topicData.value.choices = {
+      choices: template.choices.choices.map((ele) => {
+        return {
+          name: i18n.t(ele.name, ele.name),
+          image: ele.image,
+        }
+      }),
+      customable: template.choices.customable,
+    } ;
+  }
+  
+  useTemplate.value = false;
+}
 
 async function createTopic() {
   if(!isFormValid.value) {

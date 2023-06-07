@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
-import TopicNotificationData from "~/server/models/topic-notifications"
+import NotificationModel from "~/src/models/notification";
 import mongoose, { Types } from "mongoose";
 import { isTopicFormValid } from "~/src/services/validations/topic";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
@@ -75,16 +75,19 @@ export default defineEventHandler(async (event) => {
   ]);
 
   if(topicFormData.notifyVoter) {
-    const topicNotifications : TopicNotificationData[] = topicFormData.voterAllows.map((ele) => {
+    const notifications : NotificationModelData[] = topicFormData.voterAllows.map((ele) => {
       return {
         userid: new Types.ObjectId(ele.userid),
-        topicid: newTopicDoc._id,
-        createdAt: today,
-        updatedAt: today,
+        group: "topic",
+        extra: {
+          id: newTopicDoc._id.toString(),
+          name: newTopicDoc.name,
+          status: "voting",
+        },
         notifyAt: newTopicDoc.voteStartAt,
       }
     });
-    await TopicNotificationData.insertMany(topicNotifications);
+    await NotificationModel.insertMany(notifications);
   }
 
   await dbSession.commitTransaction();

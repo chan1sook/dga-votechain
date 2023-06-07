@@ -77,6 +77,10 @@ const schema = new Schema<TopicModelData>({
     type: Boolean,
     default: true,
   },
+  notifyFinished: {
+    type: Boolean,
+    default: false,
+  },
   recoredToBlockchain: {
     type: Boolean,
     default: true,

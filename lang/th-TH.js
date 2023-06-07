@@ -29,6 +29,73 @@ export default {
         failed: 'แก้ไขโหวตล้มเหลว',
       },
       defaultVotes: "จำนวนโหวตตั้งต้น",
+      template: {
+        yesno: {
+          label: "ใช่/ไม่",
+          choice1: "ใช่",
+          choice2: "ไม่"
+        },
+        option2: {
+          label: "สองตัวเลือก",
+          choice1: "ตัวเลือก 1",
+          choice2: "ตัวเลือก 2",
+        },
+        option3: {
+          label: "สามตัวเลือก",
+          choice1: "ตัวเลือก 1",
+          choice2: "ตัวเลือก 2",
+          choice3: "ตัวเลือก 3",
+        }
+      },
+      templateTitle: "ต้นแบบการโหวต",
+      useTemplate: "ใช้ต้นแบบการโหวต",
+      applyTemplate: "ใช้ต้นแบบ",
+      error: {
+        notFound: "ไม่พบกระทู้โหวต",
+        notEditable: "ไม่สามารถแก้ไขกระทู้โหวต"
+      },
+      accessModifier: "การเข้าถึง",
+      voteDuration: {
+        title: "ระยะเวลา",
+        inputMode: "โหมด",
+        mode: {
+          startDuration: "เริ่มต้น/ระยะเวลา",
+          startEnd: "เริ่มต้น/สิ้นสุด",
+        },
+        start: "เริ่มต้นโหวต",
+        duration: "ระยะเวลาโหวต",
+        end: "สิ้นสุดโหวต",
+        startDate: "วันเริ่มต้น",
+        endDate: "วันสิ้นสุด",
+        startTime: "เวลาเริ่มต้น",
+        endTime: "เวลาสิ้นสุด",
+      },
+      topicQuestion: "คำถาม",
+      addChoice: {
+        title: "เพิ่มตัวเลือก",
+        add: "เพิ่มตัวเลือก",
+        remove: "ลบตัวเลือก",
+        error: {
+          empty: "ต้องระบุชื่อตัวเลือก",
+          duplicated: "ชื่อตัวเลือกซ้ำกัน"
+        }
+      },
+      coadminList: {
+        title: "รายชื่อแอดมินร่วม",
+        email: "Email",
+        name: "ชื่อ",
+        add: "เพิ่มชื่อ",
+        remove: "ลบชื่อ",
+        searchUser: "ค้นหาผู้ใช้",
+        error: {
+          duplicated: "ผู้ใช้ซ้ำ"
+        }
+      },
+      notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
+      skipBlockchain: "ไม่บันทึกลง Blockchain",
+      voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
+      allow: "อนุญาต",
+      deny: "ปฏิเสธ",
     },
     voting: {
       title: "ร่วมโหวต",
@@ -66,7 +133,6 @@ export default {
         notVoteable: "กำลังเปิดโหวต รอจนกว่าสิ้นสุดการโหวต",
         waitResult: "กำลังนับคะแนน รอนับคะแนนสำเร็จ",
       },
-      back: "กลับ",
       now: "ขณะนี้",
       localtime: "เวลาท้องถิ่น",
       remainVotes: "เหลืออีก",
@@ -78,10 +144,8 @@ export default {
       startVoteOn: "เริ่มโหวตเมื่อ",
       timeRemain: "เหลือระยะเวลาอีก",
       timePaused: "หยุดเวลาไปแล้ว",
-      evoteState: {
-        running: "การโหวตกำลังดำเนินการ",
-        paused: "การโหวตหยุดชั่วคราว",
-      },
+      running: "การโหวตกำลังดำเนินการ",
+      paused: "การโหวตหยุดชั่วคราว",
       adminWarning: "ให้เปลี่ยนสถานะเป็น ผู้โหวต ก่อนการลงคะแนนเสียง",
       cannotVote: "ไม่สามารถโหวตได้",
       pause: "หยุด",
@@ -90,10 +154,8 @@ export default {
       noVote: "งดออกเสียง",
       submit: "ส่ง",
       confirm: "ยืนยันการเลือกโหวตนี้?",
-      pauseForm: {
-        title: "ระบุเหตุผลหยุดโหวตชั่วคราว",
-        cause: "เหตุผล"
-      }
+      pauseCause: "เหตุผล",
+      pasueCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
     },
     result: {
       title: "ผลการโหวต",
@@ -112,6 +174,19 @@ export default {
       winner: "ผู้ชนะ",
       export: "ส่งออกผลโหวต",
     },
+    voterList: {
+      title: "รายชื่อโหวต",
+      multipleVotes: "โหวตได้หลายเสียง",
+      totalVotes: "จำนวนเสียง",
+      add: "เพิ่มชื่อ",
+      remove: "ลบชื่อ",
+      searchUser: "ค้นหาผู้ใช้",
+      error: {
+        duplicated: "ผู้ใช้ซ้ำ"
+      }
+    },
+    userid: "User ID",
+    userName: "ชื่อ",
     firstName: "ชื่อ",
     lastName: "นามสกุล",
     email: "อีเมล",
@@ -132,6 +207,11 @@ export default {
     countable: {
       vote: "โหวต",
       voter: "คน"
+    },
+    modal: {
+      back: "กลับ",
+      cancel: "ยกเลิก",
+      confirm: "ยืนยัน"
     },
     edit: "แก้ไข",
   },
@@ -174,10 +254,14 @@ export default {
     title: "นโยบายคุกกี้"
   },
   notification: {
-    topicStart: "เริ่มเปิดโหวต",
-    requestPermission: {
+    topic: {
+      title: "การโหวต",
+      voting: "เริ่มต้นแล้ว",
+      finished: "สิ้นสุดแล้ว",
+    },
+    "request-permission": {
       title: "การขอสิทธิ์",
-      inProgress: "กำลังดำเนินการ",
+      pending: "กำลังดำเนินการ",
       approved: "อนุมัติแล้ว",
       rejected: "ปฏิเสธ"
     }
@@ -226,69 +310,6 @@ export default {
     voter: "ผู้โหวต",
     admin: "ผู้ดูแล",
     developer: "ผู้พัฒนา",
-  },
-  topic: {
-    error: {
-      notFound: "ไม่พบกระทู้โหวต",
-      notEditable: "ไม่สามารถแก้ไขกระทู้โหวต"
-    },
-    accessModifier: "การเข้าถึง",
-    voteDuration: {
-      title: "ระยะเวลา",
-      inputMode: "โหมด",
-      mode: {
-        startDuration: "เริ่มต้น/ระยะเวลา",
-        startEnd: "เริ่มต้น/สิ้นสุด",
-      },
-      start: "เริ่มต้นโหวต",
-      duration: "ระยะเวลาโหวต",
-      end: "สิ้นสุดโหวต",
-      startDate: "วันเริ่มต้น",
-      endDate: "วันสิ้นสุด",
-      startTime: "เวลาเริ่มต้น",
-      endTime: "เวลาสิ้นสุด",
-    },
-    topicQuestion: "คำถาม",
-    addChoice: {
-      title: "เพิ่มตัวเลือก",
-      add: "เพิ่มตัวเลือก",
-      remove: "ลบตัวเลือก",
-      error: {
-        empty: "ต้องระบุชื่อตัวเลือก",
-        duplicated: "ชื่อตัวเลือกซ้ำกัน"
-      }
-    },
-    voterList: {
-      title: "รายชื่อโหวต",
-      multipleVotes: "โหวตได้หลายเสียง",
-      totalVotes: "จำนวนเสียง",
-      userId: "User ID",
-      email: "Email",
-      name: "ชื่อ",
-      add: "เพิ่มชื่อ",
-      remove: "ลบชื่อ",
-      searchUser: "ค้นหาผู้ใช้",
-      error: {
-        duplicated: "ผู้ใช้ซ้ำ"
-      }
-    },
-    coadminList: {
-      title: "รายชื่อแอดมินร่วม",
-      userId: "User ID",
-      email: "Email",
-      name: "ชื่อ",
-      add: "เพิ่มชื่อ",
-      remove: "ลบชื่อ",
-      searchUser: "ค้นหาผู้ใช้",
-      error: {
-        duplicated: "ผู้ใช้ซ้ำ"
-      }
-    },
-    notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
-    skipBlockchain: "ไม่บันทึกลง Blockchain",
-    voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
-    allow: "อนุญาต",
-    deny: "ปฏิเสธ",
   },
   news: {
     title: "ข่าว",
@@ -417,10 +438,6 @@ export default {
     minute: "นาที",
     hour: "ชั่วโมง",
     day: "วัน",
-  },
-  modal: {
-    cancel: "ยกเลิก",
-    confirm: "ยืนยัน"
   },
   error: {
     title: "ผิดพลาด",

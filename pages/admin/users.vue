@@ -2,7 +2,7 @@
   <div v-if="userList">
     <DgaHead>{{ $t('admin.user.title') }}</DgaHead>
     <div class="flex flex-col sm:flex-row gap-2 items-center my-2">
-      <DgaUserSearch class="flex-1 w-full" :placeholder="$t('topic.coadminList.searchUser')" @select="selectUser"></DgaUserSearch>
+      <DgaUserSearch class="flex-1 w-full" :placeholder="$t('app.topic.coadminList.searchUser')" @select="selectUser"></DgaUserSearch>
       <DgaButton 
         class="flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
         :href="localePathOf('/permissions/approve')"
