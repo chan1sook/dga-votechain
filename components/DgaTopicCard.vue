@@ -13,11 +13,9 @@
         <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
       </div>
       <div class="status">
-        <template >
-          <button v-if="props.editable" :title="$t('app.voting.editTopic')" @click="emit('edit')">
-            {{ $t('app.voting.editTopic') }}
-          </button>
-        </template>
+        <button v-if="props.editable" :title="$t('app.voting.editTopic')" @click="emit('edit')">
+          {{ $t('app.voting.editTopic') }}
+        </button>
         <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
           {{ actualStatusStr }}
         </button>
