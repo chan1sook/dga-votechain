@@ -5,14 +5,13 @@ import { createClient } from "redis";
 import UserModel from "~/src/models/user";
 import TopicModel from "~/src/models/topic";
 import TopicCtrlPauseModel from "~/src/models/topic-ctrl-pause";
-import NotificationModel from "~/server/models/notification";
-import TopicNotificationModel from "~/server/models/topic-notifications";
 import dayjs from "dayjs";
 import { getNotifyData, setNotifyData } from "~/server/notify-storage";
 import { blockchainHbEventEmitter, votedEventEmitter } from "~/server/event-emitter";
 import mongoose, { Types } from "mongoose";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { getUnreadNotificationByUser } from "~/src/services/fetch/notification";
 
 export default async () => {
   const { SOCKETIO_ORIGIN_URL, REDIS_URI } = useRuntimeConfig();
@@ -58,17 +57,14 @@ export default async () => {
     
     socket.on("syncTime", emitServerTime);
     
-    socket.on("hasNotify", async ({userid} : {userid: string}) => {
+    socket.on("hasNotify", async ({ userid } : {userid: string}) => {
       let notifyData = await getNotifyData(userid);
       
       if(notifyData === undefined || Date.now() - notifyData.lastChecked >= 60000) {
-        const [unreadNoti, unreadTopicNoti] = await Promise.all([
-          NotificationModel.getLastestUnreadNotifications(new Types.ObjectId(userid), 1),
-          TopicNotificationModel.getLastestUnreadNotifications(new Types.ObjectId(userid), 1)
-        ]);
+        const unreadNotification = await getUnreadNotificationByUser(new Types.ObjectId(userid), 1);
         
         notifyData = {
-          unread: (unreadNoti.length + unreadTopicNoti.length) > 0,
+          unread: unreadNotification.length > 0,
           lastChecked: Date.now(),
         };
         

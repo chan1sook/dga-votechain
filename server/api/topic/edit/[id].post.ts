@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
-import TopicNotificationData from "~/server/models/topic-notifications"
+import NotificationModel from "~/src/models/notification";
 import mongoose, { Types } from "mongoose";
 import { isTopicFormValid, isTopicReadyToVote } from "~/src/services/validations/topic";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
@@ -127,22 +127,27 @@ export default defineEventHandler(async (event) => {
 
   const voterAllowDocs = await TopicVoterAllowsModel.find({ topicid: topicDoc._id });
 
-  await TopicNotificationData.deleteMany({ topicid: topicDoc._id });
+  await NotificationModel.deleteMany({ 
+    group: "topic",
+    "extra.id": topicDoc._id.toString(),
+   });
+
   if(topicFormData.notifyVoter) {
-    const topicNotifications : TopicNotificationData[] = [];
+    const notifications : NotificationModelData[] = [];
     for(const voteAllow of voterAllowDocs) {
-      if(voteAllow.userid) {
-        topicNotifications.push({
-          userid: voteAllow.userid,
-          topicid: topicDoc._id,
-          createdAt: today,
-          updatedAt: today,
-          notifyAt: topicDoc.voteStartAt,
-        })
-      }
+      notifications.push({
+        userid: new Types.ObjectId(voteAllow.userid),
+        group: "topic",
+        extra: {
+          id: topicDoc._id.toString(),
+          name: topicDoc.name,
+          status: "voting",
+        },
+        notifyAt: topicDoc.voteStartAt,
+      })
     }
     
-    await TopicNotificationData.insertMany(topicNotifications);
+    await NotificationModel.insertMany(notifications);
   }
   
   if(!isTopicFormValid({

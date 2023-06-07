@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-import NotificationModel from "~/server/models/notification"
-import TopicNotificationModel from "~/server/models/topic-notifications"
+import NotificationModel from "~/src/models/notification"
 import { clearNotifyData } from "~/server/notify-storage";
 
 export default defineEventHandler(async (event) => {
@@ -16,44 +15,22 @@ export default defineEventHandler(async (event) => {
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
 
-  const [notiDocs, topicNotiDocs] = await Promise.all([
-    NotificationModel.find({
-      "target.userid": userData._id,
-      "target.readAt": { $exists: false },
-    }),
-    TopicNotificationModel.find({
-      userid: userData._id,
-      readAt: { $exists: false },
-    }),
-  ]);
+  const notificationDocs = await NotificationModel.find({
+    userid: userData._id,
+    readAt: { $exists: false },
+  });
 
-  const today = new Date();
-
-  for(const doc of notiDocs) {
-    doc.target = doc.target.map((ele) => {
-      if(ele.userid.toString() === userData._id.toString()) {
-        return {
-          ...ele,
-          readAt: today,
-        }
-      }
-      return ele;
-    })
-  }for(const doc of topicNotiDocs) {
-    doc.readAt = today;
+  for(const doc of notificationDocs) {
+    doc.readAt = new Date();
   }
 
-  await Promise.all([
-    NotificationModel.bulkSave(notiDocs),
-    TopicNotificationModel.bulkSave(topicNotiDocs),
-  ]);
-
+  await NotificationModel.bulkSave(notificationDocs);
   await dbSession.commitTransaction();
   await dbSession.endSession();
 
   clearNotifyData(userData._id.toString());
 
-  const counts = notiDocs.length + topicNotiDocs.length;
+  const counts = notificationDocs.length;
   
   return {
     counts,

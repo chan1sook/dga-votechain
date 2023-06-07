@@ -254,10 +254,14 @@ export default {
     title: "นโยบายคุกกี้"
   },
   notification: {
-    topicStart: "เริ่มเปิดโหวต",
-    requestPermission: {
+    topic: {
+      title: "การโหวต",
+      voting: "เริ่มต้นแล้ว",
+      finished: "สิ้นสุดแล้ว",
+    },
+    "request-permission": {
       title: "การขอสิทธิ์",
-      inProgress: "กำลังดำเนินการ",
+      pending: "กำลังดำเนินการ",
       approved: "อนุมัติแล้ว",
       rejected: "ปฏิเสธ"
     }

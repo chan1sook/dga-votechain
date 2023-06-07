@@ -8,13 +8,13 @@
       <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
         color="dga-orange" :title="$t('app.topic.applyTemplate')" @click="emit('useTemplate', templateName)"
       >
-        <FloppyIcon />
+        <ArrowDownBoldOutlineIcon />
         <span class="truncate">{{ $t('app.topic.applyTemplate') }}</span>
       </DgaButton>
       <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
         :title="$t('app.modal.back')" @click="emit('cancel')"
       >
-        <CloseIcon />
+        <ArrowLeftIcon />
         <span class="truncate">{{ $t('app.modal.back') }}</span>
       </DgaButton>
     </DgaButtonGroup>
@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
-import CloseIcon from 'vue-material-design-icons/Close.vue';
-import FloppyIcon from 'vue-material-design-icons/Floppy.vue';
+import ArrowDownBoldOutlineIcon from 'vue-material-design-icons/ArrowDownBoldOutline.vue';
+import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
 
 const props = withDefaults(defineProps<{
   template?: string

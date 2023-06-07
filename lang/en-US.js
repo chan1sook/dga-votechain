@@ -252,10 +252,14 @@ export default {
     title: "Cookie Policy"
   },
   notification: {
-    topicStart: "Topic Started",
-    requestPermission: {
+    topic: {
+      title: "Topic",
+      voting: "Started",
+      finished: "Finished",
+    },
+    "request-permission": {
       title: "Request Permission",
-      inProgress: "in progress",
+      pending: "in progress",
       approved: "approved",
       rejected: "rejected"
     }

@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
 import io from "~/server/socketio"
 import smartContract from '../smart-contract';
-import { setPredefinedDevs, setPredefinedBlockchainServers, addTopicFields } from '../migrations';
+import { setPredefinedDevs, setPredefinedBlockchainServers, addTopicFields, purgeOldNotifications } from '../migrations';
 import { initFirebase } from '../firebase';
 import initHbCheck from '../blockchain-server-hb';
+import beginNotificationWatcher from '../notification-watcher';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log("[Config] View Config");
@@ -27,8 +28,11 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   await setPredefinedBlockchainServers();
   await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
+  await purgeOldNotifications();
   await addTopicFields();
 
   initHbCheck();
   console.log('[BlockchainServerHB] Started!');
+  beginNotificationWatcher();
+  console.log('[Notification Watcher] Started!');
 });

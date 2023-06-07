@@ -1,5 +1,6 @@
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
+import NotificationModel from "~/src/models/notification"
 import BlockchainServerModel from "~/src/models/blockchain-server"
 import { combinePermissions, legacyRoleToPermissions } from '~/src/services/transform/permission';
 
@@ -74,6 +75,14 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
+}
+
+export async function purgeOldNotifications() {
+  migrationSeq +=1 ;
+
+  console.log(`[Migration] ${migrationSeq}. Purge old Notifications`);
+  const res = await NotificationModel.deleteMany({ from: "server" });
+  console.log(`[Migration] Purge old Notifications (Deleted: ${res.deletedCount})`);
 }
 
 export async function addTopicFields() {

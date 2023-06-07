@@ -30,16 +30,3 @@ export function getExistsRequestPermissionsData(userid: Types.ObjectId) {
   
   return RequestPermissionsModel.find(query);
 }
-
-
-export function getRequestPermissionsDataById(userid: Types.ObjectId, pagesize?: number, startid?: string) {
-  const query : FilterQuery<RequestPermissionsModelData> = {
-    userid: userid,
-  };
-  
-  if(startid) {
-    query._id = { $lt: new Types.ObjectId(startid) }
-  }
-
-  return RequestPermissionsModel.find(query).sort({ _id: -1 }).limit(pagesize || 50);
-}

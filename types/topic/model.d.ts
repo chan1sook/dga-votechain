@@ -23,6 +23,7 @@ declare global {
     createdAt: Date;
     updatedAt: Date;
     notifyVoter: boolean;
+    notifyFinished?: boolean;
   }
   
   interface ChoicesInfo {
