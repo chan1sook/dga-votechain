@@ -155,7 +155,7 @@ export default {
       submit: "ส่ง",
       confirm: "ยืนยันการเลือกโหวตนี้?",
       pauseCause: "เหตุผล",
-      pasueCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
+      pauseCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
     },
     result: {
       title: "ผลการโหวต",

@@ -154,7 +154,7 @@ export default {
       submit: "Submit",
       confirm: "Confirm voting choices?",
       pauseCause: "Reason",
-      pasueCauseTitle: "Enter Reason of Pause",
+      pauseCauseTitle: "Enter Reason of Pause",
     },
     result: {
       title: "Voting Result",
