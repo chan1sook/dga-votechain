@@ -17,12 +17,12 @@
     </div>
     <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.start') }}</div>
     <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-      <VueDatePicker v-model="voteStart" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
+      <VueDatePicker v-model="voteStart" is-24 teleport teleport-center :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
     </div>
     <template v-if="topicData.durationMode === 'startEnd'">
       <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.end')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-        <VueDatePicker v-model="voteEnd" :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
+        <VueDatePicker v-model="voteEnd" teleport teleport-center :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
       </div>
     </template>
     <template v-else>
@@ -446,7 +446,9 @@ function addCoadmin(user: UserSearchResponseData) {
 .user-grid.multichoice {
   grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
 }
+</style>
 
+<style>
 .dp__theme_light {
   --dp-font-family: "Mitr", system-ui, sans-serif;
   --dp-border-radius: theme("borderRadius.2xl");
@@ -470,7 +472,7 @@ function addCoadmin(user: UserSearchResponseData) {
   --dp-danger-color: #ff6f60;
   --dp-highlight-color: rgba(25, 118, 210, 0.1);
 }
-.dp__theme_light:deep(.dp__input)  {
+.dp__theme_light .dp__input  {
   border-width: 2px !important;
 }
 </style>
