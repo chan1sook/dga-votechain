@@ -8,6 +8,7 @@ import { blockchainHbEventEmitter, votedEventEmitter } from "~/server/event-emit
 import { Types } from "mongoose";
 import { getUnreadNotificationByUser } from "~/src/services/fetch/notification";
 import { pauseTopic, resumeTopic } from "~/src/services/action/pause-topic";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default async () => {
   const { SOCKETIO_ORIGIN_URL, REDIS_URI } = useRuntimeConfig();
