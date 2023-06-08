@@ -255,6 +255,8 @@ export default {
     topic: {
       title: "Topic",
       voting: "Started",
+      pause: "Paused",
+      resume: "Resumed",
       finished: "Finished",
     },
     "request-permission": {

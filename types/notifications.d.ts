@@ -15,7 +15,8 @@ declare global {
     extra: {
       id: string,
       name: string,
-      status: "voting" | "finished"
+      status: "voting" | "pause" | "resume" | "finished",
+      cause?: string,
     }
   }
   type NotificationGroups = NotificationRequestGroup | NotificationTopicGroup;

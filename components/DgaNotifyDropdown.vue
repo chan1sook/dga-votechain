@@ -13,7 +13,7 @@
         <div v-for="notification of loadedNotifications">
           <h3 class="font-bold">
             <div v-if="!notification.readAt" class="inline-block bg-red-700 w-2 h-2 rounded-full"></div>
-            {{ getGeneratedHeaderOf(notification) }}
+            {{ formatNotificationHeader(notification) }}
           </h3>
           <div class="text-xs">
             {{ prettyDateTime(notification.notifyAt) }} - <b>System</b>
@@ -41,6 +41,7 @@
 import EmailOutlineIcon from 'vue-material-design-icons/EmailOutline.vue';
 
 import dayjs from 'dayjs';
+import { formatNotificationHeader } from '~/src/services/formatter/notification';
 const i18t = useI18n();
 
 const showOption = computed(() => useVisibleMenuGroup().value === 'notification');
@@ -60,18 +61,6 @@ function prettyDateTime(date: any) {
 }
 function checkIsUnread() {
   return loadedNotifications.value.length > 0 && loadedNotifications.value.some((ele) => ele.readAt === undefined);
-}
-
-function getGeneratedHeaderOf(notification: NotificationUserResponseData) {
-  let status;
-  switch(notification.group) {
-    case "request-permission":
-      status = i18t.t(`notification.${notification.group}.${notification.extra.status}`, notification.extra.status)
-      return `${i18t.t(`notification.${notification.group}.title`)} #${notification.extra.id} ${status}`;
-    case "topic":
-      status = i18t.t(`notification.${notification.group}.${notification.extra.status}`, notification.extra.status)
-      return `${i18t.t(`notification.${notification.group}.title`)} "${notification.extra.name}" ${status}`;
-  }
 }
 
 async function toggleShowOption() {

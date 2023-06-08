@@ -2,16 +2,12 @@ import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createClient } from "redis";
 
-import UserModel from "~/src/models/user";
-import TopicModel from "~/src/models/topic";
-import TopicCtrlPauseModel from "~/src/models/topic-ctrl-pause";
 import dayjs from "dayjs";
 import { getNotifyData, setNotifyData } from "~/server/notify-storage";
 import { blockchainHbEventEmitter, votedEventEmitter } from "~/server/event-emitter";
-import mongoose, { Types } from "mongoose";
-import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { Types } from "mongoose";
 import { getUnreadNotificationByUser } from "~/src/services/fetch/notification";
+import { pauseTopic, resumeTopic } from "~/src/services/action/pause-topic";
 
 export default async () => {
   const { SOCKETIO_ORIGIN_URL, REDIS_URI } = useRuntimeConfig();
@@ -74,66 +70,33 @@ export default async () => {
       socket.emit(`hasNotify/${userid}`, notifyData);
     });
 
-    socket.on("pauseVote", async ({userid, topicId, cause} : {userid: string, topicId?: string, cause: string}) => {
-      const [userData, targetTopic] = await Promise.all([
-        UserModel.findById(userid),
-        TopicModel.findById(topicId)
-      ]);
-      if(!userData || !targetTopic || !checkPermissionNeeds(userData.permissions, "change-topic")) {
-        return;
-      }
-      
-      const topicPauseFlag = await isTopicPause(targetTopic._id);
-      if(!topicPauseFlag) {
-        const topicCtrlPauseDoc = new TopicCtrlPauseModel({
-          topicid: targetTopic._id,
-          pauseAt: new Date(),
-          cause: cause,
-        });
-        
-        await topicCtrlPauseDoc.save()
-        
-        io.emit(`pauseVote/${topicId}`, {
-          topicid: topicCtrlPauseDoc.topicid,
-          pauseAt: dayjs(topicCtrlPauseDoc.pauseAt).toISOString(),
-        });
+    socket.on("pauseVote", async ({userid, topicid, cause} : {userid: string, topicid: string, cause: string}) => {
+      try {
+        const pauseAt = await pauseTopic(userid, topicid, cause);
+        if(pauseAt) {        
+          io.emit(`pauseVote/${topicid}`, {
+            topicid: topicid,
+            pauseAt: dayjs(pauseAt).toISOString(),
+          });
+        }
+      } catch(err) {
+        console.error(err);
       }
     })
   
-    socket.on("resumeVote", async ({userid, topicId} : {userid: string, topicId?: string}) => {
-      const dbSession = await mongoose.startSession();
-      dbSession.startTransaction();
-
-      const [userData, targetTopic] = await Promise.all([
-        UserModel.findById(userid),
-        TopicModel.findById(topicId)
-      ]);
-      if(!userData || !targetTopic || !checkPermissionNeeds(userData.permissions, "change-topic")) {
-        return;
-      }
-      
-      let lastestPauseData = await TopicCtrlPauseModel.findOne({
-        topicid: targetTopic._id,
-        resumeAt: { $exists: false }
-      })
-      if(lastestPauseData) {
-        lastestPauseData.resumeAt = new Date();
-        targetTopic.voteExpiredAt = dayjs(new Date()).add(dayjs(targetTopic.voteExpiredAt).diff(lastestPauseData.pauseAt)).toDate()
-        
-        await Promise.all([
-          lastestPauseData.save(),
-          targetTopic.save()
-        ]);
-
-        await dbSession.commitTransaction();
-        await dbSession.endSession();
-
-        io.emit(`resumeVote/${topicId}`, {
-          topicid: lastestPauseData.topicid,
-          pauseAt: dayjs(lastestPauseData.pauseAt).toISOString(),
-          resumeAt: dayjs(lastestPauseData.resumeAt).toISOString(),
-          voteExpiredAt:  targetTopic.voteExpiredAt.toISOString(),
-        });
+    socket.on("resumeVote", async ({userid, topicid} : {userid: string, topicid: string}) => {
+      try {
+        const response = await resumeTopic(userid, topicid);
+        if(response) {
+          io.emit(`resumeVote/${topicid}`, {
+            topicid: topicid,
+            pauseAt: dayjs(response.pauseAt).toISOString(),
+            resumeAt: dayjs(response.resumeAt).toISOString(),
+            voteExpiredAt:  response.voteExpiredAt.toISOString(),
+          });
+        }
+      } catch(err) {
+        console.error(err);
       }
     })
   });

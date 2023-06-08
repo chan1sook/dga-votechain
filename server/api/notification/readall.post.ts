@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
   }
 
   await NotificationModel.bulkSave(notificationDocs);
+  
   await dbSession.commitTransaction();
   await dbSession.endSession();
 

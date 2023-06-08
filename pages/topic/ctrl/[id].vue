@@ -263,15 +263,30 @@ function popupPauseModal() {
 }
 
 function emitPause() {
+  if(!topic.value) {
+    return;
+  }
+
   showConfirmModal.value = false;
   waitPause.value = true;
-  socket.volatile.emit('pauseVote', { userid: useSessionData().value.userid, topicId: topic.value?._id, cause: pauseCause.value });
+  socket.volatile.emit('pauseVote', {
+    userid: useSessionData().value.userid,
+    topicid: topic.value._id,
+    cause: pauseCause.value
+  });
   waitPause.value = false;
 }
 
 function emitResume() {
+  if(!topic.value) {
+    return;
+  }
+
   waitPause.value = true;
-  socket.volatile.emit('resumeVote', { userid: useSessionData().value.userid, topicId: topic.value?._id });
+  socket.volatile.emit('resumeVote', {
+    userid: useSessionData().value.userid,
+    topicid: topic.value._id
+  });
   waitPause.value = false;
 }
 
