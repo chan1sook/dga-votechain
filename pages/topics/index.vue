@@ -30,6 +30,7 @@
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
         :editable="isAdminMode && !isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime())"
         :status="getStatusOf(topic)"
+        :is-admin="isAdminMode"
         @edit="toEditTopic(topic)"
         @recreate="toRecreateTopic(topic)"
         @action="handleStatusAction(topic, $event)"

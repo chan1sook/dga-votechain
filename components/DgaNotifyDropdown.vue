@@ -13,7 +13,7 @@
         <div v-for="notification of loadedNotifications">
           <h3 class="font-bold">
             <div v-if="!notification.readAt" class="inline-block bg-red-700 w-2 h-2 rounded-full"></div>
-            {{ getGeneratedHeaderOf(notification) }}
+            {{ formatNotificationHeader(notification) }}
           </h3>
           <div class="text-xs">
             {{ prettyDateTime(notification.notifyAt) }} - <b>System</b>
@@ -41,6 +41,7 @@
 import EmailOutlineIcon from 'vue-material-design-icons/EmailOutline.vue';
 
 import dayjs from 'dayjs';
+import { formatNotificationHeader } from '~/src/services/formatter/notification';
 const i18t = useI18n();
 
 const showOption = computed(() => useVisibleMenuGroup().value === 'notification');
@@ -73,22 +74,6 @@ function getGeneratedHeaderOf(notification: NotificationUserResponseData) {
       return `${i18t.t(`notification.${notification.group}.title`)} "${notification.extra.name}" ${status}`;
   }
 }
-
-async function toggleShowOption() {
-  if(!showOption.value) {
-    if(!isToggleActive.value) {
-      isToggleActive.value = true;
-      useVisibleMenuGroup().value = 'notification';
-      loadedNotifications.value = [];
-      await setReadAll();
-      await loadMoreNotifications();
-      isToggleActive.value = false;
-    }
-  } else {
-    useVisibleMenuGroup().value = undefined;
-  }
-}
-
 async function setReadAll() {
   isLoadMoreNotifications.value = true;
 

@@ -155,7 +155,7 @@ export default {
       submit: "ส่ง",
       confirm: "ยืนยันการเลือกโหวตนี้?",
       pauseCause: "เหตุผล",
-      pasueCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
+      pauseCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
     },
     result: {
       title: "ผลการโหวต",
@@ -257,6 +257,8 @@ export default {
     topic: {
       title: "การโหวต",
       voting: "เริ่มต้นแล้ว",
+      pause: "ถูกหยุดชั่วคราว",
+      resume: "กลับมาโหวตใหม่แล้ว",
       finished: "สิ้นสุดแล้ว",
     },
     "request-permission": {

@@ -37,6 +37,7 @@ async function checkTopics() {
       notifyAt: targetTopic?.voteExpiredAt,
     }
   });
+  
   await Promise.all([
     TopicModel.bulkSave(notNotifyTopics),
     NotificationModel.insertMany(notifications),

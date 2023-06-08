@@ -51,7 +51,7 @@
       <div class="font-bold text-xl mb-2">{{ $t('app.votersList') }}</div>
       <div class="grid grid-cols-12 gap-2">
         <div class="col-span-12 sm:col-span-8 font-bold">
-          {{ $t('app.topic.voterList.name')}}
+          {{ $t('app.userName')}}
         </div>
         <div class="hidden sm:block col-span-2 text-right font-bold">
           {{ $t('app.voting.remainVotes') }}
@@ -263,15 +263,30 @@ function popupPauseModal() {
 }
 
 function emitPause() {
+  if(!topic.value) {
+    return;
+  }
+
   showConfirmModal.value = false;
   waitPause.value = true;
-  socket.volatile.emit('pauseVote', { userid: useSessionData().value.userid, topicId: topic.value?._id, cause: pauseCause });
+  socket.volatile.emit('pauseVote', {
+    userid: useSessionData().value.userid,
+    topicid: topic.value._id,
+    cause: pauseCause.value
+  });
   waitPause.value = false;
 }
 
 function emitResume() {
+  if(!topic.value) {
+    return;
+  }
+
   waitPause.value = true;
-  socket.volatile.emit('resumeVote', { userid: useSessionData().value.userid, topicId: topic.value?._id });
+  socket.volatile.emit('resumeVote', {
+    userid: useSessionData().value.userid,
+    topicid: topic.value._id
+  });
   waitPause.value = false;
 }
 
