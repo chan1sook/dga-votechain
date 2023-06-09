@@ -37,6 +37,14 @@
         >
           {{ $t('role.developer') }}
         </DgaButton>
+        <div class="border-t-2"></div>
+        <NuxtLink href="/user/preferences" class="w-full" @click="useVisibleMenuGroup().value = undefined">
+          <DgaButton color="dga-orange" theme="hollow" 
+            class="w-full !py-1 !text-sm" :title="$t('navbar.user.preferences')"
+          >
+            {{  $t('navbar.user.preferences') }}
+          </DgaButton>
+        </NuxtLink>
       </div>
       <a href="/api/logout" class="flex flex-row gap-2 items-center justify-center bg-dga-blue-lighter text-white px-2 py-2" :title="$t('navbar.logout')">
         <LogoutIcon class="!text-lg" />

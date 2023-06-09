@@ -1,3 +1,5 @@
+import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from "~/src/services/form/preference"
+
 export const useSessionData = () => {
   return useState<{
     userid?: string,
@@ -17,7 +19,9 @@ export const useSessionData = () => {
       roleMode: "guest",
       permissions: [],
       preferences: {
-        topMenus: [],
+        topMenus: getDefaultTopMenus(),
+        adminTopMenus: getDefaultAdminTopMenus(),
+        devTopMenus: getDefaultDevTopMenus(),
       }
     }
   })

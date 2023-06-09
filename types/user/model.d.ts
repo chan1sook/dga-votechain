@@ -25,8 +25,12 @@ declare global {
     _id: Types.ObjectId,
   }
   
+  type PreferenceTopMenuOption = "home" | "voting" | "about" | "help" | "contact-us" | "users-management" | "blockchain";
+  
   interface UserPreferences {
-    topMenus: string[],
+    topMenus: PreferenceTopMenuOption[],
+    adminTopMenus: PreferenceTopMenuOption[],
+    devTopMenus: PreferenceTopMenuOption[],
   }
 
   interface UserAuthSourceData {

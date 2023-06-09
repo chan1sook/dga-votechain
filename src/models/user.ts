@@ -41,6 +41,8 @@ const schema = new Schema<UserModelData>({
   group: [String],
   preferences: new Schema({
     topMenus: [String],
+    adminTopMenus: [String],
+    devTopMenus: [String],
   })
 }, {
   timestamps: true,
