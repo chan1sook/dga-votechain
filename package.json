@@ -37,6 +37,7 @@
     "dotenv": "^16.0.3",
     "firebase": "^9.22.0",
     "firebase-admin": "^11.8.0",
+    "h3-formidable": "^0.3.4",
     "mongodb": "^5.1.0",
     "mongoose": "^7.0.1",
     "nanoid": "^4.0.1",

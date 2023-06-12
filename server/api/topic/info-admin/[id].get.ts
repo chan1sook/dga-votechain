@@ -3,10 +3,11 @@ import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-pause";
+import { isAdminRole } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  const isAdminMode = userData && (userData.roleMode === "admin" || userData.roleMode === "developer");
+  const isAdminMode = userData && isAdminRole(userData.roleMode);
   if(!isAdminMode) {
     throw createError({
       statusCode: 403,
@@ -56,6 +57,27 @@ export default defineEventHandler(async (event) => {
     UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) }}),
     getTopicCtrlPauseListByTopicId(topicDoc._id),
   ]);
+
+  if(!topic.publicVote) {
+    let isAllowed = false;
+
+    // check if is admin
+    if(topicDoc.admin.toString() === userData._id.toString()) {
+      isAllowed = true;
+    }
+
+    // check if is coadmins
+    if(topicDoc.coadmins.find((ele) => ele.toString() === userData._id.toString())) {
+      isAllowed = true;
+    }
+    
+    if(!isAllowed) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+  }
   
   const voterAllows : VoterAllowVoteData[] = voterAllowDocs.map((ele) => {
     return ele.userid ? {

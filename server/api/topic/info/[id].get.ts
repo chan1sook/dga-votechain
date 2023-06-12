@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
     topicid: topicDoc._id,
   });
 
+
   if(userData) {
     const [_voterAllow, _votes] = await Promise.all([
       TopicVoterAllowsModel.findOne({
@@ -45,13 +46,6 @@ export default defineEventHandler(async (event) => {
       }
     }
     
-    if(userData.roleMode === "voter" && !_voterAllow) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-      });
-    }
-    
     votes = _votes.map((vote) => {
       return {
         _id: `${vote._id}`,
@@ -62,6 +56,33 @@ export default defineEventHandler(async (event) => {
         tx: vote.tx,
       }
     })
+  }
+  
+  if(!topicDoc.publicVote) {
+    let isAllowed = false;
+
+    if(userData) {
+      if(voterAllow.userid) {
+        isAllowed = true;
+      }
+
+      // check if is admin
+      if(topicDoc.admin.toString() === userData._id.toString()) {
+        isAllowed = true;
+      }
+
+      // check if is coadmins
+      if(topicDoc.coadmins.find((ele) => ele.toString() === userData._id.toString())) {
+        isAllowed = true;
+      }
+    }
+
+    if(!isAllowed) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
   }
   
   const topic : TopicResponseData = {

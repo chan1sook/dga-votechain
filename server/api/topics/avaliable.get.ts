@@ -70,6 +70,7 @@ export default defineEventHandler(async (event) => {
         return {
           topicid: topicData._id.toString(),
           pauseAt: dayjs(ele.pauseAt).toISOString(),
+          cause: ele.cause,
           resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toISOString() : undefined
         }
       }),
