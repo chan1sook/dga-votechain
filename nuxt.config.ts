@@ -62,6 +62,10 @@ export default defineNuxtConfig({
   },
   i18n: {
     config: './i18n.config.ts',
+    detectBrowserLanguage: {
+      useCookie: true,
+      alwaysRedirect: true
+    },
     lazy: false,
     langDir: 'lang',
     defaultLocale: 'th',

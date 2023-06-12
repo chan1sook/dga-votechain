@@ -50,14 +50,8 @@
     <div class="mx-auto max-w-2xl">
       <div class="font-bold text-xl mb-2">{{ $t('app.votersList') }}</div>
       <div class="grid grid-cols-12 gap-2">
-        <div class="col-span-12 sm:col-span-8 font-bold">
+        <div class="col-span-12 font-bold">
           {{ $t('app.userName')}}
-        </div>
-        <div class="hidden sm:block col-span-2 text-right font-bold">
-          {{ $t('app.voting.remainVotes') }}
-        </div>
-        <div class="hidden sm:block col-span-2 text-right font-bold">
-          {{ $t('app.voting.totalVotes') }}
         </div>
         <template v-for="voter of voterAllowList">
           <div class="col-span-12">
