@@ -60,22 +60,8 @@
           {{ $t('app.voting.totalVotes') }}
         </div>
         <template v-for="voter of voterAllowList">
-          <div class="hidden sm:block col-span-8">
+          <div class="col-span-12">
             {{ getPrettyFullName(voter) }}
-          </div>
-          <div class="hidden sm:block col-span-2 text-right">
-            {{ voter.remainVotes }}
-          </div>
-          <div class="hidden sm:block col-span-2 text-right">
-            {{ voter.totalVotes }}
-          </div>
-          <div class="sm:hidden col-span-12 flex flex-row gap-2">
-            <div class="flex-1">
-              {{ getPrettyFullName(voter) }}: 
-            </div>
-            <div>
-              {{ voter.remainVotes }} / {{ voter.totalVotes }}
-            </div>
           </div>
         </template>
       </div>
@@ -135,6 +121,7 @@ const localTime = ref(Date.now());
 const showLocaltime = ref(false);
 const isSync = ref(false);
 const voterAllowList: Ref<VoterAllowVoteData[]> = ref([]);
+const rawVoterAllows: Ref<RawVoterAllowVoteData[]> = ref([]);
 const totalVoters = computed(() => {
   if(topic.value) {
     return voterAllowList.value.length
@@ -143,13 +130,13 @@ const totalVoters = computed(() => {
 });
 const totalVotersVoted = computed(() => {
   if(topic.value) {
-    return voterAllowList.value.filter((ele) => ele.remainVotes === 0).length;
+    return rawVoterAllows.value.filter((ele) => ele.remainVotes === 0).length;
   }
   return 0
 });
 const totalRemainVotes = computed(() => {
   if(topic.value) {
-    return  voterAllowList.value.reduce((prev, current) => prev + current.remainVotes, 0);
+    return  rawVoterAllows.value.reduce((prev, current) => prev + current.remainVotes, 0);
   }
   return 0
 });
@@ -160,7 +147,7 @@ const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 if (!data.value) {
   showError(i18n.t("voting.cannotVote"));
 } else {
-  const { topic: _topic, voterAllows: _voteAllows, pauseData: _pauseData } = data.value;
+  const { topic: _topic, voterAllows: _voteAllows, pauseData: _pauseData, rawVoterAllows: _rawVoterAllows } = data.value;
 
   if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
     navigateTo(`/topic/result/${_topic._id}`);
@@ -168,6 +155,7 @@ if (!data.value) {
     topic.value = _topic;
     pauseData.value = _pauseData;
     voterAllowList.value = _voteAllows;
+    rawVoterAllows.value = _rawVoterAllows;
   }
 }
 
@@ -222,15 +210,12 @@ const socket = useSocketIO();
 
 socket.on("voted", (votes: VoteResponseData[]) => {
   if(topic.value) {
-
-    console.log("voted", votes);
-
     for(const vote of votes) {
       if(vote.topicid !== topicid) {
         continue;
       }
       
-      const target = voterAllowList.value.find((ele) => ele.userid === vote.userid);
+      const target = rawVoterAllows.value.find((ele) => ele._id === vote._id);
       if(target && target.remainVotes > 0) {
         target.remainVotes -= 1;
       }

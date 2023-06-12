@@ -85,12 +85,17 @@ export default defineEventHandler(async (event) => {
       firstName: (ele.userid as unknown as UserModelDataWithId).firstName,
       lastName: (ele.userid as unknown as UserModelDataWithId).lastName,
       email: (ele.userid as unknown as UserModelDataWithId).email,
-      totalVotes: ele.totalVotes,
-      remainVotes: ele.remainVotes
+      totalVotes: ele.totalVotes
     } : {
       userid: `${ele.userid}`,
-      totalVotes: ele.totalVotes,
-      remainVotes: ele.remainVotes
+      totalVotes: ele.totalVotes
+    }
+  })
+
+  const rawVoterAllows: RawVoterAllowVoteData[] = voterAllowDocs.map((ele) => {
+    return {
+      _id: ele._id.toString(),
+      remainVotes: ele.remainVotes,
     }
   })
   
@@ -115,6 +120,7 @@ export default defineEventHandler(async (event) => {
   return {
     topic,
     voterAllows,
+    rawVoterAllows,
     coadmins,
     pauseData
   }

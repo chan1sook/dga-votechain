@@ -4,6 +4,9 @@ type VoterAllowResponseData = Omit<VoterAllowModelData, "topicid" | "userid"> & 
 }
 
 
-type VoterAllowVoteData = VoterAllowFormData & {
+type VoterAllowVoteData = VoterAllowFormData;
+
+interface RawVoterAllowVoteData {
+  _id: string,
   remainVotes: number,
 }
