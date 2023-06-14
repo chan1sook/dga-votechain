@@ -1,14 +1,11 @@
 # DGA E-votechain
 
-https://e-vote.sensesiot.net
+https://e-vote.dga.or.th/
 
 Powered by [Nuxt3 framework](https://nuxt.com/)
 
 ## Request permissions
-https://e-vote.sensesiot.net/permissions/request  (Required Login)
-
-## Approve permissions
-https://e-vote.sensesiot.net/permissions/approve 
+https://e-vote.dga.or.th/permissions/request  (Required Login)
 
 ## Monitors
 https://app.pm2.io/#/bucket/640dd1c6b3fdc680cb119093
