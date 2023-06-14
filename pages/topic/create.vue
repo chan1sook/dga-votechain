@@ -68,6 +68,7 @@ const topicData = ref<TopicFormData>({
   multipleVotes: false,
   distinctVotes: false,
   publicVote: true,
+  anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],

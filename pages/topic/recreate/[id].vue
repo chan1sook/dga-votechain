@@ -75,6 +75,7 @@ const topicData = ref<TopicFormData>({
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
   publicVote: true,
+  anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   coadmins: [],
@@ -94,6 +95,7 @@ if (!data.value) {
   topicData.value.choices = topic.choices;
   topicData.value.durationMode = topic.durationMode;
   topicData.value.publicVote = topic.publicVote;
+  topicData.value.anonymousVotes = topic.anonymousVotes;
   topicData.value.notifyVoter = topic.notifyVoter;
   topicData.value.multipleVotes = topic.multipleVotes;
   topicData.value.distinctVotes = topic.distinctVotes;

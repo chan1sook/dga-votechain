@@ -77,6 +77,10 @@ const schema = new Schema<TopicModelData>({
     type: Boolean,
     required: true,
   },
+  anonymousVotes: {
+    type: Boolean,
+    default: false,
+  },
   notifyVoter: {
     type: Boolean,
     default: true,

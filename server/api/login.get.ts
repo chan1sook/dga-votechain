@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   
   if(query.source === "digitalId") {
     const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, public: { DID_API_URL } } = useRuntimeConfig();
-  
+
     const urlParams = new URLSearchParams();
     urlParams.set("response_type", "code");
     urlParams.set("client_id", DID_CLIENT_KEY);

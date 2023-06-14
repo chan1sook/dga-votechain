@@ -11,7 +11,8 @@ import { checkPermissionNeeds } from "~/src/services/validations/permission";
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
   const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, BCRYPT_SALT_ROUND, public: { DID_API_URL },  } = useRuntimeConfig()
-  
+
+
   if(typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE });
 

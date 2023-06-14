@@ -43,6 +43,8 @@ export default defineEventHandler(async (event) => {
     name: topicFormData.name,
     description: topicFormData.description,
     choices: topicFormData.choices,
+    multipleVotes: topicFormData.multipleVotes,
+    distinctVotes: topicFormData.distinctVotes,
     status: "approved",
     createdBy: userData._id,
     updatedBy: userData._id,
@@ -54,11 +56,10 @@ export default defineEventHandler(async (event) => {
     voteStartAt: dayjs(topicFormData.voteStartAt).toDate(),
     voteExpiredAt: dayjs(topicFormData.voteExpiredAt).toDate(),
     publicVote: topicFormData.publicVote,
+    anonymousVotes: topicFormData.anonymousVotes,
     recoredToBlockchain: topicFormData.recoredToBlockchain,
     notifyVoter: topicFormData.notifyVoter,
     defaultVotes: topicFormData.defaultVotes,
-    multipleVotes: topicFormData.multipleVotes,
-    distinctVotes: topicFormData.distinctVotes,
   });
   
   const voterAllows : VoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {

@@ -95,7 +95,11 @@ export default defineEventHandler(async (event) => {
     if(topicFormData.publicVote !== undefined) {
       topicDoc.publicVote = topicFormData.publicVote;
     }
-  
+
+    if(topicFormData.anonymousVotes !== undefined) {
+      topicDoc.anonymousVotes = topicFormData.anonymousVotes;
+    }
+
     if(topicFormData.recoredToBlockchain !== undefined) {
       topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
     }

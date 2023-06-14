@@ -19,6 +19,7 @@ declare global {
     voteStartAt: Date;
     voteExpiredAt: Date;
     publicVote: boolean;
+    anonymousVotes: boolean;
     recoredToBlockchain: boolean;
     defaultVotes: number;
     createdAt: Date;

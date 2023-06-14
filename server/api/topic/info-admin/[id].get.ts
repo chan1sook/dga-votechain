@@ -48,6 +48,7 @@ export default defineEventHandler(async (event) => {
       return ele.toString()
     }),
     publicVote: topicDoc.publicVote,
+    anonymousVotes: topicDoc.anonymousVotes,
     defaultVotes: topicDoc.defaultVotes,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     notifyVoter: topicDoc.notifyVoter,
