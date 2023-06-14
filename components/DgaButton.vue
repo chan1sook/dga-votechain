@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 type DgaButtonTheme = "default" | "hollow" | "hollow2";
-type DgaColorTheme = "dga-orange" | "dga-blue" | "gray" | "green";
+type DgaColorTheme = "dga-orange" | "dga-blue" | "gray" | "gray2" | "green";
 const props = defineProps<{
   type?: "button" | "submit" | "reset",
   disabled?: boolean,
@@ -62,13 +62,23 @@ const btnClasses = computed(() => [
   @apply bg-gray-500 border-gray-500 hover:bg-gray-500/80 focus:ring-gray-500/50  disabled:bg-gray-500/50;
 }
 .dga-btn.gray.hollow, .dga-btn.green.hollow2 {
-  @apply text-gray-500 bg-transparent;
+  @apply text-gray-300 bg-transparent;
 }
 .dga-btn.gray.hollow2:not(:disabled) {
   @apply hover:bg-gray-500 hover:text-white hover:border-transparent
 }
 .dga-btn.gray.vivid {
   @apply disabled:bg-gray-500;
+}
+
+.dga-btn.gray2 {
+  @apply bg-gray-300 border-gray-300 hover:bg-gray-300/80 focus:ring-gray-500/50  disabled:bg-gray-300/50 disabled:text-gray-500;
+}
+.dga-btn.gray2.hollow2:not(:disabled) {
+  @apply hover:bg-gray-300 hover:text-white hover:border-transparent
+}
+.dga-btn.gray2.vivid {
+  @apply disabled:bg-gray-300;
 }
 
 

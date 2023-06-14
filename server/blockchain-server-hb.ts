@@ -18,10 +18,10 @@ async function checkHBs() {
       headers: {}
     }).then((res) => {
       doc.lastActiveAt = new Date();
-      console.log(`[BlockchainServerHB] HB OK: ${doc.host}`);
+      // console.log(`[BlockchainServerHB] HB OK: ${doc.host}`);
       return doc.save()
     }).then((res) => {
-      console.log(`[BlockchainServerHB] HB Saved: ${doc.host}`);
+      // console.log(`[BlockchainServerHB] HB Saved: ${doc.host}`);
       blockchainHbEventEmitter.emit("blockchainHb", doc);
     }).catch((res) => {
       console.log(`[BlockchainServerHB] HB Failed: ${doc.host}`);

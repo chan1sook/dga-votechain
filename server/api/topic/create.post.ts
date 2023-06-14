@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
     notifyVoter: topicFormData.notifyVoter,
     defaultVotes: topicFormData.defaultVotes,
     multipleVotes: topicFormData.multipleVotes,
+    distinctVotes: topicFormData.distinctVotes,
   });
   
   const voterAllows : VoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {

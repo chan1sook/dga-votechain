@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     DID_LOGOUT_CALLBACK: isProduction ? process.env.DID_LOGOUT_CALLBACK : process.env.DEV_DID_LOGOUT_CALLBACK,
     SOCKETIO_ORIGIN_URL: isProduction ? process.env.SOCKETIO_ORIGIN_URL : process.env.DEV_SOCKETIO_ORIGIN_URL,
     REDIS_URI: isProduction ? process.env.REDIS_URI : process.env.DEV_REDIS_URI,
+    IMG_STORAGE_PATH: isProduction ? process.env.IMG_STORAGE_PATH : process.env.DEV_IMG_STORAGE_PATH,
     BLOCKCHAIN_PRIVATE_KEY: process.env.BLOCKCHAIN_PRIVATE_KEY,
     BCRYPT_SALT_ROUND: 12,
     public: {

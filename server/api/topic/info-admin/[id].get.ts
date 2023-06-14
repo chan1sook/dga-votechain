@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
+    distinctVotes: topicDoc.distinctVotes,
     multipleVotes: topicDoc.multipleVotes,
     choices: topicDoc.choices,
     durationMode: topicDoc.durationMode,

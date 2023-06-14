@@ -91,6 +91,7 @@ export default defineEventHandler(async (event) => {
     name: topicDoc.name,
     description: topicDoc.description,
     multipleVotes: topicDoc.multipleVotes,
+    distinctVotes: topicDoc.distinctVotes,
     choices: topicDoc.choices,
     durationMode: topicDoc.durationMode,
     voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),

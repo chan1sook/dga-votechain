@@ -134,9 +134,12 @@
         <div class="col-span-10 sm:col-span-8 relative rounded-md border-2 border-dga-blue">
           <div class="flex flex-row gap-2 px-2 py-1">
             <div class="flex-1 flex flex-row items-center gap-2">
-              <div class="flex-1">{{ choice.name }}</div>
+              <div class="flex-1 flex flex-row gap-2 items-center">
+                <div>{{ choice.name }}</div>
+                <img :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/>
+              </div>
               <template v-if="getScoreOf(choice.name)">
-                <div>{{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}% |</div>
+                <div class="flex-1 text-right">{{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}% |</div>
                 <div>
                   {{ getScoreOf(choice.name)?.count }} {{ $t('app.voting.vote' , { count: getScoreOf(choice.name).count })}}
                 </div>
@@ -174,7 +177,6 @@
         </div>
         <div class="col-span-2 mt-2"></div>
       </template>
-      
     </div>
     <template v-if="voters">
       <div class="max-w-4xl mx-auto grid grid-cols-12 items-center gap-y-1 gap-x-2">
@@ -193,10 +195,14 @@
         </template>
       </div>
     </template>
+    <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
+      <img :src="getImgUrlChoice(selectedImageChoice)" />
+    </DgaModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 import { getPrettyFullName } from '~/src/services/formatter/user';
 
 const i18n = useI18n();
@@ -205,6 +211,14 @@ const { id } = useRoute().params;
 let topicid = Array.isArray(id) ? id[id.length - 1] : id;
 
 const voteResult: Ref<TopicResultResponse | undefined> = ref(undefined);
+const haveImage = computed(() => {
+  if(!voteResult.value) {
+    return false;
+  }
+  return voteResult.value.choices.choices.some((ele) => !!ele.image)
+});
+const selectedImageChoice: Ref<ChoiceData | undefined> = ref(undefined);
+const showImageModal = ref(false);
 
 const title = computed(() => {
   if(voteResult.value) {
@@ -260,6 +274,23 @@ const totalVotes = computed(() => {
 
   return voteResult.value.scores.reduce((prev, current) => prev + current.count, 0);
 })
+
+function getImgUrlChoice(choice: ChoiceData | undefined) {
+  if(!choice) {
+    return GRAY_BASE64_IMAGE;
+  }
+  
+  if(choice.image) {
+    return `/api/image/${choice.image}`
+  }
+  
+  return GRAY_BASE64_IMAGE;
+}
+
+function showBigImage(choice: ChoiceData) {
+  selectedImageChoice.value = choice;
+  showImageModal.value = true;
+}
 
 function exportResult() {
   print();

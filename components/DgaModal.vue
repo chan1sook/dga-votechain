@@ -5,12 +5,17 @@
     leave-from-class="transition duration-500 opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="show" class="z-[1000] fixed inset-0 bg-gray-500/50 flex flex-row items-center justify-center" @click="backdropClose">
+    <div v-if="props.show" class="z-[1000] fixed inset-0 bg-gray-500/50 flex flex-row items-center justify-center" @click="backdropClose">
       <div class="bg-dga-blue rounded-lg p-6 text-white flex flex-col gap-4" @click.stop>
         <slot>Modal</slot>
-        <div v-if="!hideButtons" class="flex flex-row items-center justify-center gap-4">
-          <DgaButton color="dga-orange" :title="$t('app.modal.cancel')" @click="emit('cancel')">{{ $t('app.modal.cancel') }}</DgaButton>
-          <DgaButton color="green" :title="$t('app.modal.confirm')" @click="emit('confirm')">{{ $t('app.modal.confirm')}}</DgaButton>
+        <div v-if="!props.hideButtons" class="flex flex-row items-center justify-center gap-4">
+          <template v-if="props.closeOnly">
+            <DgaButton color="dga-orange" :title="$t('app.modal.close')" @click="emit('close')">{{ $t('app.modal.close') }}</DgaButton>
+          </template>
+          <template v-else>
+            <DgaButton color="dga-orange" :title="$t('app.modal.cancel')" @click="emit('cancel')">{{ $t('app.modal.cancel') }}</DgaButton>
+            <DgaButton color="green" :title="$t('app.modal.confirm')" @click="emit('confirm')">{{ $t('app.modal.confirm')}}</DgaButton>
+          </template>
         </div>
       </div>
     </div>
@@ -21,6 +26,7 @@
 const props =  defineProps<{
   cancelBackdrop?: boolean,
   hideButtons?: boolean,
+  closeOnly?: boolean,
   show? : boolean,
 }>();
 

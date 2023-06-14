@@ -2,7 +2,6 @@ import { type Types } from "mongoose";
 
 declare global {
   type TopicStatus = "pending" | "rejected" | "approved";
-  // type TopicVoteType = "single" | "multiple" | "multipleDistict";
   type TopicDurationMode = "startDuration" | "startEnd";
 
   interface TopicModelData {
@@ -10,7 +9,7 @@ declare global {
     name: string;
     description: string;
     multipleVotes: boolean;
-    // voteTypes?: TopicVoteType;
+    distinctVotes: boolean;
     choices: ChoicesInfo;
     createdBy: Types.ObjectId;
     updatedBy: Types.ObjectId;

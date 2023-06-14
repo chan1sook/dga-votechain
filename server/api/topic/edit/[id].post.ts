@@ -67,7 +67,11 @@ export default defineEventHandler(async (event) => {
     if(topicFormData.multipleVotes !== undefined) {
       topicDoc.multipleVotes = topicFormData.multipleVotes;
     }
-  
+
+    if(topicFormData.distinctVotes !== undefined) {
+      topicDoc.distinctVotes = topicFormData.distinctVotes;
+    }
+    
     if(topicFormData.choices !== undefined) {
       topicDoc.choices = topicFormData.choices;
     }

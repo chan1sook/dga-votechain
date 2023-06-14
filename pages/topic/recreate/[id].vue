@@ -2,7 +2,8 @@
   <div v-if="editable">
     <DgaHead>{{ $t('app.topic.recreate.title')  }}</DgaHead>
     <template v-if="!useTemplate">
-      <DgaTopicForm v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins" @template="useTemplate = true"></DgaTopicForm>
+      <DgaTopicForm v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins" 
+        @template="useTemplate = true" @showImage="showImageFromURL"></DgaTopicForm>
       <DgaButtonGroup class="col-span-12 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('app.topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
@@ -23,6 +24,9 @@
     >
       {{ $t('app.topic.create.confirm') }}
     </DgaModal>
+    <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
+      <img :src="imgURL" />
+    </DgaModal>
     <DgaLoadingModal :show="waitCreate"></DgaLoadingModal>
   </div>
 </template>
@@ -33,6 +37,7 @@ import BallotIcon from 'vue-material-design-icons/Ballot.vue';
 import dayjs from "dayjs";
 import { isTopicFormValid } from '~/src/services/validations/topic';
 import { getDefaultChoices, getPresetTemplate } from '~/src/services/form/topic';
+import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -51,6 +56,8 @@ const useTemplate = ref(false);
 const editable = ref(false);
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
+const imgURL = ref(GRAY_BASE64_IMAGE);
+const showImageModal = ref(false);
 
 const startDate = dayjs(useComputedServerTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
@@ -62,6 +69,7 @@ const topicData = ref<TopicFormData>({
   name: "",
   description: "",
   multipleVotes: false,
+  distinctVotes: false,
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
@@ -72,6 +80,7 @@ const topicData = ref<TopicFormData>({
   coadmins: [],
   voterAllows: [],
   recoredToBlockchain: true,
+  images: [],
 });
 
 const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
@@ -87,6 +96,8 @@ if (!data.value) {
   topicData.value.publicVote = topic.publicVote;
   topicData.value.notifyVoter = topic.notifyVoter;
   topicData.value.multipleVotes = topic.multipleVotes;
+  topicData.value.distinctVotes = topic.distinctVotes;
+  topicData.value.defaultVotes = topic.defaultVotes;
 
   voterAllows.value = _voteAllows;
   coadmins.value = _coadmins;
@@ -115,6 +126,11 @@ function applyTemplate(name: string) {
   useTemplate.value = false;
 }
 
+function showImageFromURL(url: string | undefined) {
+  imgURL.value = url || GRAY_BASE64_IMAGE;
+  showImageModal.value = true;
+}
+
 async function createTopic() {
   if(!isFormValid.value) {
     return;
@@ -122,6 +138,29 @@ async function createTopic() {
 
   showConfirmModal.value = false;
   waitCreate.value = true;
+  
+  for(const i in topicData.value.images) {
+    const file = topicData.value.images[i];
+    if(file === undefined) {
+      continue;
+    } else if(file === false) {
+      topicData.value.choices.choices[i].image = undefined;
+      continue;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const { data } = await useFetch("/api/image/upload", {
+      method: "POST",
+      body: formData,
+      headers: {"cache-control": "no-cache"},
+    });
+
+    if(data.value) {
+      topicData.value.choices.choices[i].image = data.value.fileName;
+    }
+  }
 
   const { error } = await useFetch("/api/topic/create/", {
     method: "POST",

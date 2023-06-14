@@ -11,4 +11,5 @@ dist
 .output*.zip
 etc/
 .config/
+.img-upload/
 firebase-admin-config.json

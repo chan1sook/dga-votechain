@@ -91,6 +91,7 @@ export default {
           duplicated: "ผู้ใช้ซ้ำ"
         }
       },
+      distinctVotes: "โหวตตัวเลือกสูงสุดหนึ่งเสียง",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
       skipBlockchain: "ไม่บันทึกลง Blockchain",
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
@@ -210,6 +211,7 @@ export default {
     },
     modal: {
       back: "กลับ",
+      close: "ปิด",
       cancel: "ยกเลิก",
       confirm: "ยืนยัน"
     },

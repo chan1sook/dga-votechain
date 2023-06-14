@@ -90,6 +90,7 @@ export default {
           duplicated: "Duplicated User"
         }
       },
+      distinctVotes: "Distinct Votes",
       notifyUsers: "Send notice to users",
       skipBlockchain: "Not record to Blockchain",
       scorePublic: "Display voter choice(s) for public",
@@ -208,6 +209,7 @@ export default {
     },
     modal: {
       back: "Back",
+      close: "Close",
       cancel: "Cancel",
       confirm: "Confirm"
     },
