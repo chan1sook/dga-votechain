@@ -63,17 +63,21 @@ function checkIsUnread() {
   return loadedNotifications.value.length > 0 && loadedNotifications.value.some((ele) => ele.readAt === undefined);
 }
 
-function getGeneratedHeaderOf(notification: NotificationUserResponseData) {
-  let status;
-  switch(notification.group) {
-    case "request-permission":
-      status = i18t.t(`notification.${notification.group}.${notification.extra.status}`, notification.extra.status)
-      return `${i18t.t(`notification.${notification.group}.title`)} #${notification.extra.id} ${status}`;
-    case "topic":
-      status = i18t.t(`notification.${notification.group}.${notification.extra.status}`, notification.extra.status)
-      return `${i18t.t(`notification.${notification.group}.title`)} "${notification.extra.name}" ${status}`;
+async function toggleShowOption() {
+  if(!showOption.value) {
+    if(!isToggleActive.value) {
+      isToggleActive.value = true;
+      useVisibleMenuGroup().value = 'notification';
+      loadedNotifications.value = [];
+      await setReadAll();
+      await loadMoreNotifications();
+      isToggleActive.value = false;
+    }
+  } else {
+    useVisibleMenuGroup().value = undefined;
   }
 }
+
 async function setReadAll() {
   isLoadMoreNotifications.value = true;
 

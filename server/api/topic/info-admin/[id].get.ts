@@ -3,10 +3,11 @@ import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-pause";
+import { isAdminRole } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  const isAdminMode = userData && (userData.roleMode === "admin" || userData.roleMode === "developer");
+  const isAdminMode = userData && isAdminRole(userData.roleMode);
   if(!isAdminMode) {
     throw createError({
       statusCode: 403,
@@ -27,6 +28,7 @@ export default defineEventHandler(async (event) => {
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
+    distinctVotes: topicDoc.distinctVotes,
     multipleVotes: topicDoc.multipleVotes,
     choices: topicDoc.choices,
     durationMode: topicDoc.durationMode,
@@ -46,6 +48,7 @@ export default defineEventHandler(async (event) => {
       return ele.toString()
     }),
     publicVote: topicDoc.publicVote,
+    anonymousVotes: topicDoc.anonymousVotes,
     defaultVotes: topicDoc.defaultVotes,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     notifyVoter: topicDoc.notifyVoter,
@@ -56,6 +59,27 @@ export default defineEventHandler(async (event) => {
     UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) }}),
     getTopicCtrlPauseListByTopicId(topicDoc._id),
   ]);
+
+  if(!topic.publicVote) {
+    let isAllowed = false;
+
+    // check if is admin
+    if(topicDoc.admin.toString() === userData._id.toString()) {
+      isAllowed = true;
+    }
+
+    // check if is coadmins
+    if(topicDoc.coadmins.find((ele) => ele.toString() === userData._id.toString())) {
+      isAllowed = true;
+    }
+    
+    if(!isAllowed) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+  }
   
   const voterAllows : VoterAllowVoteData[] = voterAllowDocs.map((ele) => {
     return ele.userid ? {
@@ -63,12 +87,17 @@ export default defineEventHandler(async (event) => {
       firstName: (ele.userid as unknown as UserModelDataWithId).firstName,
       lastName: (ele.userid as unknown as UserModelDataWithId).lastName,
       email: (ele.userid as unknown as UserModelDataWithId).email,
-      totalVotes: ele.totalVotes,
-      remainVotes: ele.remainVotes
+      totalVotes: ele.totalVotes
     } : {
       userid: `${ele.userid}`,
-      totalVotes: ele.totalVotes,
-      remainVotes: ele.remainVotes
+      totalVotes: ele.totalVotes
+    }
+  })
+
+  const rawVoterAllows: RawVoterAllowVoteData[] = voterAllowDocs.map((ele) => {
+    return {
+      _id: ele._id.toString(),
+      remainVotes: ele.remainVotes,
     }
   })
   
@@ -93,6 +122,7 @@ export default defineEventHandler(async (event) => {
   return {
     topic,
     voterAllows,
+    rawVoterAllows,
     coadmins,
     pauseData
   }

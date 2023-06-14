@@ -91,6 +91,7 @@ export default {
           duplicated: "ผู้ใช้ซ้ำ"
         }
       },
+      distinctVotes: "โหวตตัวเลือกสูงสุดหนึ่งเสียง",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
       skipBlockchain: "ไม่บันทึกลง Blockchain",
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
@@ -210,6 +211,7 @@ export default {
     },
     modal: {
       back: "กลับ",
+      close: "ปิด",
       cancel: "ยกเลิก",
       confirm: "ยืนยัน"
     },
@@ -243,9 +245,27 @@ export default {
       welcome: "ยินดีต้อนรับสู่ to E-Voting",
       anonymous: "ผู้ไม่ทราบนาม",
       switchRoleMode: "เปลี่ยนโหมดเป็น",
-      desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์"
+      desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์",
+      preferences: "ตั้งค่าผู้ใช้",
     },
     logout: "ออกจากระบบ"
+  },
+  userPreferences: {
+    title: "ตั้งค่าผู้ใช้",
+    topMenuOrders: "ลำดับเมนูด้านบน",
+    remainTopMenu: "เมนูที่เหลืออยู่",
+    currentTopMenu: "เมนูปัจจุบัน",
+    selectAll: "เลือกทั้งหมด",
+    deselectAll: "เอาออกทั้งหมด",
+    select: "เลือก",
+    deselect: "เอาออก",
+    moveToTop: "ย้ายไปยังบนสุด",
+    moveUp: "ย้ายขึ้น",
+    moveDown: "ย้ายลง",
+    moveToBottom: "ย้ายไปยังล่างสุด",
+    confirm: "ยืนยันการแก้ไขการตั้งค่าผู้ใช้?",
+    success: "แก้ไขการตั้งค่าผู้ใช้สำเร็จ",
+    failed: "แก้ไขการตั้งค่าผู้ใช้ล้มเหลว"
   },
   privacyPolicy: {
     title: "นโยบายความเป็นส่วนตัว"

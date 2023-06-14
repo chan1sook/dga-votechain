@@ -90,6 +90,7 @@ export default {
           duplicated: "Duplicated User"
         }
       },
+      distinctVotes: "Distinct Votes",
       notifyUsers: "Send notice to users",
       skipBlockchain: "Not record to Blockchain",
       scorePublic: "Display voter choice(s) for public",
@@ -208,6 +209,7 @@ export default {
     },
     modal: {
       back: "Back",
+      close: "Close",
       cancel: "Cancel",
       confirm: "Confirm"
     },
@@ -241,9 +243,27 @@ export default {
       welcome: "Welcome to E-Voting",
       anonymous: "Anonymous",
       switchRoleMode: "Switch mode to",
-      desyncTime: "Desync time"
+      desyncTime: "Desync time",
+      preferences: "Preferences",
     },
     logout: "Logout"
+  },
+  userPreferences: {
+    title: "User Preferences",
+    topMenuOrders: "Top Menu Orders",
+    remainTopMenu: "Remain Menu",
+    currentTopMenu: "Current Menu",
+    selectAll: "Select All",
+    deselectAll: "Deselect All",
+    select: "Select",
+    deselect: "Deselect",
+    moveToTop: "Move to Top",
+    moveUp: "Move Up",
+    moveDown: "Move Down",
+    moveToBottom: "Move to Bottom",
+    confirm: "Confirm to Edit User Preferences?",
+    success: "Edit User Preferences Successful",
+    failed: "Edit User Preferences Failed"
   },
   privacyPolicy: {
     title: "Private Policy"

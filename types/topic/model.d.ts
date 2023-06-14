@@ -9,6 +9,7 @@ declare global {
     name: string;
     description: string;
     multipleVotes: boolean;
+    distinctVotes: boolean;
     choices: ChoicesInfo;
     createdBy: Types.ObjectId;
     updatedBy: Types.ObjectId;
@@ -18,6 +19,7 @@ declare global {
     voteStartAt: Date;
     voteExpiredAt: Date;
     publicVote: boolean;
+    anonymousVotes: boolean;
     recoredToBlockchain: boolean;
     defaultVotes: number;
     createdAt: Date;

@@ -36,15 +36,27 @@ export default defineEventHandler(async (event) => {
   ]);
     
   if(!topicDoc.publicVote) {
-    if(!userData) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-      });
+    let isAllowed = false;
+
+    if(userData) {
+      // check if in topicAllow
+      const topicAllowDoc = votersData.find((ele) => ele.userid.toString() === userData._id.toString())
+      if(topicAllowDoc) {
+        isAllowed = true;
+      }
+
+      // check if is admin
+      if(topicDoc.admin.toString() === userData._id.toString()) {
+        isAllowed = true;
+      }
+
+      // check if is coadmins
+      if(topicDoc.coadmins.find((ele) => ele.toString() === userData._id.toString())) {
+        isAllowed = true;
+      }
     }
 
-    const topicAllowDoc = votersData.find((ele) => ele.userid && ele.userid.toString() === userData._id.toString())
-    if(!topicAllowDoc) {
+    if(!isAllowed) {
       throw createError({
         statusCode: 403,
         statusMessage: "Forbidden",

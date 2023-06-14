@@ -27,6 +27,7 @@ export default defineEventHandler(async (event) => {
     topicid: topicDoc._id,
   });
 
+
   if(userData) {
     const [_voterAllow, _votes] = await Promise.all([
       TopicVoterAllowsModel.findOne({
@@ -45,13 +46,6 @@ export default defineEventHandler(async (event) => {
       }
     }
     
-    if(userData.roleMode === "voter" && !_voterAllow) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-      });
-    }
-    
     votes = _votes.map((vote) => {
       return {
         _id: `${vote._id}`,
@@ -64,12 +58,40 @@ export default defineEventHandler(async (event) => {
     })
   }
   
+  if(!topicDoc.publicVote) {
+    let isAllowed = false;
+
+    if(userData) {
+      if(voterAllow.userid) {
+        isAllowed = true;
+      }
+
+      // check if is admin
+      if(topicDoc.admin.toString() === userData._id.toString()) {
+        isAllowed = true;
+      }
+
+      // check if is coadmins
+      if(topicDoc.coadmins.find((ele) => ele.toString() === userData._id.toString())) {
+        isAllowed = true;
+      }
+    }
+
+    if(!isAllowed) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+  }
+  
   const topic : TopicResponseData = {
     _id: topicDoc._id.toString(),
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
     multipleVotes: topicDoc.multipleVotes,
+    distinctVotes: topicDoc.distinctVotes,
     choices: topicDoc.choices,
     durationMode: topicDoc.durationMode,
     voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
@@ -88,6 +110,7 @@ export default defineEventHandler(async (event) => {
       return ele.toString()
     }),
     publicVote: topicDoc.publicVote,
+    anonymousVotes: topicDoc.anonymousVotes,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     defaultVotes: topicDoc.defaultVotes,
     notifyVoter: topicDoc.notifyVoter

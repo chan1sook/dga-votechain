@@ -13,9 +13,18 @@ function isChoicesValid(choices: {name: string}[]) {
   );
 }
 
-function isVoterAllowsValid(voterAllows: VoterAllowFormData[]) {
+function isVoterAllowsValid(voterAllows: VoterAllowFormData[], maxChoices?: number) {
   return voterAllows.length > 0 && voterAllows.every(
-    (ele, i, arr) => arr.findIndex((ele2) => ele2.userid === ele.userid) === i
+    (ele, i, arr) => {
+      const notDuplicate = arr.findIndex((ele2) => ele2.userid === ele.userid) === i;
+      const isTotalVoteValid = Number.isInteger(ele.totalVotes) && ele.totalVotes > 0;
+
+      if(typeof maxChoices === "number" && Number.isInteger(maxChoices)) {
+        return notDuplicate && isTotalVoteValid && ele.totalVotes <= maxChoices;
+      }
+
+      return notDuplicate && isTotalVoteValid;
+    }
   );
 }
 
@@ -26,10 +35,13 @@ function isCoadminsValid(coadmins: string[]) {
 }
 
 export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
+  const maxChoices = topicData.multipleVotes && topicData.distinctVotes ? topicData.choices.choices.length: undefined;
+
   return topicData.name !== "" && 
     isVoteDateTimeValid(topicData.voteStartAt, topicData.voteExpiredAt) && 
+    Number.isInteger(topicData.defaultVotes) && topicData.defaultVotes > 0 &&
     isChoicesValid(topicData.choices.choices) &&
-    isVoterAllowsValid(topicData.voterAllows) &&
+    isVoterAllowsValid(topicData.voterAllows, maxChoices) &&
     isCoadminsValid(topicData.coadmins);
 }
 

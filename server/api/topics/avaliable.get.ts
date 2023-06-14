@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
       name: topicData.name,
       description: topicData.description,
       multipleVotes: topicData.multipleVotes,
+      distinctVotes: topicData.distinctVotes,
       choices: topicData.choices,
       createdBy: {
         _id: topicData.createdBy._id.toString(),
@@ -59,6 +60,7 @@ export default defineEventHandler(async (event) => {
       voteStartAt: dayjs(topicData.voteStartAt).toISOString(),
       voteExpiredAt: dayjs(topicData.voteExpiredAt).toISOString(),
       publicVote: topicData.publicVote,
+      anonymousVotes: topicData.anonymousVotes,
       recoredToBlockchain: topicData.recoredToBlockchain,
       voterAllow: topicAllowDoc ? {
         topicid: topicData._id.toString(),
@@ -70,6 +72,7 @@ export default defineEventHandler(async (event) => {
         return {
           topicid: topicData._id.toString(),
           pauseAt: dayjs(ele.pauseAt).toISOString(),
+          cause: ele.cause,
           resumeAt: ele.resumeAt ? dayjs(ele.resumeAt).toISOString() : undefined
         }
       }),

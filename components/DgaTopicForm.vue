@@ -73,14 +73,32 @@
           class="text-red-500"
           :title="getChoiceErrorReason(choice.name)"
         />
-        <div class="flex-1 inline-flex flex-row">
-          <DgaInput v-model="choice.name" type="text" class="flex-1"></DgaInput>
-          <button class="px-2 py-1 inline-flex items-center"
-            :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
-          >
-            <MinusIcon />
-          </button>
+        <div class="w-full flex-1 grid grid-cols-12 items-center justify-center gap-x-2 gap-y-1">
+          <DgaInput v-model="choice.name" type="text" class="col-span-8 md:col-span-10"></DgaInput>
+          <img :src="getImgUrlAt(i)" class="w-full max-h-24 col-span-4 md:col-span-2 row-span-2 cursor-pointer" @click="emit('showImage', getImgUrlAt(i))"/>
+          <div class="col-span-8 md:col-span-10 flex flex-row gap-2 items-center">
+            <ImageIcon />
+            <DgaFileInput type="file" class="w-full flex-1" accept="image/jpeg,image/x-png" @change="changeImgFile($event, i)"></DgaFileInput>
+            <template v-if="choice.image && !imgUrl[i]">
+              <button v-if="topicData.images[i] !== false" @click="setRemoveImgAt(i)">
+                <TrashCanIcon />
+              </button>
+              <button v-else @click="revertImgFileAt(i)">
+                <UndoIcon />
+              </button>
+            </template>
+            <template v-else>
+              <button v-if="topicData.images[i]" @click="revertImgFileAt(i)">
+                <UndoIcon />
+              </button>
+            </template>
+          </div>
         </div>
+        <button class="px-2 py-1 inline-flex items-center"
+          :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
+        >
+          <MinusIcon />
+        </button>
       </div>
     </div>
     <div class="col-span-12 flex justify-center items-center">
@@ -96,10 +114,18 @@
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
       </div>
-      <div v-if="topicData.multipleVotes" class="grid grid-cols-12 gap-2 items-center">
-        <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
-        <DgaInput v-model.number="topicData.defaultVotes" type="number" min="1" class="col-span-12 md:col-span-10"></DgaInput>
-      </div>
+      <template v-if="topicData.multipleVotes">
+        <div class="flex flex-row gap-2 items-center">
+          <DgaCheckbox v-model="topicData.distinctVotes"></DgaCheckbox> 
+          <label class="flex-none">{{ $t('app.topic.distinctVotes') }}</label>
+        </div>
+        <div class="grid grid-cols-12 gap-2 items-center">
+          <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
+          <DgaInput v-model.number="topicData.defaultVotes" type="number" 
+            min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
+            class="col-span-12 md:col-span-10"></DgaInput>
+        </div>
+      </template>
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
           <div class="font-bold"></div>
@@ -121,7 +147,11 @@
             <div>{{ voter.firstName ? getVoterName(voter) : "-" }}</div>
             <div>{{ voter.email || "-" }}</div>
             <div v-if="topicData.multipleVotes">
-              <DgaInput v-model.number="voter.totalVotes"  type="number" class="w-full min-w-[100px]" :placeholder="$t('app.voterList.totalVotes')"></DgaInput>
+              <DgaInput v-model.number="voter.totalVotes" type="number" 
+                min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
+                class="w-full min-w-[100px]" 
+                :placeholder="$t('app.voterList.totalVotes')">
+              </DgaInput>
             </div>
             <div>
               <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
@@ -189,6 +219,9 @@
 import PlusIcon from 'vue-material-design-icons/Plus.vue';
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import MinusIcon from 'vue-material-design-icons/Minus.vue';
+import ImageIcon from 'vue-material-design-icons/Image.vue';
+import UndoIcon from 'vue-material-design-icons/Undo.vue';
+import TrashCanIcon from 'vue-material-design-icons/TrashCan.vue';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
@@ -198,6 +231,7 @@ import { getPrettyFullName } from '~/src/services/formatter/user';
 import { getDefaultChoices } from '~/src/services/form/topic';
 import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
 import { voterCountOf } from '~/src/services/validations/user';
+import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
@@ -209,13 +243,14 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: "update:modelValue", v: TopicFormData) : void,
   (e: "template", v: void): void,
+  (e: "showImage", v: string | undefined): void,
 }>();
 
 const i18n = useI18n();
 
 const startDate = dayjs().minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
-
+const imgUrl : Ref<(string | undefined)[]> = ref([]);
 const voteStart = ref(dayjs(startDate).format("YYYY-MM-DD HH:mm"));
 const voteEnd = ref(dayjs(expiredDate).format("YYYY-MM-DD HH:mm"));
 const voteDuration = ref({
@@ -239,11 +274,14 @@ const topicData = ref<TopicFormData>({
   voteExpiredAt: expiredDate,
   coadmins: [],
   multipleVotes: false,
+  distinctVotes: false,
   publicVote: true,
+  anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
   recoredToBlockchain: true,
+  images: [],
 });
 
 const modelValue = computed(() => props.modelValue);
@@ -378,7 +416,13 @@ function getChoiceErrorReason(choice: string) {
 }
 
 function removeOption(nth: number) {
-  topicData.value.choices.choices.splice(nth, 1)
+  topicData.value.choices.choices.splice(nth, 1);
+  topicData.value.images.splice(nth, 1);
+  const oldUrl = imgUrl.value[nth];
+  if(oldUrl !== undefined) {
+    URL.revokeObjectURL(oldUrl);
+  }
+  imgUrl.value.splice(nth, 1);
 }
 
 function addOption() {
@@ -436,6 +480,51 @@ function addCoadmin(user: UserSearchResponseData) {
   return true
 }
 
+function getImgUrlAt(i: number) {
+  if(imgUrl.value[i]) {
+    return imgUrl.value[i];
+  }
+
+  if(topicData.value.choices.choices[i].image && topicData.value.images[i] !== false) {
+    return `/api/image/${topicData.value.choices.choices[i].image}`
+  }
+  
+  return GRAY_BASE64_IMAGE;
+}
+
+function changeImgFile(ev: Event, i: number) {
+  const target = ev.target;
+  if(target instanceof HTMLInputElement) {
+    if(target.files && target.files.length > 0) {
+      const currentFile = target.files[0];
+      topicData.value.images[i] = currentFile;
+      const oldUrl = imgUrl.value[i];
+      if(oldUrl !== undefined) {
+        URL.revokeObjectURL(oldUrl);
+      }
+
+      imgUrl.value[i] = URL.createObjectURL(currentFile);
+    }
+  }
+}
+
+function setRemoveImgAt(i: number) {
+  topicData.value.images[i] = false;
+  const oldUrl = imgUrl.value[i];
+  if(oldUrl !== undefined) {
+    URL.revokeObjectURL(oldUrl);
+  }
+  imgUrl.value[i] = undefined;
+}
+
+function revertImgFileAt(i: number) {
+  topicData.value.images[i] = undefined;
+  const oldUrl = imgUrl.value[i];
+  if(oldUrl !== undefined) {
+    URL.revokeObjectURL(oldUrl);
+  }
+  imgUrl.value[i] = undefined;
+}
 </script>
 
 <style scoped>

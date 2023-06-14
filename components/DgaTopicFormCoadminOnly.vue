@@ -82,11 +82,14 @@ const topicData = ref<TopicFormData>({
   voteExpiredAt: expiredDate,
   coadmins: [],
   multipleVotes: false,
+  distinctVotes: false,
   publicVote: true,
+  anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
   recoredToBlockchain: true,
+  images: [],
 });
 
 const modelValue = computed(() => props.modelValue);

@@ -67,7 +67,11 @@ export default defineEventHandler(async (event) => {
     if(topicFormData.multipleVotes !== undefined) {
       topicDoc.multipleVotes = topicFormData.multipleVotes;
     }
-  
+
+    if(topicFormData.distinctVotes !== undefined) {
+      topicDoc.distinctVotes = topicFormData.distinctVotes;
+    }
+    
     if(topicFormData.choices !== undefined) {
       topicDoc.choices = topicFormData.choices;
     }
@@ -91,7 +95,11 @@ export default defineEventHandler(async (event) => {
     if(topicFormData.publicVote !== undefined) {
       topicDoc.publicVote = topicFormData.publicVote;
     }
-  
+
+    if(topicFormData.anonymousVotes !== undefined) {
+      topicDoc.anonymousVotes = topicFormData.anonymousVotes;
+    }
+
     if(topicFormData.recoredToBlockchain !== undefined) {
       topicDoc.recoredToBlockchain = topicFormData.recoredToBlockchain;
     }

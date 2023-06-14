@@ -8,3 +8,7 @@ interface UserEditFormData {
   department: string,
   division: string,
 }
+
+interface UserPreferenceFormData {
+  preferences: UserPreferences
+}

@@ -5,7 +5,7 @@ import { SessionHandler, getSessionData } from "~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
   let sid = getCookie(event, "sid");
-
+  
   const storage : Storage = useStorage();
   const sessionStorage = prefixStorage(storage, "session");
   const sessionExpired =  dayjs().add(60, "minute").toDate();

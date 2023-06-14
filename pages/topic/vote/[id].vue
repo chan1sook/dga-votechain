@@ -1,9 +1,9 @@
 <template>
   <div v-if="topic">
     <div class="relative flex flex-col md:flex-row gap-x-2 gap-y-1 justify-center items-center">
-      <button class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center" @click="navigateTo(localePathOf('/topics'))">
+      <NuxtLink :href="localePathOf('/topics')" class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center">
         <ArrowLeftIcon /> {{ $t("app.modal.back") }}
-      </button>
+      </NuxtLink>
       <div class="font-bold text-xl md:text-2xl" @click="showLocaltime = !showLocaltime">
         <div class="text-center flex flex-row justify-center items-center gap-2">{{ $t("app.voting.now") }}: {{ $d(dayjs(todayTime).toDate(), "long") }}</div>
         <div v-if="showLocaltime" class="text-center flex flex-row justify-center items-center gap-2 text-sm">{{ $t("app.voting.localtime") }}: {{ $d(dayjs(localTime).toDate(), "long") }}</div>
@@ -43,15 +43,19 @@
         <template v-for="choice of topic.choices.choices">
           <DgaButton 
             class="relative w-full max-w-md mx-auto flex flex-row gap-x-4 items-center justify-center !px-4 !rounded-3xl"
+            :class="[haveImage ? 'max-w-lg': 'max-w-md']"
             :theme="getBtnThemeOfChoice(choice)"
-            :color="noVoteLocked ? 'gray' : 'dga-blue'"
-            :disabled="!canVote || noVoteLocked"
+            :color="noVoteLocked || (canVote && prevVotes.map((ele) => ele.choice).includes(choice.name)) ? 'gray2' : 'dga-blue'"
+            :disabled="!canVote || noVoteLocked || prevVotes.map((ele) => ele.choice).includes(choice.name)"
             :disabled-vivid="!canVote && !noVoteLocked"
             @click="addVote(choice.name)"
           >
             <div class="w-8 sm:w-24 h-8 flex flex-row justify-center">
               <template v-if="canVote">
-                <div v-if="noVoteLocked" class="w-full text-white bg-gray-500 rounded-full px-4 sm:px-8 py-1 text-sm">
+                <div v-if="prevVotes.map((ele) => ele.choice).includes(choice.name)" class="w-full text-gray-500 bg-gray-300 rounded-full px-4 sm:px-8 py-1 text-sm flex flex-row justify-center items-center gap-1">
+                  <CheckIcon /> <span class="hidden sm:block">VOTED</span>
+                </div>
+                <div v-else-if="noVoteLocked" class="w-full text-gray-500 bg-gray-300 rounded-full px-4 sm:px-8 py-1 text-sm">
                   <span class="hidden sm:block">VOTE</span>
                 </div>
                 <div v-else-if="voteCount(choice.name) === 0" class="w-full text-white bg-dga-orange rounded-full px-4 sm:px-8 py-1 text-sm">
@@ -74,14 +78,15 @@
               </template>
             </div>
             <div class="flex-1 text-left">{{ choice.name }}</div>
+            <img v-if="haveImage" :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem]" @click.stop="showBigImage(choice)" />
             <div class="relative w-12">
               <template v-if="canVote">
-                <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && topic.multipleVotes">
+                <div v-if="!noVoteLocked && voteCount(choice.name) > 0 && !isDistinctVotes">
                   x{{ voteCount(choice.name) }}
                 </div>
               </template>
               <template v-else>
-                <div v-if="votedCount(choice.name) > 0 && topic.multipleVotes">
+                <div v-if="votedCount(choice.name) > 0 && !isDistinctVotes">
                   x{{ votedCount(choice.name) }}
                 </div>
               </template>
@@ -114,6 +119,9 @@
     >
       {{ $t('app.voting.confirm') }}
     </DgaModal>
+    <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
+      <img :src="getImgUrlChoice(selectedImageChoice)" />
+    </DgaModal>
     <DgaLoadingModal :show="waitVote"></DgaLoadingModal>
   </div>
 </template>
@@ -124,6 +132,7 @@ import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
 
 import dayjs from "dayjs";
 import { isTopicExpired } from '~/src/services/validations/topic';
+import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 definePageMeta({
   middleware: ["vote-redirect", "auth-voter"]
@@ -142,16 +151,27 @@ useHead({
 });
 
 const topic: Ref<TopicResponseData | undefined> = ref(undefined);
+const haveImage = computed(() => {
+  if(!topic.value) {
+    return false;
+  }
+  console.log(topic.value.choices.choices.some((ele) => !!ele.image), topic.value.choices.choices)
+  return topic.value.choices.choices.some((ele) => !!ele.image)
+})
 const pauseData: Ref<TopicCtrlPauseResponseData[]> = ref([]);
 const voterAllow: Ref<VoterAllowResponseData | undefined> = ref(undefined);
 const noVoteLocked = ref(false);
 const showConfirmModal = ref(false);
+const selectedImageChoice: Ref<ChoiceData | undefined> = ref(undefined);
+const showImageModal = ref(false);
 const waitVote = ref(false);
 const remainVotes = ref(0);
 const totalVotes = ref(0);
 const canVote = computed(() => {
   return topic.value && voterAllow.value && voterAllow.value.remainVotes > 0;
 });
+const isDistinctVotes = computed(() => topic.value && topic.value.multipleVotes && topic.value.distinctVotes);
+const allVoted = computed(() => currentVotes.value.slice().concat(prevVotes.value.map((ele) => ele.choice)))
 const remainTime = ref(0);
 const pauseTime = ref(0);
 const isPaused = computed(() => {
@@ -165,7 +185,7 @@ const localTime = ref(Date.now());
 const showLocaltime = ref(false);
 const isSync = ref(false);
 const currentVotes : Ref<ChoiceDataType[]> = ref([]);
-const voted: Ref<VoteResponseData[]> = ref([]);
+const prevVotes: Ref<VoteResponseData[]> = ref([]);
 
 function getBtnThemeOfChoice(choice: { name: string }) {
   const voteCounts = canVote.value ? voteCount(choice.name) : votedCount(choice.name);
@@ -183,14 +203,14 @@ if (!data.value) {
     navigateTo(`/topic/result/${_topic._id}`);
   } else {
     topic.value = _topic;
-    voted.value = votes;
+    prevVotes.value = votes;
     pauseData.value = _pauseData;
     voterAllow.value = _voterAllow;
     const _remainVotes = _voterAllow ? _voterAllow.remainVotes : 0;
     remainVotes.value = _remainVotes;
     totalVotes.value = _remainVotes;
     console.log("remainVotes", remainVotes.value , "totalVotes", totalVotes.value);
-    if(_remainVotes === 0 && voted.value.every((ele) => ele.choice === null)) {
+    if(_remainVotes === 0 && prevVotes.value.every((ele) => ele.choice === null)) {
       noVoteLocked.value = true;
     }
   }
@@ -205,11 +225,33 @@ function voteCount(choice: ChoiceDataType) {
   }, 0)
 }
 function votedCount(choice: ChoiceDataType) {
-  return voted.value.filter((ele) => ele.choice === choice).length;
+  return prevVotes.value.filter((ele) => ele.choice === choice).length;
+}
+
+function getImgUrlChoice(choice: ChoiceData | undefined) {
+  if(!choice ) {
+    return GRAY_BASE64_IMAGE;
+  }
+  
+  if(choice.image) {
+    return `/api/image/${choice.image}`
+  }
+  
+  return GRAY_BASE64_IMAGE;
+}
+
+function showBigImage(choice: ChoiceData) {
+  selectedImageChoice.value = choice;
+  showImageModal.value = true;
 }
 
 function addVote(choice: ChoiceDataType) {
   if(!canVote.value || remainVotes.value <= 0) { return; }
+
+  if(isDistinctVotes.value && allVoted.value.includes(choice)) {
+    return
+  }
+
   currentVotes.value.push(choice);
   remainVotes.value -= 1;
 }
@@ -339,7 +381,7 @@ socket.on("voted", (votes: VoteResponseData[]) => {
       }
 
       if(vote.userid === useSessionData().value.userid) {
-        voted.value.push(vote);
+        prevVotes.value.push(vote);
       }
     }
   }

@@ -16,6 +16,10 @@ const schema = new Schema<TopicModelData>({
     type: Boolean,
     default: false,
   },
+  distinctVotes: {
+    type: Boolean,
+    default: false,
+  },
   choices: {
     type: new Schema<ChoicesInfo>({
       choices: {
@@ -72,6 +76,10 @@ const schema = new Schema<TopicModelData>({
   publicVote: {
     type: Boolean,
     required: true,
+  },
+  anonymousVotes: {
+    type: Boolean,
+    default: false,
   },
   notifyVoter: {
     type: Boolean,
