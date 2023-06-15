@@ -24,6 +24,7 @@ export default async () => {
         voteId: `${tx._id}`,
         topicId: tx.topicid.toString(),
         userId: tx.userid ? tx.userid.toString() : "",
+        groupid: tx.groupid,
         choice: tx.choice === "" ? null : tx.choice,
         createdAt: dayjs(tx.createdAt).toString(),
         txhash: tx.tx,
@@ -102,7 +103,13 @@ export default async () => {
   });
 
   const pubClient = createClient({ url: REDIS_URI });
+  pubClient.on("error", (err) => {
+    console.log(err);
+  });
   const subClient = pubClient.duplicate();
+  subClient.on("error", (err) => {
+    console.log(err);
+  });
 
   await Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
     io.adapter(createAdapter(pubClient, subClient));

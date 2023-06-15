@@ -9,6 +9,7 @@ interface VoteDataBlockchainResponseData {
 
 type TxResponseData = Omit<VoteDataBlockchainResponseData, "choice"> & {
   txhash: string | null,
+  groupid: string,
   choice: ChoiceDataType,
   createdAt: DateString | undefined,
   txStatus: TxStatus,

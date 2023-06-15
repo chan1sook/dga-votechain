@@ -30,8 +30,10 @@
       <DgaTopicCard v-for="topic of loadedTopics" :topic="topic" :mode="roleMode"
         :editable="isAdminMode && !isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime())"
         :status="getStatusOf(topic)"
+        :with-qrcode="isAdminMode"
         :is-admin="isAdminMode"
         @edit="toEditTopic(topic)"
+        @qr="showQr(topic)"
         @recreate="toRecreateTopic(topic)"
         @action="handleStatusAction(topic, $event)"
       ></DgaTopicCard>
@@ -49,15 +51,21 @@
         </DgaButton>
       </template>
     </div>
+    <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
+      <img :src="qrCodeSrc" />
+      <div>{{ currentLink }}</div>
+    </DgaModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import PlusCircleOutlineIcon from 'vue-material-design-icons/PlusCircleOutline.vue';
 
+import QRCode from 'qrcode'
 import dayjs from "dayjs";
 import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
 import { isAdminRole } from '~/src/services/validations/role';
+import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -109,6 +117,9 @@ const startid = computed(() => {
 })
 const hasMoreTopics = ref(false);
 const isLoadMoreTopics = ref(false);
+const showImageModal = ref(false);
+const currentLink = ref("");
+const qrCodeSrc = ref(GRAY_BASE64_IMAGE);
 
 function resetTopics() {
   loadedTopics.value = [];
@@ -144,9 +155,11 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
     return "result";
   } else if(!isTopicReadyToVote(topic, useComputedServerTime().getTime())) {
     return "waiting";
+  } else if(topic.publicVote && topic.anonymousVotes) {
+    return "access";
   } else if(!useSessionData().value.userid) {
     return "voting";
-  } else if( !isAdminMode) {
+  } else if(!isAdminMode) {
     if(topic.voterAllow) {
       return topic.voterAllow.remainVotes > 0 ? "access" : "voted"
     } else {
@@ -181,6 +194,13 @@ function handleStatusAction(topic: TopicResponseDataExtended, status: TopicCardS
       });
       break;
   }
+}
+
+async function showQr(topic: TopicResponseData) {
+  const host = window.location;
+  currentLink.value = host.protocol + "//" + host.host + "/vote/" + topic._id;
+  qrCodeSrc.value = await QRCode.toDataURL(currentLink.value);
+  showImageModal.value = true;
 }
 
 async function fetchTopics(filter: TopicFilterParams) {

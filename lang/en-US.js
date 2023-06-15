@@ -91,6 +91,7 @@ export default {
         }
       },
       distinctVotes: "Distinct Votes",
+      anonymousVotes: "Allow Anonymous to Vote",
       notifyUsers: "Send notice to users",
       skipBlockchain: "Not record to Blockchain",
       scorePublic: "Display voter choice(s) for public",
@@ -115,6 +116,7 @@ export default {
       loadingTopic: "Loading...",
       loadMoreTopic: "Load more topics",
       noMoreTopic: "No more topic",
+      qrcode: "QR Code",
       createTopic: "Create",
       avaliableTopic: "All Avaliable",
       editTopic: "Edit",
@@ -315,7 +317,7 @@ export default {
     registerDigitalId: "Register with Digital ID",
   },
   role: {
-    guest: "Guest",
+    guest: "Anonymous",
     voter: "Voter",
     admin: "Admin",
     developer: "Developer",

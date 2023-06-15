@@ -9,20 +9,9 @@ import mongoose from "mongoose";
 import { addVoteOnBlockchain } from "../smart-contract";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { nanoid } from "nanoid";
 
 export default defineEventHandler(async (event) => {
-  const userData = event.context.userData;
-
-  if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") || userData.roleMode !== "voter") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
-  
-  const dbSession = await mongoose.startSession();
-  dbSession.startTransaction();
-
   const voteFormData : VotesFormData = await readBody(event);
 
   const topicDoc = await TopicModel.findById(voteFormData.topicid);
@@ -32,19 +21,34 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Topic not found",
     });
   }
-  
-  const voterAllowData = await VoterAllowModel.findOne({
-    userid: userData._id,
-    topicid: topicDoc._id,
-  });
 
-  if(!voterAllowData) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
+  // TODO allow anonVotes
+  let voterAllowData;
+  const userData = event.context.userData;
+  if(!(topicDoc.publicVote && topicDoc.anonymousVotes)) {
+    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") || userData.roleMode !== "voter") {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
+
+    voterAllowData = await VoterAllowModel.findOne({
+      userid: userData?._id,
+      topicid: topicDoc._id,
     });
+
+    if(!voterAllowData) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden",
+      });
+    }
   }
 
+  const dbSession = await mongoose.startSession();
+  dbSession.startTransaction();
+  
   const topicPauseFlag = await isTopicPause(topicDoc._id);
 
   if(topicPauseFlag) {
@@ -54,7 +58,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const remainVotes = voterAllowData.remainVotes;
+  const remainVotes = voterAllowData?.remainVotes || topicDoc.defaultVotes;
   if(remainVotes <= 0) {
     throw createError({
       statusCode: 400,
@@ -63,21 +67,26 @@ export default defineEventHandler(async (event) => {
   }
   
   if(topicDoc.multipleVotes) {
-    if(voteFormData.votes.length > voterAllowData.remainVotes) {
-      voteFormData.votes = voteFormData.votes.slice(0, voterAllowData.remainVotes);
+    if(voteFormData.votes.length > remainVotes) {
+      voteFormData.votes = voteFormData.votes.slice(0, remainVotes);
     }
-    voterAllowData.remainVotes -= voteFormData.votes.length;
+    if(voterAllowData) {
+      voterAllowData.remainVotes -= voteFormData.votes.length;
+    }
   } else {
     voteFormData.votes = voteFormData.votes.slice(0, 1);
-    voterAllowData.remainVotes = 0;
+    if(voterAllowData) {
+      voterAllowData.remainVotes = 0;
+    }
   }
 
-
+  const groupid = nanoid();
   const today = new Date();
   const voteDatas : VoteModelData[] = voteFormData.votes.map((choice) => {
     return {
-      userid: userData._id,
+      userid: userData?._id,
       topicid: topicDoc._id,
+      groupid: groupid,
       choice: choice,
       createdAt: today,
       updatedAt: today,
@@ -87,7 +96,7 @@ export default defineEventHandler(async (event) => {
 
   const [voteDocs] = await Promise.all([
     VoteModel.insertMany(voteDatas),
-    voterAllowData.save(),
+    voterAllowData ? voterAllowData.save() : () => {},
   ]);
   
   const votes : VoteResponseData[] = voteDocs.map((newVoteDoc) => {
@@ -95,6 +104,7 @@ export default defineEventHandler(async (event) => {
       _id: `${newVoteDoc._id}`,
       userid: `${newVoteDoc.userid}`,
       topicid: `${newVoteDoc.topicid}`,
+      groupid: groupid,
       choice: newVoteDoc.choice,
       createdAt: dayjs(newVoteDoc.createdAt).toString(),
       tx: newVoteDoc.tx,

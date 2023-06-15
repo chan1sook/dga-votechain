@@ -8,9 +8,14 @@
     <div class="flex flex-col md:flex-row gap-2 my-4">
       <div class="w-full md:w-64 bg-dga-orange text-white rounded-lg flex flex-row md:flex-col justify-center text-center gap-2 px-4 py-2 md:px-8 md:py-4">
         <div>
-          {{ $t("app.voting.voterVoted") }}: {{ totalVotersVoted }}/{{ totalVoters }}
+          {{ $t("app.voting.voterVoted") }}: 
+          <template v-if="totalVoters > 0">
+            {{ totalVotersVoted }}/{{ totalVoters }} 
+            <span v-if="anonVotes.length > 0">+{{ anonVotes.length }}</span>
+          </template>
+          <template v-else>{{ anonVotes.length }}</template>
         </div>
-        <div class="ml-auto md:ml-0 md:text-xl">
+        <div v-if="totalVoters > 0" class="ml-auto md:ml-0 md:text-xl">
           {{ $t("app.voting.remainVotes") }}: {{ totalRemainVotes || 0 }} {{ $t("app.voting.vote", { count: totalRemainVotes || 0 }) }}
         </div>
       </div>
@@ -58,6 +63,9 @@
             {{ getPrettyFullName(voter) }}
           </div>
         </template>
+        <template v-if="voterAllowList.length === 0">
+          <div class="col-span-12">-</div>
+        </template>
       </div>
     </div>
     <DgaModal :show="showConfirmModal"
@@ -100,6 +108,7 @@ useHead({
 
 const topic: Ref<TopicResponseData | undefined> = ref(undefined);
 const pauseData: Ref<TopicCtrlPauseResponseData[]> = ref([]);
+const anonVotes: Ref<AnonymousVoteResponseData[]> = ref([]);
 const showConfirmModal = ref(false);
 const waitPause = ref(false);
 const remainTime = ref(0);
@@ -141,7 +150,13 @@ const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 if (!data.value) {
   showError(i18n.t("voting.cannotVote"));
 } else {
-  const { topic: _topic, voterAllows: _voteAllows, pauseData: _pauseData, rawVoterAllows: _rawVoterAllows } = data.value;
+  const {
+    topic: _topic,
+    voterAllows: _voteAllows,
+    pauseData: _pauseData,
+    rawVoterAllows: _rawVoterAllows,
+    anonyomusVotes: _anonVoteGroups,
+  } = data.value;
 
   if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
     navigateTo(`/topic/result/${_topic._id}`);
@@ -150,6 +165,7 @@ if (!data.value) {
     pauseData.value = _pauseData;
     voterAllowList.value = _voteAllows;
     rawVoterAllows.value = _rawVoterAllows;
+    anonVotes.value = _anonVoteGroups;
   }
 }
 
@@ -212,6 +228,15 @@ socket.on("voted", (votes: VoteResponseData[]) => {
       const target = rawVoterAllows.value.find((ele) => ele._id === vote._id);
       if(target && target.remainVotes > 0) {
         target.remainVotes -= 1;
+      }
+
+      if(!vote.userid) {
+        const anonVoteTarget = anonVotes.value.find((ele) => ele.groupid === vote.groupid);
+        if(anonVoteTarget) {
+          anonVoteTarget.count += 1;
+        } else {
+          anonVotes.value.push({ groupid: vote.groupid, count: 1})
+        }
       }
     }
   }

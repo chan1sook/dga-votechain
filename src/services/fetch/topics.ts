@@ -8,11 +8,14 @@ import { escapeRegExp } from "../formatter/regexp";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export function getLastestFinishedPublicVoteTopics(filter?: TopicFilterParams) {
+export function getLastestGuestTopics(filter?: TopicFilterParams) {
   const query : FilterQuery<TopicModelData> = {
     status: "approved",
     publicVote: true,
-    voteExpiredAt: { $lte: new Date() },
+    $or: [
+      { voteExpiredAt: { $lte: new Date() }, },
+      { anonymousVotes: true }
+    ],
   };
 
   if(filter) {

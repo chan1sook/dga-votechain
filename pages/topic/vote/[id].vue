@@ -135,7 +135,7 @@ import { isTopicExpired } from '~/src/services/validations/topic';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 definePageMeta({
-  middleware: ["vote-redirect", "auth-voter"]
+  middleware: ["vote-redirect"]
 })
 
 const i18n = useI18n()
@@ -168,9 +168,16 @@ const waitVote = ref(false);
 const remainVotes = ref(0);
 const totalVotes = ref(0);
 const canVote = computed(() => {
-  return topic.value && voterAllow.value && voterAllow.value.remainVotes > 0;
+  if(topic.value) {
+    if(topic.value.publicVote && topic.value.anonymousVotes) {
+      return true;
+    }
+    return voterAllow.value && voterAllow.value.remainVotes > 0;
+  }
+  return false;
+
 });
-const isDistinctVotes = computed(() => topic.value && topic.value.multipleVotes && topic.value.distinctVotes);
+const isDistinctVotes = computed(() => topic.value && (topic.value.multipleVotes ? topic.value.distinctVotes : true));
 const allVoted = computed(() => currentVotes.value.slice().concat(prevVotes.value.map((ele) => ele.choice)))
 const remainTime = ref(0);
 const pauseTime = ref(0);
@@ -201,15 +208,19 @@ if (!data.value) {
 
   if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
     navigateTo(`/topic/result/${_topic._id}`);
+  } if(useSessionData().value.roleMode === "guest" && !(_topic.publicVote && _topic.anonymousVotes)) {
+    showError({
+      message: i18n.t('app.voting.error.notVoteable'),
+      statusCode: 403,
+    })
   } else {
     topic.value = _topic;
     prevVotes.value = votes;
     pauseData.value = _pauseData;
     voterAllow.value = _voterAllow;
-    const _remainVotes = _voterAllow ? _voterAllow.remainVotes : 0;
+    const _remainVotes = _voterAllow ? _voterAllow.remainVotes : _topic.defaultVotes;
     remainVotes.value = _remainVotes;
     totalVotes.value = _remainVotes;
-    console.log("remainVotes", remainVotes.value , "totalVotes", totalVotes.value);
     if(_remainVotes === 0 && prevVotes.value.every((ele) => ele.choice === null)) {
       noVoteLocked.value = true;
     }
@@ -303,7 +314,7 @@ async function submitVotes() {
     voterAllow.value.remainVotes -= votes.length;
   }
 
-  if(topic.value && voterAllow.value && voterAllow.value.remainVotes === 0) {
+  if(topic.value && (voterAllow.value ? voterAllow.value.remainVotes === 0 : true)) {
     navigateTo(localePathOf("/topics"))
   } else {
     waitVote.value = false;
@@ -380,7 +391,7 @@ socket.on("voted", (votes: VoteResponseData[]) => {
         continue;
       }
 
-      if(vote.userid === useSessionData().value.userid) {
+      if(vote.userid && vote.userid === useSessionData().value.userid) {
         prevVotes.value.push(vote);
       }
     }

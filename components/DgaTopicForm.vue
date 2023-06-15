@@ -10,6 +10,28 @@
       {{ $t('app.topic.accessModifier') }}
     </div>
     <DgaSelect v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"></DgaSelect>
+    <div class="col-span-12">
+      <div v-if="topicData.publicVote" class="flex flex-row gap-2 items-center">
+        <DgaCheckbox v-model="topicData.anonymousVotes"></DgaCheckbox> 
+        <label class="flex-none">{{ $t('app.topic.anonymousVotes') }}</label>
+      </div>
+      <div class="flex flex-row gap-2 items-center">
+        <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
+        <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
+      </div>
+      <template v-if="topicData.multipleVotes">
+        <div class="flex flex-row gap-2 items-center">
+          <DgaCheckbox v-model="topicData.distinctVotes"></DgaCheckbox> 
+          <label class="flex-none">{{ $t('app.topic.distinctVotes') }}</label>
+        </div>
+        <div class="grid grid-cols-12 gap-2 items-center">
+          <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
+          <DgaInput v-model.number="topicData.defaultVotes" type="number" 
+            min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
+            class="col-span-12 md:col-span-10"></DgaInput>
+        </div>
+      </template>
+    </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.voteDuration.title')}}</h3>
     <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.inputMode')}}</div>
     <div class="col-span-12 md:col-span-10">
@@ -110,22 +132,6 @@
     </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.voterList.title') }}</h3>
     <div class="col-span-12 flex flex-col gap-2">
-      <div class="flex flex-row gap-2 items-center">
-        <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
-        <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
-      </div>
-      <template v-if="topicData.multipleVotes">
-        <div class="flex flex-row gap-2 items-center">
-          <DgaCheckbox v-model="topicData.distinctVotes"></DgaCheckbox> 
-          <label class="flex-none">{{ $t('app.topic.distinctVotes') }}</label>
-        </div>
-        <div class="grid grid-cols-12 gap-2 items-center">
-          <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
-          <DgaInput v-model.number="topicData.defaultVotes" type="number" 
-            min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
-            class="col-span-12 md:col-span-10"></DgaInput>
-        </div>
-      </template>
       <div class="overflow-auto max-h-[50vh]">
         <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
           <div class="font-bold"></div>

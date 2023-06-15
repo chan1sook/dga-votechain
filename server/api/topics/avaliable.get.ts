@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-import { getLastestAdminTopics, getLastestFinishedPublicVoteTopics, getLastestVoterTopicsWithIds } from "~/src/services/fetch/topics";
+import { getLastestAdminTopics, getLastestGuestTopics, getLastestVoterTopicsWithIds } from "~/src/services/fetch/topics";
 import { getVoterAllowByUserId } from "~/src/services/fetch/vote-allow";
 import { getTopicCtrlPauseListByTopicIds } from "~/src/services/fetch/topic-ctrl-pause";
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   
   let filterIds;
   if(!userData || userData.roleMode === "guest") {
-    topicsData = await getLastestFinishedPublicVoteTopics(filterParams).populate("createdBy");
+    topicsData = await getLastestGuestTopics(filterParams).populate("createdBy");
   } else if(userData.roleMode === "voter") {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
     topicsData = await getLastestVoterTopicsWithIds(filterIds, filterParams).populate("createdBy");

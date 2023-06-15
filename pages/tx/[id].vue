@@ -78,6 +78,7 @@ function filterTxData(tx: TxResponseDataWithRaw) {
     ...tx,
   }
   delete result.txStatus;
+  delete result.groupid;
   delete result.createdAt;
   delete result.txhash;
   delete result.txData;

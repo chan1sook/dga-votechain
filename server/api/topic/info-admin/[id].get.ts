@@ -4,6 +4,7 @@ import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-pause";
 import { isAdminRole } from "~/src/services/validations/role";
+import { getAnonymousVotesByTopicId } from "~/src/services/fetch/vote";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -54,12 +55,26 @@ export default defineEventHandler(async (event) => {
     notifyVoter: topicDoc.notifyVoter,
   };
 
-  const [voterAllowDocs, coadminDocs, pauseDataDocs] = await Promise.all([
+  const [voterAllowDocs, coadminDocs, pauseDataDocs, anonVotes] = await Promise.all([
     TopicVoterAllowsModel.find({ topicid: topicDoc._id }).populate("userid"),
     UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) }}),
     getTopicCtrlPauseListByTopicId(topicDoc._id),
+    getAnonymousVotesByTopicId(topicDoc._id)
   ]);
 
+  const anonyomusVotes : AnonymousVoteResponseData[] = [];
+  for(const vote of anonVotes) {
+    const target = anonyomusVotes.find((ele) => ele.groupid === vote.groupid);
+    if(target) {
+      target.count += 1;
+    } else {
+      anonyomusVotes.push({
+        groupid: vote.groupid,
+        count: 1
+      });
+    }
+  }
+  
   if(!topic.publicVote) {
     let isAllowed = false;
 
@@ -92,7 +107,7 @@ export default defineEventHandler(async (event) => {
       userid: `${ele.userid}`,
       totalVotes: ele.totalVotes
     }
-  })
+  });
 
   const rawVoterAllows: RawVoterAllowVoteData[] = voterAllowDocs.map((ele) => {
     return {
@@ -124,6 +139,7 @@ export default defineEventHandler(async (event) => {
     voterAllows,
     rawVoterAllows,
     coadmins,
+    anonyomusVotes,
     pauseData
   }
 })
