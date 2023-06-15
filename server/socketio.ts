@@ -103,6 +103,9 @@ export default async () => {
   });
 
   const pubClient = createClient({ url: REDIS_URI });
+  pubClient.on("error", (err) => {
+    console.log(err);
+  });
   const subClient = pubClient.duplicate();
 
   await Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
