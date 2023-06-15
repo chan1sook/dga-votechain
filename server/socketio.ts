@@ -107,6 +107,9 @@ export default async () => {
     console.log(err);
   });
   const subClient = pubClient.duplicate();
+  subClient.on("error", (err) => {
+    console.log(err);
+  });
 
   await Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
     io.adapter(createAdapter(pubClient, subClient));
