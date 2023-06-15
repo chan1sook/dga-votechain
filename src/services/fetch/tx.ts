@@ -11,6 +11,7 @@ export async function getTxListFilter(pagesize: number, startid: string) {
       voteId: tx._id.toString(),
       topicId: tx.topicid.toString(),
       userId: tx.userid ? tx.userid.toString() : "",
+      groupid: tx.groupid,
       choice: tx.choice === "" ? null : tx.choice,
       createdAt: dayjs(tx.createdAt).toString(),
       txhash: tx.tx,

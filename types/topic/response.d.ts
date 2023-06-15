@@ -21,7 +21,8 @@ type TopicResultResponse = Pick<TopicResponseData, "_id" | "name" | "description
     },
     votes: {
       quota: number,
-      actual: number,
+      anonymous: number,
+      user: number,
     }
   },
   scores: TopicVoteCountRecord[],

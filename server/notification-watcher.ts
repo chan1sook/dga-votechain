@@ -24,19 +24,23 @@ async function checkTopics() {
     topicid: { $in: notNotifyTopics.map((ele) => ele._id)}
   })
 
-  const notifications : NotificationModelDataWithId[] = voteAllowsDocs.map((ele) => {
-    const targetTopic = notNotifyTopics.find((ele2) => ele2._id.toString() === ele.topicid.toString());
-    return {
-      userid: new Types.ObjectId(ele.userid),
-      group: "topic",
-      extra: {
-        id: ele.topicid.toString(),
-        name: targetTopic?.name,
-        status: "finished",
-      },
-      notifyAt: targetTopic?.voteExpiredAt,
+  const notifications : NotificationModelData[] = [];
+  
+  for(const noti of voteAllowsDocs) {
+    const targetTopic = notNotifyTopics.find((ele2) => ele2._id.toString() === noti.topicid.toString());
+    if(targetTopic) {
+      notifications.push({
+        userid: new Types.ObjectId(noti.userid),
+        group: "topic",
+        extra: {
+          id: noti.topicid.toString(),
+          name: targetTopic.name,
+          status: "finished",
+        },
+        notifyAt: targetTopic.voteExpiredAt,
+      })
     }
-  });
+  }
   
   await Promise.all([
     TopicModel.bulkSave(notNotifyTopics),

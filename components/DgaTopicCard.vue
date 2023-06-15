@@ -12,6 +12,11 @@
         <div class="time">{{ $t('app.voting.voteOn') }} {{ prettyStartAt }}</div>
         <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
       </div>
+      <div v-if="props.withQrcode" class="qr">
+        <button :title="$t('app.voting.qrcode')" @click="emit('qr')">
+          <QrcodeIcon />
+        </button>
+      </div>
       <div class="status">
         <button v-if="props.editable" :title="$t('app.voting.editTopic')" @click="emit('edit')">
           {{ $t('app.voting.editTopic') }}
@@ -33,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+import QrcodeIcon from 'vue-material-design-icons/Qrcode.vue';
 import dayjs from 'dayjs';
 
 const i18n = useI18n();
@@ -41,6 +47,7 @@ const props = withDefaults(defineProps<{
   topic: TopicResponseData,
   editable?: boolean,
   isAdmin?: boolean,
+  withQrcode?: boolean,
   status?: TopicCardStatus,
 }>(), {
   status: "access",
@@ -49,6 +56,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'edit') : void,
   (e: 'recreate') : void,
+  (e: 'qr') : void,
   (e: 'action', v:TopicCardStatus) : void,
   (e: 'approve', v:boolean) : void,
 }>();
@@ -114,14 +122,14 @@ function getCreatedByName(createdBy?: UserBasicResponseDataWithId) {
 
 .dga-topic-card > .inner {
   @apply rounded-lg bg-white grid items-center p-2 sm:p-4 gap-2 sm:gap-y-0 overflow-auto;
-  grid-template-areas: "public duration" "content content" "status status";
-  grid-template-columns: 150px auto;
+  grid-template-areas: "public duration duration" "content content content" "status status qr";
+  grid-template-columns: 150px auto 50px;
 }
 
 @media (min-width: 640px) {
   .dga-topic-card > .inner {
-    grid-template-areas: "public content status" "duration content status";
-    grid-template-columns: 150px auto 120px;
+    grid-template-areas: "public content qr status" "duration content qr status";
+    grid-template-columns: 150px auto 50px 120px;
   }
 }
 
@@ -143,6 +151,10 @@ function getCreatedByName(createdBy?: UserBasicResponseDataWithId) {
 .dga-topic-card > .inner > .content > .time
 {
   @apply flex-none
+}
+.dga-topic-card > .inner > .qr {
+  grid-area: qr;
+  @apply flex flex-col justify-center gap-2
 }
 .dga-topic-card > .inner > .status {
   grid-area: status;

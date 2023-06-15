@@ -15,12 +15,7 @@ export default defineEventHandler(async (event) => {
   
   const userData = event.context.userData;
 
-  let voterAllow: VoterAllowResponseData = {
-    topicid: topicDoc._id.toString(),
-    userid: "",
-    remainVotes: 1,
-    totalVotes: 1,
-  };
+  let voterAllow: VoterAllowResponseData | undefined;
   let votes : VoteResponseData[] = [];
 
   const topicPauseData = await TopicPauseData.find({
@@ -51,6 +46,7 @@ export default defineEventHandler(async (event) => {
         _id: `${vote._id}`,
         userid: `${vote.userid}`,
         topicid: `${vote.topicid}`,
+        groupid: vote.groupid,
         choice: vote.choice,
         createdAt: dayjs(vote.createdAt).toISOString(),
         tx: vote.tx,
@@ -62,7 +58,7 @@ export default defineEventHandler(async (event) => {
     let isAllowed = false;
 
     if(userData) {
-      if(voterAllow.userid) {
+      if(voterAllow && voterAllow.userid) {
         isAllowed = true;
       }
 

@@ -24,6 +24,7 @@ export default async () => {
         voteId: `${tx._id}`,
         topicId: tx.topicid.toString(),
         userId: tx.userid ? tx.userid.toString() : "",
+        groupid: tx.groupid,
         choice: tx.choice === "" ? null : tx.choice,
         createdAt: dayjs(tx.createdAt).toString(),
         txhash: tx.tx,

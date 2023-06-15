@@ -10,6 +10,10 @@ const schema = new Schema<VoteModelData>({
     ref: "topic",
     required: true,
   },
+  groupid: {
+    type: String,
+    default: "",
+  },
   choice: {
     type: String,
   },

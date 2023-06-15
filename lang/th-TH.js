@@ -92,6 +92,7 @@ export default {
         }
       },
       distinctVotes: "โหวตตัวเลือกสูงสุดหนึ่งเสียง",
+      anonymousVotes: "อนุญาตให้คนทั่วไปโหวตได้",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
       skipBlockchain: "ไม่บันทึกลง Blockchain",
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
@@ -116,6 +117,7 @@ export default {
       loadingTopic: "รอสักครู่...",
       loadMoreTopic: "โหลดคำถามเพิ่มเติม",
       noMoreTopic: "ไม่พบคำถาม",
+      qrcode: "QR Code",
       createTopic: "ตั้งโหวต",
       avaliableTopic: "โหวตที่เปิดอยู่",
       editTopic: "แก้ไข",
@@ -328,7 +330,7 @@ export default {
     failed: "ลงทะเบียนล้มเหลว",
   },
   role: {
-    guest: "แขกรับเชิญ",
+    guest: "นิรนาม",
     voter: "ผู้โหวต",
     admin: "ผู้ดูแล",
     developer: "ผู้พัฒนา",

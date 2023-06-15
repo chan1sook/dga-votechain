@@ -76,7 +76,7 @@
           <div class="flex-1">{{ $t('app.result.totalVotes') }}</div>
           <div>100.00% |</div>
           <div>
-            {{ voteResult.stats.votes.quota }}  {{  $t('app.countable.vote', { count: voteResult.stats.votes.quota }) }}
+            {{ totalVoteStats }}  {{  $t('app.countable.vote', { count: totalVoteStats }) }}
           </div>
         </div>
       </div>
@@ -85,13 +85,13 @@
       <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1 border-2 border-dga-blue">
         <div class="flex-1 flex flex-row gap-2 items-center">
           <div class="flex-1">{{ $t('app.result.actualVotes') }}</div>
-          <div>{{ getPercentOf(voteResult.stats.votes.actual, voteResult.stats.votes.quota).toFixed(2) }}% |</div>
+          <div>{{ getPercentOf(actualVoteStats, totalVoteStats).toFixed(2) }}% |</div>
           <div>
-            {{ voteResult.stats.votes.actual }}  {{  $t('app.countable.vote', { count: voteResult.stats.votes.actual }) }}
+            {{ actualVoteStats }}  {{  $t('app.countable.vote', { count: actualVoteStats }) }}
           </div>
         </div>
         <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-          :style="{ width: getPercentOf(voteResult.stats.votes.actual, voteResult.stats.votes.quota).toFixed(2) + '%'}"
+          :style="{ width: getPercentOf(actualVoteStats, totalVoteStats).toFixed(2) + '%'}"
         ></div>
       </div>
       <div class="col-span-2"></div>
@@ -99,13 +99,13 @@
       <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1 border-2 border-dga-blue">
         <div class="flex-1 flex flex-row gap-2 items-center">
           <div class="flex-1">{{ $t('app.result.remainVotes') }}</div>
-          <div>{{ getPercentOf(absentVotes, voteResult.stats.votes.quota).toFixed(2) }}% |</div>
+          <div>{{ getPercentOf(absentVotes, totalVoteStats).toFixed(2) }}% |</div>
           <div>
             {{ absentVotes }}  {{  $t('app.countable.vote', { count: absentVotes }) }}
           </div>
         </div>
         <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-          :style="{ width: getPercentOf(absentVotes, voteResult.stats.votes.quota).toFixed(2) + '%'}"
+          :style="{ width: getPercentOf(absentVotes, totalVoteStats).toFixed(2) + '%'}"
         ></div>
       </div>
     </div>
@@ -136,7 +136,7 @@
             <div class="flex-1 flex flex-row items-center gap-2">
               <div class="flex-1 flex flex-row gap-2 items-center">
                 <div>{{ choice.name }}</div>
-                <img :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/>
+                <img v-if="haveImage" :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/>
               </div>
               <template v-if="getScoreOf(choice.name)">
                 <div class="flex-1 text-right">{{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}% |</div>
@@ -236,6 +236,8 @@ if (!data.value) {
 } else {
   const { voteResult: _voteResult } =  data.value;
   voteResult.value = _voteResult;
+
+  console.log(voteResult)
 }
 
 const ranking : Ref<TopicChoiceRanking[]> = computed(() => {
@@ -263,7 +265,9 @@ const ranking : Ref<TopicChoiceRanking[]> = computed(() => {
 const voters = computed(() => voteResult.value ? voteResult.value.voters : undefined);
 const yourVotes = computed(() => voteResult.value ? voteResult.value.yourVotes : null);
 const absentVoters = computed(() => voteResult.value ? voteResult.value.stats.voters.total - voteResult.value.stats.voters.voted : 0);
-const absentVotes = computed(() => voteResult.value ? voteResult.value.stats.votes.quota - voteResult.value.stats.votes.actual : 0);
+const totalVoteStats = computed(() => voteResult.value ? voteResult.value.stats.votes.quota + voteResult.value.stats.votes.anonymous : 0);
+const actualVoteStats = computed(() => voteResult.value ? voteResult.value.stats.votes.user + voteResult.value.stats.votes.anonymous : 0);
+const absentVotes = computed(() => voteResult.value ? totalVoteStats.value - actualVoteStats.value : 0);
 
 const showDescription = ref(false);
 
@@ -319,8 +323,6 @@ function getRanking(choice: ChoiceDataType) {
   if(!ranking.value) {
     return undefined;
   }
-
-  console.log(ranking.value)
 
   return ranking.value.find((ele) => ele.choice === choice)
 }

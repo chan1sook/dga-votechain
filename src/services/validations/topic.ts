@@ -36,12 +36,13 @@ function isCoadminsValid(coadmins: string[]) {
 
 export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
   const maxChoices = topicData.multipleVotes && topicData.distinctVotes ? topicData.choices.choices.length: undefined;
-
+  const requiredVotes = (topicData.publicVote && topicData.anonymousVotes) ? true : isVoterAllowsValid(topicData.voterAllows, maxChoices);
+  
   return topicData.name !== "" && 
     isVoteDateTimeValid(topicData.voteStartAt, topicData.voteExpiredAt) && 
     Number.isInteger(topicData.defaultVotes) && topicData.defaultVotes > 0 &&
     isChoicesValid(topicData.choices.choices) &&
-    isVoterAllowsValid(topicData.voterAllows, maxChoices) &&
+    requiredVotes &&
     isCoadminsValid(topicData.coadmins);
 }
 
