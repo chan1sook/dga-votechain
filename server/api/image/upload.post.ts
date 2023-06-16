@@ -6,6 +6,7 @@ import fs from "fs/promises";
 import { nanoid } from 'nanoid';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { isBannedUser } from '~/src/services/validations/user';
 
 
 const supportMimeTypes = ['image/jpeg', 'image/png'];
@@ -13,7 +14,7 @@ const supportMimeTypes = ['image/jpeg', 'image/png'];
 export default eventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData || !checkPermissionNeeds(userData.permissions, "admin-mode")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "admin-mode")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

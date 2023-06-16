@@ -30,7 +30,7 @@ async function searchUsers() {
 
   popupShow.value = false;
   isSearching.value = true;
-  const { data } = await useFetch("/api/user/search", { query: {
+  const { data } = await useFetch("/api/users/search", { query: {
     keyword: keyword.value,
     adminOnly: props.adminOnly ? "1" : undefined,
     notSelf: props.notSelf ? "1" : undefined,

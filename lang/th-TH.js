@@ -250,6 +250,11 @@ export default {
       desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์",
       preferences: "ตั้งค่าผู้ใช้",
     },
+    withdrawUser: {
+      title: "ถอนตัวจากระบบ",
+      confirm1: "ต้องการถอนตัวจากระบบ E-Voting หรือไม่?",
+      confirm2: "กระบวนการนี้ไม่สามารถย้อนกลับได้",
+    },
     logout: "ออกจากระบบ"
   },
   userPreferences: {

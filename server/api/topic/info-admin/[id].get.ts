@@ -5,11 +5,11 @@ import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-pause";
 import { isAdminRole } from "~/src/services/validations/role";
 import { getAnonymousVotesByTopicId } from "~/src/services/fetch/vote";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  const isAdminMode = userData && isAdminRole(userData.roleMode);
-  if(!isAdminMode) {
+  if(!userData || isBannedUser(userData) || !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { getLastestAdminTopics, getLastestGuestTopics, getLastestVoterTopicsWithIds } from "~/src/services/fetch/topics";
 import { getVoterAllowByUserId } from "~/src/services/fetch/vote-allow";
 import { getTopicCtrlPauseListByTopicIds } from "~/src/services/fetch/topic-ctrl-pause";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const { filter } = getQuery(event);
@@ -17,10 +18,10 @@ export default defineEventHandler(async (event) => {
   }
   
   const userData = event.context.userData;
-  const topicVoterAllowsDocs = userData ? await getVoterAllowByUserId(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
+  const topicVoterAllowsDocs = (userData && !isBannedUser(userData)) ? await getVoterAllowByUserId(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
   
   let filterIds;
-  if(!userData || userData.roleMode === "guest") {
+  if(!userData || userData.roleMode === "guest" || isBannedUser(userData)) {
     topicsData = await getLastestGuestTopics(filterParams).populate("createdBy");
   } else if(userData.roleMode === "voter") {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);

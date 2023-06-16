@@ -5,7 +5,7 @@ import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~/src/services
 import UserModel from "~/src/models/user"
 import { legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
-import { getUserByAuthSource, getUserByEmail } from "~/server/utils";
+import { getActiveUserByAuthSource, getActiveUserByEmail } from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       authSource: "digitalId",
       digitalIdUserId: digitalIdUserInfo.user_id
     };
-    let userDoc = await getUserByAuthSource(authSource);
+    let userDoc = await getActiveUserByAuthSource(authSource);
 
     if(userDoc) {
       if(!userDoc.firstName) {
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       }
       await userDoc.save();
     } else {
-      userDoc = await getUserByEmail(digitalIdUserInfo.email);
+      userDoc = await getActiveUserByEmail(digitalIdUserInfo.email);
       if(!userDoc) {
         const hashedCitizenID = bcrypt.hashSync(digitalIdUserInfo.citizen_id, BCRYPT_SALT_ROUND);
         

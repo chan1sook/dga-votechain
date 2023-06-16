@@ -14,11 +14,14 @@ declare global {
     ministry?: string,
     department?: string,
     division?: string,
-    hashedCitizenId: string,
+    hashedCitizenId?: string,
     createdAt: Date,
     updatedAt: Date,
     group: string[],
     preferences: UserPreferences,
+    bannedUntil?: Date,
+    removeAt?: Date,
+    removed?: boolean,
   }
 
   interface UserModelDataWithId extends UserModelData {

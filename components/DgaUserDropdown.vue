@@ -45,12 +45,30 @@
             {{  $t('navbar.user.preferences') }}
           </DgaButton>
         </NuxtLink>
+        <div class="border-t-2"></div>
+          <DgaButton color="gray" theme="hollow" 
+            class="w-full !py-1 !text-sm" :title="$t('navbar.withdrawUser.title')"
+            @click="showWithdrawUserModal = true"
+          >
+            {{ $t('navbar.withdrawUser.title') }}
+          </DgaButton>
       </div>
-      <a href="/api/logout" class="flex flex-row gap-2 items-center justify-center bg-dga-blue-lighter text-white px-2 py-2" :title="$t('navbar.logout')">
-        <LogoutIcon class="!text-lg" />
-        {{ $t('navbar.logout') }}
-      </a>
+      <form action="/api/logout" method="POST" class="w-full">
+        <button type="submit" class="w-full flex flex-row gap-2 items-center justify-center bg-dga-blue-lighter text-white px-2 py-2" :title="$t('navbar.logout')">
+          <LogoutIcon class="!text-lg" />
+          {{ $t('navbar.logout') }}
+        </button>
+      </form>
     </div>
+    <DgaModal :show="showWithdrawUserModal" cancel-backdrop
+      @confirm="withdrawUser"
+      @close="showWithdrawUserModal = false"
+      @cancel="showWithdrawUserModal = false"
+    >
+      <div>{{ $t('navbar.withdrawUser.confirm1') }}</div>
+      <div>{{ $t('navbar.withdrawUser.confirm2') }}</div>
+      <form ref="withdrawForm" action="/api/user/withdraw" method="POST" class="hidden"></form>
+    </DgaModal>
   </div>
 </template>
 
@@ -78,6 +96,8 @@ const { public: { SYNCTIME_THERSOLD } } = useRuntimeConfig();
 
 const todayTime = ref(Date.now());
 const isSync = ref(false);
+const showWithdrawUserModal = ref(false);
+const withdrawForm : Ref<HTMLFormElement | null> = ref(null);
 
 const perttyTime = computed(() => {
   const datetime = dayjs(todayTime.value).toDate()
@@ -101,7 +121,7 @@ const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permi
 
 function updateTime() {
   todayTime.value = useComputedServerTime().getTime();
-  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD);
 }
 
 const roleMode = computed(() => useSessionData().value.roleMode);
@@ -117,6 +137,10 @@ async function switchRoleMode(role: UserRole) {
   });
   useVisibleMenuGroup().value = undefined;
   useRouter().go(0);
+}
+
+function withdrawUser() {
+  withdrawForm.value?.submit();
 }
 
 let timeId: NodeJS.Timer | undefined;

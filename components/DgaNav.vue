@@ -22,7 +22,7 @@
       <template v-else>
         <DgaNewsDropdown></DgaNewsDropdown>
         <DgaNotifyDropdown></DgaNotifyDropdown>
-        <DgaUserDropdown class="!hidden sm:!inline-flex"></DgaUserDropdown>
+        <DgaUserDropdown></DgaUserDropdown>
       </template>
     </div>
 
@@ -39,13 +39,7 @@
         <NuxtLink v-else-if="menu === 'users-management'"  :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
         <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('navbar.blockchain')}}</NuxtLink>
       </template>
-      <div class="border-t my-1"></div>
-      <div class="dga-menu-item-small" @click="toggleLang">{{ $t('navbar.language') }}: {{ prettyLocaleCode  }}</div>
       <NuxtLink v-if="!isLogin" :href="localePathOf('/login')" class="dga-menu-item-small">{{ $t('navbar.login') }}</NuxtLink>
-      <template v-if="isLogin">
-        <div class="border-t my-1"></div>
-        <DgaUserSmallSection class="lg:hidden"></DgaUserSmallSection>
-      </template>
     </div>
   </nav>
 </template>

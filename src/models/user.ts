@@ -43,7 +43,13 @@ const schema = new Schema<UserModelData>({
     topMenus: [String],
     adminTopMenus: [String],
     devTopMenus: [String],
-  })
+  }),
+  removeAt: {
+    type: Date,
+  },
+  removed: {
+    type: Boolean,
+  },
 }, {
   timestamps: true,
 });

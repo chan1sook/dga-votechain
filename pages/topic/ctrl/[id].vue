@@ -206,7 +206,7 @@ function computePauseTime() {
 function updateTime() {
   todayTime.value = useComputedServerTime().getTime();
   localTime.value = Date.now();
-  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD);
   
   computeRemainTime();
   computePauseTime();

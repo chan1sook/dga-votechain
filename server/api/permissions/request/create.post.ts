@@ -2,11 +2,12 @@ import RequestPermissionsModel from "~/src/models/request-permission"
 import NotificationModel from "~/src/models/notification";
 import { getExistsRequestPermissionsData } from "~/src/services/fetch/permission";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !checkPermissionNeeds(userData.permissions, "request-permissions")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "request-permissions")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

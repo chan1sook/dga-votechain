@@ -82,6 +82,7 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
           authFrom: userSessionData.authFrom,
           group: userData.group,
           preferences: userData.preferences,
+          bannedUntil: userData.bannedUntil,
         };
       }
       return null;

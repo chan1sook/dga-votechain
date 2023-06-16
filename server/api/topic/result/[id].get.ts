@@ -5,6 +5,7 @@ import { getVotesByTopicId } from "~/src/services/fetch/vote"
 import { getVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
 import { isAdminRole } from "~/src/services/validations/role"
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause"
+import { isBannedUser } from "~/src/services/validations/user"
 
 export default defineEventHandler(async (event) => {  
   const topicDoc = await TopicModel.findById(event.context.params?.id);
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
   if(!topicDoc.publicVote) {
     let isAllowed = false;
 
-    if(userData) {
+    if(userData && !isBannedUser(userData)) {
       // check if in topicAllow
       const topicAllowDoc = votersData.find((ele) => ele.userid.toString() === userData._id.toString())
       if(topicAllowDoc) {
@@ -76,7 +77,7 @@ export default defineEventHandler(async (event) => {
   scores.sort((a, b) => b.count - a.count);
   
   let yourVotes: ChoiceDataType[] = [];
-  if(userData) {
+  if(userData && !isBannedUser(userData)) {
     const _yourVotes = votes.filter((ele) =>  ele.userid && ele.userid.toString() === userData._id.toString());
     yourVotes = _yourVotes.map((ele) => ele.choice)
   }

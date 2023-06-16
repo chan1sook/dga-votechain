@@ -1,10 +1,11 @@
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData) {
+  if(!userData || isBannedUser(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

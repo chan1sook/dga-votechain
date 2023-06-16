@@ -4,8 +4,9 @@
       {{  $t("login.title") }}
     </h2>
     <DgaButtonGroup larger class="mt-6">
-      <a href="/api/login?source=digitalId">
-        <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
+      <form action="/api/login" method="POST" class="w-full">
+        <input type="hidden" name="source" value="digitalId" />
+        <DgaButton type="submit" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('login.loginDigitalId')"
         >
           <FingerprintIcon />
@@ -13,11 +14,13 @@
             {{ $t("login.loginDigitalId") }}
           </span>
         </DgaButton>
-      </a>
+      </form>
     </DgaButtonGroup>
     <DgaButtonGroup larger class="mt-2">
-      <div>
-        <DgaButton class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
+      <form ref="firebaseForm" action="/api/login" method="POST" class="w-full">
+        <input type="hidden" name="source" value="firebase" />
+        <input v-model="firebaseToken" type="hidden" name="token" />
+        <DgaButton type="button" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           :title="$t('login.loginWithGoogle')" @click="loginWithGoogle"
         >
           <FingerprintIcon />
@@ -25,7 +28,7 @@
             {{ $t("login.loginWithGoogle") }}
           </span>
         </DgaButton>
-      </div>
+      </form>
     </DgaButtonGroup>
     <DgaButtonGroup larger class="mt-2">
       <NuxtLink :to="registerDigitalIdUrl">
@@ -39,6 +42,7 @@
         </DgaButton>
       </NuxtLink>
     </DgaButtonGroup>
+    <DgaLoadingModal :show="firebaseLoading"></DgaLoadingModal>
   </div>
 </template>
 
@@ -59,15 +63,26 @@ useHead({
 
 const { public: { DID_API_URL } } = useRuntimeConfig();
 const registerDigitalIdUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
+const firebaseToken = ref("");
+const firebaseForm : Ref<HTMLFormElement | null> = ref(null);
+const firebaseLoading = ref(false);
 const nuxtApp = useNuxtApp()
 
-async function loginWithGoogle() {
-  const provider = new GoogleAuthProvider();
-  useDeviceLanguage(nuxtApp.$auth);
-  const user = await signInWithPopup(nuxtApp.$auth, provider);
-  if (user) {
-    const token = await user.user.getIdToken();
-    location.href = `/api/login?source=firebase&token=${token}`
+async function loginWithGoogle(ev: Event) {
+  try {
+    const provider = new GoogleAuthProvider();
+    useDeviceLanguage(nuxtApp.$auth);
+    const user = await signInWithPopup(nuxtApp.$auth, provider);
+    if (user) {
+      const token = await user.user.getIdToken();
+      firebaseToken.value = token;
+      firebaseLoading.value = true;
+      setTimeout(() => {
+        firebaseForm.value?.submit();
+      }, 100);
+    }
+  } catch(err) {
+    console.error(err);
   }
 }
 </script>

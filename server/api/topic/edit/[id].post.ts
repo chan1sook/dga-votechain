@@ -8,10 +8,11 @@ import mongoose, { Types } from "mongoose";
 import { isTopicFormValid, isTopicReadyToVote } from "~/src/services/validations/topic";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-topic")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionSelections(userData.permissions, "change-topic")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

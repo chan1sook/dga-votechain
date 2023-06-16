@@ -3,8 +3,9 @@ import io from "~/server/socketio"
 import smartContract from '../smart-contract';
 import { setPredefinedDevs, setPredefinedBlockchainServers } from '../migrations';
 import { initFirebase } from '../firebase';
-import initHbCheck from '../blockchain-server-hb';
-import beginNotificationWatcher from '../notification-watcher';
+import initBlockchainHbWorkers from '../../src/worker/blockchain-hb';
+import initNotificationWorkers from '../../src/worker/notification';
+import initUserWorkers from '~/src/worker/users';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log("[Config] View Config");
@@ -29,8 +30,10 @@ export default defineNitroPlugin(async (nitroApp) => {
   await setPredefinedBlockchainServers();
   await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
 
-  initHbCheck();
-  console.log('[BlockchainServerHB] Started!');
-  beginNotificationWatcher();
-  console.log('[Notification Watcher] Started!');
+  initBlockchainHbWorkers();
+  console.log('[BlockchainServerHB Workers] Started!');
+  initNotificationWorkers();
+  console.log('[Notification Workers] Started!');
+  initUserWorkers();
+  console.log('[User Workers] Started!');
 });

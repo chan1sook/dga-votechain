@@ -10,6 +10,7 @@ import { addVoteOnBlockchain } from "../smart-contract";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { nanoid } from "nanoid";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const voteFormData : VotesFormData = await readBody(event);
@@ -25,8 +26,9 @@ export default defineEventHandler(async (event) => {
   // TODO allow anonVotes
   let voterAllowData;
   const userData = event.context.userData;
+  
   if(!(topicDoc.publicVote && topicDoc.anonymousVotes)) {
-    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") || userData.roleMode !== "voter") {
+    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") || userData.roleMode !== "voter" || isBannedUser(userData)) {
       throw createError({
         statusCode: 403,
         statusMessage: "Forbidden",

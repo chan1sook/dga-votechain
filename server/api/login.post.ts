@@ -1,16 +1,16 @@
 import crypto from "crypto"
 import { getApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { getUserByAuthSource, getUserByEmail } from "../utils";
+import { getActiveUserByAuthSource, getActiveUserByEmail }  from "~/src/services/fetch/user";
 import { legacyRoleToPermissions } from "~/src/services/transform/permission";
 import UserModel from "~/src/models/user"
 import { USER_SESSION_KEY } from "../session-handler";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
-  const query = getQuery(event);
+  const param = await readBody(event);
   
-  if(query.source === "digitalId") {
+  if(param.source === "digitalId") {
     const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, public: { DID_API_URL } } = useRuntimeConfig();
 
     const urlParams = new URLSearchParams();
@@ -33,8 +33,8 @@ export default defineEventHandler(async (event) => {
     const url = new URL(`/connect/authorize?${urlParams}`, DID_API_URL);
   
     return sendRedirect(event, url.toString())
-  } else if(query.source === "firebase") {
-    const decodedFirebaseUserdata = await getAuth(getApp()).verifyIdToken(`${query.token}`, true).catch((err) => {
+  } else if(param.source === "firebase") {
+    const decodedFirebaseUserdata = await getAuth(getApp()).verifyIdToken(`${param.token}`, true).catch((err) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Invalid Token'
@@ -45,14 +45,14 @@ export default defineEventHandler(async (event) => {
       firebaseUid: decodedFirebaseUserdata.uid,
     };
 
-    let userDoc = await getUserByAuthSource(authSource);
+    let userDoc = await getActiveUserByAuthSource(authSource);
     if(userDoc) {
       if(!userDoc.email) {
         userDoc.email = decodedFirebaseUserdata.email;
         await userDoc.save();
       }
     } else {
-      userDoc = await getUserByEmail(decodedFirebaseUserdata.email);
+      userDoc = await getActiveUserByEmail(decodedFirebaseUserdata.email);
       if(!userDoc) {
         userDoc = new UserModel({
           permissions: legacyRoleToPermissions("admin"),
@@ -79,7 +79,7 @@ export default defineEventHandler(async (event) => {
       roleMode: defaultRoleMode,
       authFrom: {
         ...authSource,
-        userToken: query.token?.toString(),
+        userToken: param.token?.toString(),
       },
     });
 

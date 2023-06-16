@@ -71,7 +71,7 @@ useHead({
 const userList : Ref<UserSearchResponseData[] | undefined> = ref(undefined);
 const selectedUser : Ref<UserSearchResponseData | undefined> = ref(undefined);
 
-const { data: users } = await useFetch("/api/user/showall");
+const { data: users } = await useFetch("/api/users/showall");
 
 if(users.value) {
   userList.value = users.value;

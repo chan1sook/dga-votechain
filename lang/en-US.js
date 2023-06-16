@@ -248,6 +248,11 @@ export default {
       desyncTime: "Desync time",
       preferences: "Preferences",
     },
+    withdrawUser: {
+      title: "Withdraw User",
+      confirm1: "Do you want to withdraw yourself from E-Voting?",
+      confirm2: "This action is irreversible",
+    },
     logout: "Logout"
   },
   userPreferences: {

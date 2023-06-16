@@ -3,6 +3,7 @@ import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import TopicPauseData from "~/src/models/topic-ctrl-pause"
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const topicDoc : TopicModelDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
   });
 
 
-  if(userData) {
+  if(userData && !isBannedUser(userData)) {
     const [_voterAllow, _votes] = await Promise.all([
       TopicVoterAllowsModel.findOne({
         topicid: topicDoc._id,

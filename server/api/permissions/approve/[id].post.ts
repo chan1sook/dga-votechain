@@ -4,11 +4,12 @@ import NotificationModel from "~/src/models/notification";
 import { combinePermissions, isContainsAdvancePermissions } from "~/src/services/transform/permission";
 import { isAdminRole } from "~/src/services/validations/role";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !isAdminRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData)|| !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
