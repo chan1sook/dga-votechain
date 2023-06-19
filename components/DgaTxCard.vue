@@ -16,7 +16,7 @@
           {{ $t('admin.blockchain.blockInfo.pending') }}
         </button>
         <button class="detail" @click="emit('detail')">
-          {{ $t('admin.blockchain.detail') }}
+          {{ $t('app.detail') }}
         </button>
       </div>
     </div>

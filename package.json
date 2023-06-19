@@ -17,6 +17,7 @@
     "@types/md5": "^2.3.2",
     "@types/node-cron": "^3.0.7",
     "@types/qrcode": "^1.5.0",
+    "@types/vue-select": "^3.16.2",
     "autoprefixer": "^10.4.13",
     "nuxt": "^3.5.1",
     "postcss": "^8.4.21",
@@ -52,6 +53,7 @@
     "vitest": "^0.31.1",
     "vue-material-design-icons": "^5.2.0",
     "vue-pdf-embed": "^1.1.5",
+    "vue-select": "^4.0.0-beta.6",
     "web3": "^1.10.0",
     "web3-nodejs-provider": "^0.1.3"
   }

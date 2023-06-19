@@ -1,6 +1,11 @@
 type DateString = string;
 type JSONString = string;
 
+interface DgaSelectOption {
+  label: string,
+  value: any
+}
+
 interface PaginationParams {
   pagesize?: number,
   startid?: string,

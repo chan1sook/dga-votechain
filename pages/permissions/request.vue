@@ -8,7 +8,10 @@
       </div>
       <label class="col-span-12 md:col-span-2">{{ $t('requestPermissions.add.requestTo.title') }}</label>
       <div class="col-span-12 md:col-span-10">
-        <DgaSelect v-model="permissionsData.preset" :options="presetOptions"></DgaSelect>
+        <DgaVueSelect 
+          v-model="permissionsData.preset" :options="presetOptions"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
       </div>
       <div v-if="permissionEditable" class="col-span-12 grid-2-content">
         <template v-for="permission of getRequestablePermissions()">

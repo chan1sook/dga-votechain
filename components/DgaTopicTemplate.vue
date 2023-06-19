@@ -3,7 +3,10 @@
     <div class="col-span-12 md:col-span-2">
       {{ $t('app.topic.templateTitle') }}
     </div>
-    <DgaSelect v-model="templateName" class="col-span-12 md:col-span-10" :options="templateOptions"></DgaSelect>
+    <DgaVueSelect 
+      v-model="templateName" class="col-span-12 md:col-span-10" :options="templateOptions"
+      :reduce="val => val.value"
+    ></DgaVueSelect>
     <DgaButtonGroup class="col-span-12 mt-4">
       <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
         color="dga-orange" :title="$t('app.topic.applyTemplate')" @click="emit('useTemplate', templateName)"

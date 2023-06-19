@@ -10,7 +10,7 @@
       <div class="content">
         <div class="name">{{ props.topic.name }}</div>
         <div class="time">{{ $t('app.voting.voteOn') }} {{ prettyStartAt }}</div>
-        <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#{{ props.topic._id }})</div>
+        <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#Ticket {{ props.topic._id }})</div>
       </div>
       <div v-if="props.withQrcode" class="qr">
         <button :title="$t('app.voting.qrcode')" @click="emit('qr')">

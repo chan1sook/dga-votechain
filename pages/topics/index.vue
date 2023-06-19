@@ -1,10 +1,19 @@
 <template>
   <div>
     <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-2 mx-auto max-w-6xl">
-      <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-56"></DgaSelect>
+      <DgaVueSelect 
+        v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-56"
+        :reduce="val => val.value"
+      ></DgaVueSelect>
       <template v-if="filter.type === 'date'">
-        <DgaSelect v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
-        <DgaSelect v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
+        <DgaVueSelect 
+          v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
+        <DgaVueSelect 
+          v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
       </template>
       <template v-else-if="filter.type === 'ticketId'">
         <DgaInput v-model="filter.ticketId" :placeholder="$t('app.voting.filters.ticketIdPlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
@@ -63,6 +72,9 @@ import PlusCircleOutlineIcon from 'vue-material-design-icons/PlusCircleOutline.v
 
 import QRCode from 'qrcode'
 import dayjs from "dayjs";
+import "dayjs/locale/en";
+import "dayjs/locale/th";
+
 import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
 import { isAdminRole } from '~/src/services/validations/role';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
@@ -94,14 +106,14 @@ const topicFilterOptions = computed(() =>
 
 const startDate = dayjs("2023-04-03T07:00:00.000");
 
-const monthOptions = ref(new Array(12).fill(undefined).map((ele, i) => {
+const monthOptions = computed(() => new Array(12).fill(undefined).map((ele, i) => {
   return {
-    label: dayjs().month(i).format("MMM"),
+    label: dayjs().locale(i18n.locale.value).month(i).format("MMM"),
     value: i,
   }
 }))
 
-const yearOptions = ref(new Array(dayjs(useComputedServerTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
+const yearOptions = computed(() => new Array(dayjs(useComputedServerTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
   const year = dayjs(useComputedServerTime()).year() - i;
   return {
     label: dayjs(useComputedServerTime()).year(year).format("YYYY"),

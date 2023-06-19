@@ -7,11 +7,12 @@ import NotificationModel from "~/src/models/notification";
 import mongoose, { Types } from "mongoose";
 import { isTopicFormValid } from "~/src/services/validations/topic";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData || !checkPermissionNeeds(userData.permissions, "create-topic")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "create-topic")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

@@ -9,8 +9,11 @@
     <div class="col-span-12 md:col-span-2">
       {{ $t('app.topic.accessModifier') }}
     </div>
-    <DgaSelect v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"></DgaSelect>
-    <div class="col-span-12">
+    <DgaVueSelect 
+      v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"
+      :reduce="val => val.value"
+    ></DgaVueSelect>
+    <div class="col-span-12 flex flex-col gap-2">
       <div v-if="topicData.publicVote" class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.anonymousVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.topic.anonymousVotes') }}</label>
@@ -18,33 +21,65 @@
       <div class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
+        <button type="button" @click="showInputHintModal = 'multipleVotes'" :title="$t('app.detail')">
+          <InformationIcon />
+        </button>
       </div>
       <template v-if="topicData.multipleVotes">
         <div class="flex flex-row gap-2 items-center">
           <DgaCheckbox v-model="topicData.distinctVotes"></DgaCheckbox> 
           <label class="flex-none">{{ $t('app.topic.distinctVotes') }}</label>
+          <button type="button" @click="showInputHintModal = 'distinctVotes'" :title="$t('app.detail')">
+            <InformationIcon />
+          </button>
         </div>
         <div class="grid grid-cols-12 gap-2 items-center">
           <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
           <DgaInput v-model.number="topicData.defaultVotes" type="number" 
             min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
-            class="col-span-12 md:col-span-10"></DgaInput>
+            class="col-span-12 md:col-span-10"
+          ></DgaInput>
         </div>
       </template>
     </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.voteDuration.title')}}</h3>
     <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.inputMode')}}</div>
     <div class="col-span-12 md:col-span-10">
-      <DgaSelect v-model="topicData.durationMode" :options="durationModeOptions"></DgaSelect>
+      <DgaVueSelect 
+        v-model="topicData.durationMode" :options="durationModeOptions"
+        :reduce="val => val.value"
+      >
+        <template #year="{ year }">
+          {{ formatYearByLocale(year) }} 
+        </template>
+        <template #year-overlay-value="{ text, value }">
+          {{ formatYearByLocale(value) }} 
+        </template>
+      </DgaVueSelect>
     </div>
     <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.start') }}</div>
     <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-      <VueDatePicker v-model="voteStart" is-24 teleport teleport-center :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
+      <VueDatePicker 
+        v-model="voteStart" is-24 teleport teleport-center :locale="i18n.locale.value" :clearable="false" 
+        :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"
+        :format="formatDateByLocale"
+      >
+        <template #year="{ year }">
+          {{ formatYearByLocale(year) }} 
+        </template>
+        <template #year-overlay-value="{ text, value }">
+          {{ formatYearByLocale(value) }} 
+        </template>
+      </VueDatePicker>
     </div>
     <template v-if="topicData.durationMode === 'startEnd'">
       <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.end')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-        <VueDatePicker v-model="voteEnd" teleport teleport-center :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
+        <VueDatePicker 
+          v-model="voteEnd" teleport teleport-center :min="startExpiredDateStr" is-24 
+          :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" 
+          class="w-full" :format="formatDateByLocale"
+        ></VueDatePicker>
       </div>
     </template>
     <template v-else>
@@ -218,6 +253,18 @@
       <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
       <label class="flex-none"> {{ $t('app.topic.skipBlockchain') }}</label>
     </div>
+    <DgaModal :show="showInputHintModal !== false" cancel-backdrop close-only @close="showInputHintModal = false">
+      <template v-if="showInputHintModal === 'multipleVotes'">
+        <p>
+          <b>โหวตได้หลายตัวเลือก (Multiple-Choices)</b> คือ การลงสิทธิ์คะแนน (Ballot) ได้หลายตัวเลือกตามสิทธิ์คะแนนจำกัดสูงสุดที่ได้รับสิทธิ์  ตัวอย่างเช่น  ในกระทู้โหวต มีตัวเลือก  A.) , B.) , C.) , D.)  ผู้โหวตมีสิทธิ์ลงคะแนนเสียง 2 สิทธิ์  ผู้โหวตจะสามารถเลือกลงคะแนนให้ตัวเลือก    A.) , B.)  อย่างละ 1 สิทธิ์  หรืออาจเลือกเป็นตัวเลือก  D.) ทั้ง 2 คะแนนสิทธิ์ก็ได้
+        </p>
+      </template>
+      <template v-else>
+        <p>
+          <b>โหวตแต่ละตัวเลือกสูงสุดหนึ่งสิทธิ์ (Limited 1 ballot per vote)</b> คือ การตั้งค่าให้ตัวเลือกในกระทู้โหวตนั้นๆ สามารถเลือกได้สูงสุดเพียง 1 สิทธิ์  ตัวอย่างเช่น  มีตัวเลือก  A.) , B.) , C.) , D.)  ผู้โหวตมีสิทธิ์ลงคะแนนเสียง 2 สิทธิ์  ผู้โหวตจะสามารถเลือกลงคะแนนให้ตัวเลือก   A.) , B.) , C.) , D.)  เพียงตัวเลือกละ 1 สิทธิ์สูงสุด  อาจเป็น  A.) , B.)  อย่างละ 1 สิทธิ์  หรือ C.) , D.)  อย่างละ 1 สิทธิ์   โดยไม่สามารถเลือกเป็นตัวเลือก  D.) ทั้ง 2 คะแนนสิทธิ์ได้
+        </p>
+      </template>
+    </DgaModal>
   </div>
 </template>
 
@@ -228,16 +275,20 @@ import MinusIcon from 'vue-material-design-icons/Minus.vue';
 import ImageIcon from 'vue-material-design-icons/Image.vue';
 import UndoIcon from 'vue-material-design-icons/Undo.vue';
 import TrashCanIcon from 'vue-material-design-icons/TrashCan.vue';
+import InformationIcon from 'vue-material-design-icons/Information.vue';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 import dayjs from 'dayjs';
+import buddhistEra from 'dayjs/plugin/buddhistEra';
 import { getPrettyFullName } from '~/src/services/formatter/user';
 import { getDefaultChoices } from '~/src/services/form/topic';
 import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
 import { voterCountOf } from '~/src/services/validations/user';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
+
+dayjs.extend(buddhistEra);
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
@@ -293,6 +344,7 @@ const topicData = ref<TopicFormData>({
 const modelValue = computed(() => props.modelValue);
 const voterAllowsRef = computed(() => props.voterAllows);
 const coadminsRef = computed(() => props.coadmins);
+const showInputHintModal : Ref<string | false> = ref(false);
 
 watch(modelValue, (value) => {
   if(value) {
@@ -401,6 +453,24 @@ watch(voteDuration, (value) => {
 watch(topicData, (value) => {
   emit('update:modelValue', value)
 }, { deep: true });
+
+const formatDateByLocale = computed(() => {
+  const locale = i18n.locale.value;
+  
+  if(locale === "th") {
+    return (date: Date) => dayjs(date).format("DD/MM/BBBB HH:mm");
+  }
+  return (date: Date) => dayjs(date).format("DD/MM/YYYY HH:mm");
+});
+
+const formatYearByLocale = computed(() => {
+  const locale = i18n.locale.value;
+  
+  if(locale === "th") {
+    return (year: number) => dayjs().year(year).format("BBBB");
+  }
+  return (year: number) => dayjs().year(year).format("YYYY");
+})
 
 function getVoterName(voter: VoterAllowFormData) {
   return getPrettyFullName({
@@ -531,6 +601,7 @@ function revertImgFileAt(i: number) {
   }
   imgUrl.value[i] = undefined;
 }
+
 </script>
 
 <style scoped>
@@ -566,8 +637,12 @@ function revertImgFileAt(i: number) {
   --dp-icon-color: #959595;
   --dp-danger-color: #ff6f60;
   --dp-highlight-color: rgba(25, 118, 210, 0.1);
+  --dp-preview-font-size: 0.65rem;
 }
-.dp__theme_light .dp__input  {
+.dp__input  {
   border-width: 2px !important;
+}
+.dp__action_button {
+  font-size: 0.8rem;
 }
 </style>

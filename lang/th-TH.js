@@ -218,6 +218,7 @@ export default {
       confirm: "ยืนยัน"
     },
     edit: "แก้ไข",
+    detail: "รายละเอียด",
   },
   navbar: {
     home: "หน้าแรก",
@@ -457,7 +458,6 @@ export default {
       },
       createdAt: "สร้างเมื่อ",
       status: "สถานะ",
-      detail: "รายละเอียด",
       transactionData: "ข้อมูลใน TX",
       transactionRawData: "ข้อมูลดิบ TX",
     },

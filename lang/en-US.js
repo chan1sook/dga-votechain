@@ -216,6 +216,7 @@ export default {
       confirm: "Confirm"
     },
     edit: "Edit",
+    detail: "Detail",
   },
   navbar: {
     home: "Home",
@@ -444,7 +445,6 @@ export default {
       },
       createdAt: "Created At",
       status: "Status",
-      detail: "Detail",
       transactionData: "TX Data",
       transactionRawData: "Raw TX Data",
     },

@@ -47,7 +47,6 @@
 <script setup lang="ts">
 import MenuIcon from 'vue-material-design-icons/Menu.vue';
 import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from '~/src/services/form/preference';
-import { isAdminRole } from '~/src/services/validations/role';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -57,7 +56,6 @@ const prettyLocaleCode = computed(() => {
   return lang.toUpperCase();
 });
 const isLogin = computed(() => useSessionData().value.userid);
-const roleMode = computed(() => useSessionData().value.roleMode);
 const showOption = computed(() => useVisibleMenuGroup().value === 'main');
 
 const currentTopMenus = computed(() => {
