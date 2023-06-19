@@ -91,7 +91,7 @@ export default {
           duplicated: "ผู้ใช้ซ้ำ"
         }
       },
-      distinctVotes: "โหวตตัวเลือกสูงสุดหนึ่งเสียง",
+      distinctVotes: "โหวตแต่ละตัวเลือกสูงสุดหนึ่งสิทธิ์",
       anonymousVotes: "อนุญาตให้คนทั่วไปโหวตได้",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
       skipBlockchain: "ไม่บันทึกลง Blockchain",
@@ -179,7 +179,7 @@ export default {
     },
     voterList: {
       title: "รายชื่อโหวต",
-      multipleVotes: "โหวตได้หลายเสียง",
+      multipleVotes: "โหวตได้หลายตัวเลือก",
       totalVotes: "จำนวนเสียง",
       add: "เพิ่มชื่อ",
       remove: "ลบชื่อ",
