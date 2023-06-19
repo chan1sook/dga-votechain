@@ -5,8 +5,8 @@
     leave-from-class="transition duration-500 opacity-100"
     leave-to-class="opacity-0"
   >
-    <div v-if="props.show" class="z-[1000] fixed inset-0 p-2 sm:p-4 bg-gray-500/50 flex flex-row items-center justify-center" @click="backdropClose">
-      <div class="bg-dga-blue rounded-lg p-6 text-white flex flex-col gap-4" @click.stop>
+    <div v-if="props.show" class="z-[1000] fixed inset-0 p-2 sm:p-4 bg-gray-500/50 flex flex-col overflow-auto" @click="backdropClose">
+      <div class="m-auto bg-dga-blue rounded-lg p-6 text-white flex flex-col gap-4" @click.stop>
         <slot>Modal</slot>
         <div v-if="!props.hideButtons" class="flex flex-row items-center justify-center gap-4">
           <template v-if="props.closeOnly">
