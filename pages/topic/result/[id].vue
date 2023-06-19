@@ -196,7 +196,7 @@
       </div>
     </template>
     <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="getImgUrlChoice(selectedImageChoice)" />
+      <img :src="getImgUrlChoice(selectedImageChoice)" class="max-h-[77.5vh] object-contain" />
     </DgaModal>
   </div>
 </template>
@@ -236,8 +236,6 @@ if (!data.value) {
 } else {
   const { voteResult: _voteResult } =  data.value;
   voteResult.value = _voteResult;
-
-  console.log(voteResult)
 }
 
 const ranking : Ref<TopicChoiceRanking[]> = computed(() => {

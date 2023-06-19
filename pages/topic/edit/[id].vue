@@ -25,7 +25,7 @@
       {{ $t('app.topic.edit.confirm') }}
     </DgaModal>
     <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="imgURL" />
+      <img :src="imgURL" class="max-h-[77.5vh] object-contain" />
     </DgaModal>
     <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>

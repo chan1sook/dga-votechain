@@ -51,8 +51,24 @@ function search(keyword: string, loading: (state: boolean) => void) {
 }
 </script>
 
-<style scoped>
-:deep(*) {
+<style>
+:root {
+  --vs-search-input-color: theme("colors.dga-blue.DEFAULT");
+  --vs-search-input-placeholder-color: theme("colors.gray.500");
+  --vs-state-disabled-bg: theme("colors.gray.200");
+  --vs-border-color: theme("colors.dga-orange");
+  --vs-border-width: theme("borderWidth.2");
+  --vs-border-radius: theme("borderRadius.2xl");
+  --vs-state-disabled-cursor: default;
+  --vs-dropdown-option-padding: 3px 16px;
+}
+
+.vs__search {
+  background: transparent !important;
+}
+</style>
+<!-- <style scoped>
+:root {
   --vs-colors--lightest: theme("colors.dga-orange");
   --vs-colors--light: rgba(60, 60, 60, 0.5);
   --vs-colors--dark: theme("colors.dga-blue.DEFAULT");
@@ -119,4 +135,4 @@ function search(keyword: string, loading: (state: boolean) => void) {
   --vs-transition-timing-function: cubic-bezier(1, -0.115, 0.975, 0.855);
   --vs-transition-duration: 150ms;
 }
-</style>
+</style> -->

@@ -1,12 +1,9 @@
 <template>
-  <div v-if="langLoaded">
-    <DgaContainer>
-      <slot></slot>
-    </DgaContainer>
-    <DgaToastController></DgaToastController>
-  </div>
-  <DgaLoadingModal :show="!langLoaded"></DgaLoadingModal>
-  <DgaCookieConsent v-show="langLoaded && cookieConsentShow"
+  <DgaContainer>
+    <slot></slot>
+  </DgaContainer>
+  <DgaToastController></DgaToastController>
+  <DgaCookieConsent v-show="cookieConsentShow"
     @accept-all="acceptAllCookies"
     @accept-required="acceptRequiredOnly"
   ></DgaCookieConsent>
@@ -15,7 +12,6 @@
 <script setup lang="ts">
 import DgaToastController from '~/components/DgaToastController.vue';
 const i18n = useI18n();
-const langLoaded = ref(false);
 const cookieConsentShow = ref(false);
 useSocketIO();
 
@@ -45,10 +41,6 @@ onMounted(async () => {
   document.body.addEventListener("click", () => {
     useVisibleMenuGroup().value = undefined;
   })
-
-  await i18n.waitForPendingLocaleChange();
-  console.log("Langauge Loaded");
-  langLoaded.value = true;
   
   const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
   cookieConsentShow.value = !Boolean(cc.value);

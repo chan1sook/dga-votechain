@@ -120,7 +120,7 @@
       {{ $t('app.voting.confirm') }}
     </DgaModal>
     <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="getImgUrlChoice(selectedImageChoice)" />
+      <img :src="getImgUrlChoice(selectedImageChoice)" class="max-h-[77.5vh] object-contain" />
     </DgaModal>
     <DgaLoadingModal :show="waitVote"></DgaLoadingModal>
   </div>
@@ -155,7 +155,6 @@ const haveImage = computed(() => {
   if(!topic.value) {
     return false;
   }
-  console.log(topic.value.choices.choices.some((ele) => !!ele.image), topic.value.choices.choices)
   return topic.value.choices.choices.some((ele) => !!ele.image)
 })
 const pauseData: Ref<TopicCtrlPauseResponseData[]> = ref([]);

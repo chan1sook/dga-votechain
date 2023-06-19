@@ -61,7 +61,7 @@
       </template>
     </div>
     <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="qrCodeSrc" />
+      <img :src="qrCodeSrc" class="max-h-[77.5vh] object-contain" />
       <div>{{ currentLink }}</div>
     </DgaModal>
   </div>
