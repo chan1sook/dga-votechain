@@ -41,7 +41,10 @@ export default defineEventHandler(async (event) => {
 
     if(userData && !isBannedUser(userData)) {
       // check if in topicAllow
-      const topicAllowDoc = votersData.find((ele) => ele.userid.toString() === userData._id.toString())
+      const topicAllowDoc = votersData.find((ele) => {
+        const user = (ele.userid as unknown as UserModelDataWithId);
+        return user._id.toString() === userData._id.toString()
+      })
       if(topicAllowDoc) {
         isAllowed = true;
       }
