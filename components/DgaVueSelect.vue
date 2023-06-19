@@ -54,7 +54,7 @@ function search(keyword: string, loading: (state: boolean) => void) {
 <style>
 :root {
   --vs-search-input-color: theme("colors.dga-blue.DEFAULT");
-  --vs-search-input-placeholder-color: theme("colors.gray.500");
+  --vs-search-input-placeholder-color: theme("colors.dga-orange / 50%");
   --vs-state-disabled-bg: theme("colors.gray.200");
   --vs-border-color: theme("colors.dga-orange");
   --vs-border-width: theme("borderWidth.2");
