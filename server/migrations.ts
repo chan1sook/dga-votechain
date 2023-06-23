@@ -91,7 +91,7 @@ export async function updateTopics() {
 
   for(const topic of topics) {
     topic.type = topic.publicVote ? "public" : "private";
-    topic.publicVote = undefined;
+    // topic.publicVote = undefined;
     topic.internalFilter = getDefaultInternalTopicFilter();
   }
   
