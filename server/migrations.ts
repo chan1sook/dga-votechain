@@ -84,14 +84,14 @@ export async function updateTopics() {
 
   const topics = await TopicModel.find({
     $or: [
-      { internalFilter:  { $exists: false } },
+      { internalFilter: { $exists: false } },
       { publicVote: { $exists: true } },
     ]
   });
 
   for(const topic of topics) {
     topic.type = topic.publicVote ? "public" : "private";
-    // topic.publicVote = undefined;
+    topic.publicVote = undefined;
     topic.internalFilter = getDefaultInternalTopicFilter();
   }
   
