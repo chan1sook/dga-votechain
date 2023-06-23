@@ -1,5 +1,5 @@
 type UserResponseData = Omit<UserModelData,
-  "authSources" | "createdAt" | "updatedAt" | "hashedCitizenId" | "permissions" | "preferences" | "group" |
+  "authSources" | "createdAt" | "updatedAt" | "hashedCitizenId" | "permissions" | "preferences" |
   "bannedUntil" | "removeAt" | "removed"
 > & {
   userid?: string,
@@ -7,7 +7,6 @@ type UserResponseData = Omit<UserModelData,
   permissions?: EVotePermission[],
   preferences?: UserPreferences,
   hasCitizenId?: boolean,
-  group?: string[],
   bannedUntil?: DateString,
 }
 

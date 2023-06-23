@@ -36,9 +36,8 @@
         {{ $t('app.ministry') }}
       </div>
       <div class="col-span-12 md:col-span-9">
-        <DgaVueSelect v-model="userEditFormData.ministry" :options="thaiMinitries" taggable clearable
-          :disabled="!userEditFormData.isGovOfficer" :placeholder="$t('app.ministry')"
-        ></DgaVueSelect>
+        <DgaMinistryVueSelect v-model="userEditFormData.ministry" :disabled="!userEditFormData.isGovOfficer">
+        </DgaMinistryVueSelect>
       </div>
       <div class="col-span-12 md:col-span-3">
         {{ $t('app.department') }}
@@ -47,7 +46,7 @@
         <DgaInput v-model="userEditFormData.department" :disabled="!userEditFormData.isGovOfficer"  class="w-full" :placeholder="$t('app.department')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3">
-        {{ $t('app.division') }}
+        {{ $t('app.division') }} [Optional]
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.division" :disabled="!userEditFormData.isGovOfficer"  class="w-full" :placeholder="$t('app.division')"></DgaInput>
@@ -75,7 +74,6 @@
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
 import { isThaiCitizenId } from '~/src/services/validations/user';
-import { thaiMinitries } from '~/src/services/form/ministry';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();

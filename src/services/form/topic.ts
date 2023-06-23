@@ -1,4 +1,14 @@
 
+export function getDefaultInternalTopicFilter() : InternalTopicVisiblityFilter {
+  return {
+    ministry: "",
+    withDepartment: false,
+    department: "",
+  };
+}
+
+export const topicTypes : TopicType[] = ["public", "private", "internal"];
+
 export function getDefaultChoices() : ChoicesInfo {
   return {
     choices: [],

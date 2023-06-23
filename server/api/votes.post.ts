@@ -11,6 +11,7 @@ import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { nanoid } from "nanoid";
 import { isBannedUser } from "~/src/services/validations/user";
+import { isAnonymousTopic, isTopicReadyToVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
 
 export default defineEventHandler(async (event) => {
   const voteFormData : VotesFormData = await readBody(event);
@@ -23,12 +24,25 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // TODO allow anonVotes
+  if(!isTopicReadyToVote(topicDoc)) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Topic not ready to vote",
+    });
+  }
+
   let voterAllowData;
   const userData = event.context.userData;
-  
-  if(!(topicDoc.publicVote && topicDoc.anonymousVotes)) {
-    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") || userData.roleMode !== "voter" || isBannedUser(userData)) {
+
+  if(topicDoc.type === "internal" && userData && !isUserInMatchInternalTopic(topicDoc.internalFilter, userData)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
+    });
+  } else if(!isAnonymousTopic(topicDoc)) {
+    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") ||
+      userData.roleMode !== "voter" || isBannedUser(userData)
+    ) {
       throw createError({
         statusCode: 403,
         statusMessage: "Forbidden",

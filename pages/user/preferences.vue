@@ -151,19 +151,19 @@ const isFormValid = computed(() => true);
 function topMenuPretty(menu: PreferenceTopMenuOption) {
   switch(menu) {
     case "home":
-      return i18n.t("navbar.home")
+      return i18n.t("app.navbar.home")
     case "voting":
-      return i18n.t("navbar.voting")
+      return i18n.t("app.navbar.voting")
     case "about":
-      return i18n.t("navbar.about")
+      return i18n.t("app.navbar.about")
     case "help":
-      return i18n.t("navbar.help")
+      return i18n.t("app.navbar.help")
     case "contact-us":
-      return i18n.t("navbar.contactUs")
+      return i18n.t("app.navbar.contactUs")
     case "users-management":
-      return i18n.t("navbar.adminShowUsers")
+      return i18n.t("app.navbar.adminShowUsers")
     case "blockchain":
-      return i18n.t("navbar.blockchain")
+      return i18n.t("app.navbar.blockchain")
     default:
       return menu;
   }

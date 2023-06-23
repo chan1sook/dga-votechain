@@ -11,14 +11,6 @@ interface PaginationParams {
   startid?: string,
 }
 
-interface BasicListableItem<K = any, T = any, G = any> {
-  key: K,
-  value?: T,
-  group?: G,
-}
-
-type BasicListableLinkFuntion = (item: BasicListableItem, row: number) => string;
-
 interface BrowserTimeSyncData {
   synced: boolean,
   lastestSyncLocal: Date,

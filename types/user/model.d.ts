@@ -17,7 +17,6 @@ declare global {
     hashedCitizenId?: string,
     createdAt: Date,
     updatedAt: Date,
-    group: string[],
     preferences: UserPreferences,
     bannedUntil?: Date,
     removeAt?: Date,

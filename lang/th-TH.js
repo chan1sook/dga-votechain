@@ -1,6 +1,44 @@
 export default {
   appName: "DGA E-Voting",
   app: {
+    navbar: {
+      home: "หน้าแรก",
+      voting: "ร่วมโหวต",
+      about: "เกี่ยวกับบริการ",
+      help: "วิธีใช้งาน",
+      contactUs: "ติดต่อเรา",
+      adminShowUsers: "รายชื่อผู้ใช้",
+      blockchain: "Blockchain",
+      login: "เข้าสู่ระบบ",
+      language: "ภาษาปัจจุบัน",
+      news: {
+        title: "ข่าวสาร",
+        loadingNews: "รอสักครู่...",
+        noMoreNews: "ไม่พบข่าวสาร",
+        loadMoreNews: "โหลดข่าวสารเพิ่ม",
+        add: "เพิ่ม"
+      },
+      notification: {
+        title: "แจ้งเตือน",
+        loadingNotifications: "รอสักครู่...",
+        noMoreNotifications: "ไม่พบแจ้งเตือน",
+        loadMoreNotifications: "โหลดแจ้งเตือนเพิ่ม",
+      },
+      user: {
+        title: "ผู้ใช้งาน",
+        welcome: "ยินดีต้อนรับสู่ to E-Voting",
+        anonymous: "ผู้ไม่ทราบนาม",
+        switchRoleMode: "เปลี่ยนโหมดเป็น",
+        desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์",
+        preferences: "ตั้งค่า",
+      },
+      withdrawUser: {
+        title: "ถอนตัวจากระบบ",
+        confirm1: "ต้องการถอนตัวจากระบบ E-Voting หรือไม่?",
+        confirm2: "กระบวนการนี้ไม่สามารถย้อนกลับได้",
+      },
+      logout: "ออกจากระบบ"
+    },
     userInfoEdit: {
       title: "แก้ไขข้อมูลผู้ใช้",
       typeToEdit: "พิมพ์เพื่อแก้ไข",
@@ -50,6 +88,7 @@ export default {
       templateTitle: "ต้นแบบการโหวต",
       useTemplate: "ใช้ต้นแบบการโหวต",
       applyTemplate: "ใช้ต้นแบบ",
+      withDepartment: "ระบุหน่วยงาน/กรม",
       error: {
         notFound: "ไม่พบกระทู้โหวต",
         notEditable: "ไม่สามารถแก้ไขกระทู้โหวต"
@@ -94,6 +133,7 @@ export default {
       distinctVotes: "โหวตแต่ละตัวเลือกสูงสุดหนึ่งสิทธิ์",
       anonymousVotes: "อนุญาตให้คนทั่วไปโหวตได้",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
+      showCreator: "แสดงผู้ตั้งกระทู้สู่สาธารณะ",
       skipBlockchain: "ไม่บันทึกลง Blockchain",
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
       allow: "อนุญาต",
@@ -204,12 +244,67 @@ export default {
       hide: "ซ่อนรายละเอียด",
       show: "แสดงรายละเอียด",
     },
-    publicVote: "โหวตสาธารณะ",
+    topicType: {
+      public: "โหวตสาธารณะ",
+      private: "โหวตทางลับ",
+      internal: "โหวตในองค์กร"
+    },
     privateVote: "โหวตทางลับ",
     votersList: "รายชื่อผู้มีสิทธิ์โหวต",
+    permissions: {
+      "request-permissions": "ขอสิทธิ์เพิ่มเติม",
+      "voter-mode": "เข้าโหมดผู้โหวต",
+      "admin-mode": "เข้าโหมดผู้ดูแล",
+      "dev-mode": "เข้าโหมดผู้พัฒนา",
+      "vote-topic": "โหวตคำถาม",
+      "create-topic": "สร้างการโหวต",
+      "change-topic": "แก้ไขข้อมูลการโหวต",
+      "control-topic": "ควบคุมการโหวต",
+      "create-news": "สร้างข่าว",
+      "change-news": "แก้ไขข่าว",
+      "change-permissions": "เปลี่ยนสิทธิ์ให้ผู้อื่น",
+    },
+    requestPermissions: {
+      add: {
+        title: "ส่งแบบขอสิทธิ์",
+        noteToApprover: "หมายเหตุ",
+        requestTo: {
+          title: "ขอสิทธิ์",
+          moderator: "ผู้ดูแลระบบ",
+          developer: "นักพัฒนาระบบ"
+        },
+        allowConsent: "อนุมัติส่งข้อมูลส่วนตัวให้ผู้อนุมัติ",
+        action: "ส่งคำขอ",
+        success: "ส่งคำขอสำเร็จ",
+        failed: "ส่งคำขอไม่สำเร็จ",
+        pendingBlocked: "กรุณารอคำขอพิจารณาสำเร็จก่อนกรอกอีกครั้ง",
+      },
+      change: {
+        title: "แก้ไขสิทธิ์",
+        action: "เปลี่ยน",
+        confirm: "ยืนยันการเปลี่ยนสิทธิ์?",
+        success: "เปลี่ยนสิทธิ์สำเร็จ",
+        failed: "เปลี่ยนสิทธิ์ล้มเหลว",
+      },
+      permissions: "สิทธิ์",
+      note: "หมายเหตุ",
+      noteNone: "ไม่มี",
+      approveRequestPermissions: "อนุมัติการขอสิทธิ์",
+      requestsNotFound: "ไม่พบรายการขอสิทธิ์",
+      manageApproveList: "จัดการรายการอนุมัติ",
+      approve: "อนุมัติ",
+      reject: "ปฏิเสธ",
+      personalData: "ข้อมูลส่วนบุคคล",
+    },
     countable: {
       vote: "โหวต",
       voter: "คน"
+    },
+    timePeriod: {
+      nearZeroMinute: "ไม่ถึงนาที",
+      minute: "นาที",
+      hour: "ชั่วโมง",
+      day: "วัน",
     },
     modal: {
       back: "กลับ",
@@ -220,46 +315,8 @@ export default {
     edit: "แก้ไข",
     detail: "รายละเอียด",
   },
-  navbar: {
-    home: "หน้าแรก",
-    voting: "ร่วมโหวต",
-    about: "เกี่ยวกับบริการ",
-    help: "วิธีใช้งาน",
-    contactUs: "ติดต่อเรา",
-    adminShowUsers: "รายชื่อผู้ใช้",
-    blockchain: "Blockchain",
-    login: "เข้าสู่ระบบ",
-    language: "ภาษาปัจจุบัน",
-    news: {
-      title: "ข่าวสาร",
-      loadingNews: "รอสักครู่...",
-      noMoreNews: "ไม่พบข่าวสาร",
-      loadMoreNews: "โหลดข่าวสารเพิ่ม",
-      add: "เพิ่ม"
-    },
-    notification: {
-      title: "แจ้งเตือน",
-      loadingNotifications: "รอสักครู่...",
-      noMoreNotifications: "ไม่พบแจ้งเตือน",
-      loadMoreNotifications: "โหลดแจ้งเตือนเพิ่ม",
-    },
-    user: {
-      title: "ผู้ใช้งาน",
-      welcome: "ยินดีต้อนรับสู่ to E-Voting",
-      anonymous: "ผู้ไม่ทราบนาม",
-      switchRoleMode: "เปลี่ยนโหมดเป็น",
-      desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์",
-      preferences: "ตั้งค่าผู้ใช้",
-    },
-    withdrawUser: {
-      title: "ถอนตัวจากระบบ",
-      confirm1: "ต้องการถอนตัวจากระบบ E-Voting หรือไม่?",
-      confirm2: "กระบวนการนี้ไม่สามารถย้อนกลับได้",
-    },
-    logout: "ออกจากระบบ"
-  },
   userPreferences: {
-    title: "ตั้งค่าผู้ใช้",
+    title: "ตั้งค่า",
     topMenuOrders: "ลำดับเมนูด้านบน",
     remainTopMenu: "เมนูที่เหลืออยู่",
     currentTopMenu: "เมนูปัจจุบัน",
@@ -312,7 +369,7 @@ export default {
   contactUs: {
     title: "ติดต่อเรา",
     info: {
-      address1: "สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.)",
+      company: "สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.)",
       address2: "ชั้น 17 อาคารบางกอกไทยทาวเวอร์ 108 ถนนรางน้ำ แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400",
       tels: "โทรสาร:",
       email: "อีเมล:",
@@ -377,54 +434,6 @@ export default {
     anonymous: "ผู้ไม่ทราบนาม",
     noReference: "ไม่มีแหล่งอ้างอิง"
   },
-  requestPermissions: {
-    add: {
-      title: "ส่งแบบขอสิทธิ์",
-      noteToApprover: "หมายเหตุ",
-      requestTo: {
-        title: "ขอสิทธิ์",
-        moderator: "ผู้ดูแลระบบ",
-        developer: "นักพัฒนาระบบ"
-      },
-      allowConsent: "อนุมัติส่งข้อมูลส่วนตัวให้ผู้อนุมัติ",
-      action: "ส่งคำขอ",
-      success: "ส่งคำขอสำเร็จ",
-      failed: "ส่งคำขอไม่สำเร็จ",
-      pendingBlocked: "กรุณารอคำขอพิจารณาสำเร็จก่อนกรอกอีกครั้ง",
-    },
-    change: {
-      title: "แก้ไขสิทธิ์",
-      action: "เปลี่ยน",
-      confirm: "ยืนยันการเปลี่ยนสิทธิ์?",
-      success: "เปลี่ยนสิทธิ์สำเร็จ",
-      failed: "เปลี่ยนสิทธิ์ล้มเหลว",
-    },
-    permissions: "สิทธิ์",
-    note: "หมายเหตุ",
-    noteNone: "ไม่มี",
-    approveRequestPermissions: "อนุมัติการขอสิทธิ์",
-    requestsNotFound: "ไม่พบรายการขอสิทธิ์",
-    approve: "อนุมัติ",
-    manageApproveList: "จัดการรายการอนุมัติ",
-    reject: "ปฏิเสธ",
-    userid: "ID ผู้ใช้",
-    personalData: "ข้อมูลส่วนบุคคล",
-    citizenid: "รหัสบัตรประชาชน",
-    name: "ชื่อ",
-    email: "อีเมล์"
-  },
-  permissions: {
-    "request-permissions": "ขอสิทธิ์เพิ่มเติม",
-    "voter-mode": "เข้าโหมดผู้โหวต",
-    "request-topic": "ขอเปิดโหวต",
-    "admin-mode": "เข้าโหมดผู้ดูแล",
-    "dev-mode": "เข้าโหมดผู้พัฒนา",
-    "vote-topic": "โหวตคำถาม",
-    "create-topic": "สร้างการโหวต",
-    "change-topic": "แก้ไขข้อมูลการโหวต",
-    "change-permissions:basic": "เปลี่ยนสิทธิ์ขั้นพื้นฐาน",
-    "change-permissions:advance": "เปลี่ยนสิทธิ์ขั้นสูง",
-  },
   admin: {
     user: {
       title: "รายชื่อผู้ใช้งาน",
@@ -461,12 +470,6 @@ export default {
       transactionData: "ข้อมูลใน TX",
       transactionRawData: "ข้อมูลดิบ TX",
     },
-  },
-  timePeriod: {
-    nearZeroMinute: "ไม่ถึงนาที",
-    minute: "นาที",
-    hour: "ชั่วโมง",
-    day: "วัน",
   },
   error: {
     title: "ผิดพลาด",

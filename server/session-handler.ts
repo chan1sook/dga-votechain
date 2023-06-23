@@ -80,7 +80,6 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
           department: userData.department,
           division: userData.division,
           authFrom: userSessionData.authFrom,
-          group: userData.group,
           preferences: userData.preferences,
           bannedUntil: userData.bannedUntil,
         };

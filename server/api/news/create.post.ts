@@ -8,7 +8,7 @@ import { isBannedUser } from "~/src/services/validations/user";
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData)|| !checkPermissionSelections(userData.permissions, "admin-mode")) {
+  if(!userData || isBannedUser(userData)|| !checkPermissionSelections(userData.permissions, "create-news")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

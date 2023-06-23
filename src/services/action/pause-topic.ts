@@ -13,7 +13,7 @@ export async function pauseTopic(userid: string, topicid: string, cause: string)
     UserModel.findById(userid),
     TopicModel.findById(topicid)
   ]);
-  if(!userData || !targetTopic || !checkPermissionNeeds(userData.permissions, "change-topic")) {
+  if(!userData || !targetTopic || !checkPermissionNeeds(userData.permissions, "control-topic")) {
     return;
   }
 
@@ -34,7 +34,7 @@ export async function pauseTopic(userid: string, topicid: string, cause: string)
       topicid: targetTopic._id
     })
 
-    const notifications : NotificationModelDataWithId[] = voteAllowsDocs.map((ele) => {
+    const notifications : NotificationModelData[] = voteAllowsDocs.map((ele) => {
       return {
         userid: new Types.ObjectId(ele.userid),
         group: "topic",
@@ -88,7 +88,7 @@ export async function resumeTopic(userid: string, topicid: string) {
       topicid: targetTopic._id
     })
 
-    const notifications : NotificationModelDataWithId[] = voteAllowsDocs.map((ele) => {
+    const notifications : NotificationModelData[] = voteAllowsDocs.map((ele) => {
       return {
         userid: new Types.ObjectId(ele.userid),
         group: "topic",

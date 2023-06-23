@@ -12,6 +12,32 @@ const schema = new Schema<TopicModelData>({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    default: "private",
+  },
+  internalFilter: {
+    type: new Schema<InternalTopicVisiblityFilter>({
+      ministry: {
+        type: String,
+        default: "",
+      },
+      withDepartment: {
+        type: Boolean,
+        default: false,
+      },
+      department: {
+        type: String,
+        default: "",
+      }
+    }),
+    default() {
+      return {
+        ministry: "",
+        department: "",
+      }
+    }
+  },
   multipleVotes: {
     type: Boolean,
     default: false,
@@ -73,10 +99,6 @@ const schema = new Schema<TopicModelData>({
     type: Date,
     required: true,
   },
-  publicVote: {
-    type: Boolean,
-    required: true,
-  },
   anonymousVotes: {
     type: Boolean,
     default: false,
@@ -89,10 +111,17 @@ const schema = new Schema<TopicModelData>({
     type: Boolean,
     default: false,
   },
+  showCreator: {
+    type: Boolean,
+    default: false,
+  },
   recoredToBlockchain: {
     type: Boolean,
     default: true,
-  }
+  },
+  publicVote: {
+    type: Boolean,
+  },
 }, { timestamps: true });
 
 export default model<TopicModelData>('topic', schema);

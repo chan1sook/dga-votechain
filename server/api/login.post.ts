@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   
     urlParams.set("scope", scopes.join(" "));
     urlParams.set("code_challenge_method", "S256");
-  
+    
     const hash = crypto.createHash("sha256").update(DID_VERIFY_CODE).digest();
     const challengeCode = hash.toString("base64url");
     

@@ -21,6 +21,14 @@
       <template v-else-if="filter.type === 'topicName'">
         <DgaInput v-model="filter.keyword" :placeholder="$t('app.voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
+      <div class="w-full lg:w-72 flex flex-row gap-2 items-center">
+        <div class="whitespace-nowrap">{{ $t('app.topic.accessModifier') }}</div>
+        <DgaVueSelect
+          v-if="useSessionData().value.roleMode !== 'guest'"
+          v-model="filter.topicType" :options="topciTypeFilterOptions" class="flex-1"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
+      </div>
       <DgaButton color="dga-orange" class="flex-0" :title="$t('app.voting.filters.search')" @click="resetTopics">
         {{ $t("app.voting.filters.search") }}
       </DgaButton>
@@ -75,9 +83,10 @@ import dayjs from "dayjs";
 import "dayjs/locale/en";
 import "dayjs/locale/th";
 
-import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
+import { isTopicReadyToVote, isTopicExpired, isAnonymousTopic, isUserInMatchInternalTopic } from '~/src/services/validations/topic';
 import { isAdminRole } from '~/src/services/validations/role';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
+import { topicTypes } from '~/src/services/form/topic';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -91,6 +100,7 @@ const filter = ref({
   type: "all",
   month: dayjs(useComputedServerTime()).month(),
   year: dayjs(useComputedServerTime()).year(),
+  topicType: <"all" | TopicType> "all",
   ticketId: "",
   keyword: "",
 });
@@ -99,6 +109,15 @@ const topicFilterOptions = computed(() =>
   ["all", "date", "ticketId", "topicName"].map((value) => {
     return {
       label: i18n.t(`app.voting.filters.${value}`),
+      value: value
+    }
+  })
+);
+
+const topciTypeFilterOptions = computed(() => 
+  ["all", ...topicTypes].map((value) => {
+    return {
+      label: value !== "all" ? i18n.t(`app.topicType.${value}`, value): i18n.t(`app.voting.filters.${value}`),
       value: value
     }
   })
@@ -167,9 +186,11 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
     return "result";
   } else if(!isTopicReadyToVote(topic, useComputedServerTime().getTime())) {
     return "waiting";
-  } else if(topic.publicVote && topic.anonymousVotes) {
+  } else if(isAnonymousTopic(topic)) {
     return "access";
-  } else if(!useSessionData().value.userid) {
+  } else if(topic.type === "internal" && isUserInMatchInternalTopic(topic.internalFilter, useSessionData().value)) {
+    return "access";
+  } else if (!useSessionData().value.userid) {
     return "voting";
   } else if(!isAdminMode) {
     if(topic.voterAllow) {
@@ -232,6 +253,7 @@ async function loadMoreTopics() {
     type: "all",
     pagesize: pagesize.value,
     startid: startid.value,
+    topicType: filter.value.topicType,
   };
   if(filter.value.type === "date") {
     actualFilter = {
@@ -240,6 +262,7 @@ async function loadMoreTopics() {
       month: filter.value.month,
       pagesize: pagesize.value,
       startid: startid.value,
+      topicType: filter.value.topicType,
     };
   } else if(filter.value.type === "ticketId") {
     actualFilter = {
@@ -247,6 +270,7 @@ async function loadMoreTopics() {
       ticketId: filter.value.ticketId,
       pagesize: pagesize.value,
       startid: startid.value,
+      topicType: filter.value.topicType,
     };
   } else if(filter.value.type === "topicName") {
     actualFilter = {
@@ -254,6 +278,7 @@ async function loadMoreTopics() {
       keyword: filter.value.keyword,
       pagesize: pagesize.value,
       startid: startid.value,
+      topicType: filter.value.topicType,
     };
   }
   

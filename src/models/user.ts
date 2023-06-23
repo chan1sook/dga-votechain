@@ -38,7 +38,6 @@ const schema = new Schema<UserModelData>({
   hashedCitizenId: {
     type: String,
   },
-  group: [String],
   preferences: new Schema({
     topMenus: [String],
     adminTopMenus: [String],

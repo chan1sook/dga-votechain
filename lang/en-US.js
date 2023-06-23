@@ -1,6 +1,44 @@
 export default {
   appName: "DGA E-Voting",
   app: {
+    navbar: {
+      home: "Home",
+      voting: "Voting",
+      about: "About",
+      help: "Help",
+      contactUs: "Contact Us",
+      adminShowUsers: "User Lists",
+      blockchain: "Blockchain",
+      login: "Login",
+      language: "Current Language",
+      news: {
+        title: "News",
+        loadingNews: "Loading...",
+        noMoreNews: "No more news",
+        loadMoreNews: "Load more news",
+        add: "Add"
+      },
+      notification: {
+        title: "Notifications",
+        loadingNotifications: "Loading...",
+        noMoreNotifications: "No more notifications",
+        loadMoreNotifications: "Load more notifications",
+      },
+      user: {
+        title: "User Info",
+        welcome: "Welcome to E-Voting",
+        anonymous: "Anonymous",
+        switchRoleMode: "Switch mode to",
+        desyncTime: "Desync time",
+        preferences: "Preferences",
+      },
+      withdrawUser: {
+        title: "Withdraw User",
+        confirm1: "Do you want to withdraw yourself from E-Voting?",
+        confirm2: "This action is irreversible",
+      },
+      logout: "Logout"
+    },
     userInfoEdit: {
       title: "Edit User Info",
       typeToEdit: "Type to edit",
@@ -50,6 +88,7 @@ export default {
       templateTitle: "Topic Template",
       useTemplate: "Use Topic Template",
       applyTemplate: "Apply Template",
+      withDepartment: "With Department",
       error: {
         notFound: "Topic not found",
         notEditable: "Topic not editable"
@@ -93,6 +132,7 @@ export default {
       distinctVotes: "Distinct Votes",
       anonymousVotes: "Allow Anonymous to Vote",
       notifyUsers: "Send notice to users",
+      showCreator: "Show Creator to Public",
       skipBlockchain: "Not record to Blockchain",
       scorePublic: "Display voter choice(s) for public",
       allow: "Allow",
@@ -202,12 +242,66 @@ export default {
       hide: "Hide Description",
       show: "Show Description",
     },
-    publicVote: "Public Vote",
-    privateVote: "Private Vote",
+    topicType: {
+      public: "Public Vote",
+      private: "Private Vote",
+      internal: "Internal Vote"
+    },
     votersList: "Voters List",
+    permissions: {
+      "request-permissions": "Request More Permissions",
+      "voter-mode": "Access Voter Mode",
+      "admin-mode": "Access Admin Mode",
+      "dev-mode": "Access Developer Mode",
+      "vote-topic": "Vote Topics",
+      "create-topic": "Create New Topics",
+      "change-topic": "Change Topic Data",
+      "control-topic": "Control Topic",
+      "create-news": "Create News",
+      "change-news": "Change News",
+      "change-permissions": "Change Permissions to Others",
+    },
+    requestPermissions: {
+      add: {
+        title: "Add Request Permissions",
+        noteToApprover: "Note",
+        requestTo: {
+          title: "Request to",
+          moderator: "Moderator",
+          developer: "Developer"
+        },
+        allowConsent: "Allow to use personal Data for approver",
+        action: "Add Request",
+        success: "Add Request Successful",
+        failed: "Add Request Failed",
+        pendingBlocked: "Please wait before request again",
+      },
+      change: {
+        title: "Change Permissions",
+        action: "Change",
+        confirm: "Confirm to Change Permissions?",
+        success: "Change Permissions Successful",
+        failed: "Change Permissions Failed",
+      },
+      permissions: "Permissions",
+      note: "Note",
+      noteNone: "None",
+      approveRequestPermissions: "Approve Request Permission",
+      requestsNotFound: "Requests not found",
+      manageApproveList: "Manage Approve List",
+      approve: "Approve",
+      reject: "Reject",
+      personalData: "Personal Data",
+    },
     countable: {
       vote: "Vote | Votes",
       voter: "Voter | Voters"
+    },
+    timePeriod: {
+      nearZeroMinute: "Less than a minute",
+      minute: "Mins",
+      hour: "Hours",
+      day: "Days",
     },
     modal: {
       back: "Back",
@@ -218,46 +312,8 @@ export default {
     edit: "Edit",
     detail: "Detail",
   },
-  navbar: {
-    home: "Home",
-    voting: "Voting",
-    about: "About",
-    help: "Help",
-    contactUs: "Contact Us",
-    adminShowUsers: "User Lists",
-    blockchain: "Blockchain",
-    login: "Login",
-    language: "Current Language",
-    news: {
-      title: "News",
-      loadingNews: "Loading...",
-      noMoreNews: "No more news",
-      loadMoreNews: "Load more news",
-      add: "Add"
-    },
-    notification: {
-      title: "Notifications",
-      loadingNotifications: "Loading...",
-      noMoreNotifications: "No more notifications",
-      loadMoreNotifications: "Load more notifications",
-    },
-    user: {
-      title: "User Info",
-      welcome: "Welcome to E-Voting",
-      anonymous: "Anonymous",
-      switchRoleMode: "Switch mode to",
-      desyncTime: "Desync time",
-      preferences: "Preferences",
-    },
-    withdrawUser: {
-      title: "Withdraw User",
-      confirm1: "Do you want to withdraw yourself from E-Voting?",
-      confirm2: "This action is irreversible",
-    },
-    logout: "Logout"
-  },
   userPreferences: {
-    title: "User Preferences",
+    title: "Preferences",
     topMenuOrders: "Top Menu Orders",
     remainTopMenu: "Remain Menu",
     currentTopMenu: "Current Menu",
@@ -309,7 +365,7 @@ export default {
   contactUs: {
     title: "Contact Us",
     info: {
-      address1: "Digital Government Development Agency (Public Organization) (DGA)",
+      company: "Digital Government Development Agency (Public Organization) (DGA)",
       address2: "17th Floor, Bangkok Thai Tower Building 108 Rangnam Rd. Phayathai, Ratchatewi, Bangkok 10400, Thailand",
       tels: "Tel:",
       email: "Email:",
@@ -364,54 +420,6 @@ export default {
     anonymous: "Anonymous",
     noReference: "No References"
   },
-  requestPermissions: {
-    add: {
-      title: "Add Request Permissions",
-      noteToApprover: "Note",
-      requestTo: {
-        title: "Request to",
-        moderator: "Moderator",
-        developer: "Developer"
-      },
-      allowConsent: "Allow to use personal Data for approver",
-      action: "Add Request",
-      success: "Add Request Successful",
-      failed: "Add Request Failed",
-      pendingBlocked: "Please wait before request again",
-    },
-    change: {
-      title: "Change Permissions",
-      action: "Change",
-      confirm: "Confirm to Change Permissions?",
-      success: "Change Permissions Successful",
-      failed: "Change Permissions Failed",
-    },
-    permissions: "Permissions",
-    note: "Note",
-    noteNone: "None",
-    approveRequestPermissions: "Approve Request Permission",
-    requestsNotFound: "Requests not found",
-    approve: "Approve",
-    manageApproveList: "Manage Approve List",
-    reject: "Reject",
-    userid: "User ID",
-    personalData: "Personal Data",
-    citizenid: "Citizen ID",
-    name: "Name",
-    email: "Email"
-  },
-  permissions: {
-    "request-permissions": "Request More Permissions",
-    "voter-mode": "Access Voter Mode",
-    "request-topic": "Request New Topic",
-    "admin-mode": "Access Admin Mode",
-    "dev-mode": "Access Developer Mode",
-    "vote-topic": "Vote Topics",
-    "create-topic": "Create New Topics",
-    "change-topic": "Change Topic Data",
-    "change-permissions:basic": "Change Basic Permissions",
-    "change-permissions:advance": "Change Advance Permissions",
-  },
   admin: {
     user: {
       title: "User List",
@@ -448,12 +456,6 @@ export default {
       transactionData: "TX Data",
       transactionRawData: "Raw TX Data",
     },
-  },
-  timePeriod: {
-    nearZeroMinute: "Less than a minute",
-    minute: "Mins",
-    hour: "Hours",
-    day: "Days",
   },
   error: {
     title: "Error",

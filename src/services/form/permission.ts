@@ -1,17 +1,11 @@
 import { combinePermissions, legacyRoleToPermissionsExcludes } from "../transform/permission";
 
-export function getBasicPermissions() {
-  return legacyRoleToPermissionsExcludes("voter");
-}
-export function getAdvancePermissions() {
-  return combinePermissions(
-    legacyRoleToPermissionsExcludes("admin"),
-    ...legacyRoleToPermissionsExcludes("developer")
-  );
+export function getPermissions() {
+  return legacyRoleToPermissionsExcludes("developer");
 }
 
 export function getNotSelfEditablePermissions() : EVotePermission[] {
-  return ["voter-mode", "admin-mode", "dev-mode", "change-permissions:basic", "change-permissions:advance"]
+  return ["voter-mode", "admin-mode", "dev-mode", "change-permissions"]
 }
 
 export function getRequestablePermissions() : EVotePermission[] {

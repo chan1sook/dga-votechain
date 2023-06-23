@@ -28,7 +28,6 @@ async function cleanRemovedUsers() {
     user.department = undefined;
     user.division = undefined;
 
-    user.group = [];
     user.preferences = {
       topMenus: [],
       adminTopMenus: [],

@@ -1,9 +1,8 @@
 import UserModel from "~/src/models/user"
 import RequestPermissionsModel from "~/src/models/request-permission"
 import NotificationModel from "~/src/models/notification";
-import { combinePermissions, isContainsAdvancePermissions } from "~/src/services/transform/permission";
+import { combinePermissions } from "~/src/services/transform/permission";
 import { isAdminRole } from "~/src/services/validations/role";
-import { checkPermissionSelections } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
@@ -27,13 +26,6 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: "Can't change anymore",
-    });
-  }
-
-  if(isContainsAdvancePermissions(...reqData.permissions) && userData.roleMode !== "developer" && !checkPermissionSelections(userData.permissions, "change-permissions:advance")) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
     });
   }
 

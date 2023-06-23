@@ -34,7 +34,7 @@ import BallotIcon from 'vue-material-design-icons/Ballot.vue';
 
 import dayjs from "dayjs";
 import { isTopicFormValid } from '~/src/services/validations/topic';
-import { getDefaultChoices, getPresetTemplate } from '~/src/services/form/topic';
+import { getDefaultChoices, getDefaultInternalTopicFilter, getPresetTemplate } from '~/src/services/form/topic';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 const localePathOf = useLocalePath();
@@ -60,6 +60,8 @@ const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisec
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
+  type: "private",
+  internalFilter: getDefaultInternalTopicFilter(),
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
@@ -67,11 +69,11 @@ const topicData = ref<TopicFormData>({
   coadmins: [],
   multipleVotes: false,
   distinctVotes: false,
-  publicVote: true,
   anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
+  showCreator: false,
   recoredToBlockchain: true,
   images: [],
 });

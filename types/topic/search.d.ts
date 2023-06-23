@@ -13,4 +13,6 @@ type TopicFilterParams =
     type: "topicName",
     keyword: string,
   }
-  ) & PaginationParams;
+  ) & {
+    topicType: "all" | TopicType,
+  } & PaginationParams;

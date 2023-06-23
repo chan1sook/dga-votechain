@@ -6,9 +6,11 @@ import { getVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
 import { isAdminRole } from "~/src/services/validations/role"
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause"
 import { isBannedUser } from "~/src/services/validations/user"
+import { isUserInMatchInternalTopic } from "~/src/services/validations/topic"
 
 export default defineEventHandler(async (event) => {  
-  const topicDoc = await TopicModel.findById(event.context.params?.id);
+  const topicDoc : TopicModelDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
+
   if(!topicDoc) {
     throw createError({
       statusCode: 404,
@@ -35,8 +37,8 @@ export default defineEventHandler(async (event) => {
     getVoterAllowByTopicId(topicDoc._id).populate("userid"),
     getVotesByTopicId(topicDoc._id)
   ]);
-    
-  if(!topicDoc.publicVote) {
+  
+  if(topicDoc.type !== "public") {
     let isAllowed = false;
 
     if(userData && !isBannedUser(userData)) {
@@ -47,6 +49,10 @@ export default defineEventHandler(async (event) => {
       })
       if(topicAllowDoc) {
         isAllowed = true;
+      }
+      
+      if(topicDoc.type === "internal" && userData && isUserInMatchInternalTopic(topicDoc.internalFilter, userData)) {
+        isAllowed = true
       }
 
       // check if is admin
@@ -101,6 +107,13 @@ export default defineEventHandler(async (event) => {
     _id: `${topicDoc._id}`,
     name: topicDoc.name,
     description: topicDoc.description,
+    createdBy: topicDoc.showCreator ? {
+      _id: topicDoc.createdBy._id.toString(),
+      firstName: topicDoc.createdBy.firstName,
+      lastName: topicDoc.createdBy.lastName,
+      email: topicDoc.createdBy.email,
+    } : undefined,
+    type: topicDoc.type,
     choices: topicDoc.choices,
     voteStartAt: dayjs(topicDoc.voteStartAt).toString(),
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toString(),

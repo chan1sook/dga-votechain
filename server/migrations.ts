@@ -1,11 +1,13 @@
 import UserModel from "~/src/models/user"
+import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~/src/models/blockchain-server"
-import { combinePermissions, legacyRoleToPermissions } from '~/src/services/transform/permission';
+import { combinePermissions, legacyRoleToPermissions, removePermissions } from '~/src/services/transform/permission';
+import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
 
 let migrationSeq = 0;
 
 export async function setPredefinedDevs(ids: DigitalIdUserId[]) {
-  migrationSeq +=1 ;
+  migrationSeq += 1;
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);
   
@@ -44,7 +46,7 @@ export async function setPredefinedDevs(ids: DigitalIdUserId[]) {
 }
 
 export async function setPredefinedBlockchainServers() {
-  migrationSeq +=1 ;
+  migrationSeq += 1;
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Blockchain Servers`);
   
@@ -73,4 +75,71 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
+}
+
+export async function updateTopics() {
+  migrationSeq += 1;
+
+  console.log(`[Migration] ${migrationSeq}. Update Topics`);
+
+  const topics = await TopicModel.find({
+    $or: [
+      { internalFilter:  { $exists: false } },
+      { publicVote: { $exists: true } },
+    ]
+  });
+
+  for(const topic of topics) {
+    topic.type = topic.publicVote ? "public" : "private";
+    topic.publicVote = undefined;
+    topic.internalFilter = getDefaultInternalTopicFilter();
+  }
+  
+  const result = await TopicModel.bulkSave(topics);
+
+  console.log(`[Migration] Update Topics (Updated: ${result.insertedCount})`);
+}
+
+export async function updatePermissions() {
+  migrationSeq += 1;
+
+  console.log(`[Migration] ${migrationSeq}. Update Permissions`);
+
+  const users = await UserModel.find({});
+  for(const user of users) {
+    user.permissions = removePermissions(user.permissions, "request-topic", "change-permissions:basic", "change-permissions:advance")
+    
+    if(user.permissions.includes("admin-mode")) {
+      user.permissions = combinePermissions(user.permissions, "control-topic")
+    }
+    if(user.permissions.includes("dev-mode")) {
+      user.permissions = combinePermissions(user.permissions, "create-news", "change-news", "change-permissions")
+    } else {
+      user.permissions = removePermissions(user.permissions, "create-news", "change-news")
+    }
+    
+    user.markModified("permissions")
+  }
+  
+  const result = await UserModel.bulkSave(users);
+
+  console.log(`[Migration] Update Permissions (Updated: ${result.insertedCount})`);
+}
+
+export async function updatePreferenceMenu() {
+  migrationSeq += 1;
+
+  console.log(`[Migration] ${migrationSeq}. Update Preference Menu`);
+
+  const users = await UserModel.find({
+    "preferences.adminTopMenus": "users-management",
+  });
+  for(const user of users) {
+    user.preferences.adminTopMenus = user.preferences.adminTopMenus.filter((ele) => ele !== "users-management")
+    user.markModified("preferences")
+  }
+  
+  const result = await UserModel.bulkSave(users);
+
+  console.log(`[Migration] Update Preference Menu (Updated: ${result.insertedCount})`);
 }

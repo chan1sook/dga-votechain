@@ -1,14 +1,13 @@
 import { isAdminRole, isDeveloperRole, isVoterRole } from "~/src/services/validations/role";
-import { getAdvancePermissions } from "../form/permission";
   
 export function legacyRoleToPermissionsExcludes(role: UserRole) : EVotePermission[] {
   switch(role) {
     case "voter":
-      return ["request-permissions", "voter-mode", "vote-topic", "request-topic"];
+      return ["request-permissions", "voter-mode", "vote-topic"];
     case "admin":
-      return ["admin-mode", "create-topic", "change-topic", "create-news", "change-news", "change-permissions:basic"];
+      return ["admin-mode", "create-topic", "change-topic", "control-topic"];
     case "developer":
-      return ["dev-mode", "change-permissions:advance"];
+      return ["dev-mode", "create-news", "change-news", "change-permissions"];
     default:
       return [];
   }
@@ -30,10 +29,6 @@ export function legacyRoleToPermissions(role: UserRole) {
   }
   
   return permissions;
-}
-
-export function isContainsAdvancePermissions(...selections: EVotePermission[]) {
-  return removePermissions(selections, ...getAdvancePermissions()).length === 0;
 }
 
 export function combinePermissions(source: EVotePermission[], ...others: EVotePermission[]) {

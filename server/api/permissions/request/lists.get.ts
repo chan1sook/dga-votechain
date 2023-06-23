@@ -14,8 +14,7 @@ export default defineEventHandler(async (event) => {
     });
   }
   const { startid, pagesize } : PaginationParams = getQuery(event);
-  const isAdvanceMode = userData.roleMode === "developer" && checkPermissionSelections(userData.permissions, "change-permissions:advance");
-  const reqPermissionData : RequestPermissionsModelDataWithPopulated[] = await getPendingRequestPermissionsData(pagesize, startid, isAdvanceMode).populate("userid");
+  const reqPermissionData : RequestPermissionsModelDataWithPopulated[] = await getPendingRequestPermissionsData(pagesize, startid).populate("userid");
   
   const requestPermissions : RequestPermissionsListData[] = reqPermissionData.map((doc) => {
     return {

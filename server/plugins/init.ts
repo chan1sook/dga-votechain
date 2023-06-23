@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import io from "~/server/socketio"
 import smartContract from '../smart-contract';
-import { setPredefinedDevs, setPredefinedBlockchainServers } from '../migrations';
+import { setPredefinedDevs, setPredefinedBlockchainServers, updatePreferenceMenu, updatePermissions, updateTopics } from '../migrations';
 import { initFirebase } from '../firebase';
 import initBlockchainHbWorkers from '../../src/worker/blockchain-hb';
 import initNotificationWorkers from '../../src/worker/notification';
@@ -13,7 +13,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   console.log(runtimeConfig);
 
   console.log("[Blockchain] Test");
-  smartContract.init();
+  smartContract.test();
 
   console.log("[Firebase] Init");
   initFirebase();
@@ -29,6 +29,9 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   await setPredefinedBlockchainServers();
   await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
+  await updateTopics();
+  await updatePermissions();
+  await updatePreferenceMenu();
 
   initBlockchainHbWorkers();
   console.log('[BlockchainServerHB Workers] Started!');

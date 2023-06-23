@@ -1,16 +1,20 @@
 <template>
-  <div class="dga-topic-card" :class="[isPublicVote ? 'public' : 'private']">
+  <div class="dga-topic-card" :class="[ topicType ]">
     <div class="inner">
-      <div v-if="isPublicVote" class="public">
-        {{ $t('app.publicVote') }}
-      </div>
-      <div v-else class="private" >
-        {{ $t('app.privateVote') }}
+      <div class="type" :class="[ topicType ]">
+        {{ $t(`app.topicType.${topicType}`, topicType) }}
       </div>
       <div class="content">
         <div class="name">{{ props.topic.name }}</div>
         <div class="time">{{ $t('app.voting.voteOn') }} {{ prettyStartAt }}</div>
-        <div class="createdby">{{ $t('app.voting.createdBy') }} {{ getCreatedByName(props.topic.createdBy) }} (#Ticket {{ props.topic._id }})</div>
+        <div class="createdby">
+          <template v-if="props.topic.createdBy">
+            {{ $t('app.voting.createdBy') }} {{ formatCreatedByName(props.topic.createdBy) }} (#Ticket {{ props.topic._id }})
+          </template>
+          <template v-else>
+            #Ticket {{ props.topic._id }}
+          </template>
+        </div>
       </div>
       <div v-if="props.withQrcode" class="qr">
         <button :title="$t('app.voting.qrcode')" @click="emit('qr')">
@@ -21,11 +25,15 @@
         <button v-if="props.editable" :title="$t('app.voting.editTopic')" @click="emit('edit')">
           {{ $t('app.voting.editTopic') }}
         </button>
-        <button :class="[ props.status ]" :title="actualStatusStr" @click="emit('action', props.status)">
-          {{ actualStatusStr }}
+        <button :class="[ props.status ]" class="flex flex-row gap-1 items-center justify-center" :title="actualStatusStr" @click="emit('action', props.status)">
+          <span>{{ actualStatusStr }}</span>
+          <MagnifyIcon v-if="props.status === 'result'"/>
         </button>
-        <button v-if="props.isAdmin" :title="$t('app.voting.recreateTopic')" class="recreate" @click="emit('recreate')">
-          {{ $t('app.voting.recreateTopic') }}
+        <button v-if="props.isAdmin" :title="$t('app.voting.recreateTopic')" 
+          class="recreate flex flex-row gap-1 items-center justify-center" @click="emit('recreate')"
+        >
+          <span>{{ $t('app.voting.recreateTopic') }}</span>
+          <RefreshIcon />
         </button>
       </div>
 
@@ -39,6 +47,9 @@
 
 <script setup lang="ts">
 import QrcodeIcon from 'vue-material-design-icons/Qrcode.vue';
+import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
+import RefreshIcon from 'vue-material-design-icons/Refresh.vue';
+import { formatCreatedByName } from '~/src/services/formatter/user';
 import dayjs from 'dayjs';
 
 const i18n = useI18n();
@@ -65,50 +76,33 @@ const actualStatusStr = computed(() => {
   return i18n.t(`app.voting.status.${props.status}`, i18n.t('app.voting.status.access'))
 })
 
-const isPublicVote = computed(() => {
-  return props.topic.publicVote
+const topicType = computed(() => {
+  return props.topic.type
 })
 
 const prettyDuation = computed(() => {
   const originalDuration = dayjs(props.topic.voteExpiredAt).diff(props.topic.voteStartAt);
   const days = Math.floor(originalDuration / (24 * 60 * 60 * 1000));
   if(days >= 1) {
-    return `${days} ${i18n.t("timePeriod.day", {count: days})}`;
+    return `${days} ${i18n.t("app.timePeriod.day", {count: days})}`;
   }
 
   const hours = Math.floor(originalDuration / (60 * 60 * 1000));
   if(hours >= 1) {
-    return `${hours} ${i18n.t("timePeriod.hour", {count: hours})}`;
+    return `${hours} ${i18n.t("app.timePeriod.hour", {count: hours})}`;
   }
 
   const minutes = Math.floor(originalDuration / (60 * 1000));
   if(minutes >= 1) {
-    return `${minutes} ${i18n.t("timePeriod.minute", {count: minutes})}`;
+    return `${minutes} ${i18n.t("app.timePeriod.minute", {count: minutes})}`;
   }
 
-  return i18n.t("timePeriod.nearZeroMinute")
+  return i18n.t("app.stimePeriod.nearZeroMinute")
 })
 
 const prettyStartAt = computed(() => {
   return i18n.d(dayjs(props.topic.voteStartAt).toDate(), "long");
 })
-
-function getCreatedByName(createdBy?: UserBasicResponseDataWithId) {
-  if(createdBy && createdBy.firstName) {
-    return createdBy.lastName ? `${createdBy.firstName} ${createdBy.lastName}` : createdBy.firstName;
-  }
-
-  if(createdBy && createdBy.email) {
-    return createdBy.email;
-  }
-  
-
-  if(createdBy && createdBy._id) {
-    return createdBy._id;
-  }
-
-  return "-";
-}
 
 </script>
 
@@ -119,26 +113,34 @@ function getCreatedByName(createdBy?: UserBasicResponseDataWithId) {
 .dga-topic-card.public {
   @apply bg-green-700
 }
+.dga-topic-card.internal {
+  @apply bg-blue-700
+}
 
 .dga-topic-card > .inner {
   @apply rounded-lg bg-white grid items-center p-2 sm:p-4 gap-2 sm:gap-y-0 overflow-auto;
-  grid-template-areas: "public duration duration" "content content content" "status status qr";
+  grid-template-areas: "type duration duration" "content content content" "status status qr";
   grid-template-columns: 150px auto 50px;
 }
 
 @media (min-width: 640px) {
   .dga-topic-card > .inner {
-    grid-template-areas: "public content qr status" "duration content qr status";
+    grid-template-areas: "type content qr status" "duration content qr status";
     grid-template-columns: 150px auto 50px 120px;
   }
 }
 
-.dga-topic-card > .inner > .private {
-  grid-area: public;
+.dga-topic-card > .inner > .type {
+  grid-area: type;
+}
+.dga-topic-card > .inner > .type.private {
   @apply text-xl text-red-700;
 }
-.dga-topic-card > .inner > .public {
+.dga-topic-card > .inner > .type.public {
   @apply text-green-700;
+}
+.dga-topic-card > .inner > .type.internal {
+  @apply text-blue-700
 }
 
 .dga-topic-card > .inner > .content {

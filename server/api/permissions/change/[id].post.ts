@@ -1,6 +1,6 @@
 import UserModel from "~/src/models/user"
-import { combinePermissions, isContainsAdvancePermissions, removePermissions } from "~/src/services/transform/permission";
-import { isAdminRole } from "~/src/services/validations/role";
+import { combinePermissions, removePermissions } from "~/src/services/transform/permission";
+import { isDeveloperRole } from "~/src/services/validations/role";
 import mongoose from "mongoose";
 import { getNotSelfEditablePermissions } from "~/src/services/form/permission";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
@@ -9,7 +9,7 @@ import { isBannedUser } from "~/src/services/validations/user";
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData)|| !isAdminRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData)|| !isDeveloperRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -31,15 +31,6 @@ export default defineEventHandler(async (event) => {
   const permissionDiffA = removePermissions(userDoc.permissions, ...permissions)
   const permissionDiffB = removePermissions(permissions, ...userDoc.permissions)
   const permissionDiff = combinePermissions(permissionDiffA, ...permissionDiffB)
-
-  console.log("permissionDiff", permissionDiff)
-
-  if(isContainsAdvancePermissions(...permissionDiff) && userData.roleMode !== "developer" && !checkPermissionSelections(userData.permissions, "change-permissions:advance")) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Forbidden",
-    });
-  }
 
   if(userDoc._id.toString() === userData._id.toString() && checkPermissionSelections(permissionDiff, ...getNotSelfEditablePermissions())) {
     throw createError({

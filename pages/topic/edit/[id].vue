@@ -36,7 +36,7 @@ import PencilIcon from 'vue-material-design-icons/Pencil.vue';
 
 import dayjs from "dayjs";
 import { isTopicReadyToVote, isTopicFormValid } from '~/src/services/validations/topic';
-import { getDefaultChoices, getPresetTemplate } from '~/src/services/form/topic';
+import { getDefaultChoices, getDefaultInternalTopicFilter, getPresetTemplate } from '~/src/services/form/topic';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 const localePathOf = useLocalePath();
@@ -68,18 +68,20 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
+  type: "private",
+  internalFilter: getDefaultInternalTopicFilter(),
   multipleVotes: false,
   distinctVotes: false,
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
   voteExpiredAt: expiredDate,
-  publicVote: true,
   anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   coadmins: [],
   voterAllows: [],
+  showCreator: false,
   recoredToBlockchain: true,
   images: [],
 });
@@ -104,13 +106,14 @@ if (!data.value) {
 
     topicData.value.name = topic.name;
     topicData.value.description = topic.description;
+    topicData.value.type = topic.type;
     topicData.value.choices = topic.choices;
     topicData.value.durationMode = topic.durationMode;
     topicData.value.voteStartAt = dayjs(topic.voteStartAt).toDate();
     topicData.value.voteExpiredAt = dayjs(topic.voteExpiredAt).toDate();
-    topicData.value.publicVote = topic.publicVote;
     topicData.value.anonymousVotes = topic.anonymousVotes;
     topicData.value.notifyVoter = topic.notifyVoter;
+    topicData.value.internalFilter = topic.internalFilter;
     topicData.value.multipleVotes = topic.multipleVotes;
     topicData.value.distinctVotes = topic.distinctVotes;
     topicData.value.defaultVotes = topic.defaultVotes;

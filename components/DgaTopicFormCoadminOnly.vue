@@ -54,7 +54,7 @@ import MinusIcon from 'vue-material-design-icons/Minus.vue';
 
 import dayjs from 'dayjs';
 import { getPrettyFullName } from '~/src/services/formatter/user';
-import { getDefaultChoices } from '~/src/services/form/topic';
+import { getDefaultChoices, getDefaultInternalTopicFilter } from '~/src/services/form/topic';
 import { isCoadminValid } from '~/src/services/validations/topic';
 
 const props = withDefaults(defineProps<{
@@ -76,6 +76,8 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
+  type: "private",
+  internalFilter: getDefaultInternalTopicFilter(),
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
@@ -83,11 +85,11 @@ const topicData = ref<TopicFormData>({
   coadmins: [],
   multipleVotes: false,
   distinctVotes: false,
-  publicVote: true,
   anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
+  showCreator: false,
   recoredToBlockchain: true,
   images: [],
 });

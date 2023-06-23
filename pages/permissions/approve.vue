@@ -1,37 +1,37 @@
 <template>
   <div>
-    <DgaHead>{{ $t('requestPermissions.approveRequestPermissions') }}</DgaHead>
+    <DgaHead>{{ $t('app.requestPermissions.approveRequestPermissions') }}</DgaHead>
     <div class="grid-2-content">
       <template v-for="request of permissionsList">
         <div class="flex flex-row gap-2 items-center">
-          <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.approve')"
+          <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('app.requestPermissions.approve')"
             @click="setApprovePermissions(request._id, 'approved')">
             <CheckIcon />
           </button>
-          <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('requestPermissions.reject')" @click="setApprovePermissions(request._id, 'rejected')">
+          <button type="button" class="inline-flex gap-2 items-center justify-center" :title="$t('app.requestPermissions.reject')" @click="setApprovePermissions(request._id, 'rejected')">
             <CloseIcon/>
           </button>
         </div>
         <div class="border-l border-dga-orange pl-2 overflow-x-auto">
           <div class="flex flex-row gap-2 flex-wrap">
-            <b>{{ $t('requestPermissions.userid') }}:</b>
+            <b>{{ $t('app.userid') }}:</b>
             <span>{{ request.userid }}</span>
           </div>
           <div class="flex flex-row gap-2 flex-wrap">
-            <b>{{ $t('requestPermissions.personalData') }}:</b> 
-            <abbr :title="$t('requestPermissions.name')">{{ formatFullName(request.personalData) }}</abbr>
-            <abbr v-if="request.personalData.email" :title="$t('requestPermissions.email')">{{ request.personalData.email }}</abbr>
+            <b>{{ $t('app.requestPermissions.personalData') }}:</b> 
+            <abbr :title="$t('app.name')">{{ formatFullName(request.personalData) }}</abbr>
+            <abbr v-if="request.personalData.email" :title="$t('app.email')">{{ request.personalData.email }}</abbr>
           </div>
           <div class="flex flex-row gap-2 flex-wrap">
-            <b>{{ $t('requestPermissions.note')  }}:</b> 
+            <b>{{ $t('app.requestPermissions.note')  }}:</b> 
             <span v-if="request.note">{{ request.note }}</span>
-            <span v-else class="italic">{{ $t('requestPermissions.noteNone') }}</span>
+            <span v-else class="italic">{{ $t('app.requestPermissions.noteNone') }}</span>
           </div>
           <div class="flex flex-row gap-x-2 flex-wrap">
-            <b>{{ $t('requestPermissions.permissions') }}: </b>
+            <b>{{ $t('app.requestPermissions.permissions') }}: </b>
             <details>
               <summary>
-                {{ $t(`requestPermissions.add.requestTo.${request.preset}`, request.preset) }}
+                {{ $t(`app.requestPermissions.add.requestTo.${request.preset}`, request.preset) }}
               </summary>
               <div class="inline-flex flex-row flex-wrap gap-x-2">
                 <abbr v-for="permission of request.permissions" :title="getFullPermissionTitle(permission)">
@@ -44,7 +44,7 @@
         <hr class="col-span-2">
       </template>
       <div v-if="permissionsList.length === 0" class="col-span-2 italic text-2xl text-center">
-        {{ $t('requestPermissions.requestsNotFound') }}
+        {{ $t('app.requestPermissions.requestsNotFound') }}
       </div>
     </div>
     <DgaLoadingModal :show="isWaitAction">
@@ -63,11 +63,11 @@ definePageMeta({
 })
 
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('requestPermissions.approveRequestPermissions')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.requestPermissions.approveRequestPermissions')}`
 });
 
 function getFullPermissionTitle(permission: EVotePermission) {
-  return i18n.t(`permissions.${permission}`, permission);
+  return i18n.t(`app.permissions.${permission}`, permission);
 }
 
 const { data } = await useFetch("/api/permissions/request/lists");

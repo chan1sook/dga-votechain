@@ -2,13 +2,13 @@
   <nav class="dga-nav">
     <img src="~/assets/images/logo_dga.png" class="h-8 lg:h-12" />
     <template v-for="menu of currentTopMenus">
-      <NuxtLink v-if="menu === 'home'" :href="localePathOf('/')" class="dga-menu-item">{{ $t("navbar.home") }}</NuxtLink>
-      <NuxtLink v-else-if="menu === 'voting'" :href="localePathOf('/topics')" class="dga-menu-item">{{ $t("navbar.voting") }}</NuxtLink>
-      <NuxtLink v-else-if="menu === 'about'" :href="localePathOf('/about')" class="dga-menu-item">{{ $t("navbar.about") }}</NuxtLink>
-      <NuxtLink v-else-if="menu === 'help'" :href="localePathOf('/help')" class="dga-menu-item">{{ $t("navbar.help") }}</NuxtLink>
-      <NuxtLink v-else-if="menu === 'contact-us'" :href="localePathOf('/contact-us')" class="dga-menu-item">{{ $t("navbar.contactUs") }}</NuxtLink>
-      <NuxtLink v-else-if="menu === 'users-management'" :href="localePathOf('/admin/users')" class="dga-menu-item">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
-      <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item">{{ $t('navbar.blockchain') }}</NuxtLink>
+      <NuxtLink v-if="menu === 'home'" :href="localePathOf('/')" class="dga-menu-item">{{ $t("app.navbar.home") }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'voting'" :href="localePathOf('/topics')" class="dga-menu-item">{{ $t("app.navbar.voting") }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'about'" :href="localePathOf('/about')" class="dga-menu-item">{{ $t("app.navbar.about") }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'help'" :href="localePathOf('/help')" class="dga-menu-item">{{ $t("app.navbar.help") }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'contact-us'" :href="localePathOf('/contact-us')" class="dga-menu-item">{{ $t("app.navbar.contactUs") }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'users-management'" :href="localePathOf('/admin/users')" class="dga-menu-item">{{ $t('app.navbar.adminShowUsers') }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item">{{ $t('app.navbar.blockchain') }}</NuxtLink>
     </template>
     <div class="inline-flex ml-auto flex-row items-center gap-4">
       <button type="button" class="dga-small-btn" @click="toggleLang">
@@ -17,7 +17,7 @@
       <DgaButton v-if="!isLogin" 
         :href="localePathOf('/login')" theme="hollow" class="whitespace-nowrap w-32 text-center"
       >
-        {{ $t('navbar.login') }}
+        {{ $t('app.navbar.login') }}
       </DgaButton>      
       <template v-else>
         <DgaNewsDropdown></DgaNewsDropdown>
@@ -31,15 +31,15 @@
     </div>
     <div v-if="showOption" class="collasped-menu">
       <template v-for="menu of currentTopMenus">
-        <NuxtLink v-if="menu === 'home'" :href="localePathOf('/')" class="dga-menu-item-small">{{ $t("navbar.home") }}</NuxtLink>
-        <NuxtLink v-else-if="menu === 'voting'" :href="localePathOf('/topics')" class="dga-menu-item-small">{{ $t("navbar.voting") }}</NuxtLink>
-        <NuxtLink v-else-if="menu === 'about'" :href="localePathOf('/about')" class="dga-menu-item-small">{{ $t("navbar.about") }}</NuxtLink>
-        <NuxtLink v-else-if="menu === 'help'" :href="localePathOf('/help')" class="dga-menu-item-small">{{ $t("navbar.help") }}</NuxtLink>
-        <NuxtLink v-else-if="menu === 'contact-us'" :href="localePathOf('/contact-us')" class="dga-menu-item-small">{{ $t("navbar.contactUs") }}</NuxtLink>
-        <NuxtLink v-else-if="menu === 'users-management'"  :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('navbar.adminShowUsers') }}</NuxtLink>
-        <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('navbar.blockchain')}}</NuxtLink>
+        <NuxtLink v-if="menu === 'home'" :href="localePathOf('/')" class="dga-menu-item-small">{{ $t("app.navbar.home") }}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'voting'" :href="localePathOf('/topics')" class="dga-menu-item-small">{{ $t("app.navbar.voting") }}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'about'" :href="localePathOf('/about')" class="dga-menu-item-small">{{ $t("app.navbar.about") }}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'help'" :href="localePathOf('/help')" class="dga-menu-item-small">{{ $t("app.navbar.help") }}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'contact-us'" :href="localePathOf('/contact-us')" class="dga-menu-item-small">{{ $t("app.navbar.contactUs") }}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'users-management'"  :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('app.navbar.adminShowUsers') }}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('app.navbar.blockchain')}}</NuxtLink>
       </template>
-      <NuxtLink v-if="!isLogin" :href="localePathOf('/login')" class="dga-menu-item-small">{{ $t('navbar.login') }}</NuxtLink>
+      <NuxtLink v-if="!isLogin" :href="localePathOf('/login')" class="dga-menu-item-small">{{ $t('app.navbar.login') }}</NuxtLink>
     </div>
   </nav>
 </template>

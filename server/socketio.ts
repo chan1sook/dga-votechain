@@ -54,7 +54,7 @@ export default async () => {
     
     socket.on("syncTime", emitServerTime);
     
-    socket.on("hasNotify", async ({ userid } : {userid: string}) => {
+    socket.on("hasNotify", async ({ userid } : { userid: string }) => {
       let notifyData = await getNotifyData(userid);
       
       if(notifyData === undefined || Date.now() - notifyData.lastChecked >= 60000) {

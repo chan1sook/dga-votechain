@@ -65,6 +65,14 @@ export default defineEventHandler(async (event) => {
       topicDoc.description = topicFormData.description;
     }
   
+    if(topicFormData.type !== undefined) {
+      topicDoc.type = topicFormData.type;
+    }
+
+    if(topicFormData.internalFilter !== undefined) {
+      topicDoc.internalFilter = topicFormData.internalFilter;
+    }
+
     if(topicFormData.multipleVotes !== undefined) {
       topicDoc.multipleVotes = topicFormData.multipleVotes;
     }
@@ -92,13 +100,13 @@ export default defineEventHandler(async (event) => {
     if(topicFormData.voteExpiredAt !== undefined) {
       topicDoc.voteExpiredAt = dayjs(topicFormData.voteExpiredAt).toDate();
     }
-  
-    if(topicFormData.publicVote !== undefined) {
-      topicDoc.publicVote = topicFormData.publicVote;
-    }
 
     if(topicFormData.anonymousVotes !== undefined) {
       topicDoc.anonymousVotes = topicFormData.anonymousVotes;
+    }
+
+    if(topicFormData.showCreator !== undefined) {
+      topicDoc.showCreator = topicFormData.showCreator;
     }
 
     if(topicFormData.recoredToBlockchain !== undefined) {

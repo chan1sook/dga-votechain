@@ -64,7 +64,7 @@ import dayjs from "dayjs";
 import { isNewsFormValid, useWatchNewsDateTimes } from "~/src/utils/news"
 
 definePageMeta({
-  middleware: ["auth-admin"]
+  middleware: ["auth-dev"]
 })
 
 const i18n = useI18n();

@@ -10,14 +10,28 @@
       {{ $t('app.topic.accessModifier') }}
     </div>
     <DgaVueSelect 
-      v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"
+      v-model="topicData.type" class="col-span-12 md:col-span-10" :options="votePublicOptions"
       :reduce="val => val.value"
     ></DgaVueSelect>
     <div class="col-span-12 flex flex-col gap-2">
-      <div v-if="topicData.publicVote" class="flex flex-row gap-2 items-center">
+      <div v-if="topicData.type === 'public'" class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.anonymousVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.topic.anonymousVotes') }}</label>
       </div>
+      <template v-else-if="topicData.type === 'internal'">
+        <div class="flex flex-row gap-2 items-center">
+          <DgaMinistryVueSelect class="w-full" v-model="topicData.internalFilter.ministry">
+          </DgaMinistryVueSelect>
+        </div>
+        <div class="flex flex-row gap-2 items-center">
+          <DgaCheckbox v-model="topicData.internalFilter.withDepartment"></DgaCheckbox> 
+          <label class="flex-none">{{ $t('app.topic.withDepartment') }}</label>
+        </div>
+        <div v-if="topicData.internalFilter.withDepartment" class="flex flex-row gap-2 items-center">
+          <DgaInput v-model="topicData.internalFilter.department" class="w-full" :placeholder="$t('app.department')">
+          </DgaInput>
+        </div>
+      </template>
       <div class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
@@ -86,16 +100,16 @@
       <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.duration')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col sm:flex-row gap-2">
         <div class="w-full flex flex-row items-center gap-2">
-          <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
-          <div class="w-16 sm:w-auto">{{ $t('timePeriod.day', { count: 2 }) }}</div>
+          <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('app.timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
+          <div class="w-16 sm:w-auto">{{ $t('app.timePeriod.day', { count: 2 }) }}</div>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
-          <DgaInput type="number" v-model.number="voteDuration.durationHours" :placeholder="$t('timePeriod.hour', { count: 2})" min="0" max="23" class="w-20 flex-1"></DgaInput>
-          <div class="w-16 sm:w-auto">{{ $t('timePeriod.hour', { count: 2 }) }}</div>
+          <DgaInput type="number" v-model.number="voteDuration.durationHours" :placeholder="$t('app.timePeriod.hour', { count: 2})" min="0" max="23" class="w-20 flex-1"></DgaInput>
+          <div class="w-16 sm:w-auto">{{ $t('app.timePeriod.hour', { count: 2 }) }}</div>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
-          <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
-          <div class="w-16 sm:w-auto">{{ $t('timePeriod.minute', { count: 2 }) }}</div>
+          <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('app.timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
+          <div class="w-16 sm:w-auto">{{ $t('app.timePeriod.minute', { count: 2 }) }}</div>
         </div>
       </div>
     </template>
@@ -206,6 +220,7 @@
       </div>
       <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
         <DgaUserSearch class="flex-1 max-w-xl" :placeholder="$t('app.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
+        <!-- <DgaInput class="flex-1 max-w-xl" :placeholder="$t('app.voterList.searchUser')"></DgaInput> -->
       </div>
     </div>
     <template v-if="!noCoadmin">
@@ -250,6 +265,10 @@
       <label class="flex-none"> {{ $t('app.topic.notifyUsers') }}</label>
     </div>
     <div class="col-span-12 flex flex-row items-center gap-2">
+      <DgaCheckbox v-model="topicData.showCreator"></DgaCheckbox> 
+      <label class="flex-none"> {{ $t('app.topic.showCreator') }}</label>
+    </div>
+    <div class="col-span-12 flex flex-row items-center gap-2">
       <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
       <label class="flex-none"> {{ $t('app.topic.skipBlockchain') }}</label>
     </div>
@@ -283,7 +302,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import dayjs from 'dayjs';
 import buddhistEra from 'dayjs/plugin/buddhistEra';
 import { getPrettyFullName } from '~/src/services/formatter/user';
-import { getDefaultChoices } from '~/src/services/form/topic';
+import { getDefaultChoices, getDefaultInternalTopicFilter, topicTypes } from '~/src/services/form/topic';
 import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
 import { voterCountOf } from '~/src/services/validations/user';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
@@ -325,6 +344,8 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
+  type: "private",
+  internalFilter: getDefaultInternalTopicFilter(),
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
@@ -332,11 +353,11 @@ const topicData = ref<TopicFormData>({
   coadmins: [],
   multipleVotes: false,
   distinctVotes: false,
-  publicVote: true,
   anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
+  showCreator: false,
   recoredToBlockchain: true,
   images: [],
 });
@@ -376,10 +397,11 @@ watch(coadminsRef, (value) => {
   }
 }, { deep: true, immediate: true });
 
-const votePublicOptions = computed(() => [
-  { label: i18n.t('app.publicVote'), value: true },
-  { label: i18n.t('app.privateVote'), value: false }
-]);
+const votePublicOptions = computed(() => {
+  return topicTypes.map((val) => {
+    return { label: i18n.t(`app.topicType.${val}`, val), value: val };
+  })
+});
 
 const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mode) => {
   return {

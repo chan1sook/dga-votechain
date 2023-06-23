@@ -8,7 +8,7 @@
         :href="localePathOf('/permissions/approve')"
       >
         <AccountPlusOutlineIcon />
-        {{ $t('requestPermissions.manageApproveList') }}
+        {{ $t('app.requestPermissions.manageApproveList') }}
       </DgaButton>
     </div>
     <div class="grid grid-cols-12 py-2 gap-2 mx-auto max-w-5xl">
@@ -21,10 +21,10 @@
               <template #role>{{ $t(`role.${ele.role}`, ele.role) }}</template>
               <div> 
                 <span v-if="userNameOf(ele)">{{ userNameOf(ele) }}</span>
-                <span class="italic" v-else>{{ $t("navbar.user.anonymous") }}</span>
+                <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
               </div>
               <div>
-                <span class="font-bold"></span>{{ $t('requestPermissions.email') }}: 
+                <span class="font-bold"></span>{{ $t('app.email') }}: 
                 <template v-if="ele.email">{{ ele.email }}</template>
                 <span class="italic" v-else>-</span>
               </div>
@@ -35,10 +35,10 @@
                 <template #role>{{ $t(`role.${selectedUser.role}`, selectedUser.role) }}</template>
                 <div> 
                   <span v-if="userNameOf(selectedUser)">{{ userNameOf(selectedUser) }}</span>
-                  <span class="italic" v-else>{{ $t("navbar.user.anonymous") }}</span>
+                  <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
                 </div>
                 <div>
-                  <span class="font-bold"></span>{{ $t('requestPermissions.email') }}: 
+                  <span class="font-bold"></span>{{ $t('app.email') }}: 
                   <template v-if="selectedUser.email">{{ selectedUser.email }}</template>
                   <span class="italic" v-else>-</span>
                 </div>
@@ -62,7 +62,7 @@ const i18n = useI18n();
 const localePathOf = useLocalePath();
 
 definePageMeta({
-  middleware: ["auth-admin"]
+  middleware: ["auth-dev"]
 })
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.user.title')}`

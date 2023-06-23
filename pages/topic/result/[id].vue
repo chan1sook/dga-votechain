@@ -4,9 +4,17 @@
     <div class="text-2xl font-bold text-center">{{ voteResult.name }}</div>
     <div class="grid grid-cols-2 gap-2 my-2">
       <div class="col-span-2 flex flex-row items-center gap-2 mb-4 flex-wrap">
-        <div class="flex-1 w-full lg:w-auto lg:flex-none flex flex-row gap-2 items-start">
-          <h3 class="font-bold whitespace-nowrap">{{ $t('app.ticketid')}}:</h3>
-          <span>#{{ topicid }}</span>
+        <div class="flex-1 w-full lg:w-auto lg:flex-none flex flex-col gap-2">
+          <div class="topic-type" :class="[ voteResult.type ]">
+            {{ $t(`app.topicType.${voteResult.type}`, voteResult.type) }}
+          </div>
+          <div v-if="voteResult.createdBy">
+            {{ $t('app.voting.createdBy') }} {{ formatCreatedByName(voteResult.createdBy) }}
+          </div>
+          <div class="flex-1 w-full lg:w-auto lg:flex-none flex flex-row gap-2 items-start">
+            <h3 class="font-bold whitespace-nowrap">{{ $t('app.ticketid')}}:</h3>
+            <span>#{{ topicid }}</span>
+          </div>
         </div>
         <DgaButton class="w-full max-w-[200px] mx-auto lg:mr-0 whitespace-nowrap" theme="hollow" color="dga-orange" @click="exportResult">{{  $t('app.result.export') }}</DgaButton>
       </div>
@@ -32,95 +40,85 @@
     <div class="max-w-4xl mx-auto grid grid-cols-12 items-center gap-y-1 gap-x-2 mb-4">
       <h3 class="col-span-12 font-bold text-xl">{{ $t('app.result.stats')}}</h3>
       <div class="hidden sm:block sm:col-span-2 my-2"></div>
-      <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.totalVoters')}}</div>
-          <div>100.00% |</div>
-          <div>
-            {{ voteResult.stats.voters.total }}  {{  $t('app.countable.voter', { count: voteResult.stats.voters.total}) }}
-          </div>
-        </div>
-      </div>
+      <DgaReportBar class="col-span-10 sm:col-span-8">
+        {{ $t('app.result.totalVoters')}}
+        <template #percent>100.00%</template>
+        <template #count>
+          {{ voteResult.stats.voters.total }} {{ $t('app.countable.voter', { count: voteResult.stats.voters.total}) }}
+        </template>
+      </DgaReportBar>
       <div class="col-span-2 my-2"></div>
       <div class="hidden sm:block sm:col-span-2"></div>
-      <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1 border-2 border-dga-blue">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.votedVoters')}}</div>
-          <div>{{ getPercentOf(voteResult.stats.voters.voted, voteResult.stats.voters.total).toFixed(2) }}% |</div>
-          <div>
-            {{ voteResult.stats.voters.voted }}  {{  $t('app.countable.voter', { count: voteResult.stats.voters.voted }) }}
-          </div>
-        </div>
-        <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-          :style="{ width: getPercentOf(voteResult.stats.voters.voted, voteResult.stats.voters.total).toFixed(2) + '%'}"
-        ></div>
-      </div>
+      <DgaReportBar with-border class="col-span-10 sm:col-span-8"
+        :bar-percent="getPercentOf(voteResult.stats.voters.voted, voteResult.stats.voters.total)" 
+      >
+        {{ $t('app.result.votedVoters')}}
+        <template #percent>
+          {{ getPercentOf(voteResult.stats.voters.voted, voteResult.stats.voters.total).toFixed(2) }}%
+        </template>
+        <template #count>
+          {{ voteResult.stats.voters.voted }} {{ $t('app.countable.voter', { count: voteResult.stats.voters.voted }) }}
+        </template>
+      </DgaReportBar>
       <div class="col-span-2"></div>
       <div class="hidden sm:block sm:col-span-2"></div>
-      <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1 border-2 border-dga-blue">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.noVotedVoters')}}</div>
-          <div>{{ getPercentOf(absentVoters, voteResult.stats.voters.total).toFixed(2) }}% |</div>
-          <div>
-            {{ absentVoters }}  {{  $t('app.countable.voter', { count: absentVoters }) }}
-          </div>
-        </div>
-        <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-          :style="{ width: getPercentOf(absentVoters, voteResult.stats.voters.total).toFixed(2) + '%'}"
-        ></div>
-      </div>
+      <DgaReportBar with-border class="col-span-10 sm:col-span-8"
+        :bar-percent="getPercentOf(absentVoters, voteResult.stats.voters.total)" 
+      >
+        {{ $t('app.result.noVotedVoters')}}
+        <template #percent>
+          {{ getPercentOf(absentVoters, voteResult.stats.voters.total).toFixed(2) }}%
+        </template>
+        <template #count>
+          {{ absentVoters }} {{ $t('app.countable.voter', { count: absentVoters }) }}
+        </template>
+      </DgaReportBar>
       <div class="col-span-2"></div>
       <div class="hidden sm:block sm:col-span-2 my-2"></div>
-      <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.totalVotes') }}</div>
-          <div>100.00% |</div>
-          <div>
-            {{ totalVoteStats }}  {{  $t('app.countable.vote', { count: totalVoteStats }) }}
-          </div>
-        </div>
-      </div>
+      <DgaReportBar class="col-span-10 sm:col-span-8">
+        {{ $t('app.result.totalVotes') }}
+        <template #percent>100.00%</template>
+        <template #count>
+          {{ totalVoteStats }} {{  $t('app.countable.vote', { count: totalVoteStats }) }}
+        </template>
+      </DgaReportBar>
       <div class="col-span-2 my-2"></div>
       <div class="hidden sm:block sm:col-span-2"></div>
-      <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1 border-2 border-dga-blue">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.actualVotes') }}</div>
-          <div>{{ getPercentOf(actualVoteStats, totalVoteStats).toFixed(2) }}% |</div>
-          <div>
-            {{ actualVoteStats }}  {{  $t('app.countable.vote', { count: actualVoteStats }) }}
-          </div>
-        </div>
-        <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-          :style="{ width: getPercentOf(actualVoteStats, totalVoteStats).toFixed(2) + '%'}"
-        ></div>
-      </div>
+      <DgaReportBar with-border class="col-span-10 sm:col-span-8"
+        :bar-percent="getPercentOf(actualVoteStats, totalVoteStats)" 
+      >
+        {{ $t('app.result.actualVotes') }}
+        <template #percent>
+          {{ getPercentOf(actualVoteStats, totalVoteStats).toFixed(2) }}%
+        </template>
+        <template #count>
+          {{ actualVoteStats }} {{ $t('app.countable.vote', { count: actualVoteStats }) }}
+        </template>
+      </DgaReportBar>
       <div class="col-span-2"></div>
       <div class="hidden sm:block sm:col-span-2"></div>
-      <div class="col-span-10 sm:col-span-8 relative rounded-md px-2 py-1 border-2 border-dga-blue">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.remainVotes') }}</div>
-          <div>{{ getPercentOf(absentVotes, totalVoteStats).toFixed(2) }}% |</div>
-          <div>
-            {{ absentVotes }}  {{  $t('app.countable.vote', { count: absentVotes }) }}
-          </div>
-        </div>
-        <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-          :style="{ width: getPercentOf(absentVotes, totalVoteStats).toFixed(2) + '%'}"
-        ></div>
-      </div>
+      <DgaReportBar with-border class="col-span-10 sm:col-span-8"
+        :bar-percent="getPercentOf(absentVotes, totalVoteStats)" 
+      >
+        {{ $t('app.result.remainVotes') }}
+        <template #percent>
+          {{ getPercentOf(absentVotes, totalVoteStats).toFixed(2) }}%
+        </template>
+        <template #count>
+          {{ absentVotes }} {{ $t('app.countable.vote', { count: absentVotes }) }}
+        </template>
+      </DgaReportBar>
     </div>
     <div class="max-w-4xl mx-auto grid grid-cols-12 items-center gap-y-1 gap-x-2 mb-4">
       <h3 class="col-span-12 font-bold text-xl">{{ $t('app.result.scores')}}</h3>
       <div class="hidden sm:block sm:col-span-2"></div>
-      <div class="col-span-10 sm:col-span-8 flex flex-row gap-2 px-2 py-1 mb-4">
-        <div class="flex-1 flex flex-row gap-2 items-center">
-          <div class="flex-1">{{ $t('app.result.total')}}</div>
-          <div>100.00% |</div>
-          <div>
-            {{ totalVotes }}  {{ $t('app.voting.vote' , { count: totalVotes })}}
-          </div>
-        </div>
-      </div>
+      <DgaReportBar class="col-span-10 sm:col-span-8">
+        {{ $t('app.result.total')}}
+        <template #percent>100.00%</template>
+        <template #count>
+          {{ totalVotes }} {{ $t('app.voting.vote' , { count: totalVotes })}}
+        </template>
+      </DgaReportBar>
       <div class="col-span-2"></div>
       <template v-for="choice of voteResult.choices.choices">
         <div class="hidden sm:block sm:col-span-2 text-right">
@@ -131,25 +129,18 @@
             ===>
           </template>
         </div>
-        <div class="col-span-10 sm:col-span-8 relative rounded-md border-2 border-dga-blue">
-          <div class="flex flex-row gap-2 px-2 py-1">
-            <div class="flex-1 flex flex-row items-center gap-2">
-              <div class="flex-1 flex flex-row gap-2 items-center">
-                <div>{{ choice.name }}</div>
-                <img v-if="haveImage" :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/>
-              </div>
-              <template v-if="getScoreOf(choice.name)">
-                <div class="flex-1 text-right">{{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}% |</div>
-                <div>
-                  {{ getScoreOf(choice.name)?.count }} {{ $t('app.voting.vote' , { count: getScoreOf(choice.name).count })}}
-                </div>
-              </template>
-            </div>
-          </div>
-          <div class="absolute left-0 top-0 bottom-0 bg-dga-blue opacity-25"
-            :style="{ width: getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) + '%'}"
-          ></div>
-        </div>
+        <DgaReportBar with-border class="col-span-10 sm:col-span-8"
+          :bar-percent="getPercentOf(getScoreOf(choice.name).count, totalVotes)" 
+        >
+          <span>{{ choice.name }}</span>
+          <img v-if="haveImage" :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/> 
+          <template #percent>
+            {{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}%
+          </template>
+          <template #count>
+            {{ getScoreOf(choice.name)?.count || 0 }} {{ $t('app.voting.vote', { count: getScoreOf(choice.name).count })}}
+          </template>
+        </DgaReportBar>
         <div class="col-span-2">
           <span v-if="getRanking(choice.name)">
             #{{ getRanking(choice.name)?.rank }}
@@ -165,16 +156,13 @@
             x{{ countYourVoteOf(null) }} =>
           </template>
         </div>
-        <div class="col-span-10 sm:col-span-8 relative mt-2 border-2 rounded-md border-dga-blue">
-          <div class="flex flex-row gap-2 px-2 py-1 ">
-            <div class="flex-1 flex flex-row gap-2 items-center">
-              <div class="flex-1">{{ $t('app.result.noVoted')}}</div>
-              <div>
-                {{ getScoreOf(null).count }} {{ $t('app.voting.vote' , { count: totalVotes - getScoreOf(null).count })}}
-              </div>
-            </div>
-          </div>
-        </div>
+        <DgaReportBar with-border class="col-span-10 sm:col-span-8">
+          {{ $t('app.result.noVoted')}}
+          <template #percent></template>
+          <template #count>
+            {{ getScoreOf(null).count }} {{ $t('app.voting.vote' , { count: totalVotes - getScoreOf(null).count })}}
+          </template>
+        </DgaReportBar>
         <div class="col-span-2 mt-2"></div>
       </template>
     </div>
@@ -203,7 +191,7 @@
 
 <script setup lang="ts">
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
-import { getPrettyFullName } from '~/src/services/formatter/user';
+import { formatCreatedByName, getPrettyFullName } from '~/src/services/formatter/user';
 
 const i18n = useI18n();
 
@@ -333,3 +321,15 @@ function countYourVoteOf(choice: ChoiceDataType) {
 }
 
 </script>
+
+<style scoped>
+.topic-type.private {
+  @apply text-xl text-red-700;
+}
+.topic-type.public {
+  @apply text-green-700;
+}
+.topic-type.public {
+  @apply text-blue-700
+}
+</style>

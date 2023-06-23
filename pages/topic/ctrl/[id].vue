@@ -87,7 +87,7 @@ import PlayIcon from 'vue-material-design-icons/Play.vue';
 
 import dayjs from "dayjs";
 import { formatDateTime, perttyDuration } from '~/src/services/formatter/datetime';
-import { isTopicExpired } from '~/src/services/validations/topic';
+import { isTopicExpired, isTopicReadyToVote } from '~/src/services/validations/topic';
 import { getPrettyFullName } from '~/src/services/formatter/user';
 
 definePageMeta({
@@ -158,7 +158,12 @@ if (!data.value) {
     anonyomusVotes: _anonVoteGroups,
   } = data.value;
 
-  if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
+  if(!isTopicReadyToVote(_topic, useComputedServerTime().getTime())) {
+    showError({
+      message: i18n.t('app.voting.error.waiting'),
+      statusCode: 403,
+    })
+  } else if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
     navigateTo(`/topic/result/${_topic._id}`);
   } else {
     topic.value = _topic;

@@ -20,6 +20,14 @@ export default defineEventHandler(async (event) => {
     });
   }
   
+  const { public: { ALLOW_WITHDRAW_USER } } = useRuntimeConfig();
+  if(!ALLOW_WITHDRAW_USER) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: "Temporary Disabled",
+    });
+  }
+  
   const userDoc = await UserModel.findById(userData._id);
   if(!userDoc) {
     throw createError({

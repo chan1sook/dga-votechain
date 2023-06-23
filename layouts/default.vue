@@ -10,6 +10,7 @@
 </template>
 
 <script setup lang="ts">
+import Cookie from "js-cookie"
 import DgaToastController from '~/components/DgaToastController.vue';
 const i18n = useI18n();
 const cookieConsentShow = ref(false);
@@ -36,34 +37,39 @@ useHead({
   ],
 });
 
-const cookieName = "cc"
+const ccCookieName = "cc"
 onMounted(async () => {
   document.body.addEventListener("click", () => {
     useVisibleMenuGroup().value = undefined;
   })
   
-  const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
+  const cc = useCookie(ccCookieName, { secure: true, sameSite: "lax"});
   cookieConsentShow.value = !Boolean(cc.value);
   enforceCookie(cc.value);
 })
 
+const requiredCC = ["cc", "i18n_redirected", "sid"];
+
 function enforceCookie(value: string | null | undefined) {
-  if(value === "all") {
-    // all
-  } else {
-    /// required only
+  if(value !== "all") {
+    const keys = Object.keys(Cookie.get())
+    for(const key of keys) {
+      if(!requiredCC.includes(key)) {
+        useCookie(key).value = null;
+      }
+    }
   }
 }
 
 function acceptAllCookies() {
-  const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
+  const cc = useCookie(ccCookieName, { secure: true, sameSite: "lax"});
   cc.value = "all";
   cookieConsentShow.value = false;
   enforceCookie(cc.value);
 }
 
 function acceptRequiredOnly() {
-  const cc = useCookie(cookieName, { secure: true, sameSite: "lax"});
+  const cc = useCookie(ccCookieName, { secure: true, sameSite: "lax"});
   cc.value = "required";
   cookieConsentShow.value = false;
   enforceCookie(cc.value);
