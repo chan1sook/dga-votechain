@@ -91,11 +91,11 @@ export default defineEventHandler(async (event) => {
     yourVotes = _yourVotes.map((ele) => ele.choice)
   }
 
-  const listedUserVotes = votes.filter((ele) => {
-    return ele.userid && votersData.find((ele2) => ele2.userid._id.toString() === ele.userid?.toString());
+  const listedUserVotes = votes.filter((vote) => {
+    return vote.userid && votersData.find((voter) => voter.userid._id.toString() === vote.userid?.toString());
   });
 
-  const anonVotes = votes.filter((ele) => !listedUserVotes.includes(ele)).map((ele) => {
+  const anonVotes = votes.filter((vote) => !listedUserVotes.includes(vote)).map((ele) => {
     return ele.userid ? ele.userid.toString() : ele.groupid;
   });
   const anonCountDistint = anonVotes.reduce((prev, current, i, arr) => {
@@ -106,7 +106,9 @@ export default defineEventHandler(async (event) => {
   }, 0);
 
   const voterTotal = votersData.length  + anonCountDistint;
-  const voterVoted =  voterTotal - votersData.filter((ele) => ele.remainVotes >= ele.totalVotes).length;
+  const voterVoted = voterTotal - votersData.filter((voter) => {
+    return voter.remainVotes <= voter.totalVotes || votes.find((vote) => vote.userid && vote.userid.toString() === voter.userid._id.toString());
+  }).length;
 
   const voteResult : TopicResultResponse = {
     _id: `${topicDoc._id}`,

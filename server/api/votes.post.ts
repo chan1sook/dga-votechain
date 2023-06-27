@@ -34,6 +34,13 @@ export default defineEventHandler(async (event) => {
   let voterAllowData;
   const userData = event.context.userData;
 
+  if(userData) {
+    voterAllowData = await VoterAllowModel.findOne({
+      userid: userData._id,
+      topicid: topicDoc._id,
+    });
+  }
+
   if(topicDoc.type === "internal" && userData && !isUserInMatchInternalTopic(topicDoc.internalFilter, userData)) {
     throw createError({
       statusCode: 403,
@@ -41,20 +48,8 @@ export default defineEventHandler(async (event) => {
     });
   } else if(!isAnonymousTopic(topicDoc)) {
     if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") ||
-      userData.roleMode !== "voter" || isBannedUser(userData)
+      userData.roleMode !== "voter" || isBannedUser(userData) || !voterAllowData
     ) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-      });
-    }
-
-    voterAllowData = await VoterAllowModel.findOne({
-      userid: userData?._id,
-      topicid: topicDoc._id,
-    });
-
-    if(!voterAllowData) {
       throw createError({
         statusCode: 403,
         statusMessage: "Forbidden",
