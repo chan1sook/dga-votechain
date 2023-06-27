@@ -91,12 +91,13 @@ export default defineEventHandler(async (event) => {
     yourVotes = _yourVotes.map((ele) => ele.choice)
   }
 
-  if(event.context.params?.id === "649a5333dfa5bc4a4edb4943") {
-    console.log(votersData,votes)
-  }
-  
-  const userVotes = votes.filter((ele) => ele.userid);
-  const anonVotes = votes.filter((ele) => !ele.userid).map((ele) => ele.groupid);
+  const listedUserVotes = votes.filter((ele) => {
+    return ele.userid && votersData.find((ele2) => ele2.userid._id.toString() === ele.userid?.toString());
+  });
+
+  const anonVotes = votes.filter((ele) => !listedUserVotes.includes(ele)).map((ele) => {
+    return ele.userid ? ele.userid.toString() : ele.groupid;
+  });
   const anonCountDistint = anonVotes.reduce((prev, current, i, arr) => {
     if(arr.indexOf(current) === i) {
       return prev + 1
@@ -104,7 +105,7 @@ export default defineEventHandler(async (event) => {
     return prev;
   }, 0);
 
-  const voterTotal = votersData.length + anonCountDistint;
+  const voterTotal = votersData.length  + anonCountDistint;
   const voterVoted =  voterTotal - votersData.filter((ele) => ele.remainVotes >= ele.totalVotes).length;
 
   const voteResult : TopicResultResponse = {
@@ -126,13 +127,13 @@ export default defineEventHandler(async (event) => {
     yourVotes: userData ? yourVotes : undefined,
     stats: {
       voters: {
-        total: voterTotal, // 7
-        voted: voterVoted, // 6
+        total: voterTotal,
+        voted: voterVoted,
       },
       votes: {
-        quota: votersData.reduce((prev, current) => current.totalVotes + prev, 0), // 1
-        anonymous: anonVotes.length, // 6
-        user: userVotes.length, //5
+        quota: votersData.reduce((prev, current) => current.totalVotes + prev, 0),
+        anonymous: anonVotes.length,
+        user: listedUserVotes.length,
       }
     },
     scores,
