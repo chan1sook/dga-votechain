@@ -12,7 +12,7 @@
           <div>
             <NuxtLink href="#" class="underline">ส่งข้อเสนอแนะ</NuxtLink> |   
             <NuxtLink href="#" class="underline">เงื่อนไขและข้อตกลง</NuxtLink> |
-            <NuxtLink href="/private-policy" class="underline">ความเป็นส่วนตัว</NuxtLink>
+            <NuxtLink href="/privacy-policy" class="underline">ความเป็นส่วนตัว</NuxtLink>
           </div>
           <div>
             {{ $t('contactUs.info.contactCenter') }} <a href="tel:+6626126060">(+66) 02 612 6060</a>
