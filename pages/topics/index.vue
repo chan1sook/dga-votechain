@@ -22,7 +22,7 @@
         <DgaInput v-model="filter.keyword" :placeholder="$t('app.voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
       <div class="w-full lg:w-72 flex flex-row gap-2 items-center">
-        <div class="whitespace-nowrap">{{ $t('app.topic.accessModifier') }}</div>
+        <div class="whitespace-nowrap">{{ $t('app.voting.filters.accessModifier') }}</div>
         <DgaVueSelect
           v-if="useSessionData().value.roleMode !== 'guest'"
           v-model="filter.topicType" :options="topciTypeFilterOptions" class="flex-1"

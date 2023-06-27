@@ -145,6 +145,7 @@ export default {
         date: "From Date",
         ticketId: "From Ticket Vote",
         topicName: "From Topic Question",
+        accessModifier: "Display Only",
         ticketIdPlaceholder: "#Ticket Vote",
         topicNamePlaceholder: "Topic Question",
         search: "Go",

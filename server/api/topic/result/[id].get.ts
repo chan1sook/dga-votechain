@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const userVotes = votes.filter((ele) => ele.userid);
-  const anonVotes = votes.filter((ele) => !ele.userid && ele.groupid).map((ele) => ele.groupid);
+  const anonVotes = votes.filter((ele) => !ele.userid).map((ele) => ele.groupid);
   const anonCountDistint = anonVotes.reduce((prev, current, i, arr) => {
     if(arr.indexOf(current) === i) {
       return prev + 1

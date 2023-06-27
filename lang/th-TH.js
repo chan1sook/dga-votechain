@@ -146,6 +146,7 @@ export default {
         date: "จากวันที่",
         ticketId: "จาก Ticket Vote",
         topicName: "จากชื่อคำถาม",
+        accessModifier: "แสดงเฉพาะ",
         ticketIdPlaceholder: "#Ticket Vote",
         topicNamePlaceholder: "ชื่อคำถาม",
         search: "ค้นหา",
