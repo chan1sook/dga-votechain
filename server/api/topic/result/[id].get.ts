@@ -91,8 +91,6 @@ export default defineEventHandler(async (event) => {
     yourVotes = _yourVotes.map((ele) => ele.choice)
   }
 
-  console.log(votes.map((ele) => ele.userid));
-  
   const userVotes = votes.filter((ele) => ele.userid);
   const anonVotes = votes.filter((ele) => !ele.userid).map((ele) => ele.groupid);
   const anonCountDistint = anonVotes.reduce((prev, current, i, arr) => {
@@ -105,6 +103,8 @@ export default defineEventHandler(async (event) => {
   const voterTotal = votersData.length + anonCountDistint;
   const voterVoted =  voterTotal - votersData.filter((ele) => ele.remainVotes >= ele.totalVotes).length;
 
+  console.log(votersData);
+  
   const voteResult : TopicResultResponse = {
     _id: `${topicDoc._id}`,
     name: topicDoc.name,

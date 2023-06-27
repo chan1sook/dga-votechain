@@ -329,7 +329,7 @@ function countYourVoteOf(choice: ChoiceDataType) {
 .topic-type.public {
   @apply text-green-700;
 }
-.topic-type.public {
+.topic-type.internal {
   @apply text-blue-700
 }
 </style>
