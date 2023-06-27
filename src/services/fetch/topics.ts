@@ -51,17 +51,19 @@ export function getLastestVoterTopicsWithIds(ids: Types.ObjectId[], userdata: Us
   };
 
   if(userdata.isGovOfficer) {
-    const internalFilterQuery : FilterQuery<TopicModelData> = {
-      internalFilter: {
-        ministry: userdata.ministry,
-        $or: [
-          { department: userdata.department, },
-          { withDepartment: false },
-        ]
+    const internalFilterQuery = [
+      {
+        type: "internal",
+        "internalFilter.ministry": userdata.ministry,
+        "internalFilter.withDepartment": false,
+      },
+      {
+        type: "internal",
+        "internalFilter.ministry": userdata.ministry,
+        "internalFilter.department": userdata.department,
       }
-    }
-
-    query.$or?.push(internalFilterQuery)
+    ];
+    query.$or?.push(...internalFilterQuery)
   }
   
 
@@ -91,6 +93,7 @@ export function getLastestVoterTopicsWithIds(ids: Types.ObjectId[], userdata: Us
       query.type = filter.topicType;
     }
   }
+
   return TopicModel.find(query).limit(filter?.pagesize || 50).sort({_id: -1 });
 };
 

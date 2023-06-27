@@ -91,6 +91,10 @@ export default defineEventHandler(async (event) => {
     yourVotes = _yourVotes.map((ele) => ele.choice)
   }
 
+  if(event.context.params?.id === "649a5333dfa5bc4a4edb4943") {
+    console.log(votersData,votes)
+  }
+  
   const userVotes = votes.filter((ele) => ele.userid);
   const anonVotes = votes.filter((ele) => !ele.userid).map((ele) => ele.groupid);
   const anonCountDistint = anonVotes.reduce((prev, current, i, arr) => {
@@ -103,8 +107,6 @@ export default defineEventHandler(async (event) => {
   const voterTotal = votersData.length + anonCountDistint;
   const voterVoted =  voterTotal - votersData.filter((ele) => ele.remainVotes >= ele.totalVotes).length;
 
-  console.log(votersData);
-  
   const voteResult : TopicResultResponse = {
     _id: `${topicDoc._id}`,
     name: topicDoc.name,
@@ -124,13 +126,13 @@ export default defineEventHandler(async (event) => {
     yourVotes: userData ? yourVotes : undefined,
     stats: {
       voters: {
-        total: voterTotal,
-        voted: voterVoted,
+        total: voterTotal, // 7
+        voted: voterVoted, // 6
       },
       votes: {
-        quota: votersData.reduce((prev, current) => current.totalVotes + prev, 0),
-        anonymous: anonVotes.length,
-        user: userVotes.length,
+        quota: votersData.reduce((prev, current) => current.totalVotes + prev, 0), // 1
+        anonymous: anonVotes.length, // 6
+        user: userVotes.length, //5
       }
     },
     scores,
