@@ -107,10 +107,7 @@ export default defineEventHandler(async (event) => {
 
   const voterTotal = votersData.length  + anonCountDistint;
   const voterVoted = voterTotal - votersData.filter((voter) => {
-    return voter.remainVotes <= voter.totalVotes || votes.find((vote) => {
-      if(event.context.params?.id === "649a5333dfa5bc4a4edb4943") {
-        console.log(vote.userid?.toString(), voter.userid._id.toString());
-      }
+    return voter.remainVotes >= voter.totalVotes && !votes.find((vote) => {
       return vote.userid && vote.userid.toString() === voter.userid._id.toString();
     });
   }).length;
