@@ -1,6 +1,7 @@
 import { type Types } from "mongoose";
 
 declare global {
+  // "firebase" @deprecated 
   type UserAuthSource = "digitalId" | "firebase";
   type UserRole = "guest" | "voter" | "admin" | "developer";
   
@@ -14,11 +15,15 @@ declare global {
     ministry?: string,
     department?: string,
     division?: string,
-    hashedCitizenId: string,
+    cidHashed?: string,
     createdAt: Date,
     updatedAt: Date,
-    group: string[],
     preferences: UserPreferences,
+    bannedUntil?: Date,
+    removeAt?: Date,
+    removed?: boolean,
+    // @deprecated
+    hashedCitizenId?: string,
   }
 
   interface UserModelDataWithId extends UserModelData {

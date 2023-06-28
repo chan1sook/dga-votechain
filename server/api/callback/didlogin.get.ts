@@ -3,15 +3,15 @@ import bcrypt from "bcrypt";
 
 import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~/src/services/fetch/digital-id";
 import UserModel from "~/src/models/user"
-import { legacyRoleToPermissions } from "~/src/services/transform/permission";
+import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
-import { getUserByAuthSource, getUserByEmail } from "~/server/utils";
+import { getActiveUserByAuthSource, getActiveUserByCitizenID, getActiveUserByEmail }  from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, BCRYPT_SALT_ROUND, public: { DID_API_URL },  } = useRuntimeConfig()
-
+  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, public: { DID_API_URL },  } = useRuntimeConfig()
 
   if(typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE });
@@ -22,53 +22,65 @@ export default defineEventHandler(async (event) => {
       authSource: "digitalId",
       digitalIdUserId: digitalIdUserInfo.user_id
     };
-    let userDoc = await getUserByAuthSource(authSource);
+    let userDoc = await getActiveUserByAuthSource(authSource);
+
+
+    if(!userDoc) {
+      userDoc = await getActiveUserByCitizenID(digitalIdUserInfo.citizen_id);
+    }
+
+    if(!userDoc) {
+      userDoc = await getActiveUserByEmail(digitalIdUserInfo.email);
+    }
+
+    if(!userDoc) {
+      userDoc = new UserModel({
+        permissions: legacyRoleToPermissions("admin"),
+        authSources: [
+          { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
+        ],
+        firstName: digitalIdUserInfo.given_name,
+        lastName: digitalIdUserInfo.family_name,
+        email: digitalIdUserInfo.email,
+      });
+    }
 
     if(userDoc) {
+      const authSource : UserAuthSourceData = { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id };
+      if(!userDoc.authSources.find((ele) => JSON.stringify(ele) === JSON.stringify(authSource))) {
+        userDoc.authSources.push(authSource);
+      }
+      
+      // auto apply some
       if(!userDoc.firstName) {
         userDoc.firstName = digitalIdUserInfo.given_name;
       }
+
       if(!userDoc.lastName) {
         userDoc.lastName = digitalIdUserInfo.family_name;
       }
+
       if(!userDoc.email) {
         userDoc.email = digitalIdUserInfo.email;
       }
-      if(!userDoc.hashedCitizenId) {
-        const hashedCitizenID = bcrypt.hashSync(digitalIdUserInfo.citizen_id, BCRYPT_SALT_ROUND);
-        userDoc.hashedCitizenId = hashedCitizenID;
+
+      if(!userDoc.cidHashed) {
+        const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
+        userDoc.cidHashed = cidHashed;
       }
+
+      // Predefine dev at login
+      if(PREDEFINED_DEV_USERS.includes(digitalIdUserInfo.user_id)) {
+        userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("developer"));
+      }
+
       await userDoc.save();
-    } else {
-      userDoc = await getUserByEmail(digitalIdUserInfo.email);
-      if(!userDoc) {
-        const hashedCitizenID = bcrypt.hashSync(digitalIdUserInfo.citizen_id, BCRYPT_SALT_ROUND);
-        
-        userDoc = new UserModel({
-          permissions: legacyRoleToPermissions("admin"),
-          authSources: [
-            { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
-          ],
-          firstName: digitalIdUserInfo.given_name,
-          lastName: digitalIdUserInfo.family_name,
-          email: digitalIdUserInfo.email,
-          hashedCitizenId: hashedCitizenID,
-        });
-        await userDoc.save();
-      } else {
-        if(!userDoc.hashedCitizenId) {
-          const hashedCitizenID = bcrypt.hashSync(digitalIdUserInfo.citizen_id, BCRYPT_SALT_ROUND);
-          userDoc.hashedCitizenId = hashedCitizenID;
-        }
-        
-        userDoc.authSources.push({ authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id });
-        userDoc.markModified("authSources");
-        await userDoc.save();
-      }
     }
 
     let defaultRoleMode : UserRole = "voter";
-    if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
+    if(isBannedUser(userDoc)) {
+      defaultRoleMode = "guest";
+    } else if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
       defaultRoleMode = "admin";
     }
 

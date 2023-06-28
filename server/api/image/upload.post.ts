@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import fs from "fs/promises";
 import { nanoid } from 'nanoid';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { isBannedUser } from '~/src/services/validations/user';
 
 
 const supportMimeTypes = ['image/jpeg', 'image/png'];
@@ -13,7 +13,7 @@ const supportMimeTypes = ['image/jpeg', 'image/png'];
 export default eventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData || !checkPermissionNeeds(userData.permissions, "admin-mode")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "admin-mode")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -32,7 +32,7 @@ export default eventHandler(async (event) => {
     })
   }
 
-  const tempFile = await fs.readFile(file.filepath)
+  const tempFile = await fs.readFile(file.filepath);
   const mineTypeResult = await fileTypeFromBuffer(tempFile);
   if(!mineTypeResult || !supportMimeTypes.includes(mineTypeResult?.mime) || file.mimetype !== mineTypeResult?.mime) {
     throw createError({

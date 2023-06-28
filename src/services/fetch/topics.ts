@@ -8,14 +8,11 @@ import { escapeRegExp } from "../formatter/regexp";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// guest alway public with anonymousVotes
 export function getLastestGuestTopics(filter?: TopicFilterParams) {
   const query : FilterQuery<TopicModelData> = {
     status: "approved",
-    publicVote: true,
-    $or: [
-      { voteExpiredAt: { $lte: new Date() }, },
-      { anonymousVotes: true }
-    ],
+    type: "public",
   };
 
   if(filter) {
@@ -43,14 +40,33 @@ export function getLastestGuestTopics(filter?: TopicFilterParams) {
   return TopicModel.find(query).limit(filter?.pagesize || 50).sort({_id: -1 });
 };
 
-export function getLastestVoterTopicsWithIds(ids: Types.ObjectId[], filter?: TopicFilterParams) {
+// voter topic: public, internal match, voteAllow (ids)
+export function getLastestVoterTopicsWithIds(ids: Types.ObjectId[], userdata: UserSessionData, filter?: TopicFilterParams) {
   const query : FilterQuery<TopicModelData> = {
     status: "approved",
     $or: [
-      { publicVote: true, voteExpiredAt: { $lte: new Date() }, },
+      { type: "public" },
       { _id: { $in: ids }, }
     ],
   };
+
+  if(userdata.isGovOfficer) {
+    const internalFilterQuery = [
+      {
+        type: "internal",
+        "internalFilter.ministry": userdata.ministry,
+        "internalFilter.withDepartment": false,
+      },
+      {
+        type: "internal",
+        "internalFilter.ministry": userdata.ministry,
+        "internalFilter.department": userdata.department,
+      }
+    ];
+    query.$or?.push(...internalFilterQuery)
+  }
+  
+
 
   if(filter) {
     if(filter.type === "ticketId") {
@@ -72,10 +88,16 @@ export function getLastestVoterTopicsWithIds(ids: Types.ObjectId[], filter?: Top
     if(filter.startid) {
       query._id = { $lt: new Types.ObjectId(filter.startid) }
     }
+    
+    if(filter.topicType !== "all") {
+      query.type = filter.topicType;
+    }
   }
+
   return TopicModel.find(query).limit(filter?.pagesize || 50).sort({_id: -1 });
 };
 
+// admin topic is with admin/co-admin
 export function getLastestAdminTopics(userid: Types.ObjectId, filter?: TopicFilterParams) {
   const query : FilterQuery<TopicModelData> = {
     status: "approved",
@@ -104,6 +126,10 @@ export function getLastestAdminTopics(userid: Types.ObjectId, filter?: TopicFilt
 
     if(filter.startid) {
       query._id = { $lt: new Types.ObjectId(filter.startid) }
+    }
+    
+    if(filter.topicType !== "all") {
+      query.type = filter.topicType;
     }
   }
   

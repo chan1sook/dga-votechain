@@ -5,11 +5,11 @@ import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-pause";
 import { isAdminRole } from "~/src/services/validations/role";
 import { getAnonymousVotesByTopicId } from "~/src/services/fetch/vote";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  const isAdminMode = userData && isAdminRole(userData.roleMode);
-  if(!isAdminMode) {
+  if(!userData || isBannedUser(userData) || !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -29,28 +29,30 @@ export default defineEventHandler(async (event) => {
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
-    distinctVotes: topicDoc.distinctVotes,
+    type: topicDoc.type,
+    internalFilter: topicDoc.internalFilter,
     multipleVotes: topicDoc.multipleVotes,
+    distinctVotes: topicDoc.distinctVotes,
     choices: topicDoc.choices,
     durationMode: topicDoc.durationMode,
     voteStartAt: dayjs(topicDoc.voteStartAt).toISOString(),
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
     createdAt: dayjs(topicDoc.createdAt).toISOString(),
     updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
-    createdBy: {
+    createdBy: topicDoc.showCreator ? {
       _id: topicDoc.createdBy._id.toString(),
       firstName: topicDoc.createdBy.firstName,
       lastName: topicDoc.createdBy.lastName,
       email: topicDoc.createdBy.email,
-    },
+    } : undefined,
     updatedBy: topicDoc.updatedBy.toString(),
     admin: topicDoc.admin.toString(),
     coadmins: topicDoc.coadmins.map((ele) => {
       return ele.toString()
     }),
-    publicVote: topicDoc.publicVote,
     anonymousVotes: topicDoc.anonymousVotes,
     defaultVotes: topicDoc.defaultVotes,
+    showCreator: topicDoc.showCreator,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     notifyVoter: topicDoc.notifyVoter,
   };
@@ -75,7 +77,7 @@ export default defineEventHandler(async (event) => {
     }
   }
   
-  if(!topic.publicVote) {
+  if(topic.type !== "public") {
     let isAllowed = false;
 
     // check if is admin
@@ -116,7 +118,7 @@ export default defineEventHandler(async (event) => {
     }
   })
   
-  const coadmins : CoadminFormData[] = coadminDocs.map((ele) => {
+  const coadmins : UserFormData[] = coadminDocs.map((ele) => {
     return {
       userid: ele._id.toString(),
       email: ele.email,

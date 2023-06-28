@@ -19,8 +19,8 @@ function getTopicHeaderNotification(data: NotificationTopicGroup) {
 export function formatNotificationHeader(notification: NotificationUserResponseData) {
   switch(notification.group) {
     case "request-permission":
-      return getRequestPermissionHeaderNotification(notification);
+      return getRequestPermissionHeaderNotification(notification as NotificationRequestGroup);
     case "topic":
-      return getTopicHeaderNotification(notification);      
+      return getTopicHeaderNotification(notification as NotificationTopicGroup);      
   }
 }

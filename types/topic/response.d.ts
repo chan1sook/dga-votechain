@@ -2,7 +2,7 @@ type TopicResponseData = Omit<TopicFormBodyData, "voterAllows" | "admin" | "coad
   _id: string,
   createdAt: DateString,
   updatedAt: DateString,
-  createdBy: UserBasicResponseDataWithId,
+  createdBy?: UserBasicResponseDataWithId,
   updatedBy: string,
   admin: string,
   coadmins: string[],
@@ -13,7 +13,8 @@ type TopicResponseDataExtended = TopicResponseData & {
   pauseData: TopicCtrlPauseResponseData[]
 }
 
-type TopicResultResponse = Pick<TopicResponseData, "_id" | "name" | "description" | "choices" | "voteStartAt" | "voteExpiredAt" | "createdAt" | "updatedAt"> & {
+type TopicResultResponse = Pick<TopicResponseData, "_id" | "name" | "description" | "type" | "choices" | "voteStartAt" | "voteExpiredAt" | "createdAt" | "updatedAt"> & {
+  createdBy?: UserBasicResponseDataWithId,
   stats: {
     voters: {
       total: number,

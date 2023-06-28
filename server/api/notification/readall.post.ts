@@ -5,6 +5,7 @@ import { clearNotifyData } from "~/server/notify-storage";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
+  
   if(!userData) {
     throw createError({
       statusCode: 403,

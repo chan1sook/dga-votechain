@@ -9,58 +9,107 @@
     <div class="col-span-12 md:col-span-2">
       {{ $t('app.topic.accessModifier') }}
     </div>
-    <DgaSelect v-model="topicData.publicVote" class="col-span-12 md:col-span-10" :options="votePublicOptions"></DgaSelect>
-    <div class="col-span-12">
-      <div v-if="topicData.publicVote" class="flex flex-row gap-2 items-center">
+    <DgaVueSelect 
+      v-model="topicData.type" class="col-span-12 md:col-span-10" :options="votePublicOptions"
+      :reduce="val => val.value"
+    ></DgaVueSelect>
+    <div class="col-span-12 flex flex-col gap-2">
+      <div v-if="topicData.type === 'public'" class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.anonymousVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.topic.anonymousVotes') }}</label>
       </div>
+      <template v-else-if="topicData.type === 'internal'">
+        <div class="flex flex-row gap-2 items-center">
+          <DgaMinistryVueSelect class="w-full" v-model="topicData.internalFilter.ministry">
+          </DgaMinistryVueSelect>
+        </div>
+        <div class="flex flex-row gap-2 items-center">
+          <DgaCheckbox v-model="topicData.internalFilter.withDepartment"></DgaCheckbox> 
+          <label class="flex-none">{{ $t('app.topic.withDepartment') }}</label>
+        </div>
+        <div v-if="topicData.internalFilter.withDepartment" class="flex flex-row gap-2 items-center">
+          <DgaInput v-model="topicData.internalFilter.department" class="w-full" :placeholder="$t('app.department')">
+          </DgaInput>
+        </div>
+      </template>
       <div class="flex flex-row gap-2 items-center">
         <DgaCheckbox v-model="topicData.multipleVotes"></DgaCheckbox> 
         <label class="flex-none">{{ $t('app.voterList.multipleVotes') }}</label>
+        <button type="button" @click="showInputHintModal = 'multipleVotes'" :title="$t('app.detail')">
+          <InformationIcon />
+        </button>
       </div>
       <template v-if="topicData.multipleVotes">
         <div class="flex flex-row gap-2 items-center">
           <DgaCheckbox v-model="topicData.distinctVotes"></DgaCheckbox> 
           <label class="flex-none">{{ $t('app.topic.distinctVotes') }}</label>
+          <button type="button" @click="showInputHintModal = 'distinctVotes'" :title="$t('app.detail')">
+            <InformationIcon />
+          </button>
         </div>
         <div class="grid grid-cols-12 gap-2 items-center">
           <div class="col-span-12 md:col-span-2">{{ $t('app.topic.defaultVotes') }}</div>
           <DgaInput v-model.number="topicData.defaultVotes" type="number" 
             min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
-            class="col-span-12 md:col-span-10"></DgaInput>
+            class="col-span-12 md:col-span-10"
+          ></DgaInput>
         </div>
       </template>
     </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.voteDuration.title')}}</h3>
     <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.inputMode')}}</div>
     <div class="col-span-12 md:col-span-10">
-      <DgaSelect v-model="topicData.durationMode" :options="durationModeOptions"></DgaSelect>
+      <DgaVueSelect 
+        v-model="topicData.durationMode" :options="durationModeOptions"
+        :reduce="val => val.value"
+      >
+        <template #year="{ year }">
+          {{ formatYearByLocale(year) }} 
+        </template>
+        <template #year-overlay-value="{ text, value }">
+          {{ formatYearByLocale(value) }} 
+        </template>
+      </DgaVueSelect>
     </div>
     <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.start') }}</div>
     <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-      <VueDatePicker v-model="voteStart" is-24 teleport teleport-center :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"></VueDatePicker>
+      <VueDatePicker 
+        v-model="voteStart" is-24 teleport teleport-center :locale="i18n.locale.value" :clearable="false" 
+        :placeholder="$t('app.topic.voteDuration.startDate')" class="w-full"
+        :format="formatDateByLocale"
+      >
+        <template #year="{ year }">
+          {{ formatYearByLocale(year) }} 
+        </template>
+        <template #year-overlay-value="{ text, value }">
+          {{ formatYearByLocale(value) }} 
+        </template>
+      </VueDatePicker>
     </div>
     <template v-if="topicData.durationMode === 'startEnd'">
       <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.end')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col md:flex-row gap-2">
-        <VueDatePicker v-model="voteEnd" teleport teleport-center :min="startExpiredDateStr" is-24 :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" class="w-full"></VueDatePicker>
+        <VueDatePicker 
+          v-model="voteEnd" teleport teleport-center :min="startExpiredDateStr" is-24 
+          :locale="i18n.locale.value" :clearable="false" :placeholder="$t('app.topic.voteDuration.endDate')" 
+          class="w-full" :format="formatDateByLocale"
+        ></VueDatePicker>
       </div>
     </template>
     <template v-else>
       <div class="col-span-12 md:col-span-2">{{ $t('app.topic.voteDuration.duration')}}</div>
       <div class="col-span-12 md:col-span-10 flex flex-col sm:flex-row gap-2">
         <div class="w-full flex flex-row items-center gap-2">
-          <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
-          <div class="w-16 sm:w-auto">{{ $t('timePeriod.day', { count: 2 }) }}</div>
+          <DgaInput type="number" v-model.number="voteDuration.durationDays" :placeholder="$t('app.timePeriod.day', { count: 2})" min="0" class="w-20 flex-1"></DgaInput>
+          <div class="w-16 sm:w-auto">{{ $t('app.timePeriod.day', { count: 2 }) }}</div>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
-          <DgaInput type="number" v-model.number="voteDuration.durationHours" :placeholder="$t('timePeriod.hour', { count: 2})" min="0" max="23" class="w-20 flex-1"></DgaInput>
-          <div class="w-16 sm:w-auto">{{ $t('timePeriod.hour', { count: 2 }) }}</div>
+          <DgaInput type="number" v-model.number="voteDuration.durationHours" :placeholder="$t('app.timePeriod.hour', { count: 2})" min="0" max="23" class="w-20 flex-1"></DgaInput>
+          <div class="w-16 sm:w-auto">{{ $t('app.timePeriod.hour', { count: 2 }) }}</div>
         </div>
         <div class="w-full flex flex-row items-center gap-2">
-          <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
-          <div class="w-16 sm:w-auto">{{ $t('timePeriod.minute', { count: 2 }) }}</div>
+          <DgaInput type="number" v-model.number="voteDuration.durationMinutes"  :placeholder="$t('app.timePeriod.minute', { count: 2})" min="0" max="59" class="w-20 flex-1"></DgaInput>
+          <div class="w-16 sm:w-auto">{{ $t('app.timePeriod.minute', { count: 2 }) }}</div>
         </div>
       </div>
     </template>
@@ -131,93 +180,58 @@
       </DgaButton>
     </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.voterList.title') }}</h3>
-    <div class="col-span-12 flex flex-col gap-2">
-      <div class="overflow-auto max-h-[50vh]">
-        <div class="user-grid" :class="[topicData.multipleVotes ? 'multichoice' : '']">
-          <div class="font-bold"></div>
-          <div class="font-bold">{{ $t('app.userid') }}</div>
-          <div class="font-bold">{{ $t('app.userName') }}</div>
-          <div class="font-bold">{{ $t('app.email') }}</div>
-          <div v-if="topicData.multipleVotes" class="font-bold">{{ $t('app.voterList.totalVotes')}}</div>
-          <div></div>
-          <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
-          <template v-for="voter of voterAllows">
-            <div>
-              <ExclamationIcon 
-                :class="[isVoterValid(voter) ? 'invisible' : '']"
-                class="text-red-500" 
-                :title="getVoterErrorReason(voter)"
-              />
-            </div>
-            <div>{{ voter.userid }}</div>
-            <div>{{ voter.firstName ? getVoterName(voter) : "-" }}</div>
-            <div>{{ voter.email || "-" }}</div>
-            <div v-if="topicData.multipleVotes">
-              <DgaInput v-model.number="voter.totalVotes" type="number" 
-                min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
-                class="w-full min-w-[100px]" 
-                :placeholder="$t('app.voterList.totalVotes')">
-              </DgaInput>
-            </div>
-            <div>
-              <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                :title="`${$t('app.voterList.remove')} [${getVoterName(voter)}]`"  @click="removeVoter(voter)"
-              >
-                <MinusIcon/>
-              </button>
-            </div>
-          </template>
-        </div>
-      </div>
-      <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
-        <DgaUserSearch class="flex-1 max-w-xl" :placeholder="$t('app.voterList.searchUser')" @select="addVoter"></DgaUserSearch>
-      </div>
-    </div>
+    <DgaUserTable class="col-span-12" :users="voterAllows" :multiple-votes="topicData.multipleVotes"
+      :is-user-valid="isVoterValid" :get-error-reason="getVoterErrorReason"
+      @add="addVoter" @remove="removeVoter" @users="addVoters"
+    >
+      <template #multipleVotes="{ user }">
+        <DgaInput v-model.number="(user as VoterAllowFormData).totalVotes" type="number" 
+          min="1" :max="topicData.distinctVotes ? topicData.choices.choices.length : undefined"
+          class="w-full min-w-[100px]" 
+          :placeholder="$t('app.voterList.totalVotes')">
+        </DgaInput>
+      </template>
+    </DgaUserTable>
     <template v-if="!noCoadmin">
       <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.coadminList.title') }}</h3>
-      <div class="col-span-12 flex flex-col gap-2">
-        <div class="overflow-auto max-h-[50vh]">
-          <div class="user-grid">
-            <div class="font-bold"></div>
-            <div class="font-bold">{{ $t('app.userid') }}</div>
-            <div class="font-bold">{{ $t('app.userName') }}</div>
-            <div class="font-bold">{{ $t('app.email') }}</div>
-            <div></div>
-            <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
-            <template v-for="admin of coadmins">
-              <div>
-                <ExclamationIcon
-                  :class="[isCoadminValid(coadmins, admin) ? 'invisible' : '']"
-                  class="text-red-500" 
-                  :title="getCoadminErrorReason(admin)"
-                />
-              </div>
-              <div>{{ admin.userid }}</div>
-              <div>{{ admin.firstName ? getPrettyFullName(admin) : "-" }}</div>
-              <div>{{ admin.email || "-" }}</div>
-              <div>
-                <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                  :title="`${$t('app.topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
-                >
-                  <MinusIcon />
-                </button>
-              </div>
-            </template>
-          </div>
-        </div>
-        <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
-          <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('app.topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
-        </div>
-      </div>
+      <DgaUserTable class="col-span-12" :users="coadmins" coadmin
+        :is-user-valid="isCoadminValid" :get-error-reason="getCoadminErrorReason"
+        @add="addCoadmin" @remove="removeCoadmin" @users="addCoadmins"
+      >
+      </DgaUserTable>
     </template>
     <div class="col-span-12 flex flex-row items-center gap-2">
       <DgaCheckbox v-model="topicData.notifyVoter"></DgaCheckbox> 
       <label class="flex-none"> {{ $t('app.topic.notifyUsers') }}</label>
     </div>
     <div class="col-span-12 flex flex-row items-center gap-2">
-      <DgaCheckbox v-model="skipBlockchain"></DgaCheckbox> 
-      <label class="flex-none"> {{ $t('app.topic.skipBlockchain') }}</label>
+      <DgaCheckbox v-model="topicData.showCreator"></DgaCheckbox> 
+      <label class="flex-none"> {{ $t('app.topic.showCreator') }}</label>
+      <button type="button" @click="showInputHintModal = 'showCreator'" :title="$t('app.detail')">
+        <InformationIcon />
+      </button>
     </div>
+    <div class="col-span-12 flex flex-row items-center gap-2">
+      <DgaCheckbox v-model="topicData.recoredToBlockchain"></DgaCheckbox> 
+      <label class="flex-none"> {{ $t('app.topic.recordBlockchain') }}</label>
+    </div>
+    <DgaModal :show="showInputHintModal !== false" cancel-backdrop close-only @close="showInputHintModal = false">
+      <template v-if="showInputHintModal === 'multipleVotes'">
+        <p>
+          <b>{{ $t('app.topic.multipleVotes') }}</b> คือ การลงสิทธิ์คะแนน (Ballot) ได้หลายตัวเลือกตามสิทธิ์คะแนนจำกัดสูงสุดที่ได้รับสิทธิ์  ตัวอย่างเช่น  ในกระทู้โหวต มีตัวเลือก  A.) , B.) , C.) , D.)  ผู้โหวตมีสิทธิ์ลงคะแนนเสียง 2 สิทธิ์  ผู้โหวตจะสามารถเลือกลงคะแนนให้ตัวเลือก    A.) , B.)  อย่างละ 1 สิทธิ์  หรืออาจเลือกเป็นตัวเลือก  D.) ทั้ง 2 คะแนนสิทธิ์ก็ได้
+        </p>
+      </template>
+      <template v-else-if="showInputHintModal === 'distinctVotes'">
+        <p>
+          <b>{{ $t('app.topic.distinctVotes') }}</b> คือ การตั้งค่าให้ตัวเลือกในกระทู้โหวตนั้นๆ สามารถเลือกได้สูงสุดเพียง 1 สิทธิ์  ตัวอย่างเช่น  มีตัวเลือก  A.) , B.) , C.) , D.)  ผู้โหวตมีสิทธิ์ลงคะแนนเสียง 2 สิทธิ์  ผู้โหวตจะสามารถเลือกลงคะแนนให้ตัวเลือก   A.) , B.) , C.) , D.)  เพียงตัวเลือกละ 1 สิทธิ์สูงสุด  อาจเป็น  A.) , B.)  อย่างละ 1 สิทธิ์  หรือ C.) , D.)  อย่างละ 1 สิทธิ์   โดยไม่สามารถเลือกเป็นตัวเลือก  D.) ทั้ง 2 คะแนนสิทธิ์ได้
+        </p>
+      </template>
+      <template v-else-if="showInputHintModal === 'showCreator'">
+        <p>
+          <b>{{ $t('app.topic.showCreator') }}</b> เนื่องจากกฎหมายคุ้มครองข้อมูลส่วนบุคคคล หากผู้ตั้งโหวต เลือก  “แสดงชื่อผู้ตั้งโหวตสู่สาธารณะ”  ชื่อของท่านจะถูกแสดงสู่สาธารณะทั้งในระบบและตัวรายงาน
+        </p>
+      </template>
+    </DgaModal>
   </div>
 </template>
 
@@ -228,16 +242,19 @@ import MinusIcon from 'vue-material-design-icons/Minus.vue';
 import ImageIcon from 'vue-material-design-icons/Image.vue';
 import UndoIcon from 'vue-material-design-icons/Undo.vue';
 import TrashCanIcon from 'vue-material-design-icons/TrashCan.vue';
+import InformationIcon from 'vue-material-design-icons/Information.vue';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 import dayjs from 'dayjs';
-import { getPrettyFullName } from '~/src/services/formatter/user';
-import { getDefaultChoices } from '~/src/services/form/topic';
-import { choiceCountOf, isCoadminValid } from '~/src/services/validations/topic';
+import buddhistEra from 'dayjs/plugin/buddhistEra';
+import { getDefaultChoices, getDefaultInternalTopicFilter, topicTypes } from '~/src/services/form/topic';
+import { choiceCountOf, isCoadminValid as _isCoadminValid } from '~/src/services/validations/topic';
 import { voterCountOf } from '~/src/services/validations/user';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
+
+dayjs.extend(buddhistEra);
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
@@ -266,7 +283,6 @@ const voteDuration = ref({
 });
 const startExpiredDateStr = computed(() => dayjs(voteStart.value, "YYYY-MM-DD").format("YYYY-MM-DD"));
 
-const skipBlockchain = ref(false);
 const showDescription = ref(false);
 const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
 const coadmins : Ref<CoadminFormData[]> = ref([]);
@@ -274,6 +290,8 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
+  type: "private",
+  internalFilter: getDefaultInternalTopicFilter(),
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
@@ -281,11 +299,11 @@ const topicData = ref<TopicFormData>({
   coadmins: [],
   multipleVotes: false,
   distinctVotes: false,
-  publicVote: true,
   anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
+  showCreator: false,
   recoredToBlockchain: true,
   images: [],
 });
@@ -293,14 +311,13 @@ const topicData = ref<TopicFormData>({
 const modelValue = computed(() => props.modelValue);
 const voterAllowsRef = computed(() => props.voterAllows);
 const coadminsRef = computed(() => props.coadmins);
+const showInputHintModal : Ref<string | false> = ref(false);
 
 watch(modelValue, (value) => {
   if(value) {
 
     topicData.value = value;
 
-    skipBlockchain.value = !value.recoredToBlockchain;
-    
     const startDate = dayjs(value.voteStartAt);
     const expiredDate = dayjs(value.voteExpiredAt);
 
@@ -324,10 +341,11 @@ watch(coadminsRef, (value) => {
   }
 }, { deep: true, immediate: true });
 
-const votePublicOptions = computed(() => [
-  { label: i18n.t('app.publicVote'), value: true },
-  { label: i18n.t('app.privateVote'), value: false }
-]);
+const votePublicOptions = computed(() => {
+  return topicTypes.map((val) => {
+    return { label: i18n.t(`app.topicType.${val}`, val), value: val };
+  })
+});
 
 const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mode) => {
   return {
@@ -335,10 +353,6 @@ const durationModeOptions = computed(() => ["startDuration", "startEnd"].map((mo
     value: mode
   }
 }));
-
-watch(skipBlockchain, (value) => {
-  topicData.value.recoredToBlockchain = !value
-}, { immediate: true })
 
 watch(voterAllows, (value) => {
   topicData.value.voterAllows = value.map((ele) => {
@@ -402,12 +416,23 @@ watch(topicData, (value) => {
   emit('update:modelValue', value)
 }, { deep: true });
 
-function getVoterName(voter: VoterAllowFormData) {
-  return getPrettyFullName({
-    ...voter,
-    _id: voter.userid || "-",
-  });
-}
+const formatDateByLocale = computed(() => {
+  const locale = i18n.locale.value;
+  
+  if(locale === "th") {
+    return (date: Date) => dayjs(date).format("DD/MM/BBBB HH:mm");
+  }
+  return (date: Date) => dayjs(date).format("DD/MM/YYYY HH:mm");
+});
+
+const formatYearByLocale = computed(() => {
+  const locale = i18n.locale.value;
+  
+  if(locale === "th") {
+    return (year: number) => dayjs().year(year).format("BBBB");
+  }
+  return (year: number) => dayjs().year(year).format("YYYY");
+})
 
 function isChoiceValid(choice: string) {
   return choice !== "" && choiceCountOf(topicData.value.choices, choice) === 1;
@@ -435,55 +460,142 @@ function addOption() {
   topicData.value.choices.choices.push({ name: "" });
 }
 
-function isVoterValid(voter: VoterAllowFormData) {
-  return voterCountOf(voterAllows.value, voter) < 2 && (topicData.value.multipleVotes ? voter.totalVotes > 0 : true);
+function isVoterValid(voter: UserSearchTableData) {
+  const _voters = voter as VoterAllowFormData;
+  return voterCountOf(voterAllows.value, _voters) < 2 && (topicData.value.multipleVotes ? _voters.totalVotes > 0 : true);
 }
 
-function getVoterErrorReason(voter: VoterAllowFormData) {
+function getVoterErrorReason(voter: UserSearchTableData) {
   return i18n.t('app.voterList.error.duplicated');
 }
 
-function removeVoter(user: VoterAllowFormData) {
+function removeVoter(user: UserSearchTableData) {
   const compareData = JSON.stringify(user);
   voterAllows.value = voterAllows.value.filter((ele) => {
     return compareData !== JSON.stringify(ele);
   });
 }
 
-function addVoter(user: UserSearchResponseData) {
-  if(voterAllows.value.every((ele) => ele.userid !== user._id)) {
-    voterAllows.value.push({
-      userid: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      totalVotes: topicData.value.defaultVotes,
+function addVoter(user: UserSearchResponseData | null) {
+  if(user) {
+    if(voterAllows.value.every((ele) => ele.userid !== user._id)) {
+      voterAllows.value.push({
+        userid: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        totalVotes: topicData.value.defaultVotes,
+      });
+    } else {
+      useShowToast({
+        title: i18n.t('app.voterList.searchUser'),
+        content: i18n.t('app.voterList.error.duplicated'),
+        autoCloseDelay: 5000,
+      });
+    }
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
     });
   }
 }
 
-function getCoadminErrorReason(coadmin: CoadminFormData) {
-  return i18n.t('app.topic.coadminList.error.duplicated');
+function addVoters(users: UserSearchResponseData[] | null) {
+  if(users && users.length > 0) {
+    let inserted = 0;
+    for(const user of users) {
+      if(voterAllows.value.every((ele) => ele.userid !== user._id)) {
+        voterAllows.value.push({
+          userid: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          totalVotes: topicData.value.defaultVotes,
+        });
+        inserted += 1;
+      }
+    }
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: `${i18n.t('app.topic.csvInserted')} ${inserted}/${users.length}`,
+      autoCloseDelay: 5000,
+    });
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
+    });
+  }
 }
 
-function removeCoadmin(user: CoadminFormData) {
+function isCoadminValid(coadmin: UserSearchTableData) {
+  return _isCoadminValid(coadmins.value, coadmin);
+}
+function getCoadminErrorReason(coadmin: UserSearchTableData) {
+  return i18n.t('app.topic.voterList.error.duplicated');
+}
+
+function removeCoadmin(user: UserSearchTableData) {
   const compareData = JSON.stringify(user);
   coadmins.value = coadmins.value.filter((ele) => {
     return compareData !== JSON.stringify(ele);
   });
 }
 
-function addCoadmin(user: UserSearchResponseData) {
-  if(coadmins.value.every((ele) => ele.userid !== user._id)) {
-    coadmins.value.push({
-      userid: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
+function addCoadmin(user: UserSearchResponseData | null) {
+  if(user) {
+    if(coadmins.value.every((ele) => ele.userid !== user._id)) {
+      coadmins.value.push({
+        userid: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
+    } else {
+      useShowToast({
+        title: i18n.t('app.voterList.searchUser'),
+        content: i18n.t('app.voterList.error.duplicated'),
+        autoCloseDelay: 5000,
+      });
+    }
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
     });
   }
+}
 
-  return true
+function addCoadmins(users: UserSearchResponseData[] | null) {
+  if(users && users.length > 0) {
+    let inserted = 0;
+    for(const user of users) {
+      if(coadmins.value.every((ele) => ele.userid !== user._id)) {
+        coadmins.value.push({
+          userid: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+        });
+        inserted += 1;
+      }
+    }
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: `${i18n.t('app.topic.csvInserted')} ${inserted}/${users.length}`,
+      autoCloseDelay: 5000,
+    });
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
+    });
+  }
 }
 
 function getImgUrlAt(i: number) {
@@ -531,17 +643,8 @@ function revertImgFileAt(i: number) {
   }
   imgUrl.value[i] = undefined;
 }
-</script>
 
-<style scoped>
-.user-grid {
-  @apply grid w-full items-center gap-x-4 pb-2 gap-y-2 whitespace-nowrap;
-  grid-template-columns: 36px 2fr 4fr 3fr 36px;
-}
-.user-grid.multichoice {
-  grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
-}
-</style>
+</script>
 
 <style>
 .dp__theme_light {
@@ -566,8 +669,12 @@ function revertImgFileAt(i: number) {
   --dp-icon-color: #959595;
   --dp-danger-color: #ff6f60;
   --dp-highlight-color: rgba(25, 118, 210, 0.1);
+  --dp-preview-font-size: 0.65rem;
 }
-.dp__theme_light .dp__input  {
+.dp__input  {
   border-width: 2px !important;
+}
+.dp__action_button {
+  font-size: 0.8rem;
 }
 </style>

@@ -13,3 +13,20 @@ export function getPrettyFullName(params: UserBasicData & { _id?: string}) {
 
   return "";
 }
+
+export function formatCreatedByName(createdBy?: UserBasicResponseDataWithId) {
+  if(createdBy && createdBy.firstName) {
+    return createdBy.lastName ? `${createdBy.firstName} ${createdBy.lastName}` : createdBy.firstName;
+  }
+
+  if(createdBy && createdBy.email) {
+    return createdBy.email;
+  }
+  
+
+  if(createdBy && createdBy._id) {
+    return createdBy._id;
+  }
+
+  return "-";
+}

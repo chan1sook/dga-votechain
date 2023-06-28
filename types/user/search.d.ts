@@ -3,14 +3,13 @@ import { type Types } from "mongoose";
 
 declare global {
   type UserSearchParams = {
-    userid: Types.ObjectId,
-    keyword?: string,
+    keyword: string,
     adminOnly?: boolean,
-    notSelf?: boolean,
+    excludeUserId?: Types.ObjectId,
   }
   
   type UserSearchResponseData = {
     _id: string,
-    role: UserRole,
+    role?: UserRole,
   } & UserBasicData;
 }

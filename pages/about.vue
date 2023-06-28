@@ -1,7 +1,7 @@
 <template>
   <div>
     <DgaHead>{{ $t("about.title") }}</DgaHead>
-    <p class="my-4 text-md indent-8">{{ $t('about.info') }}</p>
+    <p class="my-4 text-md indent-8"></p>
   </div>
 </template>
 

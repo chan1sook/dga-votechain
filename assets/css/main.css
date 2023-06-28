@@ -15,10 +15,6 @@
 }
 
 @layer components {
-  .dga-container {
-    @apply p-8
-  }
-
   .dga-evote-input {
     @apply transition duration-200 border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75;
   }

@@ -11,51 +11,18 @@
       </DgaInput>
     </div>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.coadminList.title') }}</h3>
-    <div class="col-span-12 flex flex-col gap-2">
-      <div class="overflow-auto max-h-[50vh]">
-        <div class="user-grid">
-          <div class="font-bold"></div>
-          <div class="font-bold">{{ $t('app.userid') }}</div>
-          <div class="font-bold">{{ $t('app.userName') }}</div>
-          <div class="font-bold">{{ $t('app.email') }}</div>
-          <div></div>
-          <div class="border-b-2 border-dga-blue" style="grid-column: 1/-1;"></div>
-          <template v-for="admin of coadmins">
-            <div>
-              <ExclamationIcon
-                :class="[isCoadminValid(coadmins, admin) ? 'invisible' : '']"
-                class="text-red-500" 
-                :title="getCoadminErrorReason(admin)"
-              />
-            </div>
-            <div>{{ admin.userid }}</div>
-            <div>{{ admin.firstName ? getPrettyFullName(admin) : "-" }}</div>
-            <div>{{ admin.email || "-" }}</div>
-            <div>
-              <button class="align-middle px-2 py-1 inline-flex items-center justify-center"
-                :title="`${$t('app.topic.coadminList.remove')} [${getPrettyFullName(admin)}]`"  @click="removeCoadmin(admin)"
-              >
-                <MinusIcon />
-              </button>
-            </div>
-          </template>
-        </div>
-      </div>
-      <div class="w-full flex flex-row gap-2 items-center justify-center my-1">
-        <DgaUserSearch admin-only not-self class="flex-1 max-w-xl" :placeholder="$t('app.topic.coadminList.searchUser')" @select="addCoadmin"></DgaUserSearch>
-      </div>
-    </div>
+    <DgaUserTable class="col-span-12" :users="coadmins" coadmin
+        :is-user-valid="isCoadminValid" :get-error-reason="getCoadminErrorReason"
+        @add="addCoadmin" @remove="removeCoadmin" @users="addCoadmins"
+    >
+    </DgaUserTable>
   </div>
 </template>
 
 <script setup lang="ts">
-import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
-import MinusIcon from 'vue-material-design-icons/Minus.vue';
-
 import dayjs from 'dayjs';
-import { getPrettyFullName } from '~/src/services/formatter/user';
-import { getDefaultChoices } from '~/src/services/form/topic';
-import { isCoadminValid } from '~/src/services/validations/topic';
+import { getDefaultChoices, getDefaultInternalTopicFilter } from '~/src/services/form/topic';
+import { isCoadminValid as _isCoadminValid } from '~/src/services/validations/topic';
 
 const props = withDefaults(defineProps<{
   modelValue?: TopicFormData,
@@ -76,6 +43,8 @@ const coadmins : Ref<CoadminFormData[]> = ref([]);
 const topicData = ref<TopicFormData>({
   name: "",
   description: "",
+  type: "private",
+  internalFilter: getDefaultInternalTopicFilter(),
   choices: getDefaultChoices(),
   durationMode: "startDuration",
   voteStartAt: startDate,
@@ -83,11 +52,11 @@ const topicData = ref<TopicFormData>({
   coadmins: [],
   multipleVotes: false,
   distinctVotes: false,
-  publicVote: true,
   anonymousVotes: false,
   notifyVoter: true,
   defaultVotes: 1,
   voterAllows: [],
+  showCreator: false,
   recoredToBlockchain: true,
   images: [],
 });
@@ -121,31 +90,72 @@ watch(topicData, (value) => {
   emit('update:modelValue', value)
 }, { deep: true });
 
-
-function getCoadminErrorReason(coadmin: CoadminFormData) {
-  return i18n.t('app.topic.coadminList.error.duplicated');
+function isCoadminValid(coadmin: UserSearchTableData) {
+  return _isCoadminValid(coadmins.value, coadmin);
+}
+function getCoadminErrorReason(coadmin: UserSearchTableData) {
+  return i18n.t('app.topic.voterList.error.duplicated');
 }
 
-function removeCoadmin(user: CoadminFormData) {
+function removeCoadmin(user: UserSearchTableData) {
   const compareData = JSON.stringify(user);
   coadmins.value = coadmins.value.filter((ele) => {
     return compareData !== JSON.stringify(ele);
   });
 }
 
-function addCoadmin(user: UserSearchResponseData) {
-  if(coadmins.value.every((ele) => ele.userid !== user._id)) {
-    coadmins.value.push({
-      userid: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
+function addCoadmin(user: UserSearchResponseData | null) {
+  if(user) {
+    if(coadmins.value.every((ele) => ele.userid !== user._id)) {
+      coadmins.value.push({
+        userid: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
+    } else {
+      useShowToast({
+        title: i18n.t('app.voterList.searchUser'),
+        content: i18n.t('app.voterList.error.duplicated'),
+        autoCloseDelay: 5000,
+      });
+    }
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
     });
   }
-
-  return true
 }
 
+function addCoadmins(users: UserSearchResponseData[] | null) {
+  if(users && users.length > 0) {
+    let inserted = 0;
+    for(const user of users) {
+      if(coadmins.value.every((ele) => ele.userid !== user._id)) {
+        coadmins.value.push({
+          userid: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+        });
+        inserted += 1;
+      }
+    }
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: `${i18n.t('app.topic.csvInserted')} ${inserted}/${users.length}`,
+      autoCloseDelay: 5000,
+    });
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
+    });
+  }
+}
 </script>
 
 <style scoped>

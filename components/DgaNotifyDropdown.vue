@@ -1,6 +1,6 @@
 <template>
   <div class="relative" @click.stop>
-    <button type="button" @click="toggleShowOption" :title="$t('navbar.notification.title')">
+    <button type="button" @click="toggleShowOption" :title="$t('app.navbar.notification.title')">
       <EmailOutlineIcon />
       <div v-if="isUnread" class="absolute top-0 right-0">
         <div class="absolute bg-red-500 w-2 h-2 rounded-full animate-ping"></div>
@@ -9,7 +9,7 @@
     </button>
     <div v-if="showOption" class="z-[401] bg-white border rounded-md rounded-b-3xl shadow fixed right-0 top-16 lg:top-20 w-72 max-h-[400px] overflow-y-auto" @click.stop>
       <div class="flex-1 flex flex-col gap-2 px-4 py-2">
-        <DgaHead>{{ $t('navbar.notification.title') }}</DgaHead>
+        <DgaHead>{{ $t('app.navbar.notification.title') }}</DgaHead>
         <div v-for="notification of loadedNotifications">
           <h3 class="font-bold">
             <div v-if="!notification.readAt" class="inline-block bg-red-700 w-2 h-2 rounded-full"></div>
@@ -21,15 +21,15 @@
         </div>
         <template v-if="isLoadMoreNotifications">
           <div class="text-center text-xl italic">
-            {{ $t('navbar.notification.loadingNotifications') }}
+            {{ $t('app.navbar.notification.loadingNotifications') }}
           </div>
         </template>
         <template v-else>
           <div v-if="loadedNotifications.length === 0 && !hasMoreNotifications" class="text-center text-xl italic">
-            {{ $t('navbar.notification.noMoreNotifications') }}
+            {{ $t('app.navbar.notification.noMoreNotifications') }}
           </div>
-          <DgaButton v-if="hasMoreNotifications && isLoadMoreNotifications" color="dga-orange" class="mx-auto" :tile="$t('navbar.notification.loadMoreNotifications')" @click="loadMoreNotifications">
-            {{ $t('navbar.notification.loadMoreNotifications') }}
+          <DgaButton v-if="hasMoreNotifications && isLoadMoreNotifications" color="dga-orange" class="mx-auto" :tile="$t('app.navbar.notification.loadMoreNotifications')" @click="loadMoreNotifications">
+            {{ $t('app.navbar.notification.loadMoreNotifications') }}
           </DgaButton>
         </template>
       </div>

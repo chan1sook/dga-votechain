@@ -1,7 +1,6 @@
 import UserModel from "~/src/models/user"
 
 import mongoose from "mongoose";
-import { hashSync } from "bcrypt";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="topic">
+  <div v-if="topic && confirmVoting">
     <div class="relative flex flex-col md:flex-row gap-x-2 gap-y-1 justify-center items-center">
       <NuxtLink :href="localePathOf('/topics')" class="md:absolute md:left-0 text-dga-orange font-bold flex flex-row items-center">
         <ArrowLeftIcon /> {{ $t("app.modal.back") }}
@@ -14,11 +14,11 @@
         <template v-if="canVote">
           <div class="w-full text-center md:w-auto">{{ $t("app.voting.remainTimeVoting") }}</div>
           <div class="timer-counter"> {{ getDays(remainTime) }} </div>
-          <div>{{ $t("timePeriod.day", { count: 2 }) }}</div>
+          <div>{{ $t("app.timePeriod.day", { count: 2 }) }}</div>
           <div class="timer-counter"> {{ getHours(remainTime) }} </div>
-          <div>{{ $t("timePeriod.hour", { count: 2 }) }}</div> 
+          <div>{{ $t("app.timePeriod.hour", { count: 2 }) }}</div> 
           <div class="timer-counter"> {{ getMinutes(remainTime) }} </div>
-          <div>{{ $t("timePeriod.minute", { count: 2 }) }}</div> 
+          <div>{{ $t("app.timePeriod.minute", { count: 2 }) }}</div> 
         </template>
         <template v-else>
           <div>{{ $t("app.voting.yourVote") }}</div>
@@ -120,7 +120,7 @@
       {{ $t('app.voting.confirm') }}
     </DgaModal>
     <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="getImgUrlChoice(selectedImageChoice)" />
+      <img :src="getImgUrlChoice(selectedImageChoice)" class="max-h-[77.5vh] object-contain" />
     </DgaModal>
     <DgaLoadingModal :show="waitVote"></DgaLoadingModal>
   </div>
@@ -131,7 +131,7 @@ import CheckIcon from 'vue-material-design-icons/Check.vue';
 import ArrowLeftIcon from 'vue-material-design-icons/ArrowLeft.vue';
 
 import dayjs from "dayjs";
-import { isTopicExpired } from '~/src/services/validations/topic';
+import { isAnonymousTopic, isTopicExpired, isTopicReadyToVote, isUserInMatchInternalTopic } from '~/src/services/validations/topic';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 definePageMeta({
@@ -151,25 +151,29 @@ useHead({
 });
 
 const topic: Ref<TopicResponseData | undefined> = ref(undefined);
+const confirmVoting = ref(false);
+const showLoginModal = ref(false);
+
 const haveImage = computed(() => {
   if(!topic.value) {
     return false;
   }
-  console.log(topic.value.choices.choices.some((ele) => !!ele.image), topic.value.choices.choices)
   return topic.value.choices.choices.some((ele) => !!ele.image)
 })
 const pauseData: Ref<TopicCtrlPauseResponseData[]> = ref([]);
 const voterAllow: Ref<VoterAllowResponseData | undefined> = ref(undefined);
 const noVoteLocked = ref(false);
+
 const showConfirmModal = ref(false);
 const selectedImageChoice: Ref<ChoiceData | undefined> = ref(undefined);
 const showImageModal = ref(false);
+
 const waitVote = ref(false);
 const remainVotes = ref(0);
 const totalVotes = ref(0);
 const canVote = computed(() => {
   if(topic.value) {
-    if(topic.value.publicVote && topic.value.anonymousVotes) {
+    if(isAnonymousTopic(topic.value)) {
       return true;
     }
     return voterAllow.value && voterAllow.value.remainVotes > 0;
@@ -206,14 +210,24 @@ if (!data.value) {
 } else {
   const { topic: _topic, voterAllow: _voterAllow, pauseData: _pauseData, votes } = data.value;
 
-  if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
-    navigateTo(`/topic/result/${_topic._id}`);
-  } if(useSessionData().value.roleMode === "guest" && !(_topic.publicVote && _topic.anonymousVotes)) {
+  if(useSessionData().value.roleMode === "guest" && !isAnonymousTopic(_topic)) {
     showError({
-      message: i18n.t('app.voting.error.notVoteable'),
+      message: i18n.t('app.voting.cannotVote'),
       statusCode: 403,
     })
-  } else {
+  } else if(_topic.type === "internal" && !isUserInMatchInternalTopic(_topic.internalFilter, useSessionData().value)) {
+    showError({
+      message: i18n.t('app.voting.cannotVote'),
+      statusCode: 403,
+    })
+  } else if(!isTopicReadyToVote(_topic, useComputedServerTime().getTime())) {
+    showError({
+      message: i18n.t('app.voting.error.waiting'),
+      statusCode: 403,
+    })
+  } else if(isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())) {
+    navigateTo(`/topic/result/${_topic._id}`);
+  } else  {
     topic.value = _topic;
     prevVotes.value = votes;
     pauseData.value = _pauseData;
@@ -224,6 +238,8 @@ if (!data.value) {
     if(_remainVotes === 0 && prevVotes.value.every((ele) => ele.choice === null)) {
       noVoteLocked.value = true;
     }
+    
+    confirmVoting.value = true;
   }
 }
 
@@ -358,7 +374,7 @@ function computePauseTime() {
 function updateTime() {
   todayTime.value = useComputedServerTime().getTime();
   localTime.value = Date.now();
-  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD).value;
+  isSync.value = useIsServerTimeSync(SYNCTIME_THERSOLD);
   
   computeRemainTime();
   computePauseTime();

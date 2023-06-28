@@ -69,7 +69,7 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
       if(userData) {
         return {
           _id: userData._id,
-          hasCitizenId: !!userData.hashedCitizenId,
+          hasCitizenId: !!userData.cidHashed,
           permissions: userData.permissions,
           roleMode: userSessionData.roleMode,
           isGovOfficer: userData.isGovOfficer,
@@ -80,8 +80,8 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
           department: userData.department,
           division: userData.division,
           authFrom: userSessionData.authFrom,
-          group: userData.group,
           preferences: userData.preferences,
+          bannedUntil: userData.bannedUntil,
         };
       }
       return null;

@@ -1,9 +1,10 @@
 import { getExistsRequestPermissionsData } from "~/src/services/fetch/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData) {
+  if(!userData || isBannedUser(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

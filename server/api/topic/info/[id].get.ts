@@ -3,6 +3,8 @@ import TopicModel from "~/src/models/topic"
 import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import TopicPauseData from "~/src/models/topic-ctrl-pause"
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
+import { isBannedUser } from "~/src/services/validations/user";
+import { isUserInMatchInternalTopic } from "~/src/services/validations/topic";
 
 export default defineEventHandler(async (event) => {
   const topicDoc : TopicModelDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
@@ -22,8 +24,7 @@ export default defineEventHandler(async (event) => {
     topicid: topicDoc._id,
   });
 
-
-  if(userData) {
+  if(userData && !isBannedUser(userData)) {
     const [_voterAllow, _votes] = await Promise.all([
       TopicVoterAllowsModel.findOne({
         topicid: topicDoc._id,
@@ -53,13 +54,17 @@ export default defineEventHandler(async (event) => {
       }
     })
   }
-  
-  if(!topicDoc.publicVote) {
+
+  if(topicDoc.type !== "public") {
     let isAllowed = false;
 
     if(userData) {
       if(voterAllow && voterAllow.userid) {
         isAllowed = true;
+      }
+
+      if(topicDoc.type === "internal" && userData && isUserInMatchInternalTopic(topicDoc.internalFilter, userData)) {
+        isAllowed = true
       }
 
       // check if is admin
@@ -86,6 +91,8 @@ export default defineEventHandler(async (event) => {
     status: topicDoc.status,
     name: topicDoc.name,
     description: topicDoc.description,
+    type: topicDoc.type,
+    internalFilter: topicDoc.internalFilter,
     multipleVotes: topicDoc.multipleVotes,
     distinctVotes: topicDoc.distinctVotes,
     choices: topicDoc.choices,
@@ -94,19 +101,19 @@ export default defineEventHandler(async (event) => {
     voteExpiredAt: dayjs(topicDoc.voteExpiredAt).toISOString(),
     createdAt: dayjs(topicDoc.createdAt).toISOString(),
     updatedAt: dayjs(topicDoc.updatedAt).toISOString(),
-    createdBy: {
+    createdBy: topicDoc.showCreator ? {
       _id: topicDoc.createdBy._id.toString(),
       firstName: topicDoc.createdBy.firstName,
       lastName: topicDoc.createdBy.lastName,
       email: topicDoc.createdBy.email,
-    },
+    } : undefined,
     updatedBy: topicDoc.updatedBy.toString(),
     admin: topicDoc.admin.toString(),
     coadmins: topicDoc.coadmins.map((ele) => {
       return ele.toString()
     }),
-    publicVote: topicDoc.publicVote,
     anonymousVotes: topicDoc.anonymousVotes,
+    showCreator: topicDoc.showCreator,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     defaultVotes: topicDoc.defaultVotes,
     notifyVoter: topicDoc.notifyVoter

@@ -35,15 +35,36 @@ function isCoadminsValid(coadmins: string[]) {
 }
 
 export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
-  const maxChoices = topicData.multipleVotes && topicData.distinctVotes ? topicData.choices.choices.length: undefined;
-  const requiredVotes = (topicData.publicVote && topicData.anonymousVotes) ? true : isVoterAllowsValid(topicData.voterAllows, maxChoices);
+  const maxChoices = topicData.multipleVotes && topicData.distinctVotes ? topicData.choices.choices.length : undefined;
+  let votesValid = true;
+  if(topicData.type === "private") {
+    votesValid = isVoterAllowsValid(topicData.voterAllows, maxChoices);
+  } else if(topicData.type === "internal") {
+    votesValid = topicData.internalFilter.ministry !== "" && 
+      (topicData.internalFilter.withDepartment ? topicData.internalFilter.department !== "" : true);
+  }
   
   return topicData.name !== "" && 
     isVoteDateTimeValid(topicData.voteStartAt, topicData.voteExpiredAt) && 
     Number.isInteger(topicData.defaultVotes) && topicData.defaultVotes > 0 &&
     isChoicesValid(topicData.choices.choices) &&
-    requiredVotes &&
-    isCoadminsValid(topicData.coadmins);
+    votesValid && isCoadminsValid(topicData.coadmins);
+}
+
+export function isAnonymousTopic(topicData: { type: TopicType, anonymousVotes: boolean }) {
+  return topicData.type === "public" && topicData.anonymousVotes;
+}
+
+export function isUserInMatchInternalTopic(internalFilter: InternalTopicVisiblityFilter, userData: Pick<UserSessionData, "isGovOfficer" | "ministry" | "department">) {
+  if(!userData.isGovOfficer) {
+    return false;
+  }
+
+  if(internalFilter.withDepartment) {
+    return userData.ministry === internalFilter.ministry && userData.department === internalFilter.department;
+  } else {
+    return userData.ministry === internalFilter.ministry;
+  }
 }
 
 export function choiceCountOf(choices: ChoicesInfo, choice: string) {

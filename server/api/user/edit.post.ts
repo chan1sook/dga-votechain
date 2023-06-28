@@ -1,11 +1,13 @@
 import UserModel from "~/src/models/user"
 
 import mongoose from "mongoose";
-import { hashSync } from "bcrypt";
+import bcrypt from "bcrypt";
+import { isThaiCitizenId } from "~/src/services/validations/user";
+import isEmail from "validator/lib/isEmail";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  const { BCRYPT_SALT_ROUND } = useRuntimeConfig();
+  const { CITIZENID_FIXED_SALT } = useRuntimeConfig();
 
   if(!userData) {
     throw createError({
@@ -22,8 +24,8 @@ export default defineEventHandler(async (event) => {
   const userDoc = await UserModel.findById(userData._id);
   if(!userDoc) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Your user id not found",
+      statusCode: 500,
+      statusMessage: "Invalid User",
     });
   }
 
@@ -34,11 +36,25 @@ export default defineEventHandler(async (event) => {
     userDoc.lastName = userEditFormData.lastName;
   }
   if(userEditFormData.citizenid) {
-    userDoc.hashedCitizenId = hashSync(userEditFormData.citizenid, BCRYPT_SALT_ROUND);
+    if(!isThaiCitizenId(userEditFormData.citizenid)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Invalid Input",
+      });
+    }
+    userDoc.cidHashed = await bcrypt.hash(userEditFormData.citizenid, CITIZENID_FIXED_SALT);
   }
+  
   if(userEditFormData.email) {
+    if(!isEmail(userEditFormData.email)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Invalid Input",
+      });
+    }
     userDoc.email = userEditFormData.email;
   }
+  
   if(userEditFormData.isGovOfficer !== undefined) {
     userDoc.isGovOfficer = userEditFormData.isGovOfficer;
     if(userDoc.isGovOfficer) {

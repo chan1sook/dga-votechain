@@ -1,3 +1,10 @@
+import { checkPermissionNeeds } from "./permission";
+
+export function splitBasicName(str: string) {
+  const nameSpliter = str.split(" ", 3);
+  return nameSpliter;
+}
+
 export function isThaiCitizenId(str: string) {
   if(!/^[1-8][0-9]{12}$/.test(str)) {
     return false;
@@ -11,6 +18,14 @@ export function isThaiCitizenId(str: string) {
   const checkshum = parseInt(str.charAt(12), 10);
   
   return sumDigitValue === checkshum;
+}
+
+export function isBannedUser(user: Pick<UserSessionData, "bannedUntil">) {
+  return !!user.bannedUntil
+}
+
+export function isProtectedUser(user: Pick<UserSessionData, "permissions">) {
+  return checkPermissionNeeds(user.permissions, "dev-mode");
 }
 
 export function voterCountOf(voters: VoterAllowFormData[], user: VoterAllowFormData) {

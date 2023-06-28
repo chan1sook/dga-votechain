@@ -1,10 +1,12 @@
 import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 import io from "~/server/socketio"
 import smartContract from '../smart-contract';
-import { setPredefinedDevs, setPredefinedBlockchainServers } from '../migrations';
+import { setPredefinedBlockchainServers, updatePreferenceMenu, updatePermissions, updateTopics, resetHashCitizenID, removeFirebaseAuth } from '../migrations';
 import { initFirebase } from '../firebase';
-import initHbCheck from '../blockchain-server-hb';
-import beginNotificationWatcher from '../notification-watcher';
+import initBlockchainHbWorkers from '../../src/worker/blockchain-hb';
+import initNotificationWorkers from '../../src/worker/notification';
+import initUserWorkers from '~/src/worker/users';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log("[Config] View Config");
@@ -12,7 +14,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   console.log(runtimeConfig);
 
   console.log("[Blockchain] Test");
-  smartContract.init();
+  smartContract.test();
 
   console.log("[Firebase] Init");
   initFirebase();
@@ -26,11 +28,17 @@ export default defineNitroPlugin(async (nitroApp) => {
   });
   console.log('[MongoDB] Connected!');
 
+  await resetHashCitizenID();
+  await removeFirebaseAuth();
   await setPredefinedBlockchainServers();
-  await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
+  await updateTopics();
+  await updatePermissions();
+  await updatePreferenceMenu();
 
-  initHbCheck();
-  console.log('[BlockchainServerHB] Started!');
-  beginNotificationWatcher();
-  console.log('[Notification Watcher] Started!');
+  initBlockchainHbWorkers();
+  console.log('[BlockchainServerHB Workers] Started!');
+  initNotificationWorkers();
+  console.log('[Notification Workers] Started!');
+  initUserWorkers();
+  console.log('[User Workers] Started!');
 });

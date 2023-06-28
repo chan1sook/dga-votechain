@@ -1,10 +1,13 @@
-type UserResponseData = Omit<UserModelData, "authSources" | "createdAt" | "updatedAt" | "hashedCitizenId" | "permissions" | "preferences" | "group"> & {
+type UserResponseData = Omit<UserModelData,
+  "authSources" | "createdAt" | "updatedAt" | "hashedCitizenId" | "cidHashed" | "permissions" | "preferences" |
+  "bannedUntil" | "removeAt" | "removed"
+> & {
   userid?: string,
   roleMode: UserRole,
   permissions?: EVotePermission[],
   preferences?: UserPreferences,
   hasCitizenId?: boolean,
-  group?: string[],
+  bannedUntil?: DateString,
 }
 
 interface UserSessionSavedData {
@@ -15,7 +18,7 @@ interface UserSessionSavedData {
   },
 }
 
-type UserSessionData = Omit<UserModelData, "authSources" | "createdAt" | "updatedAt" | "hashedCitizenId"> & {
+type UserSessionData = Omit<UserModelData, "authSources" | "createdAt" | "updatedAt" | "hashedCitizenId" | "cidHashed"> & {
   _id: Types.ObjectId,
   hasCitizenId: boolean,
 } & Omit<UserSessionSavedData, "userid">;

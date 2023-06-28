@@ -31,7 +31,7 @@
         </svg>
       </div>
       <div>
-        {{ $t('loading', "Loading") }}...
+        {{ $t('app.loading', "Loading") }}...
       </div>
     </div>
   </DgaModal>

@@ -1,10 +1,19 @@
 <template>
   <div>
     <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-2 mx-auto max-w-6xl">
-      <DgaSelect v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-56"></DgaSelect>
+      <DgaVueSelect 
+        v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-56"
+        :reduce="val => val.value"
+      ></DgaVueSelect>
       <template v-if="filter.type === 'date'">
-        <DgaSelect v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
-        <DgaSelect v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"></DgaSelect>
+        <DgaVueSelect 
+          v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
+        <DgaVueSelect 
+          v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
       </template>
       <template v-else-if="filter.type === 'ticketId'">
         <DgaInput v-model="filter.ticketId" :placeholder="$t('app.voting.filters.ticketIdPlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
@@ -12,10 +21,18 @@
       <template v-else-if="filter.type === 'topicName'">
         <DgaInput v-model="filter.keyword" :placeholder="$t('app.voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
+      <div class="w-full lg:w-72 flex flex-row gap-2 items-center">
+        <div class="whitespace-nowrap">{{ $t('app.voting.filters.accessModifier') }}</div>
+        <DgaVueSelect
+          v-if="useSessionData().value.roleMode !== 'guest'"
+          v-model="filter.topicType" :options="topciTypeFilterOptions" class="flex-1"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
+      </div>
       <DgaButton color="dga-orange" class="flex-0" :title="$t('app.voting.filters.search')" @click="resetTopics">
         {{ $t("app.voting.filters.search") }}
       </DgaButton>
-      <div v-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
+      <div v-if="isAdminMode" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
           class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
           :title="$t('app.voting.createTopic')"
@@ -39,7 +56,7 @@
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
         <div class="text-center text-xl italic">
-          {{ $t("app.voting.loadingTopic") }}
+          {{ $t("app.loading") }}
         </div>
       </template>
       <template v-else>
@@ -52,7 +69,7 @@
       </template>
     </div>
     <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="qrCodeSrc" />
+      <img :src="qrCodeSrc" class="max-h-[77.5vh] object-contain" />
       <div>{{ currentLink }}</div>
     </DgaModal>
   </div>
@@ -63,9 +80,12 @@ import PlusCircleOutlineIcon from 'vue-material-design-icons/PlusCircleOutline.v
 
 import QRCode from 'qrcode'
 import dayjs from "dayjs";
-import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
-import { isAdminRole } from '~/src/services/validations/role';
+import "dayjs/locale/en";
+import "dayjs/locale/th";
+
+import { isTopicReadyToVote, isTopicExpired, isAnonymousTopic, isUserInMatchInternalTopic } from '~/src/services/validations/topic';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
+import { topicTypes } from '~/src/services/form/topic';
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -79,6 +99,7 @@ const filter = ref({
   type: "all",
   month: dayjs(useComputedServerTime()).month(),
   year: dayjs(useComputedServerTime()).year(),
+  topicType: <"all" | TopicType> "all",
   ticketId: "",
   keyword: "",
 });
@@ -92,16 +113,25 @@ const topicFilterOptions = computed(() =>
   })
 );
 
+const topciTypeFilterOptions = computed(() => 
+  ["all", ...topicTypes].map((value) => {
+    return {
+      label: value !== "all" ? i18n.t(`app.topicType.${value}`, value): i18n.t(`app.voting.filters.${value}`),
+      value: value
+    }
+  })
+);
+
 const startDate = dayjs("2023-04-03T07:00:00.000");
 
-const monthOptions = ref(new Array(12).fill(undefined).map((ele, i) => {
+const monthOptions = computed(() => new Array(12).fill(undefined).map((ele, i) => {
   return {
-    label: dayjs().month(i).format("MMM"),
+    label: dayjs().locale(i18n.locale.value).month(i).format("MMM"),
     value: i,
   }
 }))
 
-const yearOptions = ref(new Array(dayjs(useComputedServerTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
+const yearOptions = computed(() => new Array(dayjs(useComputedServerTime()).year() - startDate.year() + 1).fill(undefined).map((ele, i) => {
   const year = dayjs(useComputedServerTime()).year() - i;
   return {
     label: dayjs(useComputedServerTime()).year(year).format("YYYY"),
@@ -127,7 +157,7 @@ function resetTopics() {
   loadMoreTopics();
 }
 
-const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
+const isAdminMode = computed(() => roleMode.value === 'admin');
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return isAdminMode.value && 
     !isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime());
@@ -155,9 +185,11 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
     return "result";
   } else if(!isTopicReadyToVote(topic, useComputedServerTime().getTime())) {
     return "waiting";
-  } else if(topic.publicVote && topic.anonymousVotes) {
+  } else if(isAnonymousTopic(topic)) {
     return "access";
-  } else if(!useSessionData().value.userid) {
+  } else if(topic.type === "internal" && isUserInMatchInternalTopic(topic.internalFilter, useSessionData().value)) {
+    return "access";
+  } else if (!useSessionData().value.userid) {
     return "voting";
   } else if(!isAdminMode) {
     if(topic.voterAllow) {
@@ -220,6 +252,7 @@ async function loadMoreTopics() {
     type: "all",
     pagesize: pagesize.value,
     startid: startid.value,
+    topicType: filter.value.topicType,
   };
   if(filter.value.type === "date") {
     actualFilter = {
@@ -228,6 +261,7 @@ async function loadMoreTopics() {
       month: filter.value.month,
       pagesize: pagesize.value,
       startid: startid.value,
+      topicType: filter.value.topicType,
     };
   } else if(filter.value.type === "ticketId") {
     actualFilter = {
@@ -235,6 +269,7 @@ async function loadMoreTopics() {
       ticketId: filter.value.ticketId,
       pagesize: pagesize.value,
       startid: startid.value,
+      topicType: filter.value.topicType,
     };
   } else if(filter.value.type === "topicName") {
     actualFilter = {
@@ -242,6 +277,7 @@ async function loadMoreTopics() {
       keyword: filter.value.keyword,
       pagesize: pagesize.value,
       startid: startid.value,
+      topicType: filter.value.topicType,
     };
   }
   

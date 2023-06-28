@@ -7,11 +7,12 @@ import NotificationModel from "~/src/models/notification";
 import mongoose, { Types } from "mongoose";
 import { isTopicFormValid } from "~/src/services/validations/topic";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData || !checkPermissionNeeds(userData.permissions, "create-topic")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "create-topic") || userData.roleMode !== "admin") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -43,6 +44,8 @@ export default defineEventHandler(async (event) => {
     name: topicFormData.name,
     description: topicFormData.description,
     choices: topicFormData.choices,
+    type: topicFormData.type,
+    internalFilter: topicFormData.internalFilter,
     multipleVotes: topicFormData.multipleVotes,
     distinctVotes: topicFormData.distinctVotes,
     status: "approved",
@@ -55,8 +58,8 @@ export default defineEventHandler(async (event) => {
     durationMode: topicFormData.durationMode,
     voteStartAt: dayjs(topicFormData.voteStartAt).toDate(),
     voteExpiredAt: dayjs(topicFormData.voteExpiredAt).toDate(),
-    publicVote: topicFormData.publicVote,
     anonymousVotes: topicFormData.anonymousVotes,
+    showCreator: topicFormData.showCreator,
     recoredToBlockchain: topicFormData.recoredToBlockchain,
     notifyVoter: topicFormData.notifyVoter,
     defaultVotes: topicFormData.defaultVotes,

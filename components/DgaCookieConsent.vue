@@ -5,8 +5,8 @@
       <div class="flex flex-row flex-wrap gap-2">
         <div>{{ $t('cookieConsent.useCookieInfo1') }}</div>
         <div>{{ $t('cookieConsent.useCookieInfo2') }}</div> 
-        <NuxtLink href="/privacy-policy" class="underline">{{ $t("privacyPolicy.title") }}</NuxtLink> 
-        <NuxtLink href="/cookie-policy" class="underline">{{ $t("cookiePolicy.title") }}</NuxtLink> 
+        <NuxtLink href="/privacy-policy" class="underline">{{ $t("app.privacyPolicy") }}</NuxtLink> 
+        <NuxtLink href="/cookie-policy" class="underline">{{ $t("app.cookiePolicy") }}</NuxtLink> 
       </div>
       <div class="flex flex-col sm:flex-row w-full sm:w-auto mx-auto gap-2 text-sm">
         <DgaButton @click="emit('acceptAll')">
@@ -15,7 +15,6 @@
         <DgaButton theme="hollow" @click="emit('acceptRequired')">
           {{ $t('cookieConsent.acceptRequiredOnly') }}
         </DgaButton>
-        <!-- <DgaButton theme="hollow" @click="emit('manage')">Manage Cookies</DgaButton> -->
       </div>
     </div>
   </div>

@@ -7,9 +7,9 @@ export function getDefaultTopMenus() : PreferenceTopMenuOption[] {
 }
 
 export function getDefaultAdminTopMenus() : PreferenceTopMenuOption[] {
-  return ["home", "voting", "about", "help", "contact-us", "users-management"]
+  return ["home", "voting", "about", "help", "contact-us"]
 }
 
 export function getDefaultDevTopMenus() : PreferenceTopMenuOption[] {
-  return ["home", "voting", "about", "help", "contact-us", "blockchain"]
+  return ["home", "voting", "about", "help", "contact-us", "users-management" , "blockchain"]
 }

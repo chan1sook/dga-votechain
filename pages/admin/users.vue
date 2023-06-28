@@ -2,13 +2,16 @@
   <div v-if="userList">
     <DgaHead>{{ $t('admin.user.title') }}</DgaHead>
     <div class="flex flex-col sm:flex-row gap-2 items-center my-2">
-      <DgaUserSearch class="flex-1 w-full" :placeholder="$t('app.topic.coadminList.searchUser')" @select="selectUser"></DgaUserSearch>
+      <DgaUserSearch class="flex-1 w-full"
+        :placeholder="$t('app.voterList.searchUser')" :action-text="$t('app.voterList.searchUser')"
+        @select="selectUser"
+      ></DgaUserSearch>
       <DgaButton 
         class="flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
         :href="localePathOf('/permissions/approve')"
       >
         <AccountPlusOutlineIcon />
-        {{ $t('requestPermissions.manageApproveList') }}
+        {{ $t('app.requestPermissions.manageApproveList') }}
       </DgaButton>
     </div>
     <div class="grid grid-cols-12 py-2 gap-2 mx-auto max-w-5xl">
@@ -18,13 +21,15 @@
           <div class="flex flex-col gap-2">
             <DgaUserCard v-if="!selectedUser" v-for="ele of userList" :role="ele.role" editable @change="toChangeUserPage(ele)">
               <template #userid>#{{ ele._id }}</template>
-              <template #role>{{ $t(`role.${ele.role}`, ele.role) }}</template>
+              <template #role>
+                <span v-if="ele.role">{{ $t(`role.${ele.role}`, ele.role) }}</span>
+              </template>
               <div> 
                 <span v-if="userNameOf(ele)">{{ userNameOf(ele) }}</span>
-                <span class="italic" v-else>{{ $t("navbar.user.anonymous") }}</span>
+                <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
               </div>
               <div>
-                <span class="font-bold"></span>{{ $t('requestPermissions.email') }}: 
+                <span class="font-bold"></span>{{ $t('app.email') }}: 
                 <template v-if="ele.email">{{ ele.email }}</template>
                 <span class="italic" v-else>-</span>
               </div>
@@ -32,13 +37,15 @@
             <template v-else>
               <DgaUserCard @change="toChangeUserPage(selectedUser)">
                 <template #userid>#{{ selectedUser._id }}</template>
-                <template #role>{{ $t(`role.${selectedUser.role}`, selectedUser.role) }}</template>
+                <template #role>
+                  <span v-if="selectedUser.role">{{ $t(`role.${selectedUser.role}`, selectedUser.role) }}</span>
+                </template>
                 <div> 
                   <span v-if="userNameOf(selectedUser)">{{ userNameOf(selectedUser) }}</span>
-                  <span class="italic" v-else>{{ $t("navbar.user.anonymous") }}</span>
+                  <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
                 </div>
                 <div>
-                  <span class="font-bold"></span>{{ $t('requestPermissions.email') }}: 
+                  <span class="font-bold"></span>{{ $t('app.email') }}: 
                   <template v-if="selectedUser.email">{{ selectedUser.email }}</template>
                   <span class="italic" v-else>-</span>
                 </div>
@@ -49,7 +56,6 @@
             </template>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -62,7 +68,7 @@ const i18n = useI18n();
 const localePathOf = useLocalePath();
 
 definePageMeta({
-  middleware: ["auth-admin"]
+  middleware: ["auth-dev"]
 })
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.user.title')}`
@@ -71,7 +77,7 @@ useHead({
 const userList : Ref<UserSearchResponseData[] | undefined> = ref(undefined);
 const selectedUser : Ref<UserSearchResponseData | undefined> = ref(undefined);
 
-const { data: users } = await useFetch("/api/user/showall");
+const { data: users } = await useFetch("/api/users/showall");
 
 if(users.value) {
   userList.value = users.value;
@@ -90,14 +96,22 @@ function userNameOf(userData: UserSearchResponseData) {
   return name;
 }
 
-function selectUser(user: UserSearchResponseData) {
-  selectedUser.value = {
-    _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    role: user.role,
-  };
+function selectUser(user: UserSearchResponseData | null) {
+  if(user) {
+    selectedUser.value = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+    };
+  } else {
+    useShowToast({
+      title: i18n.t('app.voterList.searchUser'),
+      content: i18n.t('app.voterList.error.notFound'),
+      autoCloseDelay: 5000,
+    });
+  }
 }
 
 function toChangeUserPage(user: UserSearchResponseData) {

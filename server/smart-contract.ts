@@ -16,9 +16,9 @@ const web3 = new Web3(provider);
 const address = DgaEvoteArtifact.networks[1337].address;
 const DgaEvoteContract = new web3.eth.Contract(DgaEvoteArtifact.abi, address);
 
-export function init() {
+export function test() {
   try {
-    console.log("contract", DgaEvoteContract.methods);
+    console.log("contract", Object.keys(DgaEvoteContract.methods));
     console.log("contractOwner", provider.getAddress());
   } catch(err) {
     console.error(err);
@@ -64,7 +64,7 @@ export async function getTransactionByHash(txhash: string) {
 }
 
 export default Object.freeze({
-  init,
+  test,
   getVoteOnBlockchain,
   addVoteOnBlockchain,
   getTransactionByHash,

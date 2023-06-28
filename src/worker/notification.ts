@@ -7,7 +7,9 @@ import NotificationModel from "~/src/models/notification"
 import mongoose from 'mongoose';
 import { Types } from 'mongoose';
 
-async function checkTopics() {
+async function checkFinishTopicsForNotifications() {
+  console.log(`[Notification Workers] Begin Finished Topic Notifications Routine`);
+
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
 
@@ -15,6 +17,9 @@ async function checkTopics() {
     voteExpiredAt: { $lt: new Date() },
     notifyFinished: false,
   });
+
+  console.log(`[Notification Workers] Find ${notNotifyTopics.length} Topic(s)`);
+
 
   for(const topic of notNotifyTopics) {
     topic.notifyFinished = true;
@@ -49,9 +54,20 @@ async function checkTopics() {
   
   await dbSession.commitTransaction();
   await dbSession.endSession();
+
+  console.log(`[Notification Workers] Created ${notifications.length} Notification(s)`);
 }
 
-export default function beginNotificationWatcher() {
-  checkTopics();
-  return nodeCron.schedule('* * * * *', checkTopics);
+function worker() {
+  try {
+    checkFinishTopicsForNotifications();
+  } catch(err) {
+    console.log(`[Notification Workers] Failed`);
+    console.error(err)
+  }
+}
+
+export default function initNotificationWorkers() {
+  worker();
+  return nodeCron.schedule('* * * * *', worker);
 }

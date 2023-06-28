@@ -35,15 +35,24 @@ const schema = new Schema<UserModelData>({
   division: {
     type: String,
   },
-  hashedCitizenId: {
+  cidHashed: {
     type: String,
   },
-  group: [String],
   preferences: new Schema({
     topMenus: [String],
     adminTopMenus: [String],
     devTopMenus: [String],
-  })
+  }),
+  removeAt: {
+    type: Date,
+  },
+  removed: {
+    type: Boolean,
+  },
+  // @deprecated
+  hashedCitizenId: {
+    type: String,
+  },
 }, {
   timestamps: true,
 });

@@ -8,10 +8,11 @@ import mongoose, { Types } from "mongoose";
 import { isTopicFormValid, isTopicReadyToVote } from "~/src/services/validations/topic";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || !checkPermissionSelections(userData.permissions, "change-topic")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionSelections(userData.permissions, "change-topic") || userData.roleMode !== "admin") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -64,6 +65,14 @@ export default defineEventHandler(async (event) => {
       topicDoc.description = topicFormData.description;
     }
   
+    if(topicFormData.type !== undefined) {
+      topicDoc.type = topicFormData.type;
+    }
+
+    if(topicFormData.internalFilter !== undefined) {
+      topicDoc.internalFilter = topicFormData.internalFilter;
+    }
+
     if(topicFormData.multipleVotes !== undefined) {
       topicDoc.multipleVotes = topicFormData.multipleVotes;
     }
@@ -91,13 +100,13 @@ export default defineEventHandler(async (event) => {
     if(topicFormData.voteExpiredAt !== undefined) {
       topicDoc.voteExpiredAt = dayjs(topicFormData.voteExpiredAt).toDate();
     }
-  
-    if(topicFormData.publicVote !== undefined) {
-      topicDoc.publicVote = topicFormData.publicVote;
-    }
 
     if(topicFormData.anonymousVotes !== undefined) {
       topicDoc.anonymousVotes = topicFormData.anonymousVotes;
+    }
+
+    if(topicFormData.showCreator !== undefined) {
+      topicDoc.showCreator = topicFormData.showCreator;
     }
 
     if(topicFormData.recoredToBlockchain !== undefined) {

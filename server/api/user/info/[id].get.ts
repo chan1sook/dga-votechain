@@ -1,10 +1,11 @@
 import UserModel from "~/src/models/user"
 import { isAdminRole } from "~/src/services/validations/role";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || !isAdminRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData) || !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
