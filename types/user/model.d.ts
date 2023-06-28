@@ -41,6 +41,5 @@ declare global {
   interface UserAuthSourceData {
     authSource: UserAuthSource,
     digitalIdUserId?: DigitalIdUserId,
-    firebaseUid?: string,
   }
 }

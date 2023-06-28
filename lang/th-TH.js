@@ -379,16 +379,6 @@ export default {
     loginWithGoogle: "เข้าสู่ระบบด้วย Google",
     registerDigitalId: "ลงทะเบียนด้วย Digital ID",
   },
-  register: {
-    firebase: {
-      title: "ลงทะเบียนด้วยบัญชี Google",
-      token: "Token"
-    },
-    action: "ลงทะเบียน",
-    confirm: "ยืนยันข้อมูล?",
-    success: "ลงทะเบียนสำเร็จ",
-    failed: "ลงทะเบียนล้มเหลว",
-  },
   role: {
     guest: "นิรนาม",
     voter: "ผู้โหวต",

@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt'
 import io from "~/server/socketio"
 import smartContract from '../smart-contract';
 import { setPredefinedBlockchainServers, updatePreferenceMenu, updatePermissions, updateTopics, resetHashCitizenID, removeFirebaseAuth } from '../migrations';
-import { initFirebase } from '../firebase';
 import initBlockchainHbWorkers from '../../src/worker/blockchain-hb';
 import initNotificationWorkers from '../../src/worker/notification';
 import initUserWorkers from '~/src/worker/users';
@@ -15,9 +14,6 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   console.log("[Blockchain] Test");
   smartContract.test();
-
-  console.log("[Firebase] Init");
-  initFirebase();
 
   console.log("[SocketIO] Init");
   await io();

@@ -10,9 +10,6 @@ const schema = new Schema<UserModelData>({
     digitalIdUserId: {
       type: String
     },
-    firebaseUid:  {
-      type: String
-    },
   })],
   firstName: {
     type: String,
