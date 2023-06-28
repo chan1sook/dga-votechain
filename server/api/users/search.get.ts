@@ -1,10 +1,11 @@
-import { searchUsers } from "~/src/services/fetch/user";
+import { searchExactActiveUserByKeyword } from "~/src/services/fetch/user";
+import { isAdminRole } from "~/src/services/validations/role";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData)) {
+  if(!userData || isBannedUser(userData) || !isAdminRole(userData.roleMode)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -13,24 +14,31 @@ export default defineEventHandler(async (event) => {
 
   const query = getQuery(event);
   
-  const userDocs = await searchUsers({
-    userid: userData._id,
+  let user = null;
+  const userSearchParam : UserSearchParams = {
     keyword: typeof query.keyword === "string" ? query.keyword : "",
     adminOnly: query.adminOnly === "1",
-    notSelf: query.notSelf === "1",
-  }).limit(20);
+    excludeUserId: query.notSelf === "1" ? userData._id : undefined,
+  }
 
-  const users : UserSearchResponseData[] = userDocs.map((data) => {
-    const role : UserRole = data.permissions.includes("dev-mode") ? "developer" : (data.permissions.includes("admin-mode") ? "admin" : "voter");
-    
+  user = await searchExactActiveUserByKeyword(userSearchParam);
+
+  if(user) {
+    let role : UserRole | undefined;
+    if(userData.roleMode === 'developer' && userData.permissions.includes("dev-mode")) {
+      role = user.permissions.includes("dev-mode") ? "developer" :
+        (user.permissions.includes("admin-mode") ? "admin" : "voter");
+    }
+
     return {
-      _id: `${data._id}`,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
+      _id: `${user._id}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
       role,
     }
-  });
 
-  return users;
+  } else {
+    return null;
+  }
 })

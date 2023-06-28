@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 import io from "~/server/socketio"
 import smartContract from '../smart-contract';
-import { setPredefinedDevs, setPredefinedBlockchainServers, updatePreferenceMenu, updatePermissions, updateTopics } from '../migrations';
+import { setPredefinedBlockchainServers, updatePreferenceMenu, updatePermissions, updateTopics, resetHashCitizenID, removeFirebaseAuth } from '../migrations';
 import { initFirebase } from '../firebase';
 import initBlockchainHbWorkers from '../../src/worker/blockchain-hb';
 import initNotificationWorkers from '../../src/worker/notification';
@@ -27,8 +28,9 @@ export default defineNitroPlugin(async (nitroApp) => {
   });
   console.log('[MongoDB] Connected!');
 
+  await resetHashCitizenID();
+  await removeFirebaseAuth();
   await setPredefinedBlockchainServers();
-  await setPredefinedDevs(runtimeConfig.PREDEFINED_DEV_USERS);
   await updateTopics();
   await updatePermissions();
   await updatePreferenceMenu();

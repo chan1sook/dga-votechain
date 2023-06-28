@@ -35,7 +35,7 @@ const schema = new Schema<UserModelData>({
   division: {
     type: String,
   },
-  hashedCitizenId: {
+  cidHashed: {
     type: String,
   },
   preferences: new Schema({
@@ -48,6 +48,10 @@ const schema = new Schema<UserModelData>({
   },
   removed: {
     type: Boolean,
+  },
+  // @deprecated
+  hashedCitizenId: {
+    type: String,
   },
 }, {
   timestamps: true,

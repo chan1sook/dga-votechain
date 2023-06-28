@@ -1,48 +1,51 @@
 import UserModel from "~/src/models/user"
 import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~/src/models/blockchain-server"
-import { combinePermissions, legacyRoleToPermissions, removePermissions } from '~/src/services/transform/permission';
+import { combinePermissions, removePermissions } from '~/src/services/transform/permission';
 import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
 
 let migrationSeq = 0;
 
-export async function setPredefinedDevs(ids: DigitalIdUserId[]) {
+export async function resetHashCitizenID() {
   migrationSeq += 1;
 
-  console.log(`[Migration] ${migrationSeq}. Add Predefined Dev Users`);
+  console.log(`[Migration] ${migrationSeq}. Reset Hash CitizenID`);
   
-  const userDocs = await UserModel.find({
-    authSources: { $elemMatch: 
-      {
-        authSource: "digitalId",
-        digitalIdUserId:  { $in: ids }
-      }
-    }
+ 
+  const users = await UserModel.find({
+    hashedCitizenId: { $exists: true },
+    cidHashed: { $exists: false },
   });
 
-  const userDocsToSave = [];
+  for(const user of users) {
+    user.hashedCitizenId = undefined;
+  }
+  
+  const result = await UserModel.bulkSave(users);
 
-  for(const id of ids) {
-    const targetDoc = userDocs.find((doc) => {
-      return doc.authSources.some((authSource) => authSource.digitalIdUserId === id);
-    });
+  console.log(`[Migration] Reset Hash CitizenID (Updated: ${result})`);
+}
 
-    if(targetDoc) {
-      targetDoc.permissions = combinePermissions(targetDoc.permissions, ...legacyRoleToPermissions("developer"));
-      userDocsToSave.push(targetDoc);
-    } else {
-      const userDoc = new UserModel({
-        permissions: legacyRoleToPermissions("developer"),
-        authSources: [
-          { authSource: "digitalId", digitalIdUserId: id }
-        ]
-      });
-      userDocsToSave.push(userDoc);
+export async function removeFirebaseAuth() {
+  migrationSeq += 1;
+
+  console.log(`[Migration] ${migrationSeq}. Remove FirebaseAuth`);
+  
+ 
+  const users = await UserModel.find({
+    "authSources.authSource": "firebase"
+  });
+
+  for(const user of users) {
+    user.authSources = user.authSources.filter((ele) => ele.authSource !== "firebase");
+    if(user.authSources.length === 0) {
+      user.removeAt = new Date();
     }
   }
+  
+  const result = await UserModel.bulkSave(users);
 
-  const result = await UserModel.bulkSave(userDocsToSave);
-  console.log(`[Migration] Add Predefined Dev Users (Inserted: ${result.insertedCount})`);
+  console.log(`[Migration] Remove FirebaseAuth (Updated: ${result})`);
 }
 
 export async function setPredefinedBlockchainServers() {

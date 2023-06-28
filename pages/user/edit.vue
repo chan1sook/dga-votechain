@@ -2,29 +2,33 @@
   <div>
     <DgaHead>{{ $t('app.userInfoEdit.title') }}</DgaHead>
     <div class="grid grid-cols-12 gap-4 max-w-4xl mx-auto my-4">
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.firstName') }}
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.firstName') }}</span>
+        <AsteriskIcon :title="$t('app.required')" class="text-red-500" size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.firstName" class="w-full" :placeholder="$t('app.firstName')"></DgaInput>
       </div>
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.lastName') }}
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.lastName') }}</span>
+        <AsteriskIcon :title="$t('app.required')" class="text-red-500" size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.lastName" class="w-full" :placeholder="$t('app.lastName')"></DgaInput>
       </div>
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.email') }}
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.email') }}</span>
+        <AsteriskIcon :title="$t('app.required')" class="text-red-500" size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.email" class="w-full" :placeholder="$t('app.email')"></DgaInput>
       </div>
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.citizenid') }}
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.citizenid') }}</span>
+        <AsteriskIcon v-if="!hasCitizenId" :title="$t('app.required')" class="text-red-500" size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9 flex flex-col gap-y-1">
-        <DgaInput v-model="userEditFormData.citizenid" class="w-full" :placeholder="$t('app.citizenid')"></DgaInput>
+        <DgaInput v-model="userEditFormData.citizenid" maxlength="13" class="w-full" :placeholder="$t('app.citizenid')"></DgaInput>
         <div v-if="hasCitizenId" class="text-sm">
           {{ $t('app.userInfoEdit.typeToEdit') }}
         </div>
@@ -32,23 +36,25 @@
       <div class="col-span-12">
         <DgaCheckbox v-model="userEditFormData.isGovOfficer" /> {{ $t('app.userInfoEdit.isGovOfficer') }}
       </div>
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.ministry') }}
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.ministry') }}</span>
+        <AsteriskIcon v-if="userEditFormData.isGovOfficer" :title="$t('app.required')" class="text-red-500" size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaMinistryVueSelect v-model="userEditFormData.ministry" :disabled="!userEditFormData.isGovOfficer">
         </DgaMinistryVueSelect>
       </div>
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.department') }}
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.department') }}</span>
+        <AsteriskIcon v-if="userEditFormData.isGovOfficer" :title="$t('app.required')" class="text-red-500" size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.department" :disabled="!userEditFormData.isGovOfficer"  class="w-full" :placeholder="$t('app.department')"></DgaInput>
       </div>
-      <div class="col-span-12 md:col-span-3">
-        {{ $t('app.division') }} [Optional]
+      <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
+        <span>{{ $t('app.division') }} </span>
       </div>
-      <div class="col-span-12 md:col-span-9">
+      <div class="col-span-12 md:col-span-9 flex flex-col gap-y-1">
         <DgaInput v-model="userEditFormData.division" :disabled="!userEditFormData.isGovOfficer"  class="w-full" :placeholder="$t('app.division')"></DgaInput>
       </div>
       <DgaButtonGroup class="col-span-12 mt-4">
@@ -73,6 +79,8 @@
 
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+import AsteriskIcon from 'vue-material-design-icons/Asterisk.vue';
+
 import { isThaiCitizenId } from '~/src/services/validations/user';
 
 const i18n = useI18n();

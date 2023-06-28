@@ -32,7 +32,7 @@
       <DgaButton color="dga-orange" class="flex-0" :title="$t('app.voting.filters.search')" @click="resetTopics">
         {{ $t("app.voting.filters.search") }}
       </DgaButton>
-      <div v-if="isAdminRole(roleMode)" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
+      <div v-if="isAdminMode" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
           class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
           :title="$t('app.voting.createTopic')"
@@ -56,7 +56,7 @@
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
         <div class="text-center text-xl italic">
-          {{ $t("app.voting.loadingTopic") }}
+          {{ $t("app.loading") }}
         </div>
       </template>
       <template v-else>
@@ -84,7 +84,6 @@ import "dayjs/locale/en";
 import "dayjs/locale/th";
 
 import { isTopicReadyToVote, isTopicExpired, isAnonymousTopic, isUserInMatchInternalTopic } from '~/src/services/validations/topic';
-import { isAdminRole } from '~/src/services/validations/role';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 import { topicTypes } from '~/src/services/form/topic';
 
@@ -158,7 +157,7 @@ function resetTopics() {
   loadMoreTopics();
 }
 
-const isAdminMode = computed(() => roleMode.value === 'admin' ||  roleMode.value === 'developer');
+const isAdminMode = computed(() => roleMode.value === 'admin');
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return isAdminMode.value && 
     !isTopicExpired(topic, topic.pauseData, useComputedServerTime().getTime());

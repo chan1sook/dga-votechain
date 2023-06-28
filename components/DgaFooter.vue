@@ -10,9 +10,9 @@
         </div>
         <div class="col-span-12 lg:col-span-5 lg:text-right">
           <div>
-            <NuxtLink href="#" class="underline">ส่งข้อเสนอแนะ</NuxtLink> |   
-            <NuxtLink href="#" class="underline">เงื่อนไขและข้อตกลง</NuxtLink> |
-            <NuxtLink href="/privacy-policy" class="underline">ความเป็นส่วนตัว</NuxtLink>
+            <NuxtLink href="#" class="underline">{{ $t('app.sendFeedback') }}</NuxtLink> |   
+            <NuxtLink href="#" class="underline">{{ $t('app.termCondition') }}</NuxtLink> |
+            <NuxtLink href="/privacy-policy" class="underline">{{ $t('app.privacyPolicy') }}</NuxtLink>
           </div>
           <div>
             {{ $t('contactUs.info.contactCenter') }} <a href="tel:+6626126060">(+66) 02 612 6060</a>
@@ -28,6 +28,6 @@
 
 <style scoped>
 .dga-footer-about {
-  @apply bg-dga-blue text-white px-4 py-4 text-xs md:text-sm flex flex-row gap-x-8 justify-center items-center
+  @apply bg-dga-blue text-white px-2 py-2 text-[0.64rem] md:text-xs flex flex-row gap-x-8 justify-center items-center
 }
 </style>

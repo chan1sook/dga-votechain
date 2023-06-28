@@ -15,4 +15,8 @@
 .dga-container-root {
   @apply min-h-screen flex flex-col
 }
+
+.dga-container {
+  @apply py-4 px-2 sm:p-8
+}
 </style>

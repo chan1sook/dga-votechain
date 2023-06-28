@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
     }
   })
   
-  const coadmins : CoadminFormData[] = coadminDocs.map((ele) => {
+  const coadmins : UserFormData[] = coadminDocs.map((ele) => {
     return {
       userid: ele._id.toString(),
       email: ele.email,

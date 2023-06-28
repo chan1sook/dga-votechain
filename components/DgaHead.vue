@@ -1,6 +1,7 @@
 <template>
-  <h2 class="font-bold text-xl">
-    <slot></slot>
-    <hr class="w-20 border-2 mt-1 border-dga-orange">
-  </h2>
+  <div class="flex flex-row">
+    <h2 class="border-b-[3px] pb-1 border-dga-orange font-bold text-xl">
+      <slot></slot>
+    </h2>
+  </div>
 </template>

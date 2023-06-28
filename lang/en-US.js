@@ -1,6 +1,7 @@
 export default {
   appName: "DGA E-Voting",
   app: {
+    loading: "Loading",
     navbar: {
       home: "Home",
       voting: "Voting",
@@ -121,19 +122,14 @@ export default {
       },
       coadminList: {
         title: "Co-Admin Lists",
-        name: "Name",
-        add: "Add User",
-        remove: "Remove User",
-        searchUser: "Search User",
-        error: {
-          duplicated: "Duplicated User"
-        }
       },
-      distinctVotes: "Distinct Votes",
+      csvSearch: "Import CSV",
+      csvInserted: "Inserted",
+      distinctVotes: "Limited 1 ballot per vote",
       anonymousVotes: "Allow Anonymous to Vote",
       notifyUsers: "Send notice to users",
       showCreator: "Show Creator to Public",
-      skipBlockchain: "Not record to Blockchain",
+      recordBlockchain: "Record to Blockchain",
       scorePublic: "Display voter choice(s) for public",
       allow: "Allow",
       deny: "Deny",
@@ -154,7 +150,6 @@ export default {
       expired: "Close",
       createdBy: "Created by",
       voteOn: "Vote on",
-      loadingTopic: "Loading...",
       loadMoreTopic: "Load more topics",
       noMoreTopic: "No more topic",
       qrcode: "QR Code",
@@ -219,12 +214,14 @@ export default {
     },
     voterList: {
       title: "Voter Lists",
-      multipleVotes: "Multiple Votes",
+      multipleVotes: "Multiple Choices",
       totalVotes: "Total Votes",
       remove: "Remove User",
       searchUser: "Search User",
+      addUser: "Add User",
       error: {
-        duplicated: "Duplicated User"
+        duplicated: "Duplicated User",
+        notFound: "User Not Found",
       }
     },
     userid: "User ID",
@@ -294,6 +291,10 @@ export default {
       reject: "Reject",
       personalData: "Personal Data",
     },
+    privacyPolicy: "Privacy Policy",
+    cookiePolicy: "Cookie Policy",
+    termCondition: "Term and Conditions",
+    sendFeedback: "Send Feedback",
     countable: {
       vote: "Vote | Votes",
       voter: "Voter | Voters"
@@ -310,6 +311,8 @@ export default {
       cancel: "Cancel",
       confirm: "Confirm"
     },
+    required: "Required",
+    optional: "Optional",
     edit: "Edit",
     detail: "Detail",
   },
@@ -329,12 +332,6 @@ export default {
     confirm: "Confirm to Edit User Preferences?",
     success: "Edit User Preferences Successful",
     failed: "Edit User Preferences Failed"
-  },
-  privacyPolicy: {
-    title: "Private Policy"
-  },
-  cookiePolicy: {
-    title: "Cookie Policy"
   },
   notification: {
     topic: {
@@ -462,7 +459,6 @@ export default {
     title: "Error",
     backToHome: "Back to Home"
   },
-  loading: "Loading",
   cookieConsent: {
     useCookie: "This website use cookies",
     acceptAll: "Accept All",

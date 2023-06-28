@@ -12,7 +12,7 @@ import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || isBannedUser(userData) || !checkPermissionSelections(userData.permissions, "change-topic")) {
+  if(!userData || isBannedUser(userData) || !checkPermissionSelections(userData.permissions, "change-topic") || userData.roleMode !== "admin") {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

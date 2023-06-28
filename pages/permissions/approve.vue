@@ -59,7 +59,7 @@ import CloseIcon from 'vue-material-design-icons/Close.vue';
 const i18n = useI18n();
 
 definePageMeta({
-  middleware: ["auth-admin"]
+  middleware: ["auth-dev"]
 })
 
 useHead({

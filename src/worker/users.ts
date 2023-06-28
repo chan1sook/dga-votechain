@@ -23,7 +23,7 @@ async function cleanRemovedUsers() {
     user.lastName = undefined;
     user.email = undefined;
     user.isGovOfficer = undefined;
-    user.hashedCitizenId = undefined;
+    user.cidHashed = undefined;
     user.ministry = undefined;
     user.department = undefined;
     user.division = undefined;

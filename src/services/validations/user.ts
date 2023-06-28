@@ -1,5 +1,10 @@
 import { checkPermissionNeeds } from "./permission";
 
+export function splitBasicName(str: string) {
+  const nameSpliter = str.split(" ", 3);
+  return nameSpliter;
+}
+
 export function isThaiCitizenId(str: string) {
   if(!/^[1-8][0-9]{12}$/.test(str)) {
     return false;

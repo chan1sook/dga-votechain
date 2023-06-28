@@ -13,17 +13,12 @@
     <div class="inline-flex ml-auto flex-row items-center gap-4">
       <button type="button" class="dga-small-btn" @click="toggleLang">
         {{ prettyLocaleCode }}
-      </button>
-      <DgaButton v-if="!isLogin" 
-        :href="localePathOf('/login')" theme="hollow" class="whitespace-nowrap w-32 text-center"
-      >
-        {{ $t('app.navbar.login') }}
-      </DgaButton>      
-      <template v-else>
+      </button>    
+      <template v-if="isLogin">
         <DgaNewsDropdown></DgaNewsDropdown>
         <DgaNotifyDropdown></DgaNotifyDropdown>
-        <DgaUserDropdown></DgaUserDropdown>
       </template>
+      <DgaUserDropdown></DgaUserDropdown>
     </div>
 
     <div class="inline-flex lg:hidden">

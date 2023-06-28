@@ -1,6 +1,7 @@
 export default {
   appName: "DGA E-Voting",
   app: {
+    loading: "รอสักครู่",
     navbar: {
       home: "หน้าแรก",
       voting: "ร่วมโหวต",
@@ -121,20 +122,14 @@ export default {
       },
       coadminList: {
         title: "รายชื่อแอดมินร่วม",
-        email: "Email",
-        name: "ชื่อ",
-        add: "เพิ่มชื่อ",
-        remove: "ลบชื่อ",
-        searchUser: "ค้นหาผู้ใช้",
-        error: {
-          duplicated: "ผู้ใช้ซ้ำ"
-        }
       },
+      csvSearch: "เพิ่มจาก CSV",
+      csvInserted: "เพิ่มผู้ใช้",
       distinctVotes: "โหวตแต่ละตัวเลือกสูงสุดหนึ่งสิทธิ์",
       anonymousVotes: "อนุญาตให้คนทั่วไปโหวตได้",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
-      showCreator: "แสดงผู้ตั้งกระทู้สู่สาธารณะ",
-      skipBlockchain: "ไม่บันทึกลง Blockchain",
+      showCreator: "แสดงชื่อผู้ตั้งโหวตสู่สาธารณะ",
+      recordBlockchain: "บันทึกลง Blockchain",
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
       allow: "อนุญาต",
       deny: "ปฏิเสธ",
@@ -155,7 +150,6 @@ export default {
       expired: "สิ้นสุด",
       createdBy: "ตั้งโดย",
       voteOn: "เปิดโหวต",
-      loadingTopic: "รอสักครู่...",
       loadMoreTopic: "โหลดคำถามเพิ่มเติม",
       noMoreTopic: "ไม่พบคำถาม",
       qrcode: "QR Code",
@@ -224,9 +218,11 @@ export default {
       totalVotes: "จำนวนเสียง",
       add: "เพิ่มชื่อ",
       remove: "ลบชื่อ",
-      searchUser: "ค้นหาผู้ใช้",
+      searchUser: "ค้นหาผุ้ใช้",
+      addUser: "เพิ่มผู้เข้าโหวต",
       error: {
-        duplicated: "ผู้ใช้ซ้ำ"
+        duplicated: "ผู้ใช้ซ้ำ",
+        notFound: "ไม่พบผู้ใช้",
       }
     },
     userid: "User ID",
@@ -297,6 +293,10 @@ export default {
       reject: "ปฏิเสธ",
       personalData: "ข้อมูลส่วนบุคคล",
     },
+    privacyPolicy: "นโยบายความเป็นส่วนตัว",
+    cookiePolicy: "นโยบายคุกกี้",
+    termCondition: "เงื่อนไขและข้อตกลง",
+    sendFeedback: "ส่งข้อเสนอแนะ",
     countable: {
       vote: "โหวต",
       voter: "คน"
@@ -313,6 +313,8 @@ export default {
       cancel: "ยกเลิก",
       confirm: "ยืนยัน"
     },
+    required: "จำเป็น",
+    optional: "ไม่จำเป็น",
     edit: "แก้ไข",
     detail: "รายละเอียด",
   },
@@ -332,12 +334,6 @@ export default {
     confirm: "ยืนยันการแก้ไขการตั้งค่าผู้ใช้?",
     success: "แก้ไขการตั้งค่าผู้ใช้สำเร็จ",
     failed: "แก้ไขการตั้งค่าผู้ใช้ล้มเหลว"
-  },
-  privacyPolicy: {
-    title: "นโยบายความเป็นส่วนตัว"
-  },
-  cookiePolicy: {
-    title: "นโยบายคุกกี้"
   },
   notification: {
     topic: {
@@ -476,7 +472,6 @@ export default {
     title: "ผิดพลาด",
     backToHome: "กลับสู่หน้าหลัก"
   },
-  loading: "รอสักครู่",
   cookieConsent: {
     useCookie: "เว็บไซต์นี้ใช้คุกกี้",
     useCookieInfo1: "เราใช้คุกกี้เพื่อประสบการณ์ที่ดีที่สุดในเว็บไซต์ของเรา",

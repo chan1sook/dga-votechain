@@ -1,11 +1,4 @@
 import crypto from "crypto"
-import { getApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-import { getActiveUserByAuthSource, getActiveUserByEmail }  from "~/src/services/fetch/user";
-import { legacyRoleToPermissions } from "~/src/services/transform/permission";
-import UserModel from "~/src/models/user"
-import { USER_SESSION_KEY } from "../session-handler";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 export default defineEventHandler(async (event) => {
   const param = await readBody(event);
@@ -33,57 +26,6 @@ export default defineEventHandler(async (event) => {
     const url = new URL(`/connect/authorize?${urlParams}`, DID_API_URL);
   
     return sendRedirect(event, url.toString())
-  } else if(param.source === "firebase") {
-    const decodedFirebaseUserdata = await getAuth(getApp()).verifyIdToken(`${param.token}`, true).catch((err) => {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Invalid Token'
-      })
-    })
-    const authSource: UserAuthSourceData = {
-      authSource: "firebase",
-      firebaseUid: decodedFirebaseUserdata.uid,
-    };
-
-    let userDoc = await getActiveUserByAuthSource(authSource);
-    if(userDoc) {
-      if(!userDoc.email) {
-        userDoc.email = decodedFirebaseUserdata.email;
-        await userDoc.save();
-      }
-    } else {
-      userDoc = await getActiveUserByEmail(decodedFirebaseUserdata.email);
-      if(!userDoc) {
-        userDoc = new UserModel({
-          permissions: legacyRoleToPermissions("admin"),
-          authSources: [
-            { authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid }
-          ],
-          email: decodedFirebaseUserdata.email,
-        });
-        await userDoc.save();
-      } else {
-        userDoc.authSources.push({ authSource: "firebase", firebaseUid: decodedFirebaseUserdata.uid });
-        userDoc.markModified("authSources");
-        await userDoc.save();
-      }
-    }
-    
-    let defaultRoleMode : UserRole = "voter";
-    if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
-      defaultRoleMode = "admin";
-    }
-
-    await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
-      userid: userDoc._id.toString(),
-      roleMode: defaultRoleMode,
-      authFrom: {
-        ...authSource,
-        userToken: param.token?.toString(),
-      },
-    });
-
-    return sendRedirect(event, "/topics");
   }
 
   throw createError({

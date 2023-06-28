@@ -6,14 +6,14 @@
       </div>
       <div class="content">
         <div class="name">{{ props.topic.name }}</div>
-        <div class="time">{{ $t('app.voting.voteOn') }} {{ prettyStartAt }}</div>
-        <div class="createdby">
-          <template v-if="props.topic.createdBy">
-            {{ $t('app.voting.createdBy') }} {{ formatCreatedByName(props.topic.createdBy) }} (#Ticket {{ props.topic._id }})
-          </template>
-          <template v-else>
-            #Ticket {{ props.topic._id }}
-          </template>
+        <div v-if="props.topic.createdBy">
+          {{ $t('app.voting.createdBy') }} {{ formatCreatedByName(props.topic.createdBy) }}
+        </div>
+        <div class="time">
+          {{ $t('app.voting.voteOn') }} {{ prettyStartAt }}
+        </div>
+        <div class="ticketid">
+          #Ticket {{ props.topic._id }}
         </div>
       </div>
       <div v-if="props.withQrcode" class="qr">
@@ -108,7 +108,7 @@ const prettyStartAt = computed(() => {
 
 <style scoped>
 .dga-topic-card {
-  @apply rounded-lg shadow-lg bg-red-800 pl-4 sm:pl-6 overflow-hidden;
+  @apply  text-sm lg:text-base rounded-lg shadow-lg bg-red-800 pl-4 sm:pl-6 overflow-hidden;
 }
 .dga-topic-card.public {
   @apply bg-green-700
@@ -134,7 +134,7 @@ const prettyStartAt = computed(() => {
   grid-area: type;
 }
 .dga-topic-card > .inner > .type.private {
-  @apply text-xl text-red-700;
+  @apply text-red-700;
 }
 .dga-topic-card > .inner > .type.public {
   @apply text-green-700;
@@ -148,12 +148,9 @@ const prettyStartAt = computed(() => {
   @apply flex flex-row flex-wrap gap-y-2 gap-x-4
 }
 .dga-topic-card > .inner > .content > .name {
-  @apply w-full text-xl font-bold
+  @apply w-full text-base lg:text-xl font-bold
 }
-.dga-topic-card > .inner > .content > .time
-{
-  @apply flex-none
-}
+
 .dga-topic-card > .inner > .qr {
   grid-area: qr;
   @apply flex flex-col justify-center gap-2
