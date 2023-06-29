@@ -3,7 +3,7 @@ import UserModel from "~/src/models/user"
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { isThaiCitizenId } from "~/src/services/validations/user";
-import isEmail from 'validator/lib/isEmail';
+import validator from 'validator';
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
   }
   
   if(userEditFormData.email) {
-    if(!isEmail(userEditFormData.email)) {
+    if(!validator.isEmail(userEditFormData.email)) {
       throw createError({
         statusCode: 400,
         statusMessage: "Invalid Input",
