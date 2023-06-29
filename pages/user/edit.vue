@@ -4,28 +4,28 @@
     <div class="grid grid-cols-12 gap-4 max-w-4xl mx-auto my-4">
       <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
         <span>{{ $t('app.firstName') }}</span>
-        <AsteriskIcon :title="$t('app.required')" class="text-red-500" size="8"/>
+        <AsteriskIcon :title="$t('app.required')" class="text-red-500" :size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.firstName" class="w-full" :placeholder="$t('app.firstName')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
         <span>{{ $t('app.lastName') }}</span>
-        <AsteriskIcon :title="$t('app.required')" class="text-red-500" size="8"/>
+        <AsteriskIcon :title="$t('app.required')" class="text-red-500" :size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.lastName" class="w-full" :placeholder="$t('app.lastName')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
         <span>{{ $t('app.email') }}</span>
-        <AsteriskIcon :title="$t('app.required')" class="text-red-500" size="8"/>
+        <AsteriskIcon :title="$t('app.required')" class="text-red-500" :size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.email" class="w-full" :placeholder="$t('app.email')"></DgaInput>
       </div>
       <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
         <span>{{ $t('app.citizenid') }}</span>
-        <AsteriskIcon v-if="!hasCitizenId" :title="$t('app.required')" class="text-red-500" size="8"/>
+        <AsteriskIcon v-if="!hasCitizenId" :title="$t('app.required')" class="text-red-500" :size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9 flex flex-col gap-y-1">
         <DgaInput v-model="userEditFormData.citizenid" maxlength="13" class="w-full" :placeholder="$t('app.citizenid')"></DgaInput>
@@ -38,7 +38,7 @@
       </div>
       <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
         <span>{{ $t('app.ministry') }}</span>
-        <AsteriskIcon v-if="userEditFormData.isGovOfficer" :title="$t('app.required')" class="text-red-500" size="8"/>
+        <AsteriskIcon v-if="userEditFormData.isGovOfficer" :title="$t('app.required')" class="text-red-500" :size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaMinistryVueSelect v-model="userEditFormData.ministry" :disabled="!userEditFormData.isGovOfficer">
@@ -46,7 +46,7 @@
       </div>
       <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
         <span>{{ $t('app.department') }}</span>
-        <AsteriskIcon v-if="userEditFormData.isGovOfficer" :title="$t('app.required')" class="text-red-500" size="8"/>
+        <AsteriskIcon v-if="userEditFormData.isGovOfficer" :title="$t('app.required')" class="text-red-500" :size="8"/>
       </div>
       <div class="col-span-12 md:col-span-9">
         <DgaInput v-model="userEditFormData.department" :disabled="!userEditFormData.isGovOfficer"  class="w-full" :placeholder="$t('app.department')"></DgaInput>

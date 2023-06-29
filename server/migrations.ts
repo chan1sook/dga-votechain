@@ -6,48 +6,6 @@ import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
 
 let migrationSeq = 0;
 
-export async function resetHashCitizenID() {
-  migrationSeq += 1;
-
-  console.log(`[Migration] ${migrationSeq}. Reset Hash CitizenID`);
-  
- 
-  const users = await UserModel.find({
-    hashedCitizenId: { $exists: true },
-    cidHashed: { $exists: false },
-  });
-
-  for(const user of users) {
-    user.hashedCitizenId = undefined;
-  }
-  
-  const result = await UserModel.bulkSave(users);
-
-  console.log(`[Migration] Reset Hash CitizenID (Updated: ${result})`);
-}
-
-export async function removeFirebaseAuth() {
-  migrationSeq += 1;
-
-  console.log(`[Migration] ${migrationSeq}. Remove FirebaseAuth`);
-  
- 
-  const users = await UserModel.find({
-    "authSources.authSource": "firebase"
-  });
-
-  for(const user of users) {
-    user.authSources = user.authSources.filter((ele) => ele.authSource !== "firebase");
-    if(user.authSources.length === 0) {
-      user.removeAt = new Date();
-    }
-  }
-  
-  const result = await UserModel.bulkSave(users);
-
-  console.log(`[Migration] Remove FirebaseAuth (Updated: ${result})`);
-}
-
 export async function setPredefinedBlockchainServers() {
   migrationSeq += 1;
 

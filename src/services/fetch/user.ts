@@ -1,6 +1,6 @@
-import { FilterQuery, Types, isValidObjectId } from "mongoose";
+import { FilterQuery, isValidObjectId } from "mongoose";
 import bcrypt from "bcrypt";
-import isEmail from 'validator/es/lib/isEmail';
+import isEmail from 'validator/lib/isEmail';
 
 import UserModel from "~/src/models/user";
 import { isThaiCitizenId, splitBasicName } from "../validations/user";

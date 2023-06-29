@@ -3,7 +3,7 @@ import UserModel from "~/src/models/user"
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { isThaiCitizenId } from "~/src/services/validations/user";
-import isEmail from "validator/lib/isEmail";
+import isEmail from 'validator/lib/isEmail';
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
