@@ -185,21 +185,18 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
     return "result";
   } else if(!isTopicReadyToVote(topic, useComputedServerTime().getTime())) {
     return "waiting";
-  } else if(isAnonymousTopic(topic)) {
-    return "access";
-  } else if(topic.type === "internal" && isUserInMatchInternalTopic(topic.internalFilter, useSessionData().value)) {
-    return "access";
-  } else if (!useSessionData().value.userid) {
-    return "voting";
-  } else if(!isAdminMode) {
-    if(topic.voterAllow) {
-      return topic.voterAllow.remainVotes > 0 ? "access" : "voted"
-    } else {
+  } else {
+    if(isAdminMode.value) {
+      return "access";
+    }
+    if(!topic.canVote) {
       return "voting";
     }
-  }
 
-  return "access";
+
+    const isAlreadyVotes = topic.voted >= topic.quota;
+    return isAlreadyVotes ? "voted" : "access";
+  }
 }
 
 function handleStatusAction(topic: TopicResponseDataExtended, status: TopicCardStatus) {

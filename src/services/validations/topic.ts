@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { isBannedUser } from "./user";
 
 function isVoteDateTimeValid(voteStartAt: Date | DateString, voteExpiredAt: Date | DateString) {
   const startAt = dayjs(voteStartAt);
@@ -97,4 +98,10 @@ export function isTopicReadyToVote(topic: TopicModelData | TopicResponseData, no
 
 export function isTopicExpired(topic: TopicModelData | TopicResponseData, pauseLists: (TopicCtrlPauseModelData | TopicCtrlPauseResponseData)[], now = Date.now()) {
   return now >= dayjs(topic.voteExpiredAt).valueOf() && (pauseLists.every((ele) => ele.resumeAt));
+}
+
+export function isCanVote(userData: UserSessionData | undefined, topicDoc: TopicModelDataWithIdPopulated, voterAllow: any) {
+  return (userData ? !isBannedUser(userData) : true) && (!!voterAllow || isAnonymousTopic(topicDoc) || 
+    (!!userData && topicDoc.type === "internal" && isUserInMatchInternalTopic(topicDoc.internalFilter, userData))
+  );
 }

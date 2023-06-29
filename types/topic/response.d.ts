@@ -9,7 +9,9 @@ type TopicResponseData = Omit<TopicFormBodyData, "voterAllows" | "admin" | "coad
 };
 
 type TopicResponseDataExtended = TopicResponseData & {
-  voterAllow?: VoterAllowResponseData,
+  canVote: boolean,
+  quota: number,
+  voted: number,
   pauseData: TopicCtrlPauseResponseData[]
 }
 

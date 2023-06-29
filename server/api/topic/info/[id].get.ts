@@ -4,7 +4,7 @@ import TopicVoterAllowsModel from "~/src/models/voters-allow"
 import TopicPauseData from "~/src/models/topic-ctrl-pause"
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 import { isBannedUser } from "~/src/services/validations/user";
-import { isUserInMatchInternalTopic } from "~/src/services/validations/topic";
+import { isAnonymousTopic, isCanVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
 
 export default defineEventHandler(async (event) => {
   const topicDoc : TopicModelDataWithIdPopulated | null = await TopicModel.findById(event.context.params?.id).populate("createdBy");
@@ -118,6 +118,11 @@ export default defineEventHandler(async (event) => {
     defaultVotes: topicDoc.defaultVotes,
     notifyVoter: topicDoc.notifyVoter
   };
+  
+  const quota = voterAllow ? voterAllow.totalVotes : topicDoc.defaultVotes;
+  const voted = votes.length;
+
+  const canVote = isCanVote(userData, topicDoc, voterAllow);
 
   const pauseData : TopicCtrlPauseResponseData[] = topicPauseData.map((ele) => {
     return {
@@ -131,7 +136,9 @@ export default defineEventHandler(async (event) => {
   return {
     topic,
     votes,
-    voterAllow,
+    canVote,
+    quota,
+    voted,
     pauseData,
   };
 })
