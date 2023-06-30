@@ -2,6 +2,7 @@ export default {
   appName: "DGA E-Voting",
   app: {
     loading: "Loading",
+    offlineMode: "Maintenance Closed From",
     navbar: {
       home: "Home",
       voting: "Voting",

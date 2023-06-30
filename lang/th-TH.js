@@ -2,6 +2,7 @@ export default {
   appName: "DGA E-Voting",
   app: {
     loading: "รอสักครู่",
+    offlineMode: "ปิดปรับปรุงระบบชั่วคราว ตั้งแต่",
     navbar: {
       home: "หน้าแรก",
       voting: "ร่วมโหวต",
