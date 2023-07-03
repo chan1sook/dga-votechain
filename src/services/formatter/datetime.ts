@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
-export function formatDateTime(datetimeString: DateString) {
-  return dayjs(datetimeString).format("YYYY-MM-DD HH:mm");
+export function formatDateTime(datetime: Date | DateString) {
+  return dayjs(datetime).format("YYYY-MM-DD HH:mm");
 }
 
 export function perttyDuration(duration: number) {

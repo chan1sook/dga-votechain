@@ -3,7 +3,7 @@
     <DgaHead>{{ $t('help.title') }}</DgaHead>
     <hr class="my-2" />
     <div class="flex flex-row gap-2 flex-wrap">
-      <a href="/pdf/help_0_0_4.pdf" class="my-2 underline">
+      <a href="/pdf/help_1_0_0.pdf" class="my-2 underline">
         {{ $t('help.pdf') }}
       </a>
       <NuxtLink href="https://docs.google.com/document/d/1tWb_Zx8VD83nTTnBEYG8AibKrdPAgrsoCEM1WlfdLOA/edit#" class="my-2 underline">
@@ -12,7 +12,7 @@
     </div>
     <hr class="my-2"/>
     <ClientOnly>
-      <VuePdfEmbed source="/pdf/help_0_0_4.pdf"/>
+      <VuePdfEmbed source="/pdf/help_1_0_0.pdf"/>
     </ClientOnly>
   </div>
 </template>

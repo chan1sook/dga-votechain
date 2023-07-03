@@ -3,26 +3,25 @@ import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } fr
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { data } = await useFetch("/api/session/get");
 
+  const preferences = {
+    topMenu: {
+      voter: getDefaultTopMenus(),
+      admin: getDefaultAdminTopMenus(),
+      dev: getDefaultDevTopMenus(),
+    }
+  }
   if(data.value) {
-    const preferences = {
-      topMenus: getDefaultTopMenus(),
-      adminTopMenus: getDefaultAdminTopMenus(),
-      devTopMenus: getDefaultDevTopMenus(),
-    }
-    if(data.value.preferences) {
-      if(Array.isArray(data.value.preferences.topMenus)) {
-        preferences.topMenus = data.value.preferences.topMenus;
+    if(data.value.preferences && data.value.preferences.topMenu) {
+      if(Array.isArray(data.value.preferences.topMenu.voter)) {
+        preferences.topMenu.voter = data.value.preferences.topMenu.voter;
       }
-
-      if(Array.isArray(data.value.preferences.adminTopMenus)) {
-        preferences.topMenus = data.value.preferences.adminTopMenus;
+      if(Array.isArray(data.value.preferences.topMenu.admin)) {
+        preferences.topMenu.admin = data.value.preferences.topMenu.admin;
       }
-
-      if(Array.isArray(data.value.preferences.devTopMenus)) {
-        preferences.topMenus = data.value.preferences.devTopMenus;
+      if(Array.isArray(data.value.preferences.topMenu.dev)) {
+        preferences.topMenu.dev = data.value.preferences.topMenu.dev;
       }
     }
-
 
     useSessionData().value = {
       userid: data.value.userid,
@@ -43,11 +42,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       userid: undefined,
       hasCitizenId: undefined,
       permissions: [],
-      preferences: {
-        topMenus: getDefaultTopMenus(),
-        adminTopMenus: getDefaultAdminTopMenus(),
-        devTopMenus: getDefaultDevTopMenus(),
-      },
+      preferences,
       isGovOfficer: undefined,
       roleMode: "guest",
       firstName: undefined,

@@ -8,7 +8,6 @@ import { escapeRegExp } from "../formatter/regexp";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// guest alway public with anonymousVotes
 export function getLastestGuestTopics(filter?: TopicFilterParams) {
   const query : FilterQuery<TopicModelData> = {
     status: "approved",

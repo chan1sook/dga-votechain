@@ -18,6 +18,10 @@ export function getVotesByTopicIdAndUserId(topicid: Types.ObjectId, userid: Type
   return VoteModel.find({ topicid: topicid, userid: userid })
 }
 
+export function getVotesByTopicIdsAndUserId(topicIds: Types.ObjectId[], userid: Types.ObjectId) {
+  return VoteModel.find({ topicid: {$in: topicIds}, userid: userid })
+}
+
 export function getLastestVotes(pagesize?: number, startid?: string, filterKeyword?: string) {
   const query : FilterQuery<VoteModelData> = {
     $and: []

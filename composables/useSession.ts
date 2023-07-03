@@ -1,4 +1,4 @@
-import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from "~/src/services/form/preference"
+import { getDefaultTopMenus } from "~/src/services/form/preference"
 
 export const useSessionData = () => {
   return useState<{
@@ -7,7 +7,7 @@ export const useSessionData = () => {
     roleMode: UserRole,
     permissions: EVotePermission[],
     isGovOfficer?: boolean,
-    preferences?: UserPreferences,
+    preferences: UserPreferencesModel,
     firstName?: string,
     lastName?: string,
     email?: string,
@@ -19,9 +19,11 @@ export const useSessionData = () => {
       roleMode: "guest",
       permissions: [],
       preferences: {
-        topMenus: getDefaultTopMenus(),
-        adminTopMenus: getDefaultAdminTopMenus(),
-        devTopMenus: getDefaultDevTopMenus(),
+        topMenu: {
+          voter: getDefaultTopMenus(),
+          admin: getDefaultTopMenus(),
+          dev: getDefaultTopMenus(),
+        }
       }
     }
   })

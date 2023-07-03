@@ -5,7 +5,7 @@
       <div class="flex flex-col sm:flex-row gap-2 my-2">
         <div class="flex-1"> 
           <span v-if="userNameOf(userData)">{{ userNameOf(userData) }}</span>
-          <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
+          <span class="italic" v-else>{{ $t("app.anonymous") }}</span>
         </div>
         <div class="flex-1"> 
           <span class="font-bold"></span>{{ $t('app.email') }}: 

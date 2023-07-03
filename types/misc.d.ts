@@ -28,8 +28,3 @@ type ToastParams = Omit<ToastData, "id"> & {
   id?: string,
   autoCloseDelay?: number,
 };
-
-interface CustomizationModelData {
-  name: string,
-  value: any,
-}

@@ -64,10 +64,9 @@ export default defineEventHandler(async (event) => {
         userDoc.email = digitalIdUserInfo.email;
       }
 
-      if(!userDoc.cidHashed) {
-        const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
-        userDoc.cidHashed = cidHashed;
-      }
+      // Temp
+      const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
+      userDoc.cidHashed = cidHashed;
 
       // Predefine dev at login
       if(PREDEFINED_DEV_USERS.includes(digitalIdUserInfo.user_id)) {

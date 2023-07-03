@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="isOfflineMode" class="text-sm px-2 py-1 bg-red-700 text-white text-center">
+      {{ $t('app.offlineMode') }} {{ formatDateTime(offlineStart) }} - {{ formatDateTime(offlineEnd) }}
+    </div>
     <div class="dga-footer-about">
       <img src="~/assets/images/logo_dga_c.png" class="block h-8 md:h-12" />
       <div class="flex-1 grid grid-cols-12 gap-x-2 gap-y-1">
@@ -25,6 +28,47 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import dayjs from 'dayjs';
+import buddhistEra from 'dayjs/plugin/buddhistEra';
+import 'dayjs/locale/en';
+import 'dayjs/locale/th';
+import { thaiLocalTimeToGMT } from '~/src/services/transform/localtime';
+
+dayjs.extend(buddhistEra);
+
+const i18n = useI18n();
+
+const offlineStart = ref(thaiLocalTimeToGMT(2023, 5, 30, 18, 0))
+const offlineEnd = ref(thaiLocalTimeToGMT(2023, 6, 3, 0, 0))
+
+const todayTime = ref(Date.now());
+const isOfflineMode = ref(false);
+
+function updateTime() {
+  todayTime.value = useComputedServerTime().getTime();
+  isOfflineMode.value = dayjs(offlineStart.value).diff(Date.now()) < 0 && dayjs(offlineEnd.value).diff(Date.now()) > 0;
+}
+
+function formatDateTime(date: Date) {
+  if(i18n.locale.value === 'th') {
+    return dayjs(date).locale(i18n.locale.value).format("D MMMM BBBB HH:mm") + " น."
+  }
+
+  return dayjs(date).locale(i18n.locale.value).format("D MMMM YYYY HH:mm")
+}
+
+let timeId: NodeJS.Timer | undefined;
+onMounted(() => {
+  timeId = setInterval(updateTime, 500);
+  updateTime();
+})
+
+onUnmounted(() => {
+  clearInterval(timeId);
+})
+</script>
 
 <style scoped>
 .dga-footer-about {

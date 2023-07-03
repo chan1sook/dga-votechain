@@ -11,7 +11,8 @@ import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { nanoid } from "nanoid";
 import { isBannedUser } from "~/src/services/validations/user";
-import { isAnonymousTopic, isTopicReadyToVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
+import { isAnonymousTopic, isCanVote, isTopicReadyToVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
+import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 
 export default defineEventHandler(async (event) => {
   const voteFormData : VotesFormData = await readBody(event);
@@ -32,6 +33,7 @@ export default defineEventHandler(async (event) => {
   }
 
   let voterAllowData;
+  let remainVotes = 0;
   const userData = event.context.userData;
 
   if(userData) {
@@ -39,22 +41,21 @@ export default defineEventHandler(async (event) => {
       userid: userData._id,
       topicid: topicDoc._id,
     });
+    if(voterAllowData) {
+      remainVotes = voterAllowData.remainVotes;
+    } else {
+      const votes = await getVotesByTopicIdAndUserId(topicDoc._id, userData._id);
+      remainVotes =  topicDoc.defaultVotes - votes.length;
+    }
+  } else {
+    remainVotes = topicDoc.defaultVotes;
   }
 
-  if(topicDoc.type === "internal" && userData && !isUserInMatchInternalTopic(topicDoc.internalFilter, userData)) {
+  if(!isCanVote(userData, topicDoc, voterAllowData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
-  } else if(!isAnonymousTopic(topicDoc)) {
-    if(!userData || !checkPermissionNeeds(userData.permissions, "vote-topic") ||
-      userData.roleMode !== "voter" || isBannedUser(userData) || !voterAllowData
-    ) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
-      });
-    }
   }
 
   const dbSession = await mongoose.startSession();
@@ -69,7 +70,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const remainVotes = voterAllowData?.remainVotes || topicDoc.defaultVotes;
   if(remainVotes <= 0) {
     throw createError({
       statusCode: 400,

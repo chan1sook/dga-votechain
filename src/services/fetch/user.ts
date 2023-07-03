@@ -1,6 +1,6 @@
-import { FilterQuery, Types, isValidObjectId } from "mongoose";
+import { FilterQuery, isValidObjectId } from "mongoose";
 import bcrypt from "bcrypt";
-import isEmail from 'validator/es/lib/isEmail';
+import validator from 'validator';
 
 import UserModel from "~/src/models/user";
 import { isThaiCitizenId, splitBasicName } from "../validations/user";
@@ -128,7 +128,7 @@ export async function searchExactActiveUserByKeyword(params: UserSearchParams) {
     return null;
   } else if(isThaiCitizenId(params.keyword)) {
     docQuery = await getCitizenIDSearchQuery(params);
-  } else if(isEmail(params.keyword)) {
+  } else if(validator.isEmail(params.keyword)) {
     docQuery = getEmailSearchQuery(params);
   } else if(isValidObjectId(params.keyword)) {
     if(params.excludeUserId && params.keyword === params.excludeUserId.toString()) {
@@ -173,7 +173,7 @@ export async function batchSearchActiveUserByKeywords(keywords: string[], { admi
           unsearchKeywords.splice(i, 1);
           break;
         }
-      } else if(isEmail(keyword)) {
+      } else if(validator.isEmail(keyword)) {
         if(nextUser.email === keyword) {
           matchResults.push(nextUser);
           unsearchKeywords.splice(i, 1);

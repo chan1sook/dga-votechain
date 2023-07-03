@@ -161,7 +161,6 @@ const haveImage = computed(() => {
   return topic.value.choices.choices.some((ele) => !!ele.image)
 })
 const pauseData: Ref<TopicCtrlPauseResponseData[]> = ref([]);
-const voterAllow: Ref<VoterAllowResponseData | undefined> = ref(undefined);
 const noVoteLocked = ref(false);
 
 const showConfirmModal = ref(false);
@@ -173,10 +172,7 @@ const remainVotes = ref(0);
 const totalVotes = ref(0);
 const canVote = computed(() => {
   if(topic.value) {
-    if(isAnonymousTopic(topic.value)) {
-      return true;
-    }
-    return voterAllow.value && voterAllow.value.remainVotes > 0;
+    return totalVotes.value > 0;
   }
   return false;
 
@@ -208,14 +204,9 @@ const { data } = await useFetch(`/api/topic/info/${topicid}`);
 if (!data.value) {
   showError(i18n.t("app.voting.cannotVote"));
 } else {
-  const { topic: _topic, voterAllow: _voterAllow, pauseData: _pauseData, votes } = data.value;
+  const { topic: _topic, pauseData: _pauseData, votes, canVote, quota, voted } = data.value;
 
-  if(useSessionData().value.roleMode === "guest" && !isAnonymousTopic(_topic)) {
-    showError({
-      message: i18n.t('app.voting.cannotVote'),
-      statusCode: 403,
-    })
-  } else if(_topic.type === "internal" && !isUserInMatchInternalTopic(_topic.internalFilter, useSessionData().value)) {
+  if(!canVote) {
     showError({
       message: i18n.t('app.voting.cannotVote'),
       statusCode: 403,
@@ -231,8 +222,7 @@ if (!data.value) {
     topic.value = _topic;
     prevVotes.value = votes;
     pauseData.value = _pauseData;
-    voterAllow.value = _voterAllow;
-    const _remainVotes = _voterAllow ? _voterAllow.remainVotes : _topic.defaultVotes;
+    const _remainVotes = Math.min(quota - voted, 0);
     remainVotes.value = _remainVotes;
     totalVotes.value = _remainVotes;
     if(_remainVotes === 0 && prevVotes.value.every((ele) => ele.choice === null)) {
@@ -326,11 +316,7 @@ async function submitVotes() {
   totalVotes.value -= votes.length;
   clearVotes();
 
-  if(topic.value && voterAllow.value) {
-    voterAllow.value.remainVotes -= votes.length;
-  }
-
-  if(topic.value && (voterAllow.value ? voterAllow.value.remainVotes === 0 : true)) {
+  if(totalVotes.value <= 0) {
     navigateTo(localePathOf("/topics"))
   } else {
     waitVote.value = false;

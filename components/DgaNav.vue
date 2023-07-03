@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import MenuIcon from 'vue-material-design-icons/Menu.vue';
-import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from '~/src/services/form/preference';
+import { getDefaultTopMenus } from '~/src/services/form/preference';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -56,12 +56,11 @@ const showOption = computed(() => useVisibleMenuGroup().value === 'main');
 const currentTopMenus = computed(() => {
   switch(useSessionData().value.roleMode) {
     case "voter":
-      return useSessionData().value.preferences?.topMenus || getDefaultTopMenus();
+      return useSessionData().value.preferences.topMenu.voter;
     case "admin":
-      return useSessionData().value.preferences?.adminTopMenus || getDefaultAdminTopMenus();
+      return useSessionData().value.preferences.topMenu.admin;
     case "developer":
-      return useSessionData().value.preferences?.devTopMenus || getDefaultDevTopMenus();
-    case "guest":
+      return useSessionData().value.preferences.topMenu.dev;
     default:
       return getDefaultTopMenus();
   }

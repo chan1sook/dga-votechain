@@ -27,6 +27,7 @@
     "tailwindcss": "^3.2.7"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.27.2",
     "@hyperledger/fabric-gateway": "^1.2.2",
     "@nuxt/test-utils": "^3.5.1",
     "@socket.io/redis-adapter": "^8.1.0",
@@ -41,8 +42,6 @@
     "debounce": "^1.2.1",
     "dotenv": "^16.0.3",
     "file-type": "^18.5.0",
-    "firebase": "^9.22.0",
-    "firebase-admin": "^11.8.0",
     "h3-formidable": "^0.3.4",
     "js-cookie": "^3.0.5",
     "mongodb": "^5.1.0",

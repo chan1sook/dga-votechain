@@ -10,9 +10,6 @@ const schema = new Schema<UserModelData>({
     digitalIdUserId: {
       type: String
     },
-    firebaseUid:  {
-      type: String
-    },
   })],
   firstName: {
     type: String,
@@ -39,19 +36,17 @@ const schema = new Schema<UserModelData>({
     type: String,
   },
   preferences: new Schema({
-    topMenus: [String],
-    adminTopMenus: [String],
-    devTopMenus: [String],
+    topMenu: new Schema({
+      voter: [String],
+      admin: [String],
+      dev: [String],
+    }),
   }),
   removeAt: {
     type: Date,
   },
   removed: {
     type: Boolean,
-  },
-  // @deprecated
-  hashedCitizenId: {
-    type: String,
   },
 }, {
   timestamps: true,

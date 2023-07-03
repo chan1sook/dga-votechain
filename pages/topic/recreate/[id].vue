@@ -3,7 +3,7 @@
     <DgaHead>{{ $t('app.topic.recreate.title')  }}</DgaHead>
     <template v-if="!useTemplate">
       <DgaTopicForm v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins" 
-        @template="useTemplate = true" @showImage="showImageFromURL"></DgaTopicForm>
+        @template="useTemplate = true"></DgaTopicForm>
       <DgaButtonGroup class="col-span-12 mt-4">
         <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
           color="dga-orange" :title="$t('app.topic.create.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
@@ -23,9 +23,6 @@
       @cancel="showConfirmModal = false"
     >
       {{ $t('app.topic.create.confirm') }}
-    </DgaModal>
-    <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
-      <img :src="imgURL" class="max-h-[77.5vh] object-contain" />
     </DgaModal>
     <DgaLoadingModal :show="waitCreate"></DgaLoadingModal>
   </div>
@@ -56,8 +53,6 @@ const useTemplate = ref(false);
 const editable = ref(false);
 const showConfirmModal = ref(false);
 const waitCreate = ref(false);
-const imgURL = ref(GRAY_BASE64_IMAGE);
-const showImageModal = ref(false);
 
 const startDate = dayjs(useComputedServerTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
@@ -129,11 +124,6 @@ function applyTemplate(name: string) {
   }
   
   useTemplate.value = false;
-}
-
-function showImageFromURL(url: string | undefined) {
-  imgURL.value = url || GRAY_BASE64_IMAGE;
-  showImageModal.value = true;
 }
 
 async function createTopic() {

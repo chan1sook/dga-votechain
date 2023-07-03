@@ -18,12 +18,10 @@ declare global {
     cidHashed?: string,
     createdAt: Date,
     updatedAt: Date,
-    preferences: UserPreferences,
+    preferences: UserPreferencesModel,
     bannedUntil?: Date,
     removeAt?: Date,
     removed?: boolean,
-    // @deprecated
-    hashedCitizenId?: string,
   }
 
   interface UserModelDataWithId extends UserModelData {
@@ -32,15 +30,19 @@ declare global {
   
   type PreferenceTopMenuOption = "home" | "voting" | "about" | "help" | "contact-us" | "users-management" | "blockchain";
   
-  interface UserPreferences {
-    topMenus: PreferenceTopMenuOption[],
-    adminTopMenus: PreferenceTopMenuOption[],
-    devTopMenus: PreferenceTopMenuOption[],
+  
+  interface UserPreferencesModel {
+    topMenu: UserPreferencesTopMenu,
+  }
+
+  interface UserPreferencesTopMenu {
+    voter: PreferenceTopMenuOption[],
+    admin: PreferenceTopMenuOption[],
+    dev: PreferenceTopMenuOption[],
   }
 
   interface UserAuthSourceData {
     authSource: UserAuthSource,
     digitalIdUserId?: DigitalIdUserId,
-    firebaseUid?: string,
   }
 }

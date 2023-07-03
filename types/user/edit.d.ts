@@ -9,6 +9,7 @@ interface UserEditFormData {
   division: string,
 }
 
-interface UserPreferenceFormData {
-  preferences: UserPreferences
+interface UserPreferencesForm {
+  userInfo: UserEditFormData,
+  topMenu: UserPreferencesTopMenu,
 }

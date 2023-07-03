@@ -4,6 +4,8 @@ import { getLastestAdminTopics, getLastestGuestTopics, getLastestVoterTopicsWith
 import { getVoterAllowByUserId } from "~/src/services/fetch/vote-allow";
 import { getTopicCtrlPauseListByTopicIds } from "~/src/services/fetch/topic-ctrl-pause";
 import { isBannedUser } from "~/src/services/validations/user";
+import { getVotesByTopicIdsAndUserId } from "~/src/services/fetch/vote";
+import { isAnonymousTopic, isCanVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
 
 export default defineEventHandler(async (event) => {
   const { filter } = getQuery(event);
@@ -19,7 +21,6 @@ export default defineEventHandler(async (event) => {
   
   const userData = event.context.userData;
   const topicVoterAllowsDocs = (userData && !isBannedUser(userData)) ? await getVoterAllowByUserId(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
-  
   let filterIds;
   if(!userData || userData.roleMode === "guest" || isBannedUser(userData)) {
     topicsData = await getLastestGuestTopics(filterParams).populate("createdBy");
@@ -31,9 +32,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const topicPauseDocs = await getTopicCtrlPauseListByTopicIds(topicsData.map((ele) => ele._id));
-  
+  const votesDoc = userData ? await getVotesByTopicIdsAndUserId(topicsData.map((ele) => ele._id), userData._id) : [];
+
   const topics = topicsData.map<TopicResponseDataExtended>((topicData, i) => {
     const topicAllowDoc = topicVoterAllowsDocs.find((voterAllow) => `${voterAllow.topicid._id}` === `${topicData._id}`);
+    const filterVotes = votesDoc.filter((ele) => ele.topicid.toString() === topicData._id.toString());
+
+    const quota = topicAllowDoc ? topicAllowDoc.totalVotes : topicData.defaultVotes;
+    const voted = filterVotes.length;
+
+    const canVote = isCanVote(userData, topicData, topicAllowDoc);
+    
     const topicPauseArr = topicPauseDocs.filter((ele) => `${ele.topicid._id}` === `${topicData._id}`);
 
     return {
@@ -65,12 +74,9 @@ export default defineEventHandler(async (event) => {
       anonymousVotes: topicData.anonymousVotes,
       showCreator: topicData.showCreator,
       recoredToBlockchain: topicData.recoredToBlockchain,
-      voterAllow: topicAllowDoc ? {
-        topicid: topicData._id.toString(),
-        userid: `${topicAllowDoc.userid}`,
-        totalVotes: topicAllowDoc.totalVotes,
-        remainVotes: topicAllowDoc.remainVotes,
-      } : undefined,
+      canVote: canVote,
+      quota: quota,
+      voted: voted,
       pauseData: topicPauseArr.map((ele) => {
         return {
           topicid: topicData._id.toString(),
