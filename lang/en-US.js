@@ -32,7 +32,6 @@ export default {
         anonymous: "Anonymous",
         switchRoleMode: "Switch mode to",
         desyncTime: "Desync time",
-        preferences: "Preferences",
       },
       withdrawUser: {
         title: "Withdraw User",
@@ -41,14 +40,23 @@ export default {
       },
       logout: "Logout"
     },
-    userInfoEdit: {
-      title: "Edit User Info",
-      typeToEdit: "Type to edit",
+    preferences: {
+      title: "Preferences",
+      userInfo: "User Info",
+      topMenu: {
+        title: "Top Menu",
+        voter: "Voter Menu Order",
+        admin: "Admin Menu Order",
+        dev: "Developer Menu Order",
+        remainTopMenu: "Remain Menu",
+        currentTopMenu: "Current Menu",
+      },
       isGovOfficer: "Government Officer",
+      typeToEdit: "Type to edit",
       action: "Edit",
-      confirm: "Confirm to Edit User Info?",
-      success: "Edit User Info Successful",
-      failed: "Edit User Info Failed",
+      confirm: "Confirm to Edit Preferences?",
+      success: "Edit Preferences Successful",
+      failed: "Edit Preferences Failed",
     },
     topic: {
       create: {
@@ -312,16 +320,15 @@ export default {
       cancel: "Cancel",
       confirm: "Confirm"
     },
+    anonymous: "Anonymous",
+    role: {
+      guest: "Anonymous",
+      voter: "Voter",
+      admin: "Admin",
+      developer: "Developer",
+    },
     required: "Required",
     optional: "Optional",
-    edit: "Edit",
-    detail: "Detail",
-  },
-  userPreferences: {
-    title: "Preferences",
-    topMenuOrders: "Top Menu Orders",
-    remainTopMenu: "Remain Menu",
-    currentTopMenu: "Current Menu",
     selectAll: "Select All",
     deselectAll: "Deselect All",
     select: "Select",
@@ -330,6 +337,15 @@ export default {
     moveUp: "Move Up",
     moveDown: "Move Down",
     moveToBottom: "Move to Bottom",
+    edit: "Edit",
+    detail: "Detail",
+    error: {
+      title: "Error",
+      backToHome: "Back to Home"
+    },
+  },
+  userPreferences: {
+    title: "Preferences",
     confirm: "Confirm to Edit User Preferences?",
     success: "Edit User Preferences Successful",
     failed: "Edit User Preferences Failed"
@@ -377,12 +393,6 @@ export default {
     loginWithGoogle: "Login with Google",
     registerDigitalId: "Register with Digital ID",
   },
-  role: {
-    guest: "Anonymous",
-    voter: "Voter",
-    admin: "Admin",
-    developer: "Developer",
-  },
   news: {
     title: "News",
     id: "News ID",
@@ -416,7 +426,6 @@ export default {
       date: "Expired Date",
       time: "Expired Time",
     },
-    anonymous: "Anonymous",
     noReference: "No References"
   },
   admin: {
@@ -455,10 +464,6 @@ export default {
       transactionData: "TX Data",
       transactionRawData: "Raw TX Data",
     },
-  },
-  error: {
-    title: "Error",
-    backToHome: "Back to Home"
   },
   cookieConsent: {
     useCookie: "This website use cookies",

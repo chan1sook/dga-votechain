@@ -22,11 +22,11 @@
             <DgaUserCard v-if="!selectedUser" v-for="ele of userList" :role="ele.role" editable @change="toChangeUserPage(ele)">
               <template #userid>#{{ ele._id }}</template>
               <template #role>
-                <span v-if="ele.role">{{ $t(`role.${ele.role}`, ele.role) }}</span>
+                <span v-if="ele.role">{{ $t(`app.role.${ele.role}`, ele.role) }}</span>
               </template>
               <div> 
                 <span v-if="userNameOf(ele)">{{ userNameOf(ele) }}</span>
-                <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
+                <span class="italic" v-else>{{ $t("app.anonymous") }}</span>
               </div>
               <div>
                 <span class="font-bold"></span>{{ $t('app.email') }}: 
@@ -38,11 +38,11 @@
               <DgaUserCard @change="toChangeUserPage(selectedUser)">
                 <template #userid>#{{ selectedUser._id }}</template>
                 <template #role>
-                  <span v-if="selectedUser.role">{{ $t(`role.${selectedUser.role}`, selectedUser.role) }}</span>
+                  <span v-if="selectedUser.role">{{ $t(`app.role.${selectedUser.role}`, selectedUser.role) }}</span>
                 </template>
                 <div> 
                   <span v-if="userNameOf(selectedUser)">{{ userNameOf(selectedUser) }}</span>
-                  <span class="italic" v-else>{{ $t("app.navbar.user.anonymous") }}</span>
+                  <span class="italic" v-else>{{ $t("app.anonymous") }}</span>
                 </div>
                 <div>
                   <span class="font-bold"></span>{{ $t('app.email') }}: 

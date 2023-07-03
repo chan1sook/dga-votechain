@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="isOfflineMode || true" class="text-sm px-2 py-1 bg-red-700 text-white text-center">
+    <div v-if="isOfflineMode" class="text-sm px-2 py-1 bg-red-700 text-white text-center">
       {{ $t('app.offlineMode') }} {{ formatDateTime(offlineStart) }} - {{ formatDateTime(offlineEnd) }}
     </div>
     <div class="dga-footer-about">

@@ -10,7 +10,7 @@
       <div>{{ $t('news.author') }}</div>
       <div>
         <span v-if="news.author">{{ news.author }}</span>
-        <span v-else class="italic">{{ $t('news.anonymous') }}</span>
+        <span v-else class="italic">{{ $t('app.anonymous') }}</span>
       </div>
       <div>{{ $t('news.publishAt') }}</div>
       <div>{{ $d(dayjs(news.newsPublishAt).toDate(), "long") }}</div>

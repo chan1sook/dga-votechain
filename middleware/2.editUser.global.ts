@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   }
 
   const currentPath = to.path;
-  if(currentPath === "/user/edit") {
+  if(currentPath === "/user/preferences") {
     return;
   }
 
@@ -17,6 +17,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       !userData.ministry || !userData.department || !userData.division
     ) : false)
   ) {
-    return navigateTo('/user/edit')
+    return navigateTo('/user/preferences')
   }
 })

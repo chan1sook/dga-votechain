@@ -3,7 +3,7 @@ import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~/src/models/blockchain-server"
 import { combinePermissions, removePermissions } from '~/src/services/transform/permission';
 import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
-import { updateConfigurations, getConfigurations } from "~/src/services/fetch/config";
+import { updateConfigurations, getConfigurations, applyConfigurations } from "~/src/services/fetch/config";
 import { thaiLocalTimeToGMT } from "~/src/services/transform/localtime";
 
 let migrationSeq = 0;
@@ -21,6 +21,8 @@ export async function initConfigs() {
       thaiLocalTimeToGMT(2023, 6, 2, 23, 59, 59, 999)
     ],
   }, true);
+
+  applyConfigurations();
 
   console.log(`[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`);
 }
@@ -104,22 +106,4 @@ export async function updatePermissions() {
   const result = await UserModel.bulkSave(users);
 
   console.log(`[Migration] Update Permissions (Updated: ${result.modifiedCount})`);
-}
-
-export async function updatePreferenceMenu() {
-  migrationSeq += 1;
-
-  console.log(`[Migration] ${migrationSeq}. Update Preference Menu`);
-
-  const users = await UserModel.find({
-    "preferences.adminTopMenus": "users-management",
-  });
-  for(const user of users) {
-    user.preferences.adminTopMenus = user.preferences.adminTopMenus.filter((ele) => ele !== "users-management")
-    user.markModified("preferences")
-  }
-  
-  const result = await UserModel.bulkSave(users);
-
-  console.log(`[Migration] Update Preference Menu (Updated: ${result.modifiedCount})`);
 }

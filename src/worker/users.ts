@@ -29,9 +29,11 @@ async function cleanRemovedUsers() {
     user.division = undefined;
 
     user.preferences = {
-      topMenus: [],
-      adminTopMenus: [],
-      devTopMenus: [],
+      topMenu: {
+        voter: [],
+        admin: [],
+        dev: [],
+      },
     }
 
     user.bannedUntil = undefined;

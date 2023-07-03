@@ -32,7 +32,6 @@ export default {
         anonymous: "ผู้ไม่ทราบนาม",
         switchRoleMode: "เปลี่ยนโหมดเป็น",
         desyncTime: "เวลาไม่ตรงกับเซิร์ฟเวอร์",
-        preferences: "ตั้งค่า",
       },
       withdrawUser: {
         title: "ถอนตัวจากระบบ",
@@ -41,14 +40,23 @@ export default {
       },
       logout: "ออกจากระบบ"
     },
-    userInfoEdit: {
-      title: "แก้ไขข้อมูลผู้ใช้",
+    preferences: {
+      title: "ตั้งค่า",
+      userInfo: "ข้อมูลผู้ใช้",
+      topMenu: {
+        title: "ตั้งค่าแถบเมนู",
+        voter: "ลำดับเมนูสำหรับผู้โหวต",
+        admin: "ลำดับเมนูสำหรับผู้ดูแล",
+        dev: "ลำดับเมนูสำหรับผู้พัฒนา",
+        remainTopMenu: "เมนูที่เหลืออยู่",
+        currentTopMenu: "เมนูปัจจุบัน",
+      },
       typeToEdit: "พิมพ์เพื่อแก้ไข",
       isGovOfficer: "ข้าราชการ/บุคลากรของรัฐ",
       action: "แก้ไขข้อมูล",
-      confirm: "ยีนยันการแก้ไขข้อมูลผู้ใช้?",
-      success: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
-      failed: "แก้ไขข้อมูลผู้ใช้ล้มเหลว",
+      confirm: "ยีนยันการตั้งค่า?",
+      success: "ตั้งค่าสำเร็จ",
+      failed: "ตั้งค่าล้มเหลว",
     },
     topic: {
       create: {
@@ -314,16 +322,15 @@ export default {
       cancel: "ยกเลิก",
       confirm: "ยืนยัน"
     },
+    anonymous: "ผู้ไม่ทราบนาม",
+    role: {
+      guest: "นิรนาม",
+      voter: "ผู้โหวต",
+      admin: "ผู้ดูแล",
+      developer: "ผู้พัฒนา",
+    },
     required: "จำเป็น",
     optional: "ไม่จำเป็น",
-    edit: "แก้ไข",
-    detail: "รายละเอียด",
-  },
-  userPreferences: {
-    title: "ตั้งค่า",
-    topMenuOrders: "ลำดับเมนูด้านบน",
-    remainTopMenu: "เมนูที่เหลืออยู่",
-    currentTopMenu: "เมนูปัจจุบัน",
     selectAll: "เลือกทั้งหมด",
     deselectAll: "เอาออกทั้งหมด",
     select: "เลือก",
@@ -332,9 +339,12 @@ export default {
     moveUp: "ย้ายขึ้น",
     moveDown: "ย้ายลง",
     moveToBottom: "ย้ายไปยังล่างสุด",
-    confirm: "ยืนยันการแก้ไขการตั้งค่าผู้ใช้?",
-    success: "แก้ไขการตั้งค่าผู้ใช้สำเร็จ",
-    failed: "แก้ไขการตั้งค่าผู้ใช้ล้มเหลว"
+    edit: "แก้ไข",
+    detail: "รายละเอียด",
+    error: {
+      title: "ผิดพลาด",
+      backToHome: "กลับสู่หน้าหลัก"
+    },
   },
   notification: {
     topic: {
@@ -380,12 +390,6 @@ export default {
     loginWithGoogle: "เข้าสู่ระบบด้วย Google",
     registerDigitalId: "ลงทะเบียนด้วย Digital ID",
   },
-  role: {
-    guest: "นิรนาม",
-    voter: "ผู้โหวต",
-    admin: "ผู้ดูแล",
-    developer: "ผู้พัฒนา",
-  },
   news: {
     title: "ข่าว",
     id: "รหัสข่าว",
@@ -419,7 +423,6 @@ export default {
       date: "วันสิ้นสุด",
       time: "เวลาสิ้นสุด",
     },
-    anonymous: "ผู้ไม่ทราบนาม",
     noReference: "ไม่มีแหล่งอ้างอิง"
   },
   admin: {
@@ -458,10 +461,6 @@ export default {
       transactionData: "ข้อมูลใน TX",
       transactionRawData: "ข้อมูลดิบ TX",
     },
-  },
-  error: {
-    title: "ผิดพลาด",
-    backToHome: "กลับสู่หน้าหลัก"
   },
   cookieConsent: {
     useCookie: "เว็บไซต์นี้ใช้คุกกี้",

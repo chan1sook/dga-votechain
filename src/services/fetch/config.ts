@@ -1,6 +1,8 @@
 import { FilterQuery } from "mongoose";
 import ConfigModel from "~/src/models/config"
 
+export const EXTRA_CONFIGS = <Record<string, any>>{};
+
 export function getConfigurations(filterKeys?: string[]) {
   const query : FilterQuery<ConfigModelData> = {};
 
@@ -34,10 +36,8 @@ export async function updateConfigurations(config: {[key : string]: any}, create
 
 
 export async function applyConfigurations() {
-  // TODO ...
   const existsConfigs = await getConfigurations();
-  const configs: {[key : string]: any} = {};
   for(const configDoc of existsConfigs) {
-    configs[configDoc.key] = configDoc.value;
+    EXTRA_CONFIGS[configDoc.key] = configDoc.value;
   }
 }

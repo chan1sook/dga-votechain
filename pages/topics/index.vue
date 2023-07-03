@@ -34,7 +34,7 @@
       </DgaButton>
       <div v-if="isAdminMode" class="w-full sm:w-auto ml-auto flex flex-col justify-center sm:flex-row gap-2">
         <DgaButton 
-          class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2" color="dga-orange"
+          class="w-full max-w-[200px] mx-auto sm:w-auto flex flex-row gap-2 items-center !px-6 !py-2"
           :title="$t('app.voting.createTopic')"
           :href="localePathOf('/topic/create')"
         >
