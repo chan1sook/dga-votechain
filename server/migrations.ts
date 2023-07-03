@@ -3,7 +3,7 @@ import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~/src/models/blockchain-server"
 import { combinePermissions, removePermissions } from '~/src/services/transform/permission';
 import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
-import { updateConfigurations, getConfigurations, applyConfigurations } from "~/src/services/fetch/config";
+import { updateConfigurations } from "~/src/services/fetch/config";
 import { thaiLocalTimeToGMT } from "~/src/services/transform/localtime";
 
 let migrationSeq = 0;
@@ -21,8 +21,6 @@ export async function initConfigs() {
       thaiLocalTimeToGMT(2023, 6, 2, 23, 59, 59, 999)
     ],
   }, true);
-
-  applyConfigurations();
 
   console.log(`[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`);
 }

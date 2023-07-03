@@ -1,13 +1,17 @@
 import { FilterQuery } from "mongoose";
 import ConfigModel from "~/src/models/config"
 
-export const EXTRA_CONFIGS = <Record<string, any>>{};
-
-export function getConfigurations(filterKeys?: string[]) {
-  const query : FilterQuery<ConfigModelData> = {};
+export function getConfigurations(filterKeys?: string[], withProtected?: boolean) {
+  const query : FilterQuery<ConfigModelData> = {
+    protected: { $ne: true }
+  };
 
   if(Array.isArray(filterKeys) && filterKeys.length > 0) {
     query.key = { $in: filterKeys };
+  }
+
+  if(withProtected) {
+    delete query.protected;
   }
 
   return ConfigModel.find(query);
@@ -32,12 +36,4 @@ export async function updateConfigurations(config: {[key : string]: any}, create
   }
 
   return await ConfigModel.bulkSave(existsConfigs);
-}
-
-
-export async function applyConfigurations() {
-  const existsConfigs = await getConfigurations();
-  for(const configDoc of existsConfigs) {
-    EXTRA_CONFIGS[configDoc.key] = configDoc.value;
-  }
 }

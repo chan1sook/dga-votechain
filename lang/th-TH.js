@@ -339,7 +339,11 @@ export default {
     moveUp: "ย้ายขึ้น",
     moveDown: "ย้ายลง",
     moveToBottom: "ย้ายไปยังล่างสุด",
+    add: "เพิ่ม",
     edit: "แก้ไข",
+    revert: "ย้อนกลับ",
+    change: "เปลี่ยน",
+    remove: "ลบ",
     detail: "รายละเอียด",
     error: {
       title: "ผิดพลาด",

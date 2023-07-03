@@ -14,11 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { EXTRA_CONFIGS } from '~/src/services/fetch/config';
-
 const i18n = useI18n();
-
-console.log(EXTRA_CONFIGS);
 
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('home.title')}`

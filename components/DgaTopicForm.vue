@@ -122,54 +122,37 @@
       >
       </DgaInput>
     </div>
-    <template v-if="showDescription">
-      <div class="col-span-12 md:col-span-2 self-start">{{ $t('app.description.title') }}</div>
-      <div class="col-span-12 md:col-span-10">
-        <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('app.description.title')"></DgaTextArea>
-      </div>
-      <button  @click="showDescription = false" :title="$t('app.description.hide')" class="col-span-12 ml-auto">
-        {{ $t('app.description.hide')}}
-      </button>
-    </template>
-    <template v-else>
-      <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('app.description.add')" @click="showDescription = true">
-        <PlusIcon /> {{ $t('app.description.add') }}
-      </button>
+    <template v-if="false">
+      <template v-if="showDescription">
+        <div class="col-span-12 md:col-span-2 self-start">{{ $t('app.description.title') }}</div>
+        <div class="col-span-12 md:col-span-10">
+          <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('app.description.title')"></DgaTextArea>
+        </div>
+        <button  @click="showDescription = false" :title="$t('app.description.hide')" class="col-span-12 ml-auto">
+          {{ $t('app.description.hide')}}
+        </button>
+      </template>
+      <template v-else>
+        <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('app.description.add')" @click="showDescription = true">
+          <PlusIcon /> {{ $t('app.description.add') }}
+        </button>
+      </template>
     </template>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.addChoice.title') }}</h3>
     <div v-for="choice, i of topicData.choices.choices" class="col-span-12 flex justify-center items-center">
       <div class="w-full max-w-xl flex flex-row gap-2 justify-center items-center">
-        <ExclamationIcon
-          :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
-          class="text-red-500"
+        <span class="border-[3px] border-red-500" :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
           :title="getChoiceErrorReason(choice.name)"
-        />
-        <div class="w-full flex-1 grid grid-cols-12 items-center justify-center gap-x-2 gap-y-1">
-          <DgaInput v-model="choice.name" type="text" class="col-span-8 md:col-span-10"></DgaInput>
-          <img :src="getImgUrlAt(i)" class="w-full max-h-24 col-span-4 md:col-span-2 row-span-2 cursor-pointer" @click="emit('showImage', getImgUrlAt(i))"/>
-          <div class="col-span-8 md:col-span-10 flex flex-row gap-2 items-center">
-            <ImageIcon />
-            <DgaFileInput type="file" class="w-full flex-1" accept="image/jpeg,image/x-png" @change="changeImgFile($event, i)"></DgaFileInput>
-            <template v-if="choice.image && !imgUrl[i]">
-              <button v-if="topicData.images[i] !== false" @click="setRemoveImgAt(i)">
-                <TrashCanIcon />
-              </button>
-              <button v-else @click="revertImgFileAt(i)">
-                <UndoIcon />
-              </button>
-            </template>
-            <template v-else>
-              <button v-if="topicData.images[i]" @click="revertImgFileAt(i)">
-                <UndoIcon />
-              </button>
-            </template>
-          </div>
-        </div>
-        <button class="px-2 py-1 inline-flex items-center"
+        >
+          <ExclamationIcon class="text-red-500" />
+        </span>
+        <DgaInput v-model="choice.name" type="text" class="flex-1 w-0"></DgaInput>
+        <button class="px-1 py-1 inline-flex items-center rounded-full border-[3px] border-dga-blue"
           :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
         >
           <MinusIcon />
         </button>
+        <DgaImagePicker v-model="topicData.images[i]" :exists-image="getExistsImage(i)" />
       </div>
     </div>
     <div class="col-span-12 flex justify-center items-center">
@@ -266,14 +249,12 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: "update:modelValue", v: TopicFormData) : void,
   (e: "template", v: void): void,
-  (e: "showImage", v: string | undefined): void,
 }>();
 
 const i18n = useI18n();
 
 const startDate = dayjs().minute(0).second(0).millisecond(0).add(1, "hour").toDate();
 const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
-const imgUrl : Ref<(string | undefined)[]> = ref([]);
 const voteStart = ref(dayjs(startDate).format("YYYY-MM-DD HH:mm"));
 const voteEnd = ref(dayjs(expiredDate).format("YYYY-MM-DD HH:mm"));
 const voteDuration = ref({
@@ -449,11 +430,6 @@ function getChoiceErrorReason(choice: string) {
 function removeOption(nth: number) {
   topicData.value.choices.choices.splice(nth, 1);
   topicData.value.images.splice(nth, 1);
-  const oldUrl = imgUrl.value[nth];
-  if(oldUrl !== undefined) {
-    URL.revokeObjectURL(oldUrl);
-  }
-  imgUrl.value.splice(nth, 1);
 }
 
 function addOption() {
@@ -598,52 +574,13 @@ function addCoadmins(users: UserSearchResponseData[] | null) {
   }
 }
 
-function getImgUrlAt(i: number) {
-  if(imgUrl.value[i]) {
-    return imgUrl.value[i];
-  }
-
-  if(topicData.value.choices.choices[i].image && topicData.value.images[i] !== false) {
+function getExistsImage(i: number) {
+  if(topicData.value.choices.choices[i].image) {
     return `/api/image/${topicData.value.choices.choices[i].image}`
   }
   
-  return GRAY_BASE64_IMAGE;
+  return undefined;
 }
-
-function changeImgFile(ev: Event, i: number) {
-  const target = ev.target;
-  if(target instanceof HTMLInputElement) {
-    if(target.files && target.files.length > 0) {
-      const currentFile = target.files[0];
-      topicData.value.images[i] = currentFile;
-      const oldUrl = imgUrl.value[i];
-      if(oldUrl !== undefined) {
-        URL.revokeObjectURL(oldUrl);
-      }
-
-      imgUrl.value[i] = URL.createObjectURL(currentFile);
-    }
-  }
-}
-
-function setRemoveImgAt(i: number) {
-  topicData.value.images[i] = false;
-  const oldUrl = imgUrl.value[i];
-  if(oldUrl !== undefined) {
-    URL.revokeObjectURL(oldUrl);
-  }
-  imgUrl.value[i] = undefined;
-}
-
-function revertImgFileAt(i: number) {
-  topicData.value.images[i] = undefined;
-  const oldUrl = imgUrl.value[i];
-  if(oldUrl !== undefined) {
-    URL.revokeObjectURL(oldUrl);
-  }
-  imgUrl.value[i] = undefined;
-}
-
 </script>
 
 <style>

@@ -337,7 +337,11 @@ export default {
     moveUp: "Move Up",
     moveDown: "Move Down",
     moveToBottom: "Move to Bottom",
+    add: "Add",
     edit: "Edit",
+    change: "Change",
+    revert: "Revert",
+    remove: "Remove",
     detail: "Detail",
     error: {
       title: "Error",

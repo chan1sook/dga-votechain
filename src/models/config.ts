@@ -8,6 +8,10 @@ const schema = new Schema<ConfigModelData>({
   },
   value: {
     type: Schema.Types.Mixed,
+  },
+  protected: {
+    type: Boolean,
+    default: false,
   }
 }, { timestamps: true });
 
