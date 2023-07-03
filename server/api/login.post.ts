@@ -43,14 +43,13 @@ export default defineEventHandler(async (event) => {
   
     urlParams.set("scope", scopes.join(" "));
 
-    const url = new URL(`/api/v1/oauth2/auth/`, "https://imauth.bora.dopa.go.th/");
+    const url = new URL(`/api/v1/oauth2/auth/?${urlParams}`, "https://imauth.bora.dopa.go.th");
     
     setHeader(event, "Content-type", "application/x-www-form-urlencoded");
     setHeader(event, "x-imauth-apikey", THAID_API_KEY);
     const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url");
     setHeader(event, "Authorization", authBasic);
 
-    setHeader(event, "", "");
     return sendRedirect(event, url.toString())
   }
 
