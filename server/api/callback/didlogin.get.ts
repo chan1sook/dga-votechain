@@ -5,7 +5,7 @@ import { authorizationCodeDigitalID, DID_VERIFY_CODE, getUserInfoDigitalID } fro
 import UserModel from "~/src/models/user"
 import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
-import { getActiveUserByAuthSource, getActiveUserByCitizenID, getActiveUserByEmail }  from "~/src/services/fetch/user";
+import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
 
@@ -27,10 +27,6 @@ export default defineEventHandler(async (event) => {
 
     if(!userDoc) {
       userDoc = await getActiveUserByCitizenID(digitalIdUserInfo.citizen_id);
-    }
-
-    if(!userDoc) {
-      userDoc = await getActiveUserByEmail(digitalIdUserInfo.email);
     }
 
     if(!userDoc) {
