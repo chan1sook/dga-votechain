@@ -41,7 +41,7 @@ export default {
       logout: "ออกจากระบบ"
     },
     preferences: {
-      title: "ตั้งค่า",
+      title: "ตั้งค่าการใช้งาน",
       userInfo: "ข้อมูลผู้ใช้",
       topMenu: {
         title: "ตั้งค่าแถบเมนู",
