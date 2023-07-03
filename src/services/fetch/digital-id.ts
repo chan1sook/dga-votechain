@@ -1,4 +1,7 @@
 import axios from "axios";
+import crypto from "crypto";
+
+export const DID_VERIFY_CODE = crypto.randomBytes(24).toString("hex");
 
 export async function authorizationCodeDigitalID(code: string, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE }: DigitalIdAuthorizationCodeParam) {
   const urlParams = new URLSearchParams();

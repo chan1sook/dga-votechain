@@ -11,7 +11,6 @@ export default {
       contactUs: "Contact Us",
       adminShowUsers: "User Lists",
       blockchain: "Blockchain",
-      login: "Login",
       language: "Current Language",
       news: {
         title: "News",
@@ -40,6 +39,12 @@ export default {
       },
       logout: "Logout"
     },
+    login: {
+      title: "Login",
+      loginDigitalId: "Login with Digital ID",
+      loginThaId: "Login with ThaId",
+      registerDigitalId: "Register with Digital ID",
+    },
     preferences: {
       title: "Preferences",
       userInfo: "User Info",
@@ -58,6 +63,7 @@ export default {
       success: "Edit Preferences Successful",
       failed: "Edit Preferences Failed",
     },
+    
     topic: {
       create: {
         title: "Create Topic",
@@ -390,12 +396,6 @@ export default {
       email: "Email:",
       contactCenter: "DGA Contact Center:",
     }
-  },
-  login: {
-    title: "Login",
-    loginDigitalId: "Login with Digital ID",
-    loginWithGoogle: "Login with Google",
-    registerDigitalId: "Register with Digital ID",
   },
   news: {
     title: "News",

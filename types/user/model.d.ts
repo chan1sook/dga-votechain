@@ -1,8 +1,7 @@
 import { type Types } from "mongoose";
 
 declare global {
-  // "firebase" @deprecated 
-  type UserAuthSource = "digitalId" | "firebase";
+  type UserAuthSource = "digitalId" | "thaID";
   type UserRole = "guest" | "voter" | "admin" | "developer";
   
   interface UserModelData {
@@ -44,5 +43,6 @@ declare global {
   interface UserAuthSourceData {
     authSource: UserAuthSource,
     digitalIdUserId?: DigitalIdUserId,
+    thaIdUserId?: ThaIDUserId,
   }
 }

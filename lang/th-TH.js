@@ -11,7 +11,6 @@ export default {
       contactUs: "ติดต่อเรา",
       adminShowUsers: "รายชื่อผู้ใช้",
       blockchain: "Blockchain",
-      login: "เข้าสู่ระบบ",
       language: "ภาษาปัจจุบัน",
       news: {
         title: "ข่าวสาร",
@@ -39,6 +38,12 @@ export default {
         confirm2: "กระบวนการนี้ไม่สามารถย้อนกลับได้",
       },
       logout: "ออกจากระบบ"
+    },
+    login: {
+      title: "เข้าสู่ระบบ",
+      loginDigitalId: "เข้าสู่ระบบด้วย Digital ID",
+      loginThaId: "เข้าสู่ระบบด้วย ThaID",
+      registerDigitalId: "ลงทะเบียนด้วย Digital ID",
     },
     preferences: {
       title: "ตั้งค่าการใช้งาน",
@@ -387,12 +392,6 @@ export default {
       email: "อีเมล:",
       contactCenter: "DGA Contact Center:",
     },
-  },
-  login: {
-    title: "เข้าสู่ระบบ",
-    loginDigitalId: "เข้าสู่ระบบด้วย Digital ID",
-    loginWithGoogle: "เข้าสู่ระบบด้วย Google",
-    registerDigitalId: "ลงทะเบียนด้วย Digital ID",
   },
   news: {
     title: "ข่าว",

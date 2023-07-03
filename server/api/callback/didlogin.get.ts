@@ -1,7 +1,7 @@
 
 import bcrypt from "bcrypt";
 
-import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~/src/services/fetch/digital-id";
+import { authorizationCodeDigitalID, DID_VERIFY_CODE, getUserInfoDigitalID } from "~/src/services/fetch/digital-id";
 import UserModel from "~/src/models/user"
 import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
@@ -11,10 +11,10 @@ import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, public: { DID_API_URL },  } = useRuntimeConfig()
+  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, public: { DID_API_URL },  } = useRuntimeConfig()
 
   if(typeof code === "string") {
-    const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE });
+    const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE: DID_VERIFY_CODE });
 
     const digitalIdUserInfo = await getUserInfoDigitalID(access_token, { DID_API_URL });
 
