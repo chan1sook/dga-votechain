@@ -9,22 +9,18 @@ export async function authorizationThaID(code: string, { THAID_API_KEY, THAID_CL
   urlParams.set("code", code);
   urlParams.set("redirect_uri", THAID_LOGIN_CALLBACK);
 
-  const url = new URL(`/api/v1/oauth2/token`, "https://imauth.bora.dopa.go.th");
+  // TODO fix 404 error
+  const url = new URL("https://imauth.bora.dopa.go.th/api/v1/oauth2/token/");
 
   console.log("[ThaID URL]", url);
   
   const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url");
-  try {
-    const { data } = await axios.post(url.toString(), urlParams, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "x-imauth-apikey": THAID_API_KEY,
-        "Authorization": authBasic,
-      },
-    })
-    return data;
-  } catch(err) {
-    console.log("[API Error]")
-    console.error(err);
-  }
+  const { data } = await axios.post(url.toString(), urlParams, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "x-imauth-apikey": THAID_API_KEY,
+      "Authorization": authBasic,
+    },
+  })
+  return data;
 }

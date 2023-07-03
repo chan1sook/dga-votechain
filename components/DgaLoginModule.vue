@@ -16,7 +16,7 @@
         </DgaButton>
       </form>
     </DgaButtonGroup>
-    <DgaButtonGroup larger class="mt-2">
+    <DgaButtonGroup v-if="false" larger class="mt-2">
       <form action="/api/login" method="POST" class="w-full">
         <input type="hidden" name="source" value="thaID" />
         <DgaButton type="submit" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
