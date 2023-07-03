@@ -9,10 +9,10 @@ export async function authorizationThaID(code: string, { THAID_API_KEY, THAID_CL
   urlParams.set("code", code);
   urlParams.set("redirect_uri", THAID_LOGIN_CALLBACK);
 
-  const url = new URL(`/api/v1/oauth2/token?${urlParams}`, "https://imauth.bora.dopa.go.th");
+  const url = new URL(`/api/v1/oauth2/token`, "https://imauth.bora.dopa.go.th");
 
   const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url");
-  const { data } = await axios.get(url.toString(), {
+  const { data } = await axios.post(url.toString(), urlParams, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       "x-imauth-apikey": THAID_API_KEY,
