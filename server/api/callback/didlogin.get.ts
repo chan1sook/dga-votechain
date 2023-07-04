@@ -39,7 +39,12 @@ export default defineEventHandler(async (event) => {
     }
 
     if(userDoc) {
-      if(!userDoc.authSources.find((ele) => JSON.stringify(ele) === JSON.stringify(authSource))) {
+      if(!userDoc.authSources.find((ele) => {
+        const search : Record<string, any> = { ...ele };
+        delete search._id;
+        
+        JSON.stringify(ele) === JSON.stringify(authSource);
+      })) {
         userDoc.authSources.push(authSource);
       }
       
