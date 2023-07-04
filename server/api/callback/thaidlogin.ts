@@ -8,7 +8,7 @@ import { USER_SESSION_KEY } from "~/server/session-handler";
 import { getActiveUserByAuthSource, getActiveUserByCitizenID, getActiveUserByEmail }  from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
-import { authorizationThaID } from "~/src/services/fetch/thaid";
+import { authorizationThaID } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)

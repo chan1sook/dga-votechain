@@ -1,6 +1,6 @@
 import crypto from "crypto"
 import { DID_VERIFY_CODE } from "~/src/services/vendor/digital-id";
-import { THAID_STATE } from "~/src/services/fetch/thaid";
+import { THAID_STATE } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
   const param = await readBody(event);
