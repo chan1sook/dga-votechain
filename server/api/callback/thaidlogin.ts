@@ -53,8 +53,10 @@ export default defineEventHandler(async (event) => {
         userDoc.lastName = data.th_lname;
       }
 
-      const cidHashed = await bcrypt.hash(data.pid, CITIZENID_FIXED_SALT);
-      userDoc.cidHashed = cidHashed;
+      if(!userDoc.cidHashed) {
+        const cidHashed = await bcrypt.hash(data.pid, CITIZENID_FIXED_SALT);
+        userDoc.cidHashed = cidHashed;
+      }
 
       await userDoc.save();
     }
