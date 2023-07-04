@@ -43,6 +43,6 @@ declare global {
   interface UserAuthSourceData {
     authSource: UserAuthSource,
     digitalIdUserId?: DigitalIdUserId,
-    thaIdUserId?: ThaIDUserId,
+    thaIDUserId?: ThaIDUserId,
   }
 }

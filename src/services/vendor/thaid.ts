@@ -11,8 +11,7 @@ export async function authorizationThaID(code: string, { THAID_API_KEY, THAID_CL
 
   const url = "https://imauth.bora.dopa.go.th/api/v1/oauth2/token/";
   
-  const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url");
-  console.log(Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url"));
+  const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64");
   
   const { data } = await axios.post(url, urlParams, {
     headers: {
@@ -21,5 +20,5 @@ export async function authorizationThaID(code: string, { THAID_API_KEY, THAID_CL
       "Authorization": authBasic,
     },
   })
-  return data;
+  return data as ThaIDAuthResponse;
 }

@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     
     setHeader(event, "Content-type", "application/x-www-form-urlencoded");
     setHeader(event, "x-imauth-apikey", THAID_API_KEY);
-    const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url");
+    const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64");
     setHeader(event, "Authorization", authBasic);
 
     return sendRedirect(event, url.toString())

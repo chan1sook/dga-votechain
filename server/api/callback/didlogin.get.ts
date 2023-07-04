@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
     };
     let userDoc = await getActiveUserByAuthSource(authSource);
 
-
     if(!userDoc) {
       userDoc = await getActiveUserByCitizenID(digitalIdUserInfo.citizen_id);
     }
@@ -32,9 +31,7 @@ export default defineEventHandler(async (event) => {
     if(!userDoc) {
       userDoc = new UserModel({
         permissions: legacyRoleToPermissions("admin"),
-        authSources: [
-          { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
-        ],
+        authSources: [authSource],
         firstName: digitalIdUserInfo.given_name,
         lastName: digitalIdUserInfo.family_name,
         email: digitalIdUserInfo.email,
@@ -42,7 +39,6 @@ export default defineEventHandler(async (event) => {
     }
 
     if(userDoc) {
-      const authSource : UserAuthSourceData = { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id };
       if(!userDoc.authSources.find((ele) => JSON.stringify(ele) === JSON.stringify(authSource))) {
         userDoc.authSources.push(authSource);
       }
@@ -60,7 +56,6 @@ export default defineEventHandler(async (event) => {
         userDoc.email = digitalIdUserInfo.email;
       }
 
-      // Temp
       const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
       userDoc.cidHashed = cidHashed;
 

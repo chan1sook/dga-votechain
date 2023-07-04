@@ -1,26 +1,90 @@
 
 import bcrypt from "bcrypt";
 
-import { getUserInfoDigitalID } from "~/src/services/vendor/digital-id";
 import UserModel from "~/src/models/user"
-import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
+import { legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
-import { getActiveUserByAuthSource, getActiveUserByCitizenID, getActiveUserByEmail }  from "~/src/services/fetch/user";
+import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, public: { DID_API_URL },  } = useRuntimeConfig()
+  const { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT } = useRuntimeConfig()
 
   if(typeof code === "string") {
     const data = await authorizationThaID(code, { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK });
-    console.log(data);
+
+    // salt pid to unique-id
+    const modifiedPID = Buffer.from("tha" + data.pid + "id").reverse().toString("base64");
+    console.log("v1", modifiedPID);
+
+    const modifiedPID2 = Buffer.from(Buffer.from("tha" + data.pid + "id").reverse().map((n) => 0xFF - n)).toString("base64");
+    console.log("v2", modifiedPID2);
+    
     throw createError({
       statusCode: 501,
-      statusMessage: "Not Implemented (Test in production)"
-    })
+      statusMessage: "Not Implemented yet (Test Convert)"
+    });
+    
+    const thaIDUserId = await bcrypt.hash(modifiedPID, CITIZENID_FIXED_SALT);
+    const authSource : UserAuthSourceData = {
+      authSource: "thaID",
+      thaIDUserId: thaIDUserId,
+    };
+
+    let userDoc = await getActiveUserByAuthSource(authSource);
+
+    if(!userDoc) {
+      userDoc = await getActiveUserByCitizenID(data.pid);
+    }
+
+    if(!userDoc) {
+      userDoc = new UserModel({
+        permissions: legacyRoleToPermissions("admin"),
+        authSources: [authSource],
+        firstName: data.th_fname,
+        lastName: data.th_lname,
+      });
+    }
+
+    if(userDoc) {
+      if(!userDoc.authSources.find((ele) => JSON.stringify(ele) === JSON.stringify(authSource))) {
+        userDoc.authSources.push(authSource);
+      }
+      
+      // auto apply some
+      if(!userDoc.firstName) {
+        userDoc.firstName = data.th_fname;
+      }
+
+      if(!userDoc.lastName) {
+        userDoc.lastName = data.th_lname;
+      }
+
+      const cidHashed = await bcrypt.hash(data.pid, CITIZENID_FIXED_SALT);
+      userDoc.cidHashed = cidHashed;
+
+      await userDoc.save();
+    }
+
+    let defaultRoleMode : UserRole = "voter";
+    if(isBannedUser(userDoc)) {
+      defaultRoleMode = "guest";
+    } else if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
+      defaultRoleMode = "admin";
+    }
+
+    await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
+      userid: userDoc._id.toString(),
+      roleMode: defaultRoleMode,
+      authFrom: {
+        ...authSource,
+      },
+    });
+
+    return sendRedirect(event, "/topics");
   }
 
   return sendRedirect(event, "/login");
