@@ -5,7 +5,7 @@ import { initConfigs, setPredefinedBlockchainServers, updatePermissions, updateT
 import initBlockchainHbWorkers from '../../src/worker/blockchain-hb';
 import initNotificationWorkers from '../../src/worker/notification';
 import initUserWorkers from '~/src/worker/users';
-import { DID_VERIFY_CODE } from '~/src/services/fetch/digital-id';
+import { DID_VERIFY_CODE } from '~/src/services/vendor/digital-id';
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log(DID_VERIFY_CODE);

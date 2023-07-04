@@ -1,5 +1,5 @@
 import crypto from "crypto"
-import { DID_VERIFY_CODE } from "~/src/services/fetch/digital-id";
+import { DID_VERIFY_CODE } from "~/src/services/vendor/digital-id";
 import { THAID_STATE } from "~/src/services/fetch/thaid";
 
 export default defineEventHandler(async (event) => {

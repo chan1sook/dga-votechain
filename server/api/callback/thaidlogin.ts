@@ -1,7 +1,7 @@
 
 import bcrypt from "bcrypt";
 
-import { getUserInfoDigitalID } from "~/src/services/fetch/digital-id";
+import { getUserInfoDigitalID } from "~/src/services/vendor/digital-id";
 import UserModel from "~/src/models/user"
 import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";

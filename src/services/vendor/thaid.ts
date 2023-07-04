@@ -10,9 +10,10 @@ export async function authorizationThaID(code: string, { THAID_API_KEY, THAID_CL
   urlParams.set("redirect_uri", THAID_LOGIN_CALLBACK);
 
   const url = "https://imauth.bora.dopa.go.th/api/v1/oauth2/token/";
-  console.log("[ThaID URL]", url);
   
   const authBasic = "Basic " + Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url");
+  console.log(Buffer.from(THAID_CLIENT_ID + ":" + THAID_CLIENT_SECRET).toString("base64url"));
+  
   const { data } = await axios.post(url, urlParams, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
