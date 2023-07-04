@@ -24,15 +24,6 @@
       <MenuIcon class="cursor-pointer" @click.stop="toggleShowMenuOption" />
     </div>
     <div v-if="showMenuOption" class="collasped-menu px-4 py-2" @click.stop>
-      <div class="w-full mx-auto max-w-3xl">
-        <DgaVueSelect v-model="selectedRoute" class="z-[400]" :options="getMenuOptions" :reduce="(ele) => ele.value"></DgaVueSelect>
-        <DgaButton color="dga-orange" @click="goToCurrentRoute(selectedRoute)">Go</DgaButton>
-      </div>
-    </div>
-    <!-- <div class="inline-flex lg:hidden">
-      <MenuIcon class="cursor-pointer" @click.stop="toggleShowOption" />
-    </div>
-    <div v-if="showOption" class="collasped-menu">
       <template v-for="menu of currentTopMenus">
         <NuxtLink v-if="menu === 'home'" :href="localePathOf('/')" class="dga-menu-item-small">{{ $t("app.home.title") }}</NuxtLink>
         <NuxtLink v-else-if="menu === 'voting'" :href="localePathOf('/topics')" class="dga-menu-item-small">{{ $t("app.voting.title") }}</NuxtLink>
@@ -42,7 +33,16 @@
         <NuxtLink v-else-if="menu === 'users-management'"  :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('app.navbar.adminShowUsers') }}</NuxtLink>
         <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('app.navbar.blockchain')}}</NuxtLink>
       </template>
-    </div> -->
+      <div class="w-full mx-auto max-w-3xl flex flex-row gap-2 items-center">
+        <DgaVueSelect v-model="selectedRoute" class="flex-1 z-[400]" 
+          :placeholder="$t('app.navbar.target')" :options="getMenuOptions" :reduce="(ele) => ele.value"
+        >
+        </DgaVueSelect>
+        <DgaButton color="dga-orange" :disabled="!selectedRoute" @click="goToCurrentRoute(selectedRoute)">
+          {{ $t('app.navbar.go') }}
+        </DgaButton>
+      </div>
+    </div>
   </nav>
 </template>
 
@@ -124,7 +124,7 @@ function goToCurrentRoute(menu: PreferenceTopMenuOption | '') {
     case "home":
       return navigateTo("/")
     case "voting":
-      return navigateTo("/voting")
+      return navigateTo("/topics")
     case "about":
       return navigateTo("/about")
     case "help":
@@ -186,7 +186,7 @@ onUnmounted(() => {
   @apply flex flex-col absolute left-0 right-0 top-16 bg-white shadow;
 }
 .dga-nav .collasped-menu > .dga-menu-item-small {
-  @apply transition duration-100 cursor-pointer text-center text-sm px-2 py-1 border-b-4 border-transparent font-bold whitespace-nowrap hover:text-dga-orange;
+  @apply lg:hidden transition duration-100 cursor-pointer text-center text-sm px-2 py-1 border-b-4 border-transparent font-bold whitespace-nowrap hover:text-dga-orange;
 }
 
 .dga-small-btn {

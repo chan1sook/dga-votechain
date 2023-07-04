@@ -6,7 +6,7 @@ import { legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
 import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
-import { isBannedUser } from "~/src/services/validations/user";
+import { compareAuthSourceFn, isBannedUser } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
@@ -40,12 +40,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if(userDoc) {
-      if(!userDoc.authSources.find((ele) => {
-        const search : Record<string, any> = { ...ele };
-        delete search._id;
-        
-        JSON.stringify(ele) === JSON.stringify(authSource)
-      })) {
+      if(!userDoc.authSources.find((ele) => compareAuthSourceFn(ele, authSource))) {
         userDoc.authSources.push(authSource);
       }
       

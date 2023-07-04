@@ -32,6 +32,8 @@ export default {
         confirm1: "Do you want to withdraw yourself from E-Voting?",
         confirm2: "This action is irreversible",
       },
+      target: "Target",
+      go: "Go",
       logout: "Logout"
     },
     home: {

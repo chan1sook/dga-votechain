@@ -5,6 +5,7 @@ import { combinePermissions, removePermissions } from '~/src/services/transform/
 import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
 import { updateConfigurations } from "~/src/services/fetch/config";
 import { thaiLocalTimeToGMT } from "~/src/services/transform/localtime";
+import { compareAuthSourceFn } from "~/src/services/validations/user";
 
 let migrationSeq = 0;
 
@@ -80,28 +81,27 @@ export async function updateTopics() {
   console.log(`[Migration] Update Topics (Updated: ${result.modifiedCount})`);
 }
 
-export async function updatePermissions() {
+export async function updateAuthSource() {
   migrationSeq += 1;
 
-  console.log(`[Migration] ${migrationSeq}. Update Permissions`);
+  console.log(`[Migration] ${migrationSeq}. Update authSources`);
 
   const users = await UserModel.find({});
   for(const user of users) {
-    user.permissions = removePermissions(user.permissions, "request-topic", "change-permissions:basic", "change-permissions:advance")
-    
-    if(user.permissions.includes("admin-mode")) {
-      user.permissions = combinePermissions(user.permissions, "control-topic")
+    const newAuthSource : UserAuthSourceData[] = [];
+    for(const authSource of user.authSources) {
+      const isExists = newAuthSource.find((ele) => compareAuthSourceFn(ele, authSource));
+
+      if(!isExists) {
+        newAuthSource.push(authSource);
+      }
     }
-    if(user.permissions.includes("dev-mode")) {
-      user.permissions = combinePermissions(user.permissions, "create-news", "change-news", "change-permissions")
-    } else {
-      user.permissions = removePermissions(user.permissions, "create-news", "change-news")
-    }
+    user.authSources = newAuthSource;
     
-    user.markModified("permissions")
+    user.markModified("authSources")
   }
   
   const result = await UserModel.bulkSave(users);
 
-  console.log(`[Migration] Update Permissions (Updated: ${result.modifiedCount})`);
+  console.log(`[Migration] Update authSources (Updated: ${result.modifiedCount})`);
 }
