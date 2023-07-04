@@ -2,7 +2,7 @@
   <div>
     <div class="flex flex-col gap-2">
       <DgaHead>{{ $t('app.preferences.title') }}</DgaHead>
-      <div v-if="!incompleteUserConfig" class="dga-tab">
+      <div class="dga-tab">
         <div class="dga-tab-item" :class="[ currentTab === 'userInfo' ? 'is-active' : '']" @click="currentTab = 'userInfo'">
           {{ $t('app.preferences.userInfo') }}
         </div>
@@ -10,13 +10,12 @@
           {{ $t('app.preferences.topMenu.title') }}
         </div>
       </div>
-      <DgaPreferencesUserInfo v-if="incompleteUserConfig || currentTab === 'userInfo'" 
+      <DgaPreferencesUserInfo v-if="currentTab === 'userInfo'" 
         v-model="userPreferences.userInfo"
         class="grid grid-cols-12 gap-4 w-full max-w-4xl mx-auto my-4"
-        :cid-required="incompleteUserConfig"
       >
       </DgaPreferencesUserInfo>
-      <DgaPreferencesTopMenu v-if="!incompleteUserConfig && currentTab === 'topMenu'" 
+      <DgaPreferencesTopMenu v-if="currentTab === 'topMenu'" 
         class="grid grid-cols-12 gap-4 max-w-4xl mx-auto my-4"
         v-model="userPreferences.topMenu"
       >
@@ -44,7 +43,6 @@
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
 
-import { isThaiCitizenId } from '~/src/services/validations/user';
 import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from '~/src/services/form/preference';
 
 const i18n = useI18n();
@@ -58,14 +56,11 @@ useHead({
   title: `${i18n.t('appName')} - ${i18n.t('app.preferences.title')}`
 });
 
-const incompleteUserConfig = computed(() => !useSessionData().value.hasCitizenId);
-
 const userPreferences : Ref<UserPreferencesForm> = ref({
   userInfo: {
     firstName: useSessionData().value.firstName || "",
     lastName: useSessionData().value.lastName || "",
     email: useSessionData().value.email || "",
-    citizenid: "",
     isGovOfficer: useSessionData().value.isGovOfficer || false,
     ministry: useSessionData().value.ministry || "",
     department: useSessionData().value.department || "",
@@ -82,10 +77,7 @@ const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
 function isUserDataValid(userData: UserEditFormData) {
-  return userData.firstName !== "" && 
-    userData.lastName !== "" &&
-    (userData.citizenid !== "" ? isThaiCitizenId(userData.citizenid) : !incompleteUserConfig.value) &&
-    (userData.isGovOfficer ? (userData.ministry !== "" && userData.department !== "" && userData.division !== "") : true);
+  return (userData.isGovOfficer ? (userData.ministry !== "" && userData.department !== "" && userData.division !== "") : true);
 }
 const isFormValid = computed(() => isUserDataValid(userPreferences.value.userInfo));
 
@@ -99,7 +91,14 @@ async function editUserInfo() {
 
   const { error } = await useFetch("/api/user/edit-pref", {
     method: "POST",
-    body: userPreferences.value,
+    body: {
+      userInfo: {
+        ...userPreferences.value.userInfo,
+        firstName: undefined,
+        lastName: undefined,
+      },
+      topMenu: userPreferences.value.topMenu,
+    },
   });
 
   if(error.value) {
