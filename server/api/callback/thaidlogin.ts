@@ -16,18 +16,8 @@ export default defineEventHandler(async (event) => {
   if(typeof code === "string") {
     const data = await authorizationThaID(code, { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK });
 
-    // salt pid to unique-id
-    const modifiedPID = Buffer.from("tha" + data.pid + "id").reverse().toString("base64");
-    console.log("v1", modifiedPID);
+    const modifiedPID = Buffer.from(Buffer.from("tha" + data.pid + "id").reverse().map((n) => 0xFF - n)).toString("base64");
 
-    const modifiedPID2 = Buffer.from(Buffer.from("tha" + data.pid + "id").reverse().map((n) => 0xFF - n)).toString("base64");
-    console.log("v2", modifiedPID2);
-    
-    throw createError({
-      statusCode: 501,
-      statusMessage: "Not Implemented yet (Test Convert)"
-    });
-    
     const thaIDUserId = await bcrypt.hash(modifiedPID, CITIZENID_FIXED_SALT);
     const authSource : UserAuthSourceData = {
       authSource: "thaID",
