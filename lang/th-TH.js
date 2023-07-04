@@ -4,11 +4,6 @@ export default {
     loading: "รอสักครู่",
     offlineMode: "ปิดปรับปรุงระบบชั่วคราว ตั้งแต่",
     navbar: {
-      home: "หน้าแรก",
-      voting: "ร่วมโหวต",
-      about: "เกี่ยวกับบริการ",
-      help: "วิธีใช้งาน",
-      contactUs: "ติดต่อเรา",
       adminShowUsers: "รายชื่อผู้ใช้",
       blockchain: "Blockchain",
       language: "ภาษาปัจจุบัน",
@@ -38,6 +33,13 @@ export default {
         confirm2: "กระบวนการนี้ไม่สามารถย้อนกลับได้",
       },
       logout: "ออกจากระบบ"
+    },
+    home: {
+      title: "หน้าแรก",
+      header: "บริการ DGA E-Voting บน Blockchain"
+    },
+    about: {
+      title: "เกี่ยวกับบริการ",
     },
     login: {
       title: "เข้าสู่ระบบ",
@@ -239,6 +241,21 @@ export default {
         notFound: "ไม่พบผู้ใช้",
       }
     },
+    contactUs: {
+      title: "ติดต่อเรา",
+      info: {
+        company: "สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.)",
+        address: "ชั้น 17 อาคารบางกอกไทยทาวเวอร์ 108 ถนนรางน้ำ แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400",
+        tels: "โทรสาร:",
+        email: "อีเมล:",
+        contactCenter: "DGA Contact Center:",
+      },
+    },
+    help: {
+      title: "วิธีใช้งาน",
+      pdf: "PDF",
+      googleDocsVersion: "เวอร์ชั่น Google Docs",
+    },
     userid: "User ID",
     userName: "ชื่อ",
     firstName: "ชื่อ",
@@ -307,6 +324,46 @@ export default {
       reject: "ปฏิเสธ",
       personalData: "ข้อมูลส่วนบุคคล",
     },
+    admin: {
+      user: {
+        title: "รายชื่อผู้ใช้งาน",
+        changePermissions: "แก้ไขสิทธิ์",
+        showAllUsers: "แสดงผู้ใช้ทั้งหมด",
+      },
+      blockchain: {
+        title: "จัดการ Blockchain",
+        blockInfo: {
+          title: "ข้อมูลบล็อก",
+          total: "ทั้งหมด",
+          mined: "ยืนยันแล้ว",
+          pending: "รอดำเนินการ",
+          invalid: "ไม่ถูกต้อง",
+        },
+        serverStatus: {
+          title: "ข้อมูล Server",
+          total: "ทั้งหมด",
+          online: "ออนไลน์",
+          offline: "ออฟไลน์",
+        },
+        searchTx: "ค้นหา",
+        txhash: "TX Hash",
+        voteid: "Vote ID",
+        txInfo: "ข้อมูล TX",
+        liveTxUpdate: "รายการ TX ล่าสุด",
+        type: {
+          title: "ประเภท",
+          vote: "โหวต",
+          result: "ผลโหวต"
+        },
+        createdAt: "สร้างเมื่อ",
+        status: "สถานะ",
+        transactionData: "ข้อมูลใน TX",
+        transactionRawData: "ข้อมูลดิบ TX",
+      },
+      config: {
+        title: "ตั้งค่าระบบ"
+      }
+    },
     privacyPolicy: "นโยบายความเป็นส่วนตัว",
     cookiePolicy: "นโยบายคุกกี้",
     termCondition: "เงื่อนไขและข้อตกลง",
@@ -370,29 +427,6 @@ export default {
       rejected: "ปฏิเสธ"
     }
   },
-  home: {
-    title: "หน้าแรก",
-    header: "บริการ DGA E-Voting บน Blockchain"
-  },
-  about: {
-    title: "เกี่ยวกับบริการ",
-    info: "บริการนี้เกิดขึ้นจากแนวความคิดเรื่องการลงคะแนนเสียงกลุ่มย่อย ๆ ของการประชุมประชาชนภายในหมู่บ้านของอบต. เช่น อยากให้ทางเทศบาลจัดเก็บขยะมูลฝอยในวันใดของสัปดาห์ หรืออยากให้เครื่องออกกำลังกายของหมู่บ้านวางไว้ตรงจุดใด เป็นต้น ซึ่งเป็นเรื่องการถามความเห็นทั่วไป การถามความเห็นและลงคะแนนเสียงของประชาชน เกิดความไม่สะดวกของประชาชนที่จะต้องเดินทางมาลงคะแนนเสียง เลยเห็นว่าหากการลงคะแนนเสียงทางอิเล็กทรอนิกส์สามารถทำได้จริงจะแก้ไขปัญหาได้ การลงคะแนนเสียง E-Vote อาจติดเรื่องของความไม่โปร่งใสขึ้นได้  ดังนั้นในโครงการจึงได้นำเอาเทคโนโลยี Blockchain และการยืนยันตัวตนมาใช้ควบคู่กันเพื่อช่วยในการลงคะแนนเสียงเกิดความโปร่งใสมากขึ้น"
-  },
-  help: {
-    title: "วิธีใช้งาน",
-    pdf: "PDF",
-    googleDocsVersion: "เวอร์ชั่น Google Docs",
-  },
-  contactUs: {
-    title: "ติดต่อเรา",
-    info: {
-      company: "สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.)",
-      address2: "ชั้น 17 อาคารบางกอกไทยทาวเวอร์ 108 ถนนรางน้ำ แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400",
-      tels: "โทรสาร:",
-      email: "อีเมล:",
-      contactCenter: "DGA Contact Center:",
-    },
-  },
   news: {
     title: "ข่าว",
     id: "รหัสข่าว",
@@ -427,43 +461,6 @@ export default {
       time: "เวลาสิ้นสุด",
     },
     noReference: "ไม่มีแหล่งอ้างอิง"
-  },
-  admin: {
-    user: {
-      title: "รายชื่อผู้ใช้งาน",
-      changePermissions: "แก้ไขสิทธิ์",
-      showAllUsers: "แสดงผู้ใช้ทั้งหมด",
-    },
-    blockchain: {
-      title: "จัดการ Blockchain",
-      blockInfo: {
-        title: "ข้อมูลบล็อก",
-        total: "ทั้งหมด",
-        mined: "ยืนยันแล้ว",
-        pending: "รอดำเนินการ",
-        invalid: "ไม่ถูกต้อง",
-      },
-      serverStatus: {
-        title: "ข้อมูล Server",
-        total: "ทั้งหมด",
-        online: "ออนไลน์",
-        offline: "ออฟไลน์",
-      },
-      searchTx: "ค้นหา",
-      txhash: "TX Hash",
-      voteid: "Vote ID",
-      txInfo: "ข้อมูล TX",
-      liveTxUpdate: "รายการ TX ล่าสุด",
-      type: {
-        title: "ประเภท",
-        vote: "โหวต",
-        result: "ผลโหวต"
-      },
-      createdAt: "สร้างเมื่อ",
-      status: "สถานะ",
-      transactionData: "ข้อมูลใน TX",
-      transactionRawData: "ข้อมูลดิบ TX",
-    },
   },
   cookieConsent: {
     useCookie: "เว็บไซต์นี้ใช้คุกกี้",

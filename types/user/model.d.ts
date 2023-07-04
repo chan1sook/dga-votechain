@@ -27,7 +27,7 @@ declare global {
     _id: Types.ObjectId,
   }
   
-  type PreferenceTopMenuOption = "home" | "voting" | "about" | "help" | "contact-us" | "users-management" | "blockchain";
+  type PreferenceTopMenuOption = "home" | "voting" | "about" | "help" | "contact-us" | "users-management" | "blockchain" | "server-config";
   
   
   interface UserPreferencesModel {

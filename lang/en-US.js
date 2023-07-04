@@ -4,11 +4,6 @@ export default {
     loading: "Loading",
     offlineMode: "Maintenance Closed From",
     navbar: {
-      home: "Home",
-      voting: "Voting",
-      about: "About",
-      help: "Help",
-      contactUs: "Contact Us",
       adminShowUsers: "User Lists",
       blockchain: "Blockchain",
       language: "Current Language",
@@ -39,6 +34,13 @@ export default {
       },
       logout: "Logout"
     },
+    home: {
+      title: "Home",
+      header: "DGA E-Voting Service on Blockchain"
+    },
+    about: {
+      title: "About",
+    },
     login: {
       title: "Login",
       loginDigitalId: "Login with Digital ID",
@@ -63,7 +65,6 @@ export default {
       success: "Edit Preferences Successful",
       failed: "Edit Preferences Failed",
     },
-    
     topic: {
       create: {
         title: "Create Topic",
@@ -239,6 +240,61 @@ export default {
         notFound: "User Not Found",
       }
     },
+    admin: {
+      user: {
+        title: "User List",
+        changePermissions: "Change Permissions",
+        showAllUsers: "Show All Users",
+      },
+      blockchain: {
+        title: "Blockchain Admin",
+        blockInfo: {
+          title: "Block Info",
+          total: "Total",
+          mined: "Confirmed",
+          pending: "Pending",
+          invalid: "Invalid",
+        },
+        serverStatus: {
+          title: "Server Status",
+          total: "Total",
+          online: "Online",
+          offline: "Offline",
+        },
+        searchTx: "Search TX",
+        txhash: "TX Hash",
+        voteid: "Vote ID",
+        txInfo: "Tx Info",
+        liveTxUpdate: "Live TX Update",
+        type: {
+          title: "Type",
+          vote: "Vote",
+          result: "Vote Result"
+        },
+        createdAt: "Created At",
+        status: "Status",
+        transactionData: "TX Data",
+        transactionRawData: "Raw TX Data",
+      },
+      config: {
+        title: "System Config"
+      }
+    },
+    help: {
+      title: "Help",
+      pdf: "PDF",
+      googleDocsVersion: "Google Docs Version",
+    },
+    contactUs: {
+      title: "Contact Us",
+      info: {
+        company: "Digital Government Development Agency (Public Organization) (DGA)",
+        address: "17th Floor, Bangkok Thai Tower Building 108 Rangnam Rd. Phayathai, Ratchatewi, Bangkok 10400, Thailand",
+        tels: "Tel:",
+        email: "Email:",
+        contactCenter: "DGA Contact Center:",
+      }
+    },
     userid: "User ID",
     userName: "Name",
     firstName: "First Name",
@@ -375,28 +431,6 @@ export default {
       rejected: "rejected"
     }
   },
-  home: {
-    title: "Home",
-    header: "DGA E-Voting Service on Blockchain"
-  },
-  about: {
-    title: "About",
-  },
-  help: {
-    title: "Help",
-    pdf: "PDF",
-    googleDocsVersion: "Google Docs Version",
-  },
-  contactUs: {
-    title: "Contact Us",
-    info: {
-      company: "Digital Government Development Agency (Public Organization) (DGA)",
-      address2: "17th Floor, Bangkok Thai Tower Building 108 Rangnam Rd. Phayathai, Ratchatewi, Bangkok 10400, Thailand",
-      tels: "Tel:",
-      email: "Email:",
-      contactCenter: "DGA Contact Center:",
-    }
-  },
   news: {
     title: "News",
     id: "News ID",
@@ -431,43 +465,6 @@ export default {
       time: "Expired Time",
     },
     noReference: "No References"
-  },
-  admin: {
-    user: {
-      title: "User List",
-      changePermissions: "Change Permissions",
-      showAllUsers: "Show All Users",
-    },
-    blockchain: {
-      title: "Blockchain Admin",
-      blockInfo: {
-        title: "Block Info",
-        total: "Total",
-        mined: "Confirmed",
-        pending: "Pending",
-        invalid: "Invalid",
-      },
-      serverStatus: {
-        title: "Server Status",
-        total: "Total",
-        online: "Online",
-        offline: "Offline",
-      },
-      searchTx: "Search TX",
-      txhash: "TX Hash",
-      voteid: "Vote ID",
-      txInfo: "Tx Info",
-      liveTxUpdate: "Live TX Update",
-      type: {
-        title: "Type",
-        vote: "Vote",
-        result: "Vote Result"
-      },
-      createdAt: "Created At",
-      status: "Status",
-      transactionData: "TX Data",
-      transactionRawData: "Raw TX Data",
-    },
   },
   cookieConsent: {
     useCookie: "This website use cookies",

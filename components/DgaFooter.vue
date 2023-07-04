@@ -18,10 +18,10 @@
             <NuxtLink href="/privacy-policy" class="underline">{{ $t('app.privacyPolicy') }}</NuxtLink>
           </div>
           <div>
-            {{ $t('contactUs.info.contactCenter') }} <a href="tel:+6626126060">(+66) 02 612 6060</a>
+            {{ $t('app.contactUs.info.contactCenter') }} <a href="tel:+6626126060">(+66) 02 612 6060</a>
           </div>
           <div>
-            {{ $t('contactUs.info.email') }} <a href="mailto:contact@dga.or.th">contact@dga.or.th</a>
+            {{ $t('app.contactUs.info.email') }} <a href="mailto:contact@dga.or.th">contact@dga.or.th</a>
           </div>
         </div>
       </div>

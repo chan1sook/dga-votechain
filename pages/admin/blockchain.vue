@@ -1,61 +1,61 @@
 <template>
   <div v-if="stats">
-    <DgaHead>{{ $t('admin.blockchain.title') }}</DgaHead>
+    <DgaHead>{{ $t('app.admin.blockchain.title') }}</DgaHead>
     <div class="grid grid-cols-12 py-2 gap-2 mx-auto max-w-6xl">
       <div class="col-span-12 lg:col-span-4 flex flex-col border-2 border-dga-blue rounded-md self-start">
-        <h4 class="font-bold text-lg p-2">{{ $t('admin.blockchain.blockInfo.title') }}</h4>
+        <h4 class="font-bold text-lg p-2">{{ $t('app.admin.blockchain.blockInfo.title') }}</h4>
         <div class="grid grid-cols-6 p-2">
           <div class="col-span-4 align-center self-center">
             <div class="text-lg font-bold">
-              {{ $t('admin.blockchain.blockInfo.total') }}: <span class="text-3xl">{{ stats.blocks.total }}</span>
+              {{ $t('app.admin.blockchain.blockInfo.total') }}: <span class="text-3xl">{{ stats.blocks.total }}</span>
             </div>
           </div>
           <div class="col-span-2 self-center flex flex-col gap-1">
             <div>
-              {{ $t('admin.blockchain.blockInfo.mined') }}: {{ stats.blocks.mined }}
+              {{ $t('app.admin.blockchain.blockInfo.mined') }}: {{ stats.blocks.mined }}
             </div>
             <div>
-              {{ $t('admin.blockchain.blockInfo.pending') }}: {{  stats.blocks.pending }}
+              {{ $t('app.admin.blockchain.blockInfo.pending') }}: {{  stats.blocks.pending }}
             </div>
           </div>
         </div>
 
         <h4 class="font-bold text-lg border-t-2 border-dga-blue p-2">
-          {{ $t('admin.blockchain.serverStatus.title') }}
+          {{ $t('app.admin.blockchain.serverStatus.title') }}
         </h4>
         <div class="grid grid-cols-6">
           <div class="col-span-4 align-center self-center p-2">
             <div class="text-lg font-bold">
-              {{ $t('admin.blockchain.serverStatus.online') }}: <span class="text-green-700 text-3xl">{{ countServerOnlines(stats.servers) }}
+              {{ $t('app.admin.blockchain.serverStatus.online') }}: <span class="text-green-700 text-3xl">{{ countServerOnlines(stats.servers) }}
             </span>/{{ stats.servers.length }}</div>
           </div>
           <div class="col-span-2 self-center">
-            {{ $t('admin.blockchain.serverStatus.offline') }}: {{ stats.servers.length - countServerOnlines(stats.servers)  }}
+            {{ $t('app.admin.blockchain.serverStatus.offline') }}: {{ stats.servers.length - countServerOnlines(stats.servers)  }}
           </div>
         </div>
 
         <h4 class="font-bold text-lg border-t-2 border-dga-blue p-2">
-          {{ $t('admin.blockchain.searchTx') }}
+          {{ $t('app.admin.blockchain.searchTx') }}
         </h4>
         <div class="flex flex-row gap-2 items-center p-2">
-          <DgaInput v-model="searchKeyword" type="search" class="flex-1" :placeholder="$t('admin.blockchain.txhash')"></DgaInput>
+          <DgaInput v-model="searchKeyword" type="search" class="flex-1" :placeholder="$t('app.admin.blockchain.txhash')"></DgaInput>
           <DgaButton class="flex-row gap-2 items-center !px-4 !py-1" color="dga-orange" @click="toTxPage(searchKeyword)">
             <MagnifyIcon />
           </DgaButton>
         </div>
       </div>
       <div class="col-span-12 lg:col-span-8 flex flex-col border-2 border-dga-blue rounded-md max-h-[600px]">
-        <h4 class="font-bold text-lg p-2">{{ $t('admin.blockchain.liveTxUpdate') }}</h4>
+        <h4 class="font-bold text-lg p-2">{{ $t('app.admin.blockchain.liveTxUpdate') }}</h4>
         <div class="flex-1 border-t-2 border-dga-blue p-2 overflow-y-auto">
           <div class="flex flex-col gap-2">
             <DgaTxCard v-for="ele of txData" :status="ele.txStatus" @detail="toTxPage(ele.voteId.toString())">
               <template #voteid>
-                {{ $t('admin.blockchain.voteid') }}: #{{ ele.voteId }}</template>
-              <template #txid>{{ $t('admin.blockchain.txhash') }}: 
+                {{ $t('app.admin.blockchain.voteid') }}: #{{ ele.voteId }}</template>
+              <template #txid>{{ $t('app.admin.blockchain.txhash') }}: 
                 <span v-if="ele.txhash">#{{ ele.txhash }}</span>
                 <span v-else class="italic">N/A</span>
               </template>
-              <template #type>{{ $t('admin.blockchain.type.vote') }}</template>
+              <template #type>{{ $t('app.admin.blockchain.type.vote') }}</template>
               <span>
                 {{ ele.topicId }} : {{ ele.userId }} =>
                 <template v-if="ele.choice">{{ ele.choice }}</template> 
@@ -81,7 +81,7 @@ definePageMeta({
   middleware: ["auth-dev"]
 })
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.blockchain.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.admin.blockchain.title')}`
 });
 
 const blockchainStats : Ref<BlockchainStatsResponseData | undefined> = ref(undefined);

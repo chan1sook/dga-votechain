@@ -6,7 +6,7 @@
       <div class="content"><slot></slot></div>
       <div class="status">
         <button v-if="props.editable" @click="emit('change')">
-          {{ $t('admin.user.changePermissions') }}
+          {{ $t('app.admin.user.changePermissions') }}
         </button>
       </div>
     </div>

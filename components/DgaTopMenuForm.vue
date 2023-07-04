@@ -100,15 +100,15 @@ watch(currentTopMenus, (value) => {
 function topMenuPretty(menu: PreferenceTopMenuOption) {
   switch(menu) {
     case "home":
-      return i18n.t("app.navbar.home")
+      return i18n.t("app.home.title")
     case "voting":
-      return i18n.t("app.navbar.voting")
+      return i18n.t("app.voting.title")
     case "about":
-      return i18n.t("app.navbar.about")
+      return i18n.t("app.about.title")
     case "help":
-      return i18n.t("app.navbar.help")
+      return i18n.t("app.help.title")
     case "contact-us":
-      return i18n.t("app.navbar.contactUs")
+      return i18n.t("app.contactUs.title")
     case "users-management":
       return i18n.t("app.navbar.adminShowUsers")
     case "blockchain":

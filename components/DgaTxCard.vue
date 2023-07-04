@@ -7,13 +7,13 @@
       <div class="content"><slot></slot></div>
       <div class="status">
         <button v-if="props.status === 'valid'" class="valid cursor-default">
-          {{ $t('admin.blockchain.blockInfo.mined') }}
+          {{ $t('app.admin.blockchain.blockInfo.mined') }}
         </button>
         <button v-else-if="props.status === 'invalid'" class="invalid cursor-default">
-          {{ $t('admin.blockchain.blockInfo.invalid') }}
+          {{ $t('app.admin.blockchain.blockInfo.invalid') }}
         </button>
         <button v-else class="pending cursor-default">
-          {{ $t('admin.blockchain.blockInfo.pending') }}
+          {{ $t('app.admin.blockchain.blockInfo.pending') }}
         </button>
         <button class="detail" @click="emit('detail')">
           {{ $t('app.detail') }}

@@ -1,6 +1,6 @@
 <template>
   <div v-if="userList">
-    <DgaHead>{{ $t('admin.user.title') }}</DgaHead>
+    <DgaHead>{{ $t('app.admin.user.title') }}</DgaHead>
     <div class="flex flex-col sm:flex-row gap-2 items-center my-2">
       <DgaUserSearch class="flex-1 w-full"
         :placeholder="$t('app.voterList.searchUser')" :action-text="$t('app.voterList.searchUser')"
@@ -16,7 +16,7 @@
     </div>
     <div class="grid grid-cols-12 py-2 gap-2 mx-auto max-w-5xl">
       <div class="col-span-12 flex flex-col border-2 border-dga-blue rounded-md max-h-[600px]">
-        <h4 class="font-bold text-lg p-2">{{ $t('admin.user.title') }}</h4>
+        <h4 class="font-bold text-lg p-2">{{ $t('app.admin.user.title') }}</h4>
         <div class="flex-1 border-t-2 border-dga-blue p-2 overflow-y-auto">
           <div class="flex flex-col gap-2">
             <DgaUserCard v-if="!selectedUser" v-for="ele of userList" :role="ele.role" editable @change="toChangeUserPage(ele)">
@@ -51,7 +51,7 @@
                 </div>
               </DgaUserCard>
               <DgaButton color="dga-orange"  class="w-full mx-auto max-w-sm" @click="selectedUser = undefined">
-                {{ $t('admin.user.showAllUsers') }}
+                {{ $t('app.admin.user.showAllUsers') }}
               </DgaButton>
             </template>
           </div>
@@ -71,7 +71,7 @@ definePageMeta({
   middleware: ["auth-dev"]
 })
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('admin.user.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.admin.user.title')}`
 });
 
 const userList : Ref<UserSearchResponseData[] | undefined> = ref(undefined);
