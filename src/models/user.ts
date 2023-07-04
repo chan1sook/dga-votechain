@@ -10,6 +10,9 @@ const schema = new Schema<UserModelData>({
     digitalIdUserId: {
       type: String
     },
+    thaIDUserId: {
+      type: String
+    },
   })],
   firstName: {
     type: String,

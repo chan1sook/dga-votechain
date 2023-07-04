@@ -86,17 +86,17 @@ export async function updateAuthSource() {
 
   console.log(`[Migration] ${migrationSeq}. Update authSources`);
 
-  const users = await UserModel.find({});
-  for(const user of users) {
-    const newAuthSource : UserAuthSourceData[] = [];
-    for(const authSource of user.authSources) {
-      const isExists = newAuthSource.find((ele) => compareAuthSourceFn(ele, authSource));
+  const users = await UserModel.find({
+    "authSources.authSource": "thaID",
+  });
 
-      if(!isExists) {
-        newAuthSource.push(authSource);
+  for(const user of users) {
+    user.authSources = user.authSources.filter((ele) => {
+      if(ele.authSource !== "thaID") {
+        return true;
       }
-    }
-    user.authSources = newAuthSource;
+      return ele.thaIDUserId;
+    });
     
     user.markModified("authSources")
   }
