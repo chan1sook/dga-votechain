@@ -1,7 +1,7 @@
 import { USER_SESSION_KEY } from "../session-handler";
 
 export default defineEventHandler(async (event) => {
-  const { DID_LOGOUT_CALLBACK, public: { DID_API_URL } } = useRuntimeConfig();
+  const { DID_LOGOUT_CALLBACK, DID_API_URL } = useRuntimeConfig();
   const userData = event.context.userData;
 
   if(!userData) {

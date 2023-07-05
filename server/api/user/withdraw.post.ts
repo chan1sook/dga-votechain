@@ -4,6 +4,7 @@ import timezone from "dayjs/plugin/timezone.js";
 
 import UserModel from "~/src/models/user"
 import { isProtectedUser } from "~/src/services/validations/user";
+import { USER_SESSION_KEY } from "~/server/session-handler";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -43,7 +44,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Logout action
-  const { DID_LOGOUT_CALLBACK, public: { DID_API_URL } } = useRuntimeConfig();
+  const { DID_LOGOUT_CALLBACK, DID_API_URL } = useRuntimeConfig();
 
   if(userData.authFrom.authSource === 'digitalId' && userData.authFrom.userToken) {
     const urlParams = new URLSearchParams();
@@ -53,5 +54,7 @@ export default defineEventHandler(async (event) => {
     return sendRedirect(event, url.toString());
   }
 
-  return sendRedirect(event, "/api/callback/logout");
+  await event.context.session.unset(USER_SESSION_KEY);
+  delete event.context.userData;
+  return sendRedirect(event, "/login");
 })

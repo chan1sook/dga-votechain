@@ -11,7 +11,7 @@ import { compareAuthSourceFn, isBannedUser } from "~/src/services/validations/us
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, public: { DID_API_URL },  } = useRuntimeConfig()
+  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, DID_API_URL,  } = useRuntimeConfig()
 
   if(typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE: DID_VERIFY_CODE });

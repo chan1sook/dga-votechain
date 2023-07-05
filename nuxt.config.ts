@@ -9,7 +9,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     MONGODB_URI: isProduction ? process.env.MONGODB_URI : process.env.DEV_MONGODB_URI,
     DB_NAME: isProduction ? process.env.DB_NAME : process.env.DEV_DB_NAME,
-
+    
+    DID_API_URL: isProduction ? process.env.DID_API_URL : process.env.DEV_DID_API_URL,
     DID_CLIENT_KEY: isProduction ? process.env.DID_CLIENT_KEY : process.env.DEV_DID_CLIENT_KEY,
     DID_CLIENT_SECRET: isProduction ? process.env.DID_CLIENT_SECRET : process.env.DEV_DID_CLIENT_SECRET,
     DID_LOGIN_CALLBACK: isProduction ? process.env.DID_LOGIN_CALLBACK : process.env.DEV_DID_LOGIN_CALLBACK,
@@ -27,7 +28,6 @@ export default defineNuxtConfig({
     CITIZENID_FIXED_SALT:  isProduction ? process.env.DEV_CITIZENID_FIXED_SALT : process.env.CITIZENID_FIXED_SALT,
     public: {
       ALLOW_WITHDRAW_USER: false,
-      DID_API_URL: isProduction ? process.env.DID_API_URL : process.env.DEV_DID_API_URL,
       SOCKETIO_URL: isProduction ? process.env.SOCKETIO_URL : process.env.DEV_SOCKETIO_URL,
       SYNCTIME_THERSOLD: 60 * 1000,
       BLOCKCHAIN_SERVERHB_TIME_THERSOLD: 5 * 60 * 1000,

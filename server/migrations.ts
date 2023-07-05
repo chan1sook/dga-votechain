@@ -1,11 +1,6 @@
-import UserModel from "~/src/models/user"
-import TopicModel from "~/src/models/topic"
 import BlockchainServerModel from "~/src/models/blockchain-server"
-import { combinePermissions, removePermissions } from '~/src/services/transform/permission';
-import { getDefaultInternalTopicFilter } from "~/src/services/form/topic";
 import { updateConfigurations } from "~/src/services/fetch/config";
 import { thaiLocalTimeToGMT } from "~/src/services/transform/localtime";
-import { compareAuthSourceFn } from "~/src/services/validations/user";
 
 let migrationSeq = 0;
 
@@ -56,52 +51,4 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
-}
-
-export async function updateTopics() {
-  migrationSeq += 1;
-
-  console.log(`[Migration] ${migrationSeq}. Update Topics`);
-
-  const topics = await TopicModel.find({
-    $or: [
-      { internalFilter: { $exists: false } },
-      { publicVote: { $exists: true } },
-    ]
-  });
-
-  for(const topic of topics) {
-    topic.type = topic.publicVote ? "public" : "private";
-    topic.publicVote = undefined;
-    topic.internalFilter = getDefaultInternalTopicFilter();
-  }
-  
-  const result = await TopicModel.bulkSave(topics);
-
-  console.log(`[Migration] Update Topics (Updated: ${result.modifiedCount})`);
-}
-
-export async function updateAuthSource() {
-  migrationSeq += 1;
-
-  console.log(`[Migration] ${migrationSeq}. Update authSources`);
-
-  const users = await UserModel.find({
-    "authSources.authSource": "thaID",
-  });
-
-  for(const user of users) {
-    user.authSources = user.authSources.filter((ele) => {
-      if(ele.authSource !== "thaID") {
-        return true;
-      }
-      return ele.thaIDUserId;
-    });
-    
-    user.markModified("authSources")
-  }
-  
-  const result = await UserModel.bulkSave(users);
-
-  console.log(`[Migration] Update authSources (Updated: ${result.modifiedCount})`);
 }

@@ -30,8 +30,10 @@
       </form>
     </DgaButtonGroup>
     <DgaButtonGroup larger class="mt-2">
-      <NuxtLink :to="registerDigitalIdUrl">
-        <DgaButton theme="hollow" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
+      <form action="/api/login" method="POST" class="w-full">
+        <input type="hidden" name="source" value="digitalId" />
+        <input type="hidden" name="register" value="1" />
+        <DgaButton type="submit" theme="hollow" class="w-full flex flex-row gap-x-2 items-center justify-center truncate"
           :title="$t('app.login.registerDigitalId')"
         >
           <AccountPlusOutlineIcon />
@@ -39,17 +41,12 @@
             {{ $t("app.login.registerDigitalId") }}
           </span>
         </DgaButton>
-      </NuxtLink>
+      </form>
     </DgaButtonGroup>
   </div>
 </template>
 
 <script setup lang="ts">
-
 import FingerprintIcon from 'vue-material-design-icons/Fingerprint.vue';
 import AccountPlusOutlineIcon from 'vue-material-design-icons/AccountPlusOutline.vue';
-
-const { public: { DID_API_URL } } = useRuntimeConfig();
-const registerDigitalIdUrl = computed(() => new URL("/Account/Register", DID_API_URL).toString());
-
 </script>
