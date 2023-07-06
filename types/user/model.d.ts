@@ -34,11 +34,7 @@ declare global {
     topMenu: UserPreferencesTopMenu,
   }
 
-  interface UserPreferencesTopMenu {
-    voter: PreferenceTopMenuOption[],
-    admin: PreferenceTopMenuOption[],
-    dev: PreferenceTopMenuOption[],
-  }
+  type UserPreferencesTopMenu = PreferenceTopMenuOption[];
 
   interface UserAuthSourceData {
     authSource: UserAuthSource,

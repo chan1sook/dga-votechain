@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="grid grid-cols-12 gap-4">
     <div class="col-span-12 md:col-span-3 flex flex-row items-center gap-1">
       <span>{{ $t('app.firstName') }}</span>
     </div>

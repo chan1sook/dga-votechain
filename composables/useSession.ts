@@ -19,11 +19,7 @@ export const useSessionData = () => {
       roleMode: "guest",
       permissions: [],
       preferences: {
-        topMenu: {
-          voter: getDefaultTopMenus(),
-          admin: getDefaultTopMenus(),
-          dev: getDefaultTopMenus(),
-        }
+        topMenu: getDefaultTopMenus(),
       }
     }
   })

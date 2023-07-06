@@ -16,7 +16,7 @@
             <span>#{{ topicid }}</span>
           </div>
         </div>
-        <DgaButton class="w-full max-w-[200px] mx-auto lg:mr-0 whitespace-nowrap" theme="hollow" color="dga-orange" @click="exportResult">{{  $t('app.result.export') }}</DgaButton>
+        <DgaButton class="w-full max-w-[200px] mx-auto lg:mr-0 whitespace-nowrap report-hide" theme="hollow" color="dga-orange" @click="exportResult">{{  $t('app.result.export') }}</DgaButton>
       </div>
       <div class="col-span-2 flex flex-col gap-2 mb-4">
         <template v-if="showDescription">
@@ -133,7 +133,7 @@
           :bar-percent="getPercentOf(getScoreOf(choice.name).count, totalVotes)" 
         >
           <span>{{ choice.name }}</span>
-          <img v-if="haveImage" :src="getImgUrlChoice(choice)" class="hidden sm:block max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/> 
+          <img v-if="haveImage" :src="getImgUrlChoice(choice)" class="sm:max-h-16 w-[4rem] cursor-pointer" @click.stop="showBigImage(choice)"/> 
           <template #percent>
             {{ getPercentOf(getScoreOf(choice.name).count, totalVotes).toFixed(2) }}%
           </template>
@@ -331,5 +331,16 @@ function countYourVoteOf(choice: ChoiceDataType) {
 }
 .topic-type.internal {
   @apply text-blue-700
+}
+</style>
+
+<style>
+@media print {
+  img {
+    display: block !important;
+  }
+  .report-hide {
+    display: none !important;
+  }
 }
 </style>

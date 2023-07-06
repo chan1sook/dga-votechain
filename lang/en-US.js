@@ -54,9 +54,7 @@ export default {
       userInfo: "User Info",
       topMenu: {
         title: "Top Menu",
-        voter: "Voter Menu Order",
-        admin: "Admin Menu Order",
-        dev: "Developer Menu Order",
+        order: "Menu Order",
         remainTopMenu: "Remain Menu",
         currentTopMenu: "Current Menu",
       },
@@ -279,7 +277,12 @@ export default {
         transactionRawData: "Raw TX Data",
       },
       config: {
-        title: "System Config"
+        title: "System Config",
+        content: "Content",
+        homeContent: "Home Content",
+        confirm: "Confirm to Edit Configurations?",
+        success: "Edit Configurations Successful",
+        failed: "Edit Configurations Failed",
       }
     },
     help: {

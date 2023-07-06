@@ -54,9 +54,7 @@ export default {
       userInfo: "ข้อมูลผู้ใช้",
       topMenu: {
         title: "ตั้งค่าแถบเมนู",
-        voter: "ลำดับเมนูสำหรับผู้โหวต",
-        admin: "ลำดับเมนูสำหรับผู้ดูแล",
-        dev: "ลำดับเมนูสำหรับผู้พัฒนา",
+        order: "ลำดับเมนู",
         remainTopMenu: "เมนูที่เหลืออยู่",
         currentTopMenu: "เมนูปัจจุบัน",
       },
@@ -363,7 +361,12 @@ export default {
         transactionRawData: "ข้อมูลดิบ TX",
       },
       config: {
-        title: "ตั้งค่าระบบ"
+        title: "ตั้งค่าระบบ",
+        content: "เนื้อหา",
+        homeContent: "เนื้อหาหน้าแรก",
+        confirm: "ยีนยันการตั้งค่า?",
+        success: "ตั้งค่าสำเร็จ",
+        failed: "ตั้งค่าล้มเหลว",
       }
     },
     privacyPolicy: "นโยบายความเป็นส่วนตัว",

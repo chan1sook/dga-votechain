@@ -113,6 +113,8 @@ function topMenuPretty(menu: PreferenceTopMenuOption) {
       return i18n.t("app.navbar.adminShowUsers")
     case "blockchain":
       return i18n.t("app.navbar.blockchain")
+    case "server-config":
+      return i18n.t("app.admin.config.title")
     default:
       return menu;
   }

@@ -59,7 +59,6 @@ export default defineEventHandler(async (event) => {
 
   // preferences part
   userDoc.preferences.topMenu = prefData.topMenu;
-  userDoc.markModified("preferences");
   
   await userDoc.save();
 

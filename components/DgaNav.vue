@@ -9,6 +9,7 @@
       <NuxtLink v-else-if="menu === 'contact-us'" :href="localePathOf('/contact-us')" class="dga-menu-item">{{ $t("app.contactUs.title") }}</NuxtLink>
       <NuxtLink v-else-if="menu === 'users-management'" :href="localePathOf('/admin/users')" class="dga-menu-item">{{ $t('app.navbar.adminShowUsers') }}</NuxtLink>
       <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item">{{ $t('app.navbar.blockchain') }}</NuxtLink>
+      <NuxtLink v-else-if="menu === 'server-config'" :href="localePathOf('/admin/config')" class="dga-menu-item">{{ $t('app.admin.config.title') }}</NuxtLink>
     </template>
     <div class="inline-flex ml-auto flex-row items-center gap-4">
       <button type="button" class="dga-small-btn" @click="toggleLang">
@@ -20,10 +21,10 @@
       </template>
       <DgaUserDropdown></DgaUserDropdown>
     </div>
-    <div class="inline-flex">
+    <div class="inline-flex lg:hidden">
       <MenuIcon class="cursor-pointer" @click.stop="toggleShowMenuOption" />
     </div>
-    <div v-if="showMenuOption" class="collasped-menu px-4 py-2" @click.stop>
+    <div v-if="showMenuOption" class="collasped-menu lg:hidden px-4 py-2" @click.stop>
       <template v-for="menu of currentTopMenus">
         <NuxtLink v-if="menu === 'home'" :href="localePathOf('/')" class="dga-menu-item-small">{{ $t("app.home.title") }}</NuxtLink>
         <NuxtLink v-else-if="menu === 'voting'" :href="localePathOf('/topics')" class="dga-menu-item-small">{{ $t("app.voting.title") }}</NuxtLink>
@@ -32,16 +33,8 @@
         <NuxtLink v-else-if="menu === 'contact-us'" :href="localePathOf('/contact-us')" class="dga-menu-item-small">{{ $t("app.contactUs.title") }}</NuxtLink>
         <NuxtLink v-else-if="menu === 'users-management'"  :href="localePathOf('/admin/users')" class="dga-menu-item-small">{{ $t('app.navbar.adminShowUsers') }}</NuxtLink>
         <NuxtLink v-else-if="menu === 'blockchain'" :href="localePathOf('/admin/blockchain')" class="dga-menu-item-small">{{ $t('app.navbar.blockchain')}}</NuxtLink>
+        <NuxtLink v-else-if="menu === 'server-config'" :href="localePathOf('/admin/config')" class="dga-menu-item-small">{{ $t('app.admin.config.title')}}</NuxtLink>
       </template>
-      <div class="w-full mx-auto max-w-3xl flex flex-row gap-2 items-center">
-        <DgaVueSelect v-model="selectedRoute" class="flex-1 z-[400]" 
-          :placeholder="$t('app.navbar.target')" :options="getMenuOptions" :reduce="(ele) => ele.value"
-        >
-        </DgaVueSelect>
-        <DgaButton color="dga-orange" :disabled="!selectedRoute" @click="goToCurrentRoute(selectedRoute)">
-          {{ $t('app.navbar.go') }}
-        </DgaButton>
-      </div>
     </div>
   </nav>
 </template>
@@ -49,6 +42,7 @@
 <script setup lang="ts">
 import MenuIcon from 'vue-material-design-icons/Menu.vue';
 import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from '~/src/services/form/preference';
+import { checkPermissionNeeds } from '~/src/services/validations/permission';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -58,89 +52,21 @@ const prettyLocaleCode = computed(() => {
   return lang.toUpperCase();
 });
 const isLogin = computed(() => useSessionData().value.userid);
-const selectedRoute : Ref<PreferenceTopMenuOption | ''> = ref('');
 const showMenuOption = computed(() => useVisibleMenuGroup().value === 'menu');
 
 const currentTopMenus = computed(() => {
-  switch(useSessionData().value.roleMode) {
-    case "voter":
-      return useSessionData().value.preferences.topMenu.voter;
-    case "admin":
-      return useSessionData().value.preferences.topMenu.admin;
-    case "developer":
-      return useSessionData().value.preferences.topMenu.dev;
-    default:
-      return getDefaultTopMenus();
+  if(Array.isArray(useSessionData().value.preferences.topMenu)) {
+    return useSessionData().value.preferences.topMenu;
   }
+
+  const _permissions = useSessionData().value.permissions;
+  if(checkPermissionNeeds(_permissions, "dev-mode")) {
+    return getDefaultDevTopMenus();
+  } else if(checkPermissionNeeds(_permissions, "admin-mode")) {
+    return getDefaultAdminTopMenus();
+  }
+  return getDefaultTopMenus();
 })
-
-const getMenuOptions = computed(() => {
-  let menu = [];
-  switch(useSessionData().value.roleMode) {
-    case "voter":
-      menu = getDefaultTopMenus();
-      break;
-    case "admin":
-      menu = getDefaultAdminTopMenus();
-      break;
-    case "developer":
-      menu = getDefaultDevTopMenus();
-      break;
-    default:
-      menu = getDefaultTopMenus();
-      break;
-  }
-
-  return menu.map((ele) => {
-    return { label: topMenuPretty(ele), value: ele }
-  });
-})
-
-function topMenuPretty(menu: PreferenceTopMenuOption) {
-  switch(menu) {
-    case "home":
-      return i18n.t("app.home.title")
-    case "voting":
-      return i18n.t("app.voting.title")
-    case "about":
-      return i18n.t("app.about.title")
-    case "help":
-      return i18n.t("app.help.title")
-    case "contact-us":
-      return i18n.t("app.contactUs.title")
-    case "users-management":
-      return i18n.t("app.navbar.adminShowUsers")
-    case "blockchain":
-      return i18n.t("app.navbar.blockchain")
-    case "server-config":
-      return i18n.t("app.admin.config.title")
-    default:
-      return menu;
-  }
-}
-
-function goToCurrentRoute(menu: PreferenceTopMenuOption | '') {
-  switch(menu) {
-    case "home":
-      return navigateTo("/")
-    case "voting":
-      return navigateTo("/topics")
-    case "about":
-      return navigateTo("/about")
-    case "help":
-      return navigateTo("/help")
-    case "contact-us":
-      return navigateTo("/contract-us")
-    case "users-management":
-      return navigateTo("/admin/users")
-    case "blockchain":
-      return navigateTo("/admin/blockchain")
-    case "server-config":
-      return navigateTo("/admin/config")
-    default:
-      break;
-  }
-}
 
 async function toggleShowMenuOption() {
   if(!showMenuOption.value) {

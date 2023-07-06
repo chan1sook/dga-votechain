@@ -1,10 +1,10 @@
 <template>
   <div class="dga-container-root text-dga-blue">
-    <DgaNav></DgaNav>
+    <DgaNav class="report-hide"></DgaNav>
     <div class="dga-container flex-1 relative overflow-auto">
       <slot></slot>
     </div>
-    <DgaFooter></DgaFooter>
+    <DgaFooter class="report-hide"></DgaFooter>
   </div>
 </template>
 

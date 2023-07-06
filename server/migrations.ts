@@ -1,6 +1,8 @@
 import BlockchainServerModel from "~/src/models/blockchain-server"
-import { updateConfigurations } from "~/src/services/fetch/config";
-import { thaiLocalTimeToGMT } from "~/src/services/transform/localtime";
+import UserModel from "~/src/models/user"
+import { getFastConfiguration, loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
+import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from "~/src/services/form/preference";
+import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 let migrationSeq = 0;
 
@@ -9,14 +11,9 @@ export async function initConfigs() {
   migrationSeq += 1;
 
   console.log(`[Migration] ${migrationSeq}. Init Configs`);
-
-  const result = await updateConfigurations({
-    "offlineMode": true,
-    "offlineRange": [
-      thaiLocalTimeToGMT(2023, 5, 30, 18, 0),
-      thaiLocalTimeToGMT(2023, 6, 2, 23, 59, 59, 999)
-    ],
-  }, true);
+  
+  await loadServerConfigurations();
+  const result = await updateConfigurations(getFastConfiguration(), true);
 
   console.log(`[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`);
 }
@@ -51,4 +48,30 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
+}
+
+export async function changeTopMenuConfig() {
+  migrationSeq += 1;
+
+  console.log(`[Migration] ${migrationSeq}. ChangeTopMenuConfig`);
+  
+  const userDocs = await UserModel.find();
+  for(const user of userDocs) {
+    if(!user.preferences) {
+      user.preferences = {
+        topMenu: [],
+      } 
+    }
+    if(!Array.isArray(user.preferences.topMenu) || user.preferences.topMenu.length === 0) {
+      if(checkPermissionNeeds(user.permissions, "dev-mode")) {
+        user.preferences.topMenu = getDefaultDevTopMenus();
+      } else if(checkPermissionNeeds(user.permissions, "admin-mode")) {
+        user.preferences.topMenu = getDefaultAdminTopMenus();
+      } else {
+        user.preferences.topMenu = getDefaultTopMenus();
+      }
+    }
+  }
+  const result = await UserModel.bulkSave(userDocs);
+  console.log(`[Migration] ChangeTopMenuConfig (Updated: ${result.modifiedCount})`);
 }
