@@ -10,19 +10,36 @@
         <img class="mx-auto max-w-none w-full sm:w-[400px]" src="~/assets/images/blockchain.png" />
       </div>
     </div>
-    <!-- <div v-html="serverConfigs.homeContentTH"></div> -->
+    <div v-html="sanitizeHtmlCustom(indexMessage)" class="custom-content-container"></div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { sanitizeHtmlCustom } from '~/src/services/formatter/html';
 const i18n = useI18n();
-
-const serverConfigs = await useServerConfig([
-  "homeContentTH",
-]);
 
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.home.title')}`
 });
-      
+
+const serverConfigs = await useServerConfig([
+  "homeContentTH",
+  "homeContentEN",
+]);
+
+const indexMessage = computed(() => {
+  let result = "";
+  if(i18n.locale.value === 'th') {
+    result = serverConfigs.homeContentTH || "";
+  } else {
+    result = serverConfigs.homeContentEN || "";
+  }
+  return result || serverConfigs.homeContentTH || serverConfigs.homeContentEN || "";
+})
+
+onMounted(() => {
+  if(!useSessionData().value.userid) {
+    useVisibleMenuGroup().value = 'user';
+  }
+})
 </script>

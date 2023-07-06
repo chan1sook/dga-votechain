@@ -2,8 +2,20 @@ import { FilterQuery } from "mongoose";
 import ConfigModel from "~/src/models/config"
 
 const SERVER_CONFIGURATIONS : ConfigData = {
-  homeContentTH: "",
+  homeContentTH: `<p><span style="text-decoration: underline;">จุดเด่น</span></p>
+  <ul>
+  <li>ข้อมูลลงคะแนนมติสามารถประมวลผลได้อย่างรวดเร็ว มีความถูกต้อง และปลอดภัย</li>
+  <li>ข้อมูลของผู้ทำการเลือกลงคะแนนมติไม่ถูกเปิดเผล สู่สาธารณะ</li>
+  <li>ไม่สามารถแก้ไขข้อมูลเพื่อเอื้อประโยชน์แก่ผู้มีส่วนได้ส่วนเสียในเรื่องนั้นๆ</li>
+  <li>ยากต่อการปลอมแปลงหรือสวมสิทธิ์แทนบุคคลอื่น</li>
+  <li>มีความโปร่งใสผู้ทำการลงคะแนนมติ สามารถตรวจสอบข้อมูลการโหวตของตนเองย้อนหลังได้</li>
+  <li>ลดค่าใช้จ่ายในการจัดการลงคะแนนมติ สะดวก สามารถลงคะแนนมติผ่านระบบจากทุกที่ที่เข้าถึงอินเทรอ์เน็ตได้</li>
+  </ul>`,
   homeContentEN: "",
+  aboutEN: "",
+  aboutTH: "",
+  contactUsEN: "",
+  contactUsTH: "",
 };
 
 const protectedKeys: ProtectedKeys[] = [];

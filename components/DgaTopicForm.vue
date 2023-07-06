@@ -122,37 +122,23 @@
       >
       </DgaInput>
     </div>
-    <template v-if="false">
-      <template v-if="showDescription">
-        <div class="col-span-12 md:col-span-2 self-start">{{ $t('app.description.title') }}</div>
-        <div class="col-span-12 md:col-span-10">
-          <DgaTextArea v-model="topicData.description" class="w-full h-32" :placeholder="$t('app.description.title')"></DgaTextArea>
-        </div>
-        <button  @click="showDescription = false" :title="$t('app.description.hide')" class="col-span-12 ml-auto">
-          {{ $t('app.description.hide')}}
-        </button>
-      </template>
-      <template v-else>
-        <button class="col-span-12 inline-flex flex-row gap-2 items-center" :title="$t('app.description.add')" @click="showDescription = true">
-          <PlusIcon /> {{ $t('app.description.add') }}
-        </button>
-      </template>
-    </template>
     <h3 class="col-span-12 font-bold mt-2">{{ $t('app.topic.addChoice.title') }}</h3>
     <div v-for="choice, i of topicData.choices.choices" class="col-span-12 flex justify-center items-center">
-      <div class="w-full max-w-xl flex flex-row gap-2 justify-center items-center">
-        <span class="border-[3px] border-red-500" :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
-          :title="getChoiceErrorReason(choice.name)"
-        >
-          <ExclamationIcon class="text-red-500" />
-        </span>
-        <DgaInput v-model="choice.name" type="text" class="flex-1 w-0"></DgaInput>
-        <button class="px-1 py-1 inline-flex items-center rounded-full border-[3px] border-dga-blue"
-          :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
-        >
-          <MinusIcon />
-        </button>
-        <DgaImagePicker v-model="topicData.images[i]" :exists-image="getExistsImage(i)" />
+      <div class="w-full max-w-xl flex flex-col sm:flex-row gap-2 justify-center items-center">
+        <div class="flex flex-row gap-2">
+          <span class="border-[3px] border-red-500" :class="[isChoiceValid(choice.name) ? 'invisible' : '']" 
+            :title="getChoiceErrorReason(choice.name)"
+          >
+            <ExclamationIcon class="text-red-500" />
+          </span>
+          <DgaInput v-model="choice.name" type="text" class="flex-1 w-full"></DgaInput>
+          <button class="px-1 py-1 inline-flex items-center rounded-full border-[3px] border-dga-blue"
+            :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"  @click="removeOption(i)"
+          >
+            <MinusIcon />
+          </button>
+        </div>
+        <DgaImagePicker v-model="topicData.images[i]" :exists-image="getExistsImage(i)"/>
       </div>
     </div>
     <div class="col-span-12 flex justify-center items-center">
@@ -222,9 +208,6 @@
 import PlusIcon from 'vue-material-design-icons/Plus.vue';
 import ExclamationIcon from 'vue-material-design-icons/Exclamation.vue';
 import MinusIcon from 'vue-material-design-icons/Minus.vue';
-import ImageIcon from 'vue-material-design-icons/Image.vue';
-import UndoIcon from 'vue-material-design-icons/Undo.vue';
-import TrashCanIcon from 'vue-material-design-icons/TrashCan.vue';
 import InformationIcon from 'vue-material-design-icons/Information.vue';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
@@ -235,7 +218,6 @@ import buddhistEra from 'dayjs/plugin/buddhistEra';
 import { getDefaultChoices, getDefaultInternalTopicFilter, topicTypes } from '~/src/services/form/topic';
 import { choiceCountOf, isCoadminValid as _isCoadminValid } from '~/src/services/validations/topic';
 import { voterCountOf } from '~/src/services/validations/user';
-import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 
 dayjs.extend(buddhistEra);
 
@@ -264,7 +246,6 @@ const voteDuration = ref({
 });
 const startExpiredDateStr = computed(() => dayjs(voteStart.value, "YYYY-MM-DD").format("YYYY-MM-DD"));
 
-const showDescription = ref(false);
 const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
 const coadmins : Ref<CoadminFormData[]> = ref([]);
 
@@ -460,7 +441,7 @@ function addVoter(user: UserSearchResponseData | null) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        totalVotes: topicData.value.defaultVotes,
+        totalVotes: user.vote || topicData.value.defaultVotes,
       });
     } else {
       useShowToast({
@@ -488,7 +469,7 @@ function addVoters(users: UserSearchResponseData[] | null) {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          totalVotes: topicData.value.defaultVotes,
+          totalVotes: user.vote || topicData.value.defaultVotes,
         });
         inserted += 1;
       }

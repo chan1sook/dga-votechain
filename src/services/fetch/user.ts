@@ -142,15 +142,13 @@ export async function searchExactActiveUserByKeyword(params: UserSearchParams) {
   return await UserModel.findOne(docQuery);
 }
 
-export async function batchSearchActiveUserByKeywords(keywords: string[], { adminOnly, excludeUserId } : Omit<UserSearchParams, "keyword">) {
-  const unsearchKeywords = keywords.filter((ele, i, arr) => ele !== '' && arr.indexOf(ele) === i);
-  const matchResults = [];
+export async function batchSearchActiveUserByKeywords(keywordPair: { [k: string] : number | undefined }, { adminOnly, excludeUserId } : Omit<UserSearchParams, "keyword">) {
+  const unsearchKeywords = Object.keys(keywordPair);
+  const matchResults : { user: UserModelDataWithId, vote: number | undefined}[] = [];
 
   const cursor = UserModel.find({ 
     removeAt: { $exists: false },
   }).cursor();
-  
-  console.log(adminOnly, excludeUserId);
 
   let nextUser = await cursor.next();
   while(nextUser) {
@@ -169,19 +167,28 @@ export async function batchSearchActiveUserByKeywords(keywords: string[], { admi
       if(isThaiCitizenId(keyword)) {
         const cidHashed = await bcrypt.hash(keyword, useRuntimeConfig().CITIZENID_FIXED_SALT);
         if(nextUser.cidHashed === cidHashed) {
-          matchResults.push(nextUser);
+          matchResults.push({
+            user: nextUser,
+            vote: keywordPair[keyword],
+          });
           unsearchKeywords.splice(i, 1);
           break;
         }
       } else if(validator.isEmail(keyword)) {
         if(nextUser.email === keyword) {
-          matchResults.push(nextUser);
+          matchResults.push({
+            user: nextUser,
+            vote: keywordPair[keyword],
+          });
           unsearchKeywords.splice(i, 1);
           break;
         }
       } else if(isValidObjectId(keyword)) {
         if(nextUser._id.toString() === keyword) {
-          matchResults.push(nextUser);
+          matchResults.push({
+            user: nextUser,
+            vote: keywordPair[keyword],
+          });
           unsearchKeywords.splice(i, 1);
           break;
         }
@@ -197,7 +204,10 @@ export async function batchSearchActiveUserByKeywords(keywords: string[], { admi
         }
 
         if(valid) {
-          matchResults.push(nextUser);
+          matchResults.push({
+            user: nextUser,
+            vote: keywordPair[keyword],
+          });
           unsearchKeywords.splice(i, 1);
           break;
         }

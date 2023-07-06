@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DgaHead>{{ $t("privacyPolicy.title") }}</DgaHead>
+    <DgaHead>{{ $t("app.privacyPolicy") }}</DgaHead>
     <ol class="font-bold list-decimal ml-4 mt-4">
       <li>บทนำ</li>
     </ol>
@@ -361,7 +361,7 @@
 const i18n = useI18n();
 
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('privacyPolicy.title')}`
+  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.privacyPolicy')}`
 });
 
 </script>

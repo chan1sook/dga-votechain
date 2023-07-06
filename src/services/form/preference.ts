@@ -3,11 +3,11 @@ export function getDefaultTopMenus() : PreferenceTopMenuOption[] {
 }
 
 export function getDefaultAdminTopMenus() : PreferenceTopMenuOption[] {
-  return ["home", "voting", "about", "help", "contact-us"]
+  return getDefaultTopMenus();
 }
 
 export function getDefaultDevTopMenus() : PreferenceTopMenuOption[] {
-  return ["home", "voting", "about", "help", "contact-us", "users-management" , "blockchain", "server-config"]
+  return getDefaultTopMenus();
 }
 
 export function getDefaultAllTopMenus() : PreferenceTopMenuOption[] {

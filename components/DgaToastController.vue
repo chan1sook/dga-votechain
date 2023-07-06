@@ -8,7 +8,7 @@
     >
       <DgaToast v-for="toast of toastArr" :key="toast.id" class="pointer-events-auto" @close="hideToast(toast)">
         <h2 class="font-bold">{{ toast.title }}</h2>
-        <SimpleContentFormatter v-if="toast.content" :content="toast.content" class="mt-2"></SimpleContentFormatter>
+        <div v-if="toast.content">{{ toast.content }}</div>
       </DgaToast>
     </TransitionGroup>
   </div>

@@ -24,33 +24,43 @@
               <template #role>
                 <span v-if="ele.role">{{ $t(`app.role.${ele.role}`, ele.role) }}</span>
               </template>
-              <div> 
+              <div class="flex flex-row gap-2 items-center"> 
                 <span v-if="userNameOf(ele)">{{ userNameOf(ele) }}</span>
                 <span class="italic" v-else>{{ $t("app.anonymous") }}</span>
+                <span class="flex-1 flex flex-row gap-2">
+                  <DgaDigitalIdIcon v-if="ele.authSources?.includes('digitalId')" />
+                  <DgaThaIdIcon v-if="ele.authSources?.includes('thaID')" />
+                </span>
               </div>
-              <div>
-                <span class="font-bold"></span>{{ $t('app.email') }}: 
+              <div class="flex flex-row gap-2 items-center">
+                <span class="font-bold">{{ $t('app.email') }}: </span>
                 <template v-if="ele.email">{{ ele.email }}</template>
                 <span class="italic" v-else>-</span>
               </div>
             </DgaUserCard>
             <template v-else>
               <DgaUserCard @change="toChangeUserPage(selectedUser)">
-                <template #userid>#{{ selectedUser._id }}</template>
+                <template #userid>
+                  #{{ selectedUser._id }}
+                </template>
                 <template #role>
                   <span v-if="selectedUser.role">{{ $t(`app.role.${selectedUser.role}`, selectedUser.role) }}</span>
                 </template>
-                <div> 
+                <div class="flex flex-row gap-2 items-center"> 
                   <span v-if="userNameOf(selectedUser)">{{ userNameOf(selectedUser) }}</span>
                   <span class="italic" v-else>{{ $t("app.anonymous") }}</span>
+                  <span class="flex-1 flex flex-row gap-2">
+                    <DgaDigitalIdIcon v-if="selectedUser.authSources?.includes('digitalId')" />
+                    <DgaThaIdIcon v-if="selectedUser.authSources?.includes('thaID')" />
+                  </span>
                 </div>
-                <div>
-                  <span class="font-bold"></span>{{ $t('app.email') }}: 
+                <div class="flex flex-row gap-2 items-center">
+                  <span class="font-bold">{{ $t('app.email') }}: </span>
                   <template v-if="selectedUser.email">{{ selectedUser.email }}</template>
                   <span class="italic" v-else>-</span>
                 </div>
               </DgaUserCard>
-              <DgaButton color="dga-orange"  class="w-full mx-auto max-w-sm" @click="selectedUser = undefined">
+              <DgaButton color="dga-orange" class="w-full mx-auto max-w-sm" @click="selectedUser = undefined">
                 {{ $t('app.admin.user.showAllUsers') }}
               </DgaButton>
             </template>

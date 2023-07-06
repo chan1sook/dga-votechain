@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-row gap-2 items-center">
-    <ImageIcon class="hidden lg:inline" />
-    <div class="flex flex-col gap-y-1 w-20">
+  <div class="flex flex-row gap-x-1 gap-y-1 items-center">
+    <ImageIcon />
+    <div class="flex flex-row md:flex-col gap-1 md:w-20">
       <template v-if="props.existsImage">
         <template v-if="actualImage === false">
           <label :for="eleId" class="dga-image-button  bg-dga-orange text-white hover:bg-opacity-50">
@@ -35,8 +35,9 @@
       </template>
     </div>
     <input :id="eleId" type="file" class="w-0 opacity-0" accept="image/jpeg,image/x-png" @change="changeFile" />
+    <MagnifyIcon v-if="actualImageURL !== GRAY_BASE64_IMAGE" class="md:hidden" @click="showImageModal = true" />
     <img :src="actualImageURL"
-      class="w-24 max-h-24 col-span-4 md:col-span-2 row-span-2 cursor-pointer"
+      class="hidden md:block w-24 max-h-24 col-span-4 md:col-span-2 row-span-2 cursor-pointer"
       @click="showImageModal = true"
     />
   <DgaModal :show="showImageModal" cancel-backdrop close-only @close="showImageModal = false">
@@ -47,6 +48,7 @@
 
 <script setup lang="ts">
 import ImageIcon from 'vue-material-design-icons/Image.vue';
+import MagnifyIcon from 'vue-material-design-icons/Magnify.vue';
 
 import { nanoid } from 'nanoid';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
@@ -127,6 +129,6 @@ onUnmounted(() => {
 
 <style scoped>
 .dga-image-button {
-  @apply text-center rounded-2xl px-2 py-1 cursor-pointer;
+  @apply text-center rounded-2xl w-16 md:w-auto px-2 py-1 cursor-pointer;
 }
 </style>

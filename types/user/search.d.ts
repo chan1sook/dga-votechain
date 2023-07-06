@@ -11,5 +11,7 @@ declare global {
   type UserSearchResponseData = {
     _id: string,
     role?: UserRole,
+    vote?: number,
+    authSources?: UserAuthSource[],
   } & UserBasicData;
 }

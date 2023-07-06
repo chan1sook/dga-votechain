@@ -1,17 +1,24 @@
 <template>
   <div>
     <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-2 mx-auto max-w-6xl">
+      <div v-if="useSessionData().value.roleMode !== 'guest'" class="w-full lg:w-60 flex flex-row gap-2 items-center">
+        <div class="whitespace-nowrap">{{ $t('app.voting.filters.accessModifier') }}</div>
+        <DgaVueSelect
+          v-model="filter.topicType" :options="topciTypeFilterOptions" class="flex-1"
+          :reduce="val => val.value"
+        ></DgaVueSelect>
+      </div>
       <DgaVueSelect 
-        v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-56"
+        v-model="filter.type" :options="topicFilterOptions" class="w-full lg:w-52"
         :reduce="val => val.value"
       ></DgaVueSelect>
       <template v-if="filter.type === 'date'">
         <DgaVueSelect 
-          v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"
+          v-model="filter.year" :options="yearOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-32"
           :reduce="val => val.value"
         ></DgaVueSelect>
         <DgaVueSelect 
-          v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-48"
+          v-model="filter.month" :options="monthOptions" class="flex-none sm:flex-1 lg:flex-none w-full lg:w-32"
           :reduce="val => val.value"
         ></DgaVueSelect>
       </template>
@@ -21,14 +28,6 @@
       <template v-else-if="filter.type === 'topicName'">
         <DgaInput v-model="filter.keyword" :placeholder="$t('app.voting.filters.topicNamePlaceholder')" class="flex-1 lg:flex-none w-60"></DgaInput>
       </template>
-      <div class="w-full lg:w-72 flex flex-row gap-2 items-center">
-        <div class="whitespace-nowrap">{{ $t('app.voting.filters.accessModifier') }}</div>
-        <DgaVueSelect
-          v-if="useSessionData().value.roleMode !== 'guest'"
-          v-model="filter.topicType" :options="topciTypeFilterOptions" class="flex-1"
-          :reduce="val => val.value"
-        ></DgaVueSelect>
-      </div>
       <DgaButton color="dga-orange" class="flex-0" :title="$t('app.voting.filters.search')" @click="resetTopics">
         {{ $t("app.voting.filters.search") }}
       </DgaButton>
@@ -187,7 +186,7 @@ function getStatusOf(topic: TopicResponseDataExtended) : TopicCardStatus {
     return "waiting";
   } else {
     if(isAdminMode.value) {
-      return "access";
+      return "control";
     }
     if(!topic.canVote) {
       return "voting";
@@ -205,6 +204,7 @@ function handleStatusAction(topic: TopicResponseDataExtended, status: TopicCardS
       navigateTo(localePathOf(`/topic/result/${topic._id}`));
       break;
     case "access":
+    case "control":
     case "voted":
       navigateTo(localePathOf(`/vote/${topic._id}`));
       break;

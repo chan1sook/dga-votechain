@@ -33,7 +33,7 @@
         </template>
       </div>
     </div>
-    <div v-if="!isUserCsvUpload" class="w-full flex flex-row gap-2 items-center justify-center my-1">
+    <div v-if="!isUserCsvUpload" class="w-full flex flex-col sm:flex-row gap-2 items-center justify-center my-1">
       <DgaUserSearch :admin-only="props.coadmin" :not-self="props.coadmin" class="flex-1 max-w-xl"
         :placeholder="$t('app.voterList.searchUser')" :action-text="$t('app.voterList.addUser')"
         @select="emit('add', $event)"

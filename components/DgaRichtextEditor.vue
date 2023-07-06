@@ -5,7 +5,7 @@
       api-key="p8pkrq40gyd97pv4jgodbqxrsx0c9w1y18mt277tfluopgde"
       :init="{
         plugins: props.plugins,
-        toolbar: toolbar
+        toolbar: toolbar,
       }"
     />
   </div>
@@ -33,7 +33,7 @@ const modelValue = computed(() => props.modelValue)
 
 watch(modelValue, (value) => {
   content.value = value || "";
-})
+}, { immediate: true })
 
 watch(content, (value) => {
   emit("update:modelValue", value);
