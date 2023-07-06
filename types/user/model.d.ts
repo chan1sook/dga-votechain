@@ -1,8 +1,7 @@
 import { type Types } from "mongoose";
 
 declare global {
-  // "firebase" @deprecated 
-  type UserAuthSource = "digitalId" | "firebase";
+  type UserAuthSource = "digitalId" | "thaID";
   type UserRole = "guest" | "voter" | "admin" | "developer";
   
   interface UserModelData {
@@ -28,21 +27,18 @@ declare global {
     _id: Types.ObjectId,
   }
   
-  type PreferenceTopMenuOption = "home" | "voting" | "about" | "help" | "contact-us" | "users-management" | "blockchain";
+  type PreferenceTopMenuOption = "home" | "voting" | "about" | "help" | "contact-us" | "users-management" | "blockchain" | "server-config";
   
   
   interface UserPreferencesModel {
     topMenu: UserPreferencesTopMenu,
   }
 
-  interface UserPreferencesTopMenu {
-    voter: PreferenceTopMenuOption[],
-    admin: PreferenceTopMenuOption[],
-    dev: PreferenceTopMenuOption[],
-  }
+  type UserPreferencesTopMenu = PreferenceTopMenuOption[];
 
   interface UserAuthSourceData {
     authSource: UserAuthSource,
     digitalIdUserId?: DigitalIdUserId,
+    thaIDUserId?: ThaIDUserId,
   }
 }

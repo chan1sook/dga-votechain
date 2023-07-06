@@ -1,3 +1,4 @@
+import { loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
 
@@ -11,8 +12,12 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  throw createError({
-    statusCode: 501,
-    statusMessage: "Not Implemented",
-  });
+  const values : Record<string, any> = await readBody(event);
+
+  await updateConfigurations(values);
+  await loadServerConfigurations(true);
+  
+  return {
+    status: "OK"
+  }
 });

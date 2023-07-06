@@ -5,6 +5,22 @@ export function splitBasicName(str: string) {
   return nameSpliter;
 }
 
+export function compareAuthSourceFn(search: UserAuthSourceData, target: UserAuthSourceData) {
+  const _search : UserAuthSourceData = {
+    authSource: search.authSource,
+    digitalIdUserId: search.digitalIdUserId,
+    thaIDUserId: search.thaIDUserId,
+  };
+
+  const _target : UserAuthSourceData = {
+    authSource: target.authSource,
+    digitalIdUserId: target.digitalIdUserId,
+    thaIDUserId: target.thaIDUserId,
+  };
+
+  return JSON.stringify(_search) === JSON.stringify(_target);
+}
+
 export function isThaiCitizenId(str: string) {
   if(!/^[1-8][0-9]{12}$/.test(str)) {
     return false;

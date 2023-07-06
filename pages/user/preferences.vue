@@ -2,36 +2,31 @@
   <div>
     <div class="flex flex-col gap-2">
       <DgaHead>{{ $t('app.preferences.title') }}</DgaHead>
-      <div v-if="!incompleteUserConfig" class="dga-tab">
-        <div class="dga-tab-item" :class="[ currentTab === 'userInfo' ? 'is-active' : '']" @click="currentTab = 'userInfo'">
-          {{ $t('app.preferences.userInfo') }}
-        </div>
-        <div class="dga-tab-item" :class="[ currentTab === 'topMenu' ? 'is-active' : '']" @click="currentTab = 'topMenu'">
-          {{ $t('app.preferences.topMenu.title') }}
-        </div>
-      </div>
-      <DgaPreferencesUserInfo v-if="incompleteUserConfig || currentTab === 'userInfo'" 
+      <DgaTab v-model="currentTab" :tabs="{
+        userInfo: $t('app.preferences.userInfo'),
+        topMenu: $t('app.preferences.topMenu.title'),
+      }"></DgaTab>
+      <DgaPreferencesUserInfo v-if="currentTab === 'userInfo'" 
         v-model="userPreferences.userInfo"
-        class="grid grid-cols-12 gap-4 w-full max-w-4xl mx-auto my-4"
-        :cid-required="incompleteUserConfig"
+        class="w-full max-w-4xl mx-auto my-4"
       >
       </DgaPreferencesUserInfo>
-      <DgaPreferencesTopMenu v-if="!incompleteUserConfig && currentTab === 'topMenu'" 
-        class="grid grid-cols-12 gap-4 max-w-4xl mx-auto my-4"
+      <DgaPreferencesTopMenu v-if="currentTab === 'topMenu'" 
+        class="w-full max-w-4xl mx-auto my-4"
         v-model="userPreferences.topMenu"
       >
       </DgaPreferencesTopMenu>
       <DgaButtonGroup class="mt-4">
-        <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-          color="dga-orange" :title="$t('app.preferences.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
-        >
-          <PencilIcon />
-          <span class="truncate">{{ $t('app.preferences.action') }}</span>
-        </DgaButton>
-      </DgaButtonGroup>
+      <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
+        color="dga-orange" :title="$t('app.preferences.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+      >
+        <PencilIcon />
+        <span class="truncate">{{ $t('app.preferences.action') }}</span>
+      </DgaButton>
+    </DgaButtonGroup>
     </div>
     <DgaModal :show="showConfirmModal" cancel-backdrop
-      @confirm="editUserInfo"
+      @confirm="editPref"
       @close="showConfirmModal = false"
       @cancel="showConfirmModal = false"
     >
@@ -44,8 +39,8 @@
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
 
-import { isThaiCitizenId } from '~/src/services/validations/user';
 import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from '~/src/services/form/preference';
+import { checkPermissionNeeds } from '~/src/services/validations/permission';
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -58,38 +53,40 @@ useHead({
   title: `${i18n.t('appName')} - ${i18n.t('app.preferences.title')}`
 });
 
-const incompleteUserConfig = computed(() => !useSessionData().value.hasCitizenId);
-
 const userPreferences : Ref<UserPreferencesForm> = ref({
   userInfo: {
     firstName: useSessionData().value.firstName || "",
     lastName: useSessionData().value.lastName || "",
     email: useSessionData().value.email || "",
-    citizenid: "",
     isGovOfficer: useSessionData().value.isGovOfficer || false,
     ministry: useSessionData().value.ministry || "",
     department: useSessionData().value.department || "",
     division: useSessionData().value.division || "",
   },
-  topMenu: {
-    voter: useSessionData().value.preferences.topMenu.voter || getDefaultTopMenus(),
-    admin: useSessionData().value.preferences.topMenu.admin || getDefaultAdminTopMenus(),
-    dev: useSessionData().value.preferences.topMenu.dev || getDefaultDevTopMenus(),
-  },
+  topMenu: getDefaultTopMenus(),
 });
+
+if(Array.isArray(useSessionData().value.preferences.topMenu)) {
+  userPreferences.value.topMenu = useSessionData().value.preferences.topMenu.slice();
+} else {
+  const _permissions = useSessionData().value.permissions;
+  if(checkPermissionNeeds(_permissions, "dev-mode")) {
+    userPreferences.value.topMenu = getDefaultDevTopMenus();
+  } else if(checkPermissionNeeds(_permissions, "admin-mode")) {
+    userPreferences.value.topMenu = getDefaultAdminTopMenus();
+  }
+}
+
 const currentTab = ref("userInfo");
 const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
 function isUserDataValid(userData: UserEditFormData) {
-  return userData.firstName !== "" && 
-    userData.lastName !== "" &&
-    (userData.citizenid !== "" ? isThaiCitizenId(userData.citizenid) : !incompleteUserConfig.value) &&
-    (userData.isGovOfficer ? (userData.ministry !== "" && userData.department !== "" && userData.division !== "") : true);
+  return (userData.isGovOfficer ? (userData.ministry !== "" && userData.department !== "" && userData.division !== "") : true);
 }
 const isFormValid = computed(() => isUserDataValid(userPreferences.value.userInfo));
 
-async function editUserInfo() {
+async function editPref() {
   if(!isFormValid.value) {
     return;
   }
@@ -99,7 +96,14 @@ async function editUserInfo() {
 
   const { error } = await useFetch("/api/user/edit-pref", {
     method: "POST",
-    body: userPreferences.value,
+    body: {
+      userInfo: {
+        ...userPreferences.value.userInfo,
+        firstName: undefined,
+        lastName: undefined,
+      },
+      topMenu: userPreferences.value.topMenu,
+    },
   });
 
   if(error.value) {

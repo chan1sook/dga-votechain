@@ -1,20 +1,20 @@
 
 import bcrypt from "bcrypt";
 
-import { authorizationCodeDigitalID, getUserInfoDigitalID } from "~/src/services/fetch/digital-id";
+import { authorizationCodeDigitalID, DID_VERIFY_CODE, getUserInfoDigitalID } from "~/src/services/vendor/digital-id";
 import UserModel from "~/src/models/user"
 import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
-import { getActiveUserByAuthSource, getActiveUserByCitizenID, getActiveUserByEmail }  from "~/src/services/fetch/user";
+import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
-import { isBannedUser } from "~/src/services/validations/user";
+import { compareAuthSourceFn, isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, public: { DID_API_URL },  } = useRuntimeConfig()
+  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, PREDEFINED_DEV_USERS, DID_API_URL,  } = useRuntimeConfig()
 
   if(typeof code === "string") {
-    const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE });
+    const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE: DID_VERIFY_CODE });
 
     const digitalIdUserInfo = await getUserInfoDigitalID(access_token, { DID_API_URL });
 
@@ -24,21 +24,14 @@ export default defineEventHandler(async (event) => {
     };
     let userDoc = await getActiveUserByAuthSource(authSource);
 
-
     if(!userDoc) {
       userDoc = await getActiveUserByCitizenID(digitalIdUserInfo.citizen_id);
     }
 
     if(!userDoc) {
-      userDoc = await getActiveUserByEmail(digitalIdUserInfo.email);
-    }
-
-    if(!userDoc) {
       userDoc = new UserModel({
         permissions: legacyRoleToPermissions("admin"),
-        authSources: [
-          { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id }
-        ],
+        authSources: [authSource],
         firstName: digitalIdUserInfo.given_name,
         lastName: digitalIdUserInfo.family_name,
         email: digitalIdUserInfo.email,
@@ -46,8 +39,7 @@ export default defineEventHandler(async (event) => {
     }
 
     if(userDoc) {
-      const authSource : UserAuthSourceData = { authSource: "digitalId", digitalIdUserId: digitalIdUserInfo.user_id };
-      if(!userDoc.authSources.find((ele) => JSON.stringify(ele) === JSON.stringify(authSource))) {
+      if(!userDoc.authSources.find((ele) => compareAuthSourceFn(ele, authSource))) {
         userDoc.authSources.push(authSource);
       }
       
@@ -63,10 +55,11 @@ export default defineEventHandler(async (event) => {
       if(!userDoc.email) {
         userDoc.email = digitalIdUserInfo.email;
       }
-
-      // Temp
-      const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
-      userDoc.cidHashed = cidHashed;
+      
+      if(!userDoc.cidHashed) {
+        const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
+        userDoc.cidHashed = cidHashed;
+      }
 
       // Predefine dev at login
       if(PREDEFINED_DEV_USERS.includes(digitalIdUserInfo.user_id)) {

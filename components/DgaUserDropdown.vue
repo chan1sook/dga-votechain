@@ -64,6 +64,7 @@
         </form>
       </template>
     </div>
+    <DgaLoadingModal :show="waitSwap"></DgaLoadingModal>
     <DgaModal :show="showWithdrawUserModal" cancel-backdrop
       @confirm="withdrawUser"
       @close="showWithdrawUserModal = false"
@@ -130,18 +131,25 @@ function updateTime() {
 }
 
 const roleMode = computed(() => useSessionData().value.roleMode);
+const waitSwap = ref(false);
 
 function switchRoleStrOf(role: UserRole) {
   return `${i18n.t('app.navbar.user.switchRoleMode')} [${i18n.t(`app.role.${role}`)}]`
 }
 
 async function switchRoleMode(role: UserRole) {
+  if(waitSwap.value) {
+    return;
+  }
+  waitSwap.value = true;
+  
   const { data } = await useFetch("/api/session/switch", {
     method: "POST",
     body: { newMode: role }
   });
   useVisibleMenuGroup().value = undefined;
   useRouter().go(0);
+  waitSwap.value = false;
 }
 
 function withdrawUser() {

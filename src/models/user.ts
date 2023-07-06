@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { getDefaultTopMenus } from "../services/form/preference";
 
 const schema = new Schema<UserModelData>({
   permissions: [String],
@@ -8,6 +9,9 @@ const schema = new Schema<UserModelData>({
       required: true,
     },
     digitalIdUserId: {
+      type: String
+    },
+    thaIDUserId: {
       type: String
     },
   })],
@@ -36,11 +40,10 @@ const schema = new Schema<UserModelData>({
     type: String,
   },
   preferences: new Schema({
-    topMenu: new Schema({
-      voter: [String],
-      admin: [String],
-      dev: [String],
-    }),
+    topMenu: {
+      type: [String],
+      default: getDefaultTopMenus,
+    },
   }),
   removeAt: {
     type: Date,

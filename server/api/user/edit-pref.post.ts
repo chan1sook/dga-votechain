@@ -1,13 +1,10 @@
 import UserModel from "~/src/models/user"
 
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import validator from 'validator';
-import { isThaiCitizenId } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  const { CITIZENID_FIXED_SALT } = useRuntimeConfig();
 
   if(!userData) {
     throw createError({
@@ -19,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
 
-  const prefData : UserPreferencesForm = await readBody(event);
+  const prefData : Omit<UserPreferencesForm, "firstName" | "lastName"> = await readBody(event);
   
   const userDoc = await UserModel.findById(userData._id);
   if(!userDoc) {
@@ -30,29 +27,14 @@ export default defineEventHandler(async (event) => {
   }
 
   // user Info Edit Part
-  if(prefData.userInfo.firstName) {
-    userDoc.firstName = prefData.userInfo.firstName;
-  }
-  if(prefData.userInfo.lastName) {
-    userDoc.lastName = prefData.userInfo.lastName;
-  }
-  if(prefData.userInfo.citizenid) {
-    if(!isThaiCitizenId(prefData.userInfo.citizenid)) {
+  if(prefData.userInfo.email !== undefined) {
+    if(prefData.userInfo.email && !validator.isEmail(prefData.userInfo.email)) {
       throw createError({
         statusCode: 400,
         statusMessage: "Invalid Input",
       });
     }
-    userDoc.cidHashed = await bcrypt.hash(prefData.userInfo.citizenid, CITIZENID_FIXED_SALT);
-  }
-  
-  if(prefData.userInfo.email) {
-    if(!validator.isEmail(prefData.userInfo.email)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Invalid Input",
-      });
-    }
+
     userDoc.email = prefData.userInfo.email;
   }
   
@@ -75,9 +57,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // part b Pref
+  // preferences part
   userDoc.preferences.topMenu = prefData.topMenu;
-  userDoc.markModified("preferences");
   
   await userDoc.save();
 

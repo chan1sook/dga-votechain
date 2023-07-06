@@ -1,12 +1,16 @@
 <template>
   <div class="dga-user-card" :class="[props.role]">
     <div class="inner">
-      <div class="userid"><slot name="userid"></slot></div>
-      <div class="role"><slot name="role"></slot></div>
+      <div class="userid">
+        <slot name="userid"></slot>
+      </div>
+      <div class="role">
+        <slot name="role"></slot>
+      </div>
       <div class="content"><slot></slot></div>
       <div class="status">
         <button v-if="props.editable" @click="emit('change')">
-          {{ $t('admin.user.changePermissions') }}
+          {{ $t('app.admin.user.changePermissions') }}
         </button>
       </div>
     </div>
@@ -41,7 +45,7 @@ const emit = defineEmits<{
   grid-template-columns: auto;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .dga-user-card > .inner {
     grid-template-areas: "userid userid userid"  "role content status" "role content status";
     grid-template-columns: 150px auto 120px;
@@ -67,7 +71,7 @@ const emit = defineEmits<{
 
 .dga-user-card > .inner > .content {
   grid-area: content;
-  @apply flex flex-col gap-y-2 gap-x-4
+  @apply flex flex-col gap-y-2 gap-x-4 mt-1 
 }
 
 

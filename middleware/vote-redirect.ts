@@ -7,7 +7,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   
   const currentPath = to.path;
   
-  console.log(currentPath)
   if(isAdminRole(roleMode)) {
     if(currentPath !== `/topic/ctrl/${topicid}`) {
       return navigateTo(`/topic/ctrl/${topicid}`)

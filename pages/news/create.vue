@@ -18,7 +18,7 @@
         <span class="text-red-500" :title="$t('news.required')">*</span>
       </label>
       <div class="col-span-12 md:col-span-10">
-        <DgaTextArea v-model="newsData.content" type="text" :placeholder="$t('news.content')" class="w-full" required></DgaTextArea>
+        <DgaRichtextEditor v-model="newsData.content"></DgaRichtextEditor>
       </div>
       <label class="col-span-12 md:col-span-2">{{ $t('news.references') }}</label>
       <div class="col-span-12 md:col-span-10">

@@ -15,7 +15,7 @@
       <div>{{ $t('news.publishAt') }}</div>
       <div>{{ $d(dayjs(news.newsPublishAt).toDate(), "long") }}</div>
       <div>{{ $t('news.content') }}</div>
-      <div><SimpleContentFormatter :content="news.content"></SimpleContentFormatter></div>
+      <div class="custom-content-container" v-html="sanitizeHtmlCustom(news.content)"></div>
       <div>{{ $t('news.references') }}</div>
       <div>
         <template v-if="news.references">{{ news.references }}</template>
@@ -37,6 +37,7 @@
   
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+import { sanitizeHtmlCustom } from '~/src/services/formatter/html';
 
 import dayjs from "dayjs";
 
@@ -67,7 +68,6 @@ if (!data.value) {
   const { news: _news } = data.value;
   news.value = _news;
 }
-
 </script>
 
 <style scoped>

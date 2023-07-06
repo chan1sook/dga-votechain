@@ -12,6 +12,11 @@
   body {
     @apply text-dga-blue;
   }
+
+  .custom-content-container ul > li {
+    list-style-type: "-";
+    @apply ml-6 pl-2;
+  }
 }
 
 @layer components {

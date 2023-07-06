@@ -25,9 +25,16 @@ export default defineEventHandler(async (event) => {
 
   if(user) {
     let role : UserRole | undefined;
+    let authSources : UserAuthSource[] | undefined = undefined;
     if(userData.roleMode === 'developer' && userData.permissions.includes("dev-mode")) {
       role = user.permissions.includes("dev-mode") ? "developer" :
         (user.permissions.includes("admin-mode") ? "admin" : "voter");
+      authSources = [];
+      for(const authSource of user.authSources) {
+        if(!authSources.includes(authSource.authSource)) {
+          authSources.push(authSource.authSource);
+        }
+      }
     }
 
     return {
@@ -35,6 +42,7 @@ export default defineEventHandler(async (event) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      authSources,
       role,
     }
 

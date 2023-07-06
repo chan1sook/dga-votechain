@@ -5,14 +5,15 @@
         {{ $t(`app.topicType.${topicType}`, topicType) }}
       </div>
       <div class="content">
-        <div class="name">{{ props.topic.name }}</div>
-        <div v-if="props.topic.createdBy">
+        <div class="name my-1">{{ props.topic.name }}</div>
+        <div v-if="props.topic.createdBy" class="createdBy my-1">
           {{ $t('app.voting.createdBy') }} {{ formatCreatedByName(props.topic.createdBy) }}
         </div>
-        <div class="time">
+        <div class="break"></div>
+        <div class="time my-1">
           {{ $t('app.voting.voteOn') }} {{ prettyStartAt }}
         </div>
-        <div class="ticketid">
+        <div class="ticketid my-1">
           #Ticket {{ props.topic._id }}
         </div>
       </div>
@@ -145,11 +146,16 @@ const prettyStartAt = computed(() => {
 
 .dga-topic-card > .inner > .content {
   grid-area: content;
-  @apply flex flex-row flex-wrap gap-y-2 gap-x-4
+  @apply flex flex-row flex-wrap gap-x-4 lg:gap-y-0 items-center
 }
 .dga-topic-card > .inner > .content > .name {
-  @apply w-full text-base lg:text-xl font-bold
+  @apply w-full lg:w-auto text-base lg:text-xl font-bold
 }
+
+.dga-topic-card > .inner > .content > .break {
+  @apply w-full h-0
+}
+
 
 .dga-topic-card > .inner > .qr {
   grid-area: qr;
@@ -169,6 +175,7 @@ const prettyStartAt = computed(() => {
   @apply bg-blue-700;
 }
 .dga-topic-card > .inner > .status > .access,
+.dga-topic-card > .inner > .status > .control,
 .dga-topic-card > .inner > .status > .voting  {
   @apply bg-green-700
 }
