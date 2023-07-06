@@ -1,8 +1,5 @@
 import BlockchainServerModel from "~/src/models/blockchain-server"
-import UserModel from "~/src/models/user"
 import { getFastConfiguration, loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
-import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from "~/src/services/form/preference";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
 
 let migrationSeq = 0;
 
@@ -48,30 +45,4 @@ export async function setPredefinedBlockchainServers() {
     insertedCount = result.length;
   }
   console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
-}
-
-export async function changeTopMenuConfig() {
-  migrationSeq += 1;
-
-  console.log(`[Migration] ${migrationSeq}. ChangeTopMenuConfig`);
-  
-  const userDocs = await UserModel.find();
-  for(const user of userDocs) {
-    if(!user.preferences) {
-      user.preferences = {
-        topMenu: [],
-      } 
-    }
-    if(!Array.isArray(user.preferences.topMenu) || user.preferences.topMenu.length === 0) {
-      if(checkPermissionNeeds(user.permissions, "dev-mode")) {
-        user.preferences.topMenu = getDefaultDevTopMenus();
-      } else if(checkPermissionNeeds(user.permissions, "admin-mode")) {
-        user.preferences.topMenu = getDefaultAdminTopMenus();
-      } else {
-        user.preferences.topMenu = getDefaultTopMenus();
-      }
-    }
-  }
-  const result = await UserModel.bulkSave(userDocs);
-  console.log(`[Migration] ChangeTopMenuConfig (Updated: ${result.modifiedCount})`);
 }
