@@ -140,6 +140,7 @@ export default {
         title: "รายชื่อแอดมินร่วม",
       },
       csvSearch: "เพิ่มจาก CSV",
+      csvTemplate: "แบบฟอร์ม CSV",
       csvInserted: "เพิ่มผู้ใช้",
       distinctVotes: "โหวตแต่ละตัวเลือกสูงสุดหนึ่งสิทธิ์",
       anonymousVotes: "อนุญาตให้คนทั่วไปโหวตได้",

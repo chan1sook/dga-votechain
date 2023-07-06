@@ -33,15 +33,19 @@
         </template>
       </div>
     </div>
-    <div v-if="!isUserCsvUpload" class="w-full flex flex-col sm:flex-row gap-2 items-center justify-center my-1">
+    <div v-if="!isUserCsvUpload" class="w-full flex flex-col gap-2 items-center justify-center my-1">
       <DgaUserSearch :admin-only="props.coadmin" :not-self="props.coadmin" class="flex-1 max-w-xl"
         :placeholder="$t('app.voterList.searchUser')" :action-text="$t('app.voterList.addUser')"
         @select="emit('add', $event)"
       ></DgaUserSearch>
-      <div>
+      <div class="flex flex-row gap-2">
         <DgaButton class="!px-4 !py-2" :title="$t('app.topic.csvSearch')" @click="csvFileInput?.click()">
           {{ $t('app.topic.csvSearch') }}
         </DgaButton>
+        <DgaButton type="button" class="!px-4 !py-2" :title="$t('app.topic.csvTemplate')" @click="csvTemplate?.click()">
+          {{ $t('app.topic.csvTemplate') }}
+        </DgaButton>
+        <a ref="csvTemplate" href="/searchuser-csv-template.csv" download></a>
         <input ref="csvFileInput" type="file" class="opacity-0 w-0" accept=".csv"  @change="uploadUsersSearchCsv"/>
       </div>
     </div>
@@ -79,6 +83,7 @@ const emit = defineEmits<{
 
 const isUserCsvUpload = ref(false);
 const csvFileInput : Ref<HTMLInputElement | null> = ref(null);
+const csvTemplate : Ref<HTMLElement | null> = ref(null);
 
 function getFullName(user: CoadminFormData) {
   return getPrettyFullName({

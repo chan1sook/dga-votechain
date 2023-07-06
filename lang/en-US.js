@@ -140,6 +140,7 @@ export default {
         title: "Co-Admin Lists",
       },
       csvSearch: "Import CSV",
+      csvTemplate: "CSV Form",
       csvInserted: "Inserted",
       distinctVotes: "Limited 1 ballot per vote",
       anonymousVotes: "Allow Anonymous to Vote",
