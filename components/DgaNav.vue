@@ -14,6 +14,23 @@
       </div>
     </div>
     <div class="inline-flex ml-auto flex-row items-center gap-4">
+      <div class="hidden xl:flex flex-row gap-2">
+        <DgaButton v-if="isAdmin || isDeveloper" color="dga-orange" :theme="roleMode !== 'voter' ? 'hollow' : undefined" 
+          class="!py-1 !text-sm whitespace-nowrap" :title="switchRoleStrOf('voter')" @click="switchRoleMode('voter')"
+        >
+          {{ $t('app.role.voter') }}
+        </DgaButton>
+        <DgaButton v-if="isAdmin" color="dga-orange" :theme="roleMode !== 'admin' ? 'hollow' : undefined" 
+          class="!py-1 !text-sm whitespace-nowrap" :title="switchRoleStrOf('admin')" @click="switchRoleMode('admin')"
+        >
+          {{ $t('app.role.admin') }}
+        </DgaButton>
+        <DgaButton v-if="isDeveloper" color="dga-orange" :theme="roleMode !== 'developer' ? 'hollow' : undefined" 
+          class="!py-1 !text-sm whitespace-nowrap" :title="switchRoleStrOf('developer')" @click="switchRoleMode('developer')"
+        >
+          {{ $t('app.role.developer') }}
+        </DgaButton>
+      </div>
       <button type="button" class="dga-small-btn" @click="toggleLang">
         {{ prettyLocaleCode }}
       </button>    
@@ -38,6 +55,7 @@
         <NuxtLink v-else-if="menu === 'server-config'" :href="localePathOf('/admin/config')" class="dga-menu-item-small">{{ $t('app.admin.config.title')}}</NuxtLink>
       </template>
     </div>
+    <DgaLoadingModal :show="waitSwap"></DgaLoadingModal>
   </nav>
 </template>
 
@@ -54,6 +72,8 @@ const prettyLocaleCode = computed(() => {
   return lang.toUpperCase();
 });
 const isLogin = computed(() => useSessionData().value.userid);
+const isDeveloper = computed(() => checkPermissionNeeds(useSessionData().value.permissions, "dev-mode"));
+const isAdmin = computed(() => checkPermissionNeeds(useSessionData().value.permissions, 'admin-mode'));
 const showMenuOption = computed(() => useVisibleMenuGroup().value === 'menu');
 
 const currentTopMenus = computed(() => {
@@ -89,6 +109,29 @@ function toggleLang() {
 function hideMenu() {
   useVisibleMenuGroup().value = undefined;
 }
+
+const roleMode = computed(() => useSessionData().value.roleMode);
+const waitSwap = ref(false);
+
+function switchRoleStrOf(role: UserRole) {
+  return `${i18n.t('app.navbar.user.switchRoleMode')} [${i18n.t(`app.role.${role}`)}]`
+}
+
+async function switchRoleMode(role: UserRole) {
+  if(waitSwap.value) {
+    return;
+  }
+  waitSwap.value = true;
+  
+  const { data } = await useFetch("/api/session/switch", {
+    method: "POST",
+    body: { newMode: role }
+  });
+  useVisibleMenuGroup().value = undefined;
+  useRouter().go(0);
+  waitSwap.value = false;
+}
+
 
 onMounted(() => {
   document.body.addEventListener("click", hideMenu);
