@@ -1,5 +1,4 @@
-import { getFastConfiguration, getServerConfigurations } from "~/src/services/fetch/config";
-import { configSerializationReplacer } from "~/src/services/formatter/config";
+import { getFastConfiguration } from "~/src/services/fetch/config";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
 
@@ -12,7 +11,6 @@ export default defineEventHandler(async (event) => {
   if(fields.length > 0) {
     const allowProtectedMode = userData && !isBannedUser(userData) && checkPermissionNeeds(userData.permissions, "dev-mode") && userData.roleMode === 'developer';
     const configResponse = getFastConfiguration(fields, allowProtectedMode);
-    console.log(configResponse);
     return configResponse;
   } else {
     throw createError({

@@ -74,9 +74,11 @@ export async function updateConfigurations(config: Partial<ConfigData>, createNe
   return await ConfigModel.bulkSave(existsConfigs);
 }
 
-export async function loadServerConfigurations() {
+export async function loadServerConfigurations(emptyOverride?: boolean) {
   const configsDocs = await getServerConfigurations();
   for(const configDoc of configsDocs) {
-    (SERVER_CONFIGURATIONS as Record<string, any>)[configDoc.key] = configDoc.value;
+    if(emptyOverride || !!configDoc.value) {
+      (SERVER_CONFIGURATIONS as Record<string, any>)[configDoc.key] = configDoc.value;
+    }
   }
 }

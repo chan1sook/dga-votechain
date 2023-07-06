@@ -13,10 +13,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const values : Record<string, any> = await readBody(event);
-  console.log(values);
 
   await updateConfigurations(values);
-  await loadServerConfigurations();
+  await loadServerConfigurations(true);
   
   return {
     status: "OK"
