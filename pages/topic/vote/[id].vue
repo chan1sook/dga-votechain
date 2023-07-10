@@ -222,7 +222,7 @@ if (!data.value) {
     topic.value = _topic;
     prevVotes.value = votes;
     pauseData.value = _pauseData;
-    const _remainVotes = Math.min(quota - voted, 0);
+    const _remainVotes = Math.max(quota - voted, 0);
     remainVotes.value = _remainVotes;
     totalVotes.value = _remainVotes;
     if(_remainVotes === 0 && prevVotes.value.every((ele) => ele.choice === null)) {

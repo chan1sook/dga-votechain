@@ -25,17 +25,16 @@ export default defineNuxtConfig({
     REDIS_URI: isProduction ? process.env.REDIS_URI : process.env.DEV_REDIS_URI,
     IMG_STORAGE_PATH: isProduction ? process.env.IMG_STORAGE_PATH : process.env.DEV_IMG_STORAGE_PATH,
     BLOCKCHAIN_PRIVATE_KEY: process.env.BLOCKCHAIN_PRIVATE_KEY,
-    CITIZENID_FIXED_SALT:  isProduction ? process.env.DEV_CITIZENID_FIXED_SALT : process.env.CITIZENID_FIXED_SALT,
+    CITIZENID_FIXED_SALT: isProduction ? process.env.DEV_CITIZENID_FIXED_SALT : process.env.CITIZENID_FIXED_SALT,
+
+    FIRST_ACCOUNT_DEV_CID: process.env.FIRST_ACCOUNT_DEV_CID,
+
     public: {
       ALLOW_WITHDRAW_USER: false,
       SOCKETIO_URL: isProduction ? process.env.SOCKETIO_URL : process.env.DEV_SOCKETIO_URL,
       SYNCTIME_THERSOLD: 60 * 1000,
       BLOCKCHAIN_SERVERHB_TIME_THERSOLD: 5 * 60 * 1000,
     },
-    PREDEFINED_DEV_USERS: [
-      "b41eb19a-d531-4cf2-44c7-08db203dac90",
-      "d8f90135-ced7-4e4b-9bcb-08da5eeb01b7",
-    ],
   },
   telemetry: false,
   dev: true,
