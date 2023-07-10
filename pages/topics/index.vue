@@ -236,7 +236,7 @@ async function showQr(topic: TopicResponseData) {
 async function fetchTopics(filter: TopicFilterParams) {
   const fetchResult = await Promise.all([
     useFetch("/api/topics/avaliable", {
-      query: { filter }
+      query: { filter, roleMode: roleMode.value }
     })
   ])
   const [ topics ] = fetchResult.map((ele) => ele.data.value);

@@ -104,8 +104,8 @@
       </DgaReportBar>
       <div class="col-span-2"></div>
       <template v-for="choice of voteResult.choices.choices">
-        <div v-if="!isAdmin" class="hidden sm:block sm:col-span-2 text-right">
-          <template v-if="yourVotes && yourVotes.length > 0">
+        <div class="hidden sm:block sm:col-span-2 text-right">
+          <template v-if="!isAdmin && yourVotes && yourVotes.length > 0">
             x{{ countYourVoteOf(choice.name) }} =>
           </template>
         </div>
@@ -131,8 +131,8 @@
         </div>
       </template>
       <template v-if="getScoreOf(null).count > 0">
-        <div v-if="!isAdmin" class="hidden sm:block sm:col-span-2 text-right mt-2">
-          <template v-if="yourVotes && countYourVoteOf(null) > 0">
+        <div class="hidden sm:block sm:col-span-2 text-right mt-2">
+          <template v-if="!isAdmin && yourVotes && countYourVoteOf(null) > 0">
             x{{ countYourVoteOf(null) }} =>
           </template>
         </div>

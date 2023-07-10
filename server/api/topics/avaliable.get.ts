@@ -9,7 +9,7 @@ import { isCanVote } from "~/src/services/validations/topic";
 import { isUserAdmin } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
-  const { filter } = getQuery(event);
+  const { filter, roleMode } = getQuery(event);
   let topicsData: TopicModelDataWithIdPopulated[] = [];
   let filterParams : TopicFilterParams = { type: "all", topicType: "all" };
   if(typeof filter === "string") {
@@ -25,12 +25,12 @@ export default defineEventHandler(async (event) => {
   let filterIds;
   if(!userData || isBannedUser(userData)) {
     topicsData = await getLastestGuestTopics(filterParams).populate("createdBy");
-  } else if(userData.roleMode === 'voter') {
+  } else if(roleMode === 'admin' && isUserAdmin(userData)){
+    topicsData = await getLastestAdminTopics(userData._id, filterParams).populate("createdBy");
+  } else {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
     topicsData = await getLastestVoterTopicsWithIds(filterIds, userData, filterParams).populate("createdBy");
-  } else {
-    topicsData = await getLastestAdminTopics(userData._id, filterParams).populate("createdBy");
-  }
+  } 
 
   const topicPauseDocs = await getTopicCtrlPauseListByTopicIds(topicsData.map((ele) => ele._id));
   const votesDoc = userData ? await getVotesByTopicIdsAndUserId(topicsData.map((ele) => ele._id), userData._id) : [];
