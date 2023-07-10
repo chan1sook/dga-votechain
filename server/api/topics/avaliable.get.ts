@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
   let filterIds;
   if(!userData || isBannedUser(userData)) {
     topicsData = await getLastestGuestTopics(filterParams).populate("createdBy");
-  } else if(!isUserAdmin(userData)) {
+  } else if(userData.roleMode === 'voter') {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
     topicsData = await getLastestVoterTopicsWithIds(filterIds, userData, filterParams).populate("createdBy");
   } else {
