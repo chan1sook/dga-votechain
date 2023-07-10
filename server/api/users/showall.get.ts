@@ -1,11 +1,11 @@
 import UserModel from "~/src/models/user"
-import { isDeveloperRole } from "~/src/services/validations/role";
+import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData) || !isDeveloperRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData) || !isUserDeveloper(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const userDocs = await UserModel.find({ removed: { $ne: true }});
 
   const users : UserSearchResponseData[] = userDocs.map((data) => {
-    const role : UserRole = data.permissions.includes("dev-mode") ? "developer" : (data.permissions.includes("admin-mode") ? "admin" : "voter");
+    const role : UserRole = isUserDeveloper(data) ? "developer" : (isUserAdmin(data) ? "admin" : "voter");
     const authSources : UserAuthSource[] = [];
     for(const authSource of data.authSources) {
       if(!authSources.includes(authSource.authSource)) {

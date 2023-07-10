@@ -1,5 +1,5 @@
 import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from "~/src/services/form/preference";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { data } = await useFetch("/api/session/get");
@@ -13,9 +13,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       if(Array.isArray(data.value.preferences.topMenu)) {
         preferences.topMenu = data.value.preferences.topMenu;
       } else if(data.value.permissions) {
-        if(checkPermissionNeeds(data.value.permissions, "dev-mode")) {
+        if(isUserDeveloper({ permissions: data.value.permissions })) {
           preferences.topMenu = getDefaultDevTopMenus();
-        } else if(checkPermissionNeeds(data.value.permissions, "admin-mode")) {
+        } else if(isUserAdmin({ permissions: data.value.permissions })) {
           preferences.topMenu = getDefaultAdminTopMenus();
         }
       }

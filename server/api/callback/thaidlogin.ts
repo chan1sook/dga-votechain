@@ -5,8 +5,7 @@ import UserModel from "~/src/models/user"
 import { legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
 import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
-import { compareAuthSourceFn, isBannedUser } from "~/src/services/validations/user";
+import { compareAuthSourceFn } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
@@ -61,16 +60,9 @@ export default defineEventHandler(async (event) => {
       await userDoc.save();
     }
 
-    let defaultRoleMode : UserRole = "voter";
-    if(isBannedUser(userDoc)) {
-      defaultRoleMode = "guest";
-    } else if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
-      defaultRoleMode = "admin";
-    }
-
     await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
       userid: userDoc._id.toString(),
-      roleMode: defaultRoleMode,
+      roleMode: "voter",
       authFrom: {
         ...authSource,
       },

@@ -1,6 +1,6 @@
 import UserModel from "~/src/models/user"
 import { combinePermissions, removePermissions } from "~/src/services/transform/permission";
-import { isDeveloperRole } from "~/src/services/validations/role";
+import { isUserDeveloper } from "~/src/services/validations/role";
 import mongoose from "mongoose";
 import { getNotSelfEditablePermissions } from "~/src/services/form/permission";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
@@ -9,7 +9,7 @@ import { isBannedUser } from "~/src/services/validations/user";
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData)|| !isDeveloperRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData)|| !isUserDeveloper(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

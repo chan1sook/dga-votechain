@@ -1,11 +1,11 @@
 import { searchExactActiveUserByKeyword } from "~/src/services/fetch/user";
-import { isAdminRole } from "~/src/services/validations/role";
+import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData) || !isAdminRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -26,9 +26,9 @@ export default defineEventHandler(async (event) => {
   if(user) {
     let role : UserRole | undefined;
     let authSources : UserAuthSource[] | undefined = undefined;
-    if(userData.roleMode === 'developer' && userData.permissions.includes("dev-mode")) {
-      role = user.permissions.includes("dev-mode") ? "developer" :
-        (user.permissions.includes("admin-mode") ? "admin" : "voter");
+    if(isUserDeveloper(userData)) {
+      role = isUserDeveloper(user) ? "developer" :
+        (isUserAdmin(user) ? "admin" : "voter");
       authSources = [];
       for(const authSource of user.authSources) {
         if(!authSources.includes(authSource.authSource)) {

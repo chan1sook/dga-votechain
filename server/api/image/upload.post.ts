@@ -1,11 +1,11 @@
 import { readFiles } from 'h3-formidable'
-import { checkPermissionNeeds } from '~/src/services/validations/permission';
 import { fileTypeFromBuffer } from "file-type"
 import sharp from 'sharp';
 import fs from "fs/promises";
 import { nanoid } from 'nanoid';
 import path from 'path';
 import { isBannedUser } from '~/src/services/validations/user';
+import { isUserAdmin } from '~/src/services/validations/role';
 
 
 const supportMimeTypes = ['image/jpeg', 'image/png'];
@@ -13,7 +13,7 @@ const supportMimeTypes = ['image/jpeg', 'image/png'];
 export default eventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "admin-mode")) {
+  if(!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

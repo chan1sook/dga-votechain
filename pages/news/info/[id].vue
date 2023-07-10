@@ -23,7 +23,7 @@
       </div>
     </div>
     <DgaButtonGroup class="mt-12">
-      <NuxtLink v-if="isAdminRole" :to="`/news/edit/${newsid}`" >
+      <NuxtLink v-if="isDevRole" :to="`/news/edit/${newsid}`" >
         <DgaButton class="!flex flex-row gap-x-2 mx-auto items-center justify-center truncate"
           color="dga-orange" :title="$t('news.edit.title')"
         >
@@ -54,8 +54,8 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('news.title')} #${newsid}`
 });
 
-const isAdminRole = computed(() => {
-  return useSessionData().value.roleMode === "admin";
+const isDevRole = computed(() => {
+  return useSessionData().value.roleMode === "developer";
 })
 
 const { data } = await useFetch(`/api/news/info/${newsid}`);

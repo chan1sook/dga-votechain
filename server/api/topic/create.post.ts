@@ -8,11 +8,12 @@ import mongoose, { Types } from "mongoose";
 import { isTopicFormValid } from "~/src/services/validations/topic";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
+import { isUserAdmin } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
   
-  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "create-topic") || userData.roleMode !== "admin") {
+  if(!userData || isBannedUser(userData) || isUserAdmin(userData) || !checkPermissionNeeds(userData.permissions, "create-topic")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

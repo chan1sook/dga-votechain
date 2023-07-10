@@ -86,6 +86,7 @@ import dayjs from 'dayjs';
 import { checkPermissionNeeds } from '~/src/services/validations/permission';
 
 const i18n = useI18n();
+const localePathOf = useLocalePath();
 const showOption = computed(() => useVisibleMenuGroup().value === 'user');
 
 function toggleShowOption() {
@@ -147,8 +148,22 @@ async function switchRoleMode(role: UserRole) {
     method: "POST",
     body: { newMode: role }
   });
+
+  if(!useAllowRoles().value.includes(role)) {
+    switch(role) {
+      case "voter":
+      case "admin":
+        navigateTo(localePathOf("/topics"));
+        break;
+      default:
+        navigateTo(localePathOf("/"));
+        break;
+    }
+  } else {
+    useRouter().go(0);
+  }
+
   useVisibleMenuGroup().value = undefined;
-  useRouter().go(0);
   waitSwap.value = false;
 }
 

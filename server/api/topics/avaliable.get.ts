@@ -5,7 +5,8 @@ import { getVoterAllowByUserId } from "~/src/services/fetch/vote-allow";
 import { getTopicCtrlPauseListByTopicIds } from "~/src/services/fetch/topic-ctrl-pause";
 import { isBannedUser } from "~/src/services/validations/user";
 import { getVotesByTopicIdsAndUserId } from "~/src/services/fetch/vote";
-import { isAnonymousTopic, isCanVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
+import { isCanVote } from "~/src/services/validations/topic";
+import { isUserAdmin } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const { filter } = getQuery(event);
@@ -22,9 +23,9 @@ export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
   const topicVoterAllowsDocs = (userData && !isBannedUser(userData)) ? await getVoterAllowByUserId(userData._id, filterParams?.pagesize, filterParams?.startid) : [];
   let filterIds;
-  if(!userData || userData.roleMode === "guest" || isBannedUser(userData)) {
+  if(!userData || isBannedUser(userData)) {
     topicsData = await getLastestGuestTopics(filterParams).populate("createdBy");
-  } else if(userData.roleMode === "voter") {
+  } else if(!isUserAdmin(userData)) {
     filterIds = topicVoterAllowsDocs.map((ele) => ele.topicid).filter((ele, i, arr) => arr.indexOf(ele) === i);
     topicsData = await getLastestVoterTopicsWithIds(filterIds, userData, filterParams).populate("createdBy");
   } else {

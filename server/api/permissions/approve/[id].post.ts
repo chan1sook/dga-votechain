@@ -2,13 +2,13 @@ import UserModel from "~/src/models/user"
 import RequestPermissionsModel from "~/src/models/request-permission"
 import NotificationModel from "~/src/models/notification";
 import { combinePermissions } from "~/src/services/transform/permission";
-import { isAdminRole } from "~/src/services/validations/role";
+import { isUserAdmin } from "~/src/services/validations/role";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData)|| !isAdminRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData)|| !isUserAdmin(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

@@ -5,7 +5,7 @@ import validator from 'validator';
 import UserModel from "~/src/models/user";
 import { isThaiCitizenId, splitBasicName } from "../validations/user";
 import { ObjectId } from "mongodb";
-import { checkPermissionNeeds } from "../validations/permission";
+import { isUserAdmin } from "../validations/role";
 
 export async function getActiveUserByAuthSource(authSource: UserAuthSourceData) {
   const userDoc = await UserModel.findOne({
@@ -128,22 +128,22 @@ export async function searchExactActiveUserByKeyword(params: UserSearchParams) {
     return null;
   } else if(isThaiCitizenId(params.keyword)) {
     docQuery = await getCitizenIDSearchQuery(params);
-  } else if(validator.isEmail(params.keyword)) {
-    docQuery = getEmailSearchQuery(params);
   } else if(isValidObjectId(params.keyword)) {
     if(params.excludeUserId && params.keyword === params.excludeUserId.toString()) {
       return null;
     }
     docQuery = getUserIdSearchQuery(params);
-  } else {
+  } else if(!validator.isEmail(params.keyword)) {
     docQuery = getNameSearchQuery(params);
+  } else {
+    docQuery = getEmailSearchQuery(params);
   }
   
   return await UserModel.findOne(docQuery);
 }
 
-export async function batchSearchActiveUserByKeywords(keywordPair: { [k: string] : number | undefined }, { adminOnly, excludeUserId } : Omit<UserSearchParams, "keyword">) {
-  const unsearchKeywords = Object.keys(keywordPair);
+export async function batchSearchActiveUserByKeywords(searchParams: CSVSearchParams[], { adminOnly, excludeUserId } : Omit<UserSearchParams, "keyword">) {
+  const unsearchParams = searchParams.slice();
   const matchResults : { user: UserModelDataWithId, vote: number | undefined}[] = [];
 
   const cursor = UserModel.find({ 
@@ -152,7 +152,7 @@ export async function batchSearchActiveUserByKeywords(keywordPair: { [k: string]
 
   let nextUser = await cursor.next();
   while(nextUser) {
-    if(adminOnly && !checkPermissionNeeds(nextUser.permissions, "admin-mode")) {
+    if(adminOnly && !isUserAdmin(nextUser)) {
       nextUser = await cursor.next();
       continue;
     }
@@ -162,38 +162,20 @@ export async function batchSearchActiveUserByKeywords(keywordPair: { [k: string]
       continue;
     }
 
-    for(let i = 0; i < unsearchKeywords.length; i++) {
-      const keyword = unsearchKeywords[i];
-      if(isThaiCitizenId(keyword)) {
-        const cidHashed = await bcrypt.hash(keyword, useRuntimeConfig().CITIZENID_FIXED_SALT);
+    for(let i = 0; i < unsearchParams.length; i++) {
+      const params = unsearchParams[i];
+      if(params.citizenid && isThaiCitizenId(params.citizenid)) {
+        const cidHashed = await bcrypt.hash(params.citizenid, useRuntimeConfig().CITIZENID_FIXED_SALT);
         if(nextUser.cidHashed === cidHashed) {
           matchResults.push({
             user: nextUser,
-            vote: keywordPair[keyword],
+            vote: params.voteCount,
           });
-          unsearchKeywords.splice(i, 1);
+          unsearchParams.splice(i, 1);
           break;
         }
-      } else if(validator.isEmail(keyword)) {
-        if(nextUser.email === keyword) {
-          matchResults.push({
-            user: nextUser,
-            vote: keywordPair[keyword],
-          });
-          unsearchKeywords.splice(i, 1);
-          break;
-        }
-      } else if(isValidObjectId(keyword)) {
-        if(nextUser._id.toString() === keyword) {
-          matchResults.push({
-            user: nextUser,
-            vote: keywordPair[keyword],
-          });
-          unsearchKeywords.splice(i, 1);
-          break;
-        }
-      } else {
-        const nameToken = splitBasicName(keyword);
+      } else if(params.names) {
+        const nameToken = splitBasicName(params.names);
         let valid = false;
         if(nameToken.length === 3) {
           valid = nextUser.firstName === nameToken[0] && nextUser.lastName === nameToken[2];
@@ -206,15 +188,24 @@ export async function batchSearchActiveUserByKeywords(keywordPair: { [k: string]
         if(valid) {
           matchResults.push({
             user: nextUser,
-            vote: keywordPair[keyword],
+            vote: params.voteCount,
           });
-          unsearchKeywords.splice(i, 1);
+          unsearchParams.splice(i, 1);
+          break;
+        }
+      } else if(params.email && validator.isEmail(params.email)) {
+        if(nextUser.email === params.email) {
+          matchResults.push({
+            user: nextUser,
+            vote: params.voteCount,
+          });
+          unsearchParams.splice(i, 1);
           break;
         }
       }
     }
 
-    if(unsearchKeywords.length === 0) {
+    if(unsearchParams.length === 0) {
       break;
     }
 

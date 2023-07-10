@@ -1,11 +1,11 @@
 import { loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
+import { isUserDeveloper } from "~/src/services/validations/role";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "dev-mode") || userData.roleMode !== 'developer') {
+  if(!userData || isBannedUser(userData) || !isUserDeveloper(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

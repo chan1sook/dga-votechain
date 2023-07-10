@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 import TopicModel from "~/src/models/topic"
 import { getVotesByTopicId } from "~/src/services/fetch/vote"
 import { getVoterAllowByTopicId } from "~/src/services/fetch/vote-allow"
-import { isAdminRole } from "~/src/services/validations/role"
+import { isAdminRole, isUserAdmin } from "~/src/services/validations/role"
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause"
 import { isBannedUser } from "~/src/services/validations/user"
 import { isUserInMatchInternalTopic } from "~/src/services/validations/topic"
@@ -143,7 +143,7 @@ export default defineEventHandler(async (event) => {
     scores,
   }
 
-  if(isAdminRole(userData?.roleMode)) {
+  if(isUserAdmin(userData)) {
     voteResult.voters = votersData.map((ele) => {
       const user = (ele.userid as unknown as UserModelDataWithId);
       return {
