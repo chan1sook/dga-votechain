@@ -1,7 +1,7 @@
 <template>
   <div>
     <DgaHead>{{ $t("app.privacyPolicy") }}</DgaHead>
-    <div v-html="sanitizeHtmlCustom(privacyPolicyMessage)" class="my-2 custom-content-container max-w-4xl"></div>
+    <div v-html="sanitizeHtmlCustom(privacyPolicyMessage)" class="my-2 custom-content-container max-w-4xl mx-auto"></div>
   </div>
 </template>
 

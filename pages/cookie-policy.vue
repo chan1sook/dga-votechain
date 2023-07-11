@@ -1,7 +1,7 @@
 <template>
   <div>
     <DgaHead>{{ $t("app.cookiePolicy") }}</DgaHead>
-    <div v-html="sanitizeHtmlCustom(cookiePolicyMessage)" class="mt-2 custom-content-container max-w-4xl"></div>
+    <div v-html="sanitizeHtmlCustom(cookiePolicyMessage)" class="mt-2 custom-content-container max-w-4xl mx-auto"></div>
   </div>
 </template>
 
