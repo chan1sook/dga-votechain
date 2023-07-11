@@ -4,7 +4,7 @@
     <DgaTab v-model="currentTab" :tabs="{
       content: $t('app.admin.config.content'),
     }" class="mt-2"></DgaTab>
-    <div v-if="currentTab === 'content'" class="flex flex-col gap-4 w-full max-w-4xl mx-auto my-4">
+    <div v-if="currentTab === 'content'" class="flex flex-col gap-4 w-full mx-auto my-4">
       <DgaTab v-model="contentSubtab" :tabs="{
         home: $t('app.home.title'),
         about: $t('app.about.title'),
