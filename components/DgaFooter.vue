@@ -15,7 +15,8 @@
           <div>
             <NuxtLink href="#" class="underline">{{ $t('app.sendFeedback') }}</NuxtLink> |   
             <NuxtLink href="#" class="underline">{{ $t('app.termCondition') }}</NuxtLink> |
-            <NuxtLink href="/privacy-policy" class="underline">{{ $t('app.privacyPolicy') }}</NuxtLink>
+            <NuxtLink href="/privacy-policy" class="underline">{{ $t('app.privacyPolicy') }}</NuxtLink> |
+            <NuxtLink href="/cookie-policy" class="underline">{{ $t('app.cookiePolicy') }}</NuxtLink>
           </div>
           <div>
             {{ $t('app.contactUs.info.contactCenter') }} <a href="tel:+6626126060">(+66) 02 612 6060</a>

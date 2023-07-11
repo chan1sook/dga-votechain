@@ -27,8 +27,7 @@ export default defineNuxtConfig({
     BLOCKCHAIN_PRIVATE_KEY: process.env.BLOCKCHAIN_PRIVATE_KEY,
     CITIZENID_FIXED_SALT: isProduction ? process.env.DEV_CITIZENID_FIXED_SALT : process.env.CITIZENID_FIXED_SALT,
 
-    FIRST_ACCOUNT_DEV_CID: process.env.FIRST_ACCOUNT_DEV_CID,
-
+    ACCOUNT_DEV_CIDS: process.env.ACCOUNT_DEV_CIDS?.split(",") || [],
     public: {
       ALLOW_WITHDRAW_USER: false,
       SOCKETIO_URL: isProduction ? process.env.SOCKETIO_URL : process.env.DEV_SOCKETIO_URL,

@@ -10,7 +10,7 @@ import { compareAuthSourceFn } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, DID_API_URL, FIRST_ACCOUNT_DEV_CID} = useRuntimeConfig()
+  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, DID_API_URL, ACCOUNT_DEV_CIDS} = useRuntimeConfig()
 
   if(typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE: DID_VERIFY_CODE });
@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
         userDoc.cidHashed = cidHashed;
       }
 
-      if(digitalIdUserInfo.citizen_id === FIRST_ACCOUNT_DEV_CID) {
+      if(ACCOUNT_DEV_CIDS.includes(digitalIdUserInfo.citizen_id)) {
         userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("developer"));
       }
 

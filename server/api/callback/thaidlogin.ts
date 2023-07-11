@@ -10,7 +10,7 @@ import { authorizationThaID } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, FIRST_ACCOUNT_DEV_CID } = useRuntimeConfig()
+  const { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, ACCOUNT_DEV_CIDS } = useRuntimeConfig()
 
   if(typeof code === "string") {
     const data = await authorizationThaID(code, { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK });
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
         userDoc.cidHashed = cidHashed;
       }
 
-      if(data.pid === FIRST_ACCOUNT_DEV_CID) {
+      if(ACCOUNT_DEV_CIDS.includes(data.pid)) {
         userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("developer"));
       }
 

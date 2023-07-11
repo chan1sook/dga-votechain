@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import { sanitizeHtmlCustom } from '~/src/services/formatter/html';
+import { getStringConfigFieldByLocale, mapConfigKeysToAllLocales } from '~/src/services/transform/config';
 
 const i18n = useI18n();
 
@@ -23,20 +24,11 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.home.title')}`
 });
 
-const serverConfigs = await useServerConfig([
-  "homeContentTH",
-  "homeContentEN",
-]);
+const serverConfigs = await useServerConfig(
+  mapConfigKeysToAllLocales("homeContent")
+);
 
-const indexMessage = computed(() => {
-  let result = "";
-  if(i18n.locale.value === 'th') {
-    result = serverConfigs.homeContentTH || "";
-  } else {
-    result = serverConfigs.homeContentEN || "";
-  }
-  return result || serverConfigs.homeContentTH || serverConfigs.homeContentEN || "";
-})
+const indexMessage = computed(() => getStringConfigFieldByLocale("homeContent", i18n.locale.value, serverConfigs));
 
 onMounted(() => {
   if(!useSessionData().value.userid) {

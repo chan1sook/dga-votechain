@@ -4,13 +4,15 @@
     <DgaTab v-model="currentTab" :tabs="{
       content: $t('app.admin.config.content'),
     }" class="mt-2"></DgaTab>
-    <div v-if="currentTab === 'content'" class="grid grid-cols-12 gap-4 w-full max-w-4xl mx-auto my-4">
+    <div v-if="currentTab === 'content'" class="flex flex-col gap-4 w-full max-w-4xl mx-auto my-4">
       <DgaTab v-model="contentSubtab" :tabs="{
         home: $t('app.home.title'),
         about: $t('app.about.title'),
         contactUs: $t('app.contactUs.title'),
-      }" class="col-span-12"></DgaTab>
-      <template v-if="contentSubtab === 'home'">
+        cookiePolicy: $t('app.cookiePolicy'),
+        privacyPolicy: $t('app.privacyPolicy'),
+      }"></DgaTab>
+      <div v-show="contentSubtab === 'home'" class="grid grid-cols-12 gap-4">
         <div class="col-span-12 lg:col-span-3">
           {{ $t('app.admin.config.homeContent') }} (TH)
         </div>
@@ -19,8 +21,8 @@
           {{ $t('app.admin.config.homeContent') }} (EN)
         </div>
         <DgaRichtextEditor v-model="configs.homeContentEN" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
-      </template>
-      <template v-else-if="contentSubtab === 'about'">
+      </div>
+      <div v-show="contentSubtab === 'about'" class="grid grid-cols-12 gap-4">
         <div class="col-span-12 lg:col-span-3">
           {{ $t('app.admin.config.aboutContent') }} (TH)
         </div>
@@ -29,8 +31,8 @@
           {{ $t('app.admin.config.aboutContent') }} (EN)
         </div>
         <DgaRichtextEditor v-model="configs.aboutEN" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
-      </template>
-      <template v-else-if="contentSubtab === 'contactUs'">
+      </div>
+      <div v-show="contentSubtab === 'contactUs'" class="grid grid-cols-12 gap-4">
         <div class="col-span-12 lg:col-span-3">
           {{ $t('app.admin.config.contactUsContent') }} (TH)
         </div>
@@ -39,7 +41,27 @@
           {{ $t('app.admin.config.contactUsContent') }} (EN)
         </div>
         <DgaRichtextEditor v-model="configs.contactUsEN" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
-      </template>
+      </div>
+      <div v-show="contentSubtab === 'cookiePolicy'" class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 lg:col-span-3">
+          {{ $t('app.admin.config.cookiePolicyContent') }} (TH)
+        </div>
+        <DgaRichtextEditor v-model="configs.cookiePolicyTH" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
+        <div class="col-span-12 lg:col-span-3">
+          {{ $t('app.admin.config.cookiePolicyContent') }} (EN)
+        </div>
+        <DgaRichtextEditor v-model="configs.cookiePolicyEN" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
+      </div>
+      <div v-show="contentSubtab === 'privacyPolicy'" class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 lg:col-span-3">
+          {{ $t('app.admin.config.privacyPolicyContent') }} (TH)
+        </div>
+        <DgaRichtextEditor v-model="configs.privacyPolicyTH" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
+        <div class="col-span-12 lg:col-span-3">
+          {{ $t('app.admin.config.privacyPolicyContent') }} (EN)
+        </div>
+        <DgaRichtextEditor v-model="configs.privacyPolicyEN" class="col-span-12 lg:col-span-9"></DgaRichtextEditor>
+      </div>
     </div>
     <DgaButtonGroup class="mt-4">
       <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
@@ -62,6 +84,7 @@
 
 <script setup lang="ts">
 import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+import { mapConfigKeysToAllLocales } from '~/src/services/transform/config';
 const i18n = useI18n();
 const localePathOf = useLocalePath();
 
@@ -72,14 +95,9 @@ useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.admin.config.title')}`
 });
 
-const serverConfigs = await useServerConfig([
-  "homeContentEN",
-  "homeContentTH",
-  "aboutEN",
-  "aboutTH",
-  "contactUsEN",
-  "contactUsTH",
-]);
+const serverConfigs = await useServerConfig(
+  mapConfigKeysToAllLocales("homeContent", "about", "contactUs", "cookiePolicy", "privacyPolicy")
+);
 
 const configs : Ref<Partial<ConfigData>> = ref({
   homeContentEN: serverConfigs.homeContentEN || "",
@@ -88,6 +106,10 @@ const configs : Ref<Partial<ConfigData>> = ref({
   aboutTH: serverConfigs.aboutTH || "",
   contactUsEN: serverConfigs.contactUsEN || "",
   contactUsTH: serverConfigs.contactUsTH || "",
+  cookiePolicyTH: serverConfigs.cookiePolicyTH || "",
+  cookiePolicyEN: serverConfigs.cookiePolicyEN || "",
+  privacyPolicyTH: serverConfigs.privacyPolicyTH || "",
+  privacyPolicyEN: serverConfigs.privacyPolicyEN || "",
 });
 const currentTab = ref("content");
 const contentSubtab = ref("home");

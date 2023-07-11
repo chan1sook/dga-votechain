@@ -8,5 +8,10 @@ export function sanitizeHtmlCustom(html: string) {
     allowedAttributes: Object.assign({
       '*' : ['style']
     }, sanitizeHtml.defaults.allowedAttributes),
+    allowedStyles: {
+      '*': {
+        'text-align': [/^left$/, /^right$/, /^center$/],
+      }
+    }
   })
 }

@@ -17,6 +17,17 @@
     list-style-type: "-";
     @apply ml-6 pl-2;
   }
+
+  .custom-content-container a {
+    @apply underline;
+  }
+
+  .custom-content-container table {
+    @apply border-2 border-dga-blue;
+  }
+  .custom-content-container table th, .custom-content-container table td {
+    @apply p-2 border border-dga-blue;
+  }
 }
 
 @layer components {

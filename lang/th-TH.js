@@ -368,6 +368,8 @@ export default {
         homeContent: "เนื้อหาหน้าแรก",
         aboutContent: "เนื้อหาหน้าเกี่ยวกับบริการ",
         contactUsContent: "เนื้อหาหน้าติดต่อเรา",
+        cookiePolicyContent: "เนื้อหาหน้านโยบายคุกกี้",
+        privacyPolicyContent: "เนื้อหาหน้านโยบายความเป็นส่วนตัว",
         confirm: "ยีนยันการตั้งค่า?",
         success: "ตั้งค่าสำเร็จ",
         failed: "ตั้งค่าล้มเหลว",

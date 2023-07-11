@@ -1,21 +1,18 @@
 import { FilterQuery } from "mongoose";
+import { COOKIE_POLICY_TH, HOME_CONTENT_TH, PRIVACY_POLICY_TH } from "~/src/defaults";
 import ConfigModel from "~/src/models/config"
 
 const SERVER_CONFIGURATIONS : ConfigData = {
-  homeContentTH: `<p><span style="text-decoration: underline;">จุดเด่น</span></p>
-  <ul>
-  <li>ข้อมูลลงคะแนนมติสามารถประมวลผลได้อย่างรวดเร็ว มีความถูกต้อง และปลอดภัย</li>
-  <li>ข้อมูลของผู้ทำการเลือกลงคะแนนมติไม่ถูกเปิดเผล สู่สาธารณะ</li>
-  <li>ไม่สามารถแก้ไขข้อมูลเพื่อเอื้อประโยชน์แก่ผู้มีส่วนได้ส่วนเสียในเรื่องนั้นๆ</li>
-  <li>ยากต่อการปลอมแปลงหรือสวมสิทธิ์แทนบุคคลอื่น</li>
-  <li>มีความโปร่งใสผู้ทำการลงคะแนนมติ สามารถตรวจสอบข้อมูลการโหวตของตนเองย้อนหลังได้</li>
-  <li>ลดค่าใช้จ่ายในการจัดการลงคะแนนมติ สะดวก สามารถลงคะแนนมติผ่านระบบจากทุกที่ที่เข้าถึงอินเทรอ์เน็ตได้</li>
-  </ul>`,
+  homeContentTH: HOME_CONTENT_TH,
   homeContentEN: "",
-  aboutEN: "",
   aboutTH: "",
-  contactUsEN: "",
+  aboutEN: "",
   contactUsTH: "",
+  contactUsEN: "",
+  cookiePolicyTH: COOKIE_POLICY_TH,
+  cookiePolicyEN: "",
+  privacyPolicyTH: PRIVACY_POLICY_TH,
+  privacyPolicyEN: "",
 };
 
 const protectedKeys: ProtectedKeys[] = [];

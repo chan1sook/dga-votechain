@@ -284,6 +284,8 @@ export default {
         homeContent: "Home Content",
         aboutContent: "About Content",
         contactUsContent: "Contact Us Content",
+        cookiePolicyContent: "Cookie Policy Content",
+        privacyPolicyContent: "Privacy Policy Content",
         confirm: "Confirm to Edit Configurations?",
         success: "Edit Configurations Successful",
         failed: "Edit Configurations Failed",
