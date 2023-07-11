@@ -11,6 +11,7 @@ export function sanitizeHtmlCustom(html: string) {
     allowedStyles: {
       '*': {
         'text-align': [/^left$/, /^right$/, /^center$/],
+        'text-indent': [/^.+$/]
       }
     }
   })

@@ -1,3 +1,4 @@
+import { COOKIE_POLICY_TH, PRIVACY_POLICY_TH } from "~/src/defaults";
 import BlockchainServerModel from "~/src/models/blockchain-server"
 import { getFastConfiguration, loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
 
@@ -11,6 +12,13 @@ export async function initConfigs() {
   
   await loadServerConfigurations();
   const result = await updateConfigurations(getFastConfiguration(), true);
+  
+  await updateConfigurations({
+    cookiePolicyTH: COOKIE_POLICY_TH,
+    cookiePolicyEN: "",
+    privacyPolicyTH: PRIVACY_POLICY_TH,
+    privacyPolicyEN: "",
+  }, true)
 
   console.log(`[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`);
 }
