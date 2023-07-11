@@ -12,13 +12,6 @@ export async function initConfigs() {
   
   await loadServerConfigurations();
   const result = await updateConfigurations(getFastConfiguration(), true);
-  
-  await updateConfigurations({
-    cookiePolicyTH: COOKIE_POLICY_TH,
-    cookiePolicyEN: "",
-    privacyPolicyTH: PRIVACY_POLICY_TH,
-    privacyPolicyEN: "",
-  }, true)
 
   console.log(`[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`);
 }
