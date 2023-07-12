@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="flex flex-row flex-wrap items-center gap-x-4 gap-y-2 mx-auto max-w-6xl">
-      <div v-if="useSessionData().value.roleMode !== 'guest'" class="w-full lg:w-60 flex flex-row gap-2 items-center">
+      <div v-if="roleMode !== 'guest'" class="w-full lg:w-60 flex flex-row gap-2 items-center">
         <div class="whitespace-nowrap">{{ $t('app.voting.filters.accessModifier') }}</div>
         <DgaVueSelect
           v-model="filter.topicType" :options="topciTypeFilterOptions" class="flex-1"
@@ -82,7 +82,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/en";
 import "dayjs/locale/th";
 
-import { isTopicReadyToVote, isTopicExpired, isAnonymousTopic, isUserInMatchInternalTopic } from '~/src/services/validations/topic';
+import { isTopicReadyToVote, isTopicExpired } from '~/src/services/validations/topic';
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 import { topicTypes } from '~/src/services/form/topic';
 
@@ -90,6 +90,7 @@ const localePathOf = useLocalePath();
 const i18n = useI18n();
 
 const roleMode = computed(() => useSessionData().value.roleMode);
+
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.voting.title')}`
 });
@@ -235,7 +236,7 @@ async function showQr(topic: TopicResponseData) {
 async function fetchTopics(filter: TopicFilterParams) {
   const fetchResult = await Promise.all([
     useFetch("/api/topics/avaliable", {
-      query: { filter }
+      query: { filter, roleMode: roleMode.value }
     })
   ])
   const [ topics ] = fetchResult.map((ele) => ele.data.value);

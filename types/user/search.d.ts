@@ -14,4 +14,11 @@ declare global {
     vote?: number,
     authSources?: UserAuthSource[],
   } & UserBasicData;
+
+  interface CSVSearchParams {
+    citizenid?: string,
+    names?: string,
+    email?: string,
+    voteCount?: number,
+  }
 }

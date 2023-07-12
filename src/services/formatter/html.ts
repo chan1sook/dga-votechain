@@ -6,7 +6,15 @@ export function sanitizeHtmlCustom(html: string) {
       'img', 'br', 'hr', 'u'
     ]),
     allowedAttributes: Object.assign({
-      '*' : ['style']
+      '*' : ['style'],
+      'td': ['colspan', 'rowspan'],
+      'th': ['colspan', 'rowspan'],
     }, sanitizeHtml.defaults.allowedAttributes),
+    allowedStyles: {
+      '*': {
+        'text-align': [/^left$/, /^right$/, /^center$/],
+        'text-indent': [/^.+$/]
+      }
+    }
   })
 }

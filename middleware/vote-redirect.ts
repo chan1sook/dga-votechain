@@ -1,5 +1,3 @@
-import { isAdminRole } from "~/src/services/validations/role";
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { id } = to.params;
   const topicid = Array.isArray(id) ? id[id.length - 1] : id;
@@ -7,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   
   const currentPath = to.path;
   
-  if(isAdminRole(roleMode)) {
+  if(roleMode === 'admin') {
     if(currentPath !== `/topic/ctrl/${topicid}`) {
       return navigateTo(`/topic/ctrl/${topicid}`)
     }

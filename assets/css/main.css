@@ -17,6 +17,50 @@
     list-style-type: "-";
     @apply ml-6 pl-2;
   }
+
+  .custom-content-container h1 {
+    @apply my-2 font-bold;
+    font-size: 1.625rem;
+  }
+
+  .custom-content-container h2 {
+    @apply my-2 font-bold;
+    font-size: 1.5rem;
+  }
+
+  .custom-content-container h3 {
+    @apply my-2 font-bold;
+    font-size: 1.375rem;
+  }
+
+  .custom-content-container h4 {
+    @apply my-2 font-bold;
+    font-size: 1.25rem;
+  }
+
+  .custom-content-container h5 {
+    @apply my-2 font-bold;
+    font-size: 1.125rem;
+  }
+
+  .custom-content-container h6 {
+    @apply my-2 font-bold;
+  }
+
+  .custom-content-container p {
+    @apply my-2
+  }
+
+  .custom-content-container a {
+    @apply underline;
+  }
+
+  .custom-content-container table {
+    @apply border-2 border-dga-blue;
+  }
+  .custom-content-container table th, .custom-content-container table td {
+    @apply p-2 border border-dga-blue;
+  }
 }
 
 @layer components {

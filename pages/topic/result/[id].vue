@@ -105,11 +105,8 @@
       <div class="col-span-2"></div>
       <template v-for="choice of voteResult.choices.choices">
         <div class="hidden sm:block sm:col-span-2 text-right">
-          <template v-if="yourVotes && yourVotes.length > 0">
+          <template v-if="!isAdmin && yourVotes && yourVotes.length > 0">
             x{{ countYourVoteOf(choice.name) }} =>
-          </template>
-          <template v-else-if="countYourVoteOf(choice.name) > 0">
-            ===>
           </template>
         </div>
         <DgaReportBar with-border class="col-span-10 sm:col-span-8"
@@ -135,7 +132,7 @@
       </template>
       <template v-if="getScoreOf(null).count > 0">
         <div class="hidden sm:block sm:col-span-2 text-right mt-2">
-          <template v-if="yourVotes && countYourVoteOf(null) > 0">
+          <template v-if="!isAdmin && yourVotes && countYourVoteOf(null) > 0">
             x{{ countYourVoteOf(null) }} =>
           </template>
         </div>
@@ -175,6 +172,7 @@
 <script setup lang="ts">
 import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
 import { formatCreatedByName, getPrettyFullName } from '~/src/services/formatter/user';
+import { isAdminRole } from '~/src/services/validations/role';
 
 const i18n = useI18n();
 
@@ -238,7 +236,7 @@ const totalVoteStats = computed(() => voteResult.value ? voteResult.value.stats.
 const actualVoteStats = computed(() => voteResult.value ? voteResult.value.stats.votes.user + voteResult.value.stats.votes.anonymous : 0);
 const absentVotes = computed(() => voteResult.value ? totalVoteStats.value - actualVoteStats.value : 0);
 
-const showDescription = ref(false);
+const isAdmin = computed(() => isAdminRole(useSessionData().value.roleMode))
 
 const totalVotes = computed(() => {
   if(!voteResult.value) {

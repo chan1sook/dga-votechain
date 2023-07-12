@@ -1,3 +1,4 @@
+import { COOKIE_POLICY_TH, PRIVACY_POLICY_TH } from "~/src/defaults";
 import BlockchainServerModel from "~/src/models/blockchain-server"
 import { getFastConfiguration, loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
 

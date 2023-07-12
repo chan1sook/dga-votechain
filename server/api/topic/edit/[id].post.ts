@@ -9,10 +9,11 @@ import { isTopicFormValid, isTopicReadyToVote } from "~/src/services/validations
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
 import { isBannedUser } from "~/src/services/validations/user";
+import { isUserAdmin } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || isBannedUser(userData) || !checkPermissionSelections(userData.permissions, "change-topic") || userData.roleMode !== "admin") {
+  if(!userData || isBannedUser(userData) || !isUserAdmin(userData) || !checkPermissionSelections(userData.permissions, "change-topic")) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",

@@ -3,14 +3,14 @@ import fs from "fs/promises";
 import { parse } from 'csv';
 import { Readable } from "stream";
 
-import { batchSearchActiveUserByKeywords, searchExactActiveUserByKeyword } from "~/src/services/fetch/user";
-import { isAdminRole } from '~/src/services/validations/role';
+import { batchSearchActiveUserByKeywords } from "~/src/services/fetch/user";
+import { isUserAdmin, isUserDeveloper } from '~/src/services/validations/role';
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData) || !isAdminRole(userData.roleMode)) {
+  if(!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -34,8 +34,9 @@ export default defineEventHandler(async (event) => {
   const excludeUserId = query.notSelf === "1" ? userData._id : undefined;
   
   const tempFile = await fs.readFile(file.filepath);
-  const userSearchKeywords = await new Promise<{ [k: string] : number | undefined }>((resolve, reject) => {
-    const keywordVotePair: { [k: string] : number | undefined } = {}
+
+  const userSearchKeywords = await new Promise<CSVSearchParams[]>((resolve, reject) => {
+    const searchParams: CSVSearchParams[] = [];
 
     Readable.from(tempFile).pipe(parse({ delimiter: ",", from_line: 2 }))
       .on("data", (row) => {
@@ -43,11 +44,16 @@ export default defineEventHandler(async (event) => {
         if(!Number.isInteger(voteCount) || voteCount <= 0) {
           voteCount = undefined;
         }
-        keywordVotePair[row[0]] = voteCount;
+        searchParams.push({
+          citizenid: row[0],
+          names: row[1],
+          email: row[2],
+          voteCount: voteCount,
+        })
       })
 
       .on("finish", () => {
-        resolve(keywordVotePair);   
+        resolve(searchParams);   
       })
       .on("error", reject);
   });
@@ -56,9 +62,9 @@ export default defineEventHandler(async (event) => {
   
   const users = searchUsers.map((user) => {
     let role : UserRole | undefined;
-    if(userData.roleMode === 'developer' && userData.permissions.includes("dev-mode")) {
-      role = user.user.permissions.includes("dev-mode") ? "developer" :
-        (user.user.permissions.includes("admin-mode") ? "admin" : "voter");
+    if(isUserDeveloper(userData)) {
+      role = isUserDeveloper(user.user) ? "developer" :
+        (isUserAdmin(user.user) ? "admin" : "voter");
     }
     
     return {

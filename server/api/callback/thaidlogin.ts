@@ -2,16 +2,15 @@
 import bcrypt from "bcrypt";
 
 import UserModel from "~/src/models/user"
-import { legacyRoleToPermissions } from "~/src/services/transform/permission";
+import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
 import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
-import { compareAuthSourceFn, isBannedUser } from "~/src/services/validations/user";
+import { compareAuthSourceFn } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
 
 export default defineEventHandler(async (event) => {
   const { code } = getQuery(event)
-  const { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT } = useRuntimeConfig()
+  const { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, ACCOUNT_DEV_CIDS } = useRuntimeConfig()
 
   if(typeof code === "string") {
     const data = await authorizationThaID(code, { THAID_API_KEY, THAID_CLIENT_ID, THAID_CLIENT_SECRET, THAID_LOGIN_CALLBACK });
@@ -58,19 +57,16 @@ export default defineEventHandler(async (event) => {
         userDoc.cidHashed = cidHashed;
       }
 
-      await userDoc.save();
-    }
+      if(ACCOUNT_DEV_CIDS.includes(data.pid)) {
+        userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("developer"));
+      }
 
-    let defaultRoleMode : UserRole = "voter";
-    if(isBannedUser(userDoc)) {
-      defaultRoleMode = "guest";
-    } else if(checkPermissionNeeds(userDoc.permissions, "admin-mode")) {
-      defaultRoleMode = "admin";
+      await userDoc.save();
     }
 
     await event.context.session.set<UserSessionSavedData>(USER_SESSION_KEY, {
       userid: userDoc._id.toString(),
-      roleMode: defaultRoleMode,
+      roleMode: "voter",
       authFrom: {
         ...authSource,
       },

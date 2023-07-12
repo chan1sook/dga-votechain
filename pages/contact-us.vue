@@ -7,24 +7,16 @@
 
 <script setup lang="ts">
 import { sanitizeHtmlCustom } from '~/src/services/formatter/html';
+import { getStringConfigFieldByLocale, mapConfigKeysToAllLocales } from '~/src/services/transform/config';
 const i18n = useI18n();
 
 useHead({
   title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.contactUs.title')}`
 });
 
-const serverConfigs = await useServerConfig([
-  "contactUsTH",
-  "contactUsEN",
-]);
+const serverConfigs = await useServerConfig(
+  mapConfigKeysToAllLocales("contactUs")
+);
 
-const contactUsMessage = computed(() => {
-  let result = "";
-  if(i18n.locale.value === 'th') {
-    result = serverConfigs.contactUsTH || "";
-  } else {
-    result = serverConfigs.contactUsEN || "";
-  }
-  return result || serverConfigs.contactUsTH || serverConfigs.contactUsEN || "";
-})
+const contactUsMessage = computed(() => getStringConfigFieldByLocale("contactUs", i18n.locale.value, serverConfigs));
 </script>
