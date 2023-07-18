@@ -12,31 +12,36 @@
 </template>
 
 <script setup lang="ts">
-import Editor from '@tinymce/tinymce-vue'
+import Editor from "@tinymce/tinymce-vue";
 
-const props = withDefaults(defineProps<{
-  modelValue?: string,
-  plugins?: string,
-  toolbar?: string,
-}>(), {
-  plugins: 'lists link image table code help',
-  // toolbar: 'numlist bullist',
-});
-
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string;
+    plugins?: string;
+    toolbar?: string;
+  }>(),
+  {
+    plugins: "lists link image table code help",
+    // toolbar: 'numlist bullist',
+  }
+);
 
 const emit = defineEmits<{
-  (e: "update:modelValue", v: string) : void,
+  (e: "update:modelValue", v: string): void;
 }>();
 
 const content = ref("");
-const modelValue = computed(() => props.modelValue)
+const modelValue = computed(() => props.modelValue);
 
-watch(modelValue, (value) => {
-  content.value = value || "";
-}, { immediate: true })
+watch(
+  modelValue,
+  (value) => {
+    content.value = value || "";
+  },
+  { immediate: true }
+);
 
 watch(content, (value) => {
   emit("update:modelValue", value);
-})
-
+});
 </script>

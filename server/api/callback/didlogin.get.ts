@@ -1,33 +1,55 @@
-
 import bcrypt from "bcrypt";
 
-import { authorizationCodeDigitalID, DID_VERIFY_CODE, getUserInfoDigitalID } from "~/src/services/vendor/digital-id";
-import UserModel from "~/src/models/user"
-import { combinePermissions, legacyRoleToPermissions } from "~/src/services/transform/permission";
+import {
+  authorizationCodeDigitalID,
+  DID_VERIFY_CODE,
+  getUserInfoDigitalID,
+} from "~/src/services/vendor/digital-id";
+import UserModel from "~/src/models/user";
+import {
+  combinePermissions,
+  legacyRoleToPermissions,
+} from "~/src/services/transform/permission";
 import { USER_SESSION_KEY } from "~/server/session-handler";
-import { getActiveUserByAuthSource, getActiveUserByCitizenID }  from "~/src/services/fetch/user";
+import {
+  getActiveUserByAuthSource,
+  getActiveUserByCitizenID,
+} from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
-  const { code } = getQuery(event)
-  const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, CITIZENID_FIXED_SALT, DID_API_URL, ACCOUNT_DEV_CIDS} = useRuntimeConfig()
+  const { code } = getQuery(event);
+  const {
+    DID_CLIENT_KEY,
+    DID_LOGIN_CALLBACK,
+    CITIZENID_FIXED_SALT,
+    DID_API_URL,
+    ACCOUNT_DEV_CIDS,
+  } = useRuntimeConfig();
 
-  if(typeof code === "string") {
-    const { access_token, id_token } = await authorizationCodeDigitalID(code, { DID_API_URL, DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_VERIFY_CODE: DID_VERIFY_CODE });
+  if (typeof code === "string") {
+    const { access_token, id_token } = await authorizationCodeDigitalID(code, {
+      DID_API_URL,
+      DID_CLIENT_KEY,
+      DID_LOGIN_CALLBACK,
+      DID_VERIFY_CODE: DID_VERIFY_CODE,
+    });
 
-    const digitalIdUserInfo = await getUserInfoDigitalID(access_token, { DID_API_URL });
+    const digitalIdUserInfo = await getUserInfoDigitalID(access_token, {
+      DID_API_URL,
+    });
 
-    const authSource : UserAuthSourceData = {
+    const authSource: UserAuthSourceData = {
       authSource: "digitalId",
-      digitalIdUserId: digitalIdUserInfo.user_id
+      digitalIdUserId: digitalIdUserInfo.user_id,
     };
     let userDoc = await getActiveUserByAuthSource(authSource);
 
-    if(!userDoc) {
+    if (!userDoc) {
       userDoc = await getActiveUserByCitizenID(digitalIdUserInfo.citizen_id);
     }
 
-    if(!userDoc) {
+    if (!userDoc) {
       userDoc = new UserModel({
         permissions: legacyRoleToPermissions("admin"),
         authSources: [authSource],
@@ -37,31 +59,39 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    if(userDoc) {
-      if(!userDoc.authSources.find((ele) => compareAuthSourceFn(ele, authSource))) {
+    if (userDoc) {
+      if (
+        !userDoc.authSources.find((ele) => compareAuthSourceFn(ele, authSource))
+      ) {
         userDoc.authSources.push(authSource);
       }
-      
+
       // auto apply some
-      if(!userDoc.firstName) {
+      if (!userDoc.firstName) {
         userDoc.firstName = digitalIdUserInfo.given_name;
       }
 
-      if(!userDoc.lastName) {
+      if (!userDoc.lastName) {
         userDoc.lastName = digitalIdUserInfo.family_name;
       }
 
-      if(!userDoc.email) {
+      if (!userDoc.email) {
         userDoc.email = digitalIdUserInfo.email;
       }
-      
-      if(!userDoc.cidHashed) {
-        const cidHashed = await bcrypt.hash(digitalIdUserInfo.citizen_id, CITIZENID_FIXED_SALT);
+
+      if (!userDoc.cidHashed) {
+        const cidHashed = await bcrypt.hash(
+          digitalIdUserInfo.citizen_id,
+          CITIZENID_FIXED_SALT
+        );
         userDoc.cidHashed = cidHashed;
       }
 
-      if(ACCOUNT_DEV_CIDS.includes(digitalIdUserInfo.citizen_id)) {
-        userDoc.permissions = combinePermissions(userDoc.permissions, ...legacyRoleToPermissions("developer"));
+      if (ACCOUNT_DEV_CIDS.includes(digitalIdUserInfo.citizen_id)) {
+        userDoc.permissions = combinePermissions(
+          userDoc.permissions,
+          ...legacyRoleToPermissions("developer")
+        );
       }
 
       await userDoc.save();
@@ -80,4 +110,4 @@ export default defineEventHandler(async (event) => {
   }
 
   return sendRedirect(event, "/login");
-})
+});

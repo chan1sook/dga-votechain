@@ -1,9 +1,8 @@
-
-import nodeCron from 'node-cron';
+import nodeCron from "node-cron";
 import axios from "axios";
 
-import BlockchainServerModel from "~/src/models/blockchain-server"
-import { blockchainHbEventEmitter } from '../../server/event-emitter';
+import BlockchainServerModel from "~/src/models/blockchain-server";
+import { blockchainHbEventEmitter } from "../../server/event-emitter";
 
 async function checkBlockchainHBs() {
   console.log(`[Blockchain HB Workers] Begin HB Routine`);
@@ -15,26 +14,34 @@ async function checkBlockchainHBs() {
   const updated = await new Promise((resolve, reject) => {
     let updated = 0;
     const promises = [];
-    for(const doc of allServerDocs) {
+    for (const doc of allServerDocs) {
       const urlWithPort = new URL("/", `http://${doc.host}:8545`);
 
       promises.push(
-        axios.post(urlWithPort.toString(), {
-          "jsonrpc": "2.0",
-          "method": "admin_nodeInfo",
-          "params": [],
-          "id": 1
-        }, {
-          headers: {}
-        }).then((res) => {
-          doc.lastActiveAt = new Date();
-          return doc.save()
-        }).then((res) => {
-          updated += 1;
-        }).catch((res) => {
-          // console.log(`[BlockchainServerHB] HB Failed: ${doc.host}`);
-        })
-      )
+        axios
+          .post(
+            urlWithPort.toString(),
+            {
+              jsonrpc: "2.0",
+              method: "admin_nodeInfo",
+              params: [],
+              id: 1,
+            },
+            {
+              headers: {},
+            }
+          )
+          .then((res) => {
+            doc.lastActiveAt = new Date();
+            return doc.save();
+          })
+          .then((res) => {
+            updated += 1;
+          })
+          .catch((res) => {
+            // console.log(`[BlockchainServerHB] HB Failed: ${doc.host}`);
+          })
+      );
     }
 
     return Promise.all(promises).then(() => {
@@ -48,14 +55,13 @@ async function checkBlockchainHBs() {
 function worker() {
   try {
     checkBlockchainHBs();
-  } catch(err) {
-
+  } catch (err) {
     console.log(`[Blockchain HB Workers] Failed`);
-    console.error(err)
+    console.error(err);
   }
 }
 
 export default function initBlockchainHbWorkers() {
   checkBlockchainHBs();
-  return nodeCron.schedule('* * * * *', worker);
+  return nodeCron.schedule("* * * * *", worker);
 }

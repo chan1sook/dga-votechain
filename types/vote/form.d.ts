@@ -1,5 +1,4 @@
-
 type VotesFormData = {
-  topicid: string,
-  votes: ChoiceDataType[],
+  topicid: string;
+  votes: ChoiceDataType[];
 };

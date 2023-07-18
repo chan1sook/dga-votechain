@@ -1,13 +1,13 @@
-import dayjs from "dayjs"
+import dayjs from "dayjs";
 
-import NewsModel from "~/server/models/news"
+import NewsModel from "~/server/models/news";
 
 export default defineEventHandler(async (event) => {
-  const { type, pagesize, startid } : NewsQueryParams = getQuery(event);
+  const { type, pagesize, startid }: NewsQueryParams = getQuery(event);
 
   let newsData: NewsData[] = [];
 
-  switch(type) {
+  switch (type) {
     case "available":
       newsData = await NewsModel.getLastestAvaliableNews(pagesize, startid);
       break;
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
       break;
   }
 
-  const news : NewsResponseData[] = newsData.map((data) => {
+  const news: NewsResponseData[] = newsData.map((data) => {
     return {
       _id: `${data._id}`,
       visibility: data.visibility,
@@ -30,13 +30,15 @@ export default defineEventHandler(async (event) => {
       createdBy: data.createdBy,
       updatedBy: data.updatedBy,
       newsPublishAt: dayjs(data.newsPublishAt).toString(),
-      newsExpiredAt: data.newsExpiredAt ? dayjs(data.newsExpiredAt).toString() : null,
+      newsExpiredAt: data.newsExpiredAt
+        ? dayjs(data.newsExpiredAt).toString()
+        : null,
       createdAt: dayjs(data.createdAt).toString(),
       updatedAt: dayjs(data.updatedAt).toString(),
-    }
+    };
   });
 
   return {
     news,
-  }
-})
+  };
+});

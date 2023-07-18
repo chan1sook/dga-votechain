@@ -1,9 +1,14 @@
 <template>
-  <VueSelect v-model="modelValue" :options="props.options"
-    :taggable="props.taggable" :clearable="props.clearable"
-    :placeholder="props.placeholder" :disabled="props.disabled"
+  <VueSelect
+    v-model="modelValue"
+    :options="props.options"
+    :taggable="props.taggable"
+    :clearable="props.clearable"
+    :placeholder="props.placeholder"
+    :disabled="props.disabled"
     :reduce="props.reduce"
-    @search="search" :filterable="props.filterable"
+    @search="search"
+    :filterable="props.filterable"
     @change="emit('update:modelValue', $event)"
   >
     <template slot="no-options">
@@ -13,37 +18,40 @@
 </template>
 
 <script setup lang="ts">
-import VueSelect from 'vue-select'
-import 'vue-select/dist/vue-select.css';
+import VueSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
-const props = withDefaults(defineProps<{
-  modelValue?: any,
-  options?: any[],
-  taggable?: boolean,
-  disabled?: boolean,
-  clearable?: boolean,
-  filterable?: boolean,
-  reduce?: (arg0: any) => any,
-  placeholder?: string,
-}>(), {
-  options: <any>[],
-  clearable: false,
-  taggable: false,
-  filterable: false,
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue?: any;
+    options?: any[];
+    taggable?: boolean;
+    disabled?: boolean;
+    clearable?: boolean;
+    filterable?: boolean;
+    reduce?: (arg0: any) => any;
+    placeholder?: string;
+  }>(),
+  {
+    options: <any>[],
+    clearable: false,
+    taggable: false,
+    filterable: false,
+  }
+);
 
 const emit = defineEmits<{
-  (e: "update:modelValue", v: any) : void,
-  (e: "search", keyword: string, loading: (state: boolean) => void) : void,
+  (e: "update:modelValue", v: any): void;
+  (e: "search", keyword: string, loading: (state: boolean) => void): void;
 }>();
 
 const modelValue = computed({
   get() {
-    return props.modelValue
+    return props.modelValue;
   },
   set(val) {
-    emit('update:modelValue', val)
-  }
+    emit("update:modelValue", val);
+  },
 });
 
 function search(keyword: string, loading: (state: boolean) => void) {

@@ -4,11 +4,14 @@ export default defineEventHandler(async (event) => {
   const { DID_LOGOUT_CALLBACK, DID_API_URL } = useRuntimeConfig();
   const userData = event.context.userData;
 
-  if(!userData) {
+  if (!userData) {
     return sendRedirect(event, "/login");
   }
 
-  if(userData.authFrom.authSource === 'digitalId' && userData.authFrom.userToken) {
+  if (
+    userData.authFrom.authSource === "digitalId" &&
+    userData.authFrom.userToken
+  ) {
     const urlParams = new URLSearchParams();
     urlParams.append("id_token_hint", userData.authFrom.userToken);
     urlParams.append("post_logout_redirect_uri", DID_LOGOUT_CALLBACK);
@@ -19,4 +22,4 @@ export default defineEventHandler(async (event) => {
   await event.context.session.unset(USER_SESSION_KEY);
   delete event.context.userData;
   return sendRedirect(event, "/login");
-})
+});

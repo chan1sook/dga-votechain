@@ -2,9 +2,8 @@ import { type Types } from "mongoose";
 
 declare global {
   type TopicStatus = "pending" | "rejected" | "approved";
-  type TopicType = "public" | "private" | "internal"
+  type TopicType = "public" | "private" | "internal";
   type TopicDurationMode = "startDuration" | "startEnd";
-
 
   interface TopicModelData {
     status: TopicStatus;
@@ -30,30 +29,32 @@ declare global {
     updatedAt: Date;
     notifyVoter: boolean;
     notifyFinished?: boolean;
-    
+
     publicVote?: boolean;
   }
-  
+
   interface ChoicesInfo {
     choices: ChoiceData[];
     customable: boolean;
   }
 
   interface ChoiceData {
-    name: string,
-    image?: string
-  };
-  
+    name: string;
+    image?: string;
+  }
+
   interface InternalTopicVisiblityFilter {
-    ministry: string,
-    withDepartment: boolean,
-    department: string,
+    ministry: string;
+    withDepartment: boolean;
+    department: string;
   }
 
   type TopicModelDataWithId = TopicModelData & { _id: Types.ObjectId };
-  
-  type TopicModelDataWithIdPopulated = Omit<TopicModelDataWithId, "createdBy"> & {
+
+  type TopicModelDataWithIdPopulated = Omit<
+    TopicModelDataWithId,
+    "createdBy"
+  > & {
     createdBy: UserBasicDataWithId;
   };
-
 }

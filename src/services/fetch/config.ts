@@ -1,8 +1,12 @@
 import { FilterQuery } from "mongoose";
-import { COOKIE_POLICY_TH, HOME_CONTENT_TH, PRIVACY_POLICY_TH } from "~/src/defaults";
-import ConfigModel from "~/src/models/config"
+import {
+  COOKIE_POLICY_TH,
+  HOME_CONTENT_TH,
+  PRIVACY_POLICY_TH,
+} from "~/src/defaults";
+import ConfigModel from "~/src/models/config";
 
-const SERVER_CONFIGURATIONS : ConfigData = {
+const SERVER_CONFIGURATIONS: ConfigData = {
   homeContentTH: HOME_CONTENT_TH,
   homeContentEN: "",
   aboutTH: "",
@@ -21,50 +25,66 @@ export function isProtectedConfigKey(key: string) {
   return protectedKeys.includes(key);
 }
 
-export function getServerConfigurations(filterKeys?: string[], withProtected?: boolean) {
-  const query : FilterQuery<ConfigModelData> = {
-    protected: { $ne: true }
+export function getServerConfigurations(
+  filterKeys?: string[],
+  withProtected?: boolean
+) {
+  const query: FilterQuery<ConfigModelData> = {
+    protected: { $ne: true },
   };
 
-  if(Array.isArray(filterKeys) && filterKeys.length > 0) {
+  if (Array.isArray(filterKeys) && filterKeys.length > 0) {
     query.key = { $in: filterKeys };
   }
 
-  if(withProtected) {
+  if (withProtected) {
     delete query.protected;
   }
 
   return ConfigModel.find(query);
-};
+}
 
-export function getFastConfiguration(filterKeys?: string[], withProtected?: boolean) {
+export function getFastConfiguration(
+  filterKeys?: string[],
+  withProtected?: boolean
+) {
   const result: Partial<ConfigData> = {};
-  const keys = Array.isArray(filterKeys) && filterKeys.length > 0 ? filterKeys : Object.keys(SERVER_CONFIGURATIONS);
-  for(const key of keys) {
-    if(withProtected || !isProtectedConfigKey(key)) {
-      (result as Record<string, any>)[key] = (SERVER_CONFIGURATIONS as Record<string, any>)[key];
+  const keys =
+    Array.isArray(filterKeys) && filterKeys.length > 0
+      ? filterKeys
+      : Object.keys(SERVER_CONFIGURATIONS);
+  for (const key of keys) {
+    if (withProtected || !isProtectedConfigKey(key)) {
+      (result as Record<string, any>)[key] = (
+        SERVER_CONFIGURATIONS as Record<string, any>
+      )[key];
     }
   }
   return result;
 }
 
-export async function updateConfigurations(config: Partial<ConfigData>, createNew?: boolean) {
+export async function updateConfigurations(
+  config: Partial<ConfigData>,
+  createNew?: boolean
+) {
   const configKeys = Object.keys(config);
   const existsConfigs = await getServerConfigurations(configKeys);
-  for(const configDoc of existsConfigs) {
-    configDoc.value = (config as Record<string,any>)[configDoc.key];
+  for (const configDoc of existsConfigs) {
+    configDoc.value = (config as Record<string, any>)[configDoc.key];
     configDoc.protected = isProtectedConfigKey(configDoc.key);
   }
 
-  if(createNew) {
+  if (createNew) {
     const existsKeys = existsConfigs.map((ele) => ele.key);
-    const nonExistsKeys = configKeys.filter((k) => !existsKeys.includes(k))
-    for(const key of nonExistsKeys) {
-      existsConfigs.push(new ConfigModel({
-        key: key,
-        value: (config as Record<string,any>)[key],
-        protected: isProtectedConfigKey(key),
-      }));
+    const nonExistsKeys = configKeys.filter((k) => !existsKeys.includes(k));
+    for (const key of nonExistsKeys) {
+      existsConfigs.push(
+        new ConfigModel({
+          key: key,
+          value: (config as Record<string, any>)[key],
+          protected: isProtectedConfigKey(key),
+        })
+      );
     }
   }
 
@@ -73,9 +93,10 @@ export async function updateConfigurations(config: Partial<ConfigData>, createNe
 
 export async function loadServerConfigurations(emptyOverride?: boolean) {
   const configsDocs = await getServerConfigurations();
-  for(const configDoc of configsDocs) {
-    if(emptyOverride || !!configDoc.value) {
-      (SERVER_CONFIGURATIONS as Record<string, any>)[configDoc.key] = configDoc.value;
+  for (const configDoc of configsDocs) {
+    if (emptyOverride || !!configDoc.value) {
+      (SERVER_CONFIGURATIONS as Record<string, any>)[configDoc.key] =
+        configDoc.value;
     }
   }
 }

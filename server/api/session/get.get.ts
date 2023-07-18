@@ -2,12 +2,12 @@ import dayjs from "dayjs";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  
-  const userSessionResponseData : UserResponseData = {
+
+  const userSessionResponseData: UserResponseData = {
     roleMode: "guest",
   };
 
-  if(userData) {
+  if (userData) {
     userSessionResponseData.userid = userData._id.toString();
     userSessionResponseData.hasCitizenId = userData.hasCitizenId;
     userSessionResponseData.roleMode = userData.roleMode;
@@ -20,8 +20,10 @@ export default defineEventHandler(async (event) => {
     userSessionResponseData.department = userData.department;
     userSessionResponseData.division = userData.division;
     userSessionResponseData.preferences = userData.preferences;
-    userSessionResponseData.bannedUntil = userData.bannedUntil ? dayjs(userData.bannedUntil).toString() : undefined;
+    userSessionResponseData.bannedUntil = userData.bannedUntil
+      ? dayjs(userData.bannedUntil).toString()
+      : undefined;
   }
-  
+
   return userSessionResponseData;
 });

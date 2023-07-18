@@ -1,14 +1,35 @@
-type TopicCardStatus = "waiting" | "access" | "control" | "voting" | "voted" | "finished" | "result";
+type TopicCardStatus =
+  | "waiting"
+  | "access"
+  | "control"
+  | "voting"
+  | "voted"
+  | "finished"
+  | "result";
 
-type TopicFormData = Omit<TopicModelData, "status" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "votePauseAt" | "pauseDuration" | "admin" | "coadmins"> & {
-  voterAllows: VoterAllowFormData[],
-  coadmins: string[],
-  images: (File | false | undefined)[]
+type TopicFormData = Omit<
+  TopicModelData,
+  | "status"
+  | "createdBy"
+  | "updatedBy"
+  | "createdAt"
+  | "updatedAt"
+  | "votePauseAt"
+  | "pauseDuration"
+  | "admin"
+  | "coadmins"
+> & {
+  voterAllows: VoterAllowFormData[];
+  coadmins: string[];
+  images: (File | false | undefined)[];
 };
 
-type TopicFormBodyData = Omit<TopicFormData, "voteStartAt" | "voteExpiredAt" | "images"> & {
-  voteStartAt: DateString,
-  voteExpiredAt: DateString
+type TopicFormBodyData = Omit<
+  TopicFormData,
+  "voteStartAt" | "voteExpiredAt" | "images"
+> & {
+  voteStartAt: DateString;
+  voteExpiredAt: DateString;
 };
 
 type TopicFormEditData = TopicFormData & Pick<TopicModelData, "status">;

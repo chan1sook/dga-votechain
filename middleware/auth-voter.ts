@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  if(!useSessionData().value.userid) {
+  if (!useSessionData().value.userid) {
     useAllowRoles().value = ["guest"];
-    return navigateTo('/login')
+    return navigateTo("/login");
   }
-})
+});

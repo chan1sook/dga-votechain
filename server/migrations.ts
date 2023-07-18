@@ -1,30 +1,35 @@
 import { COOKIE_POLICY_TH, PRIVACY_POLICY_TH } from "~/src/defaults";
-import BlockchainServerModel from "~/src/models/blockchain-server"
-import { getFastConfiguration, loadServerConfigurations, updateConfigurations } from "~/src/services/fetch/config";
+import BlockchainServerModel from "~/src/models/blockchain-server";
+import {
+  getFastConfiguration,
+  loadServerConfigurations,
+  updateConfigurations,
+} from "~/src/services/fetch/config";
 
 let migrationSeq = 0;
 
 export async function initConfigs() {
-  
   migrationSeq += 1;
 
   console.log(`[Migration] ${migrationSeq}. Init Configs`);
-  
+
   await loadServerConfigurations();
   const result = await updateConfigurations(getFastConfiguration(), true);
 
-  console.log(`[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`);
+  console.log(
+    `[Migration] Init Configs (Inserted: ${result.insertedCount}, Updated: ${result.insertedCount})`
+  );
 }
 
 export async function setPredefinedBlockchainServers() {
   migrationSeq += 1;
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Blockchain Servers`);
-  
+
   const serverCounts = await BlockchainServerModel.countDocuments();
   let insertedCount = 0;
-  
-  if(serverCounts === 0) {
+
+  if (serverCounts === 0) {
     const today = new Date();
     const result = await BlockchainServerModel.insertMany([
       {
@@ -41,9 +46,11 @@ export async function setPredefinedBlockchainServers() {
         host: "35.239.20.185",
         createdAt: today,
         updatedAt: today,
-      }
+      },
     ]);
     insertedCount = result.length;
   }
-  console.log(`[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`);
+  console.log(
+    `[Migration] Add Predefined Blockchain Servers (Inserted: ${insertedCount})`
+  );
 }

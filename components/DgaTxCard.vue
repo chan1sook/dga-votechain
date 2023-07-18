@@ -7,16 +7,19 @@
       <div class="content"><slot></slot></div>
       <div class="status">
         <button v-if="props.status === 'valid'" class="valid cursor-default">
-          {{ $t('app.admin.blockchain.blockInfo.mined') }}
+          {{ $t("app.admin.blockchain.blockInfo.mined") }}
         </button>
-        <button v-else-if="props.status === 'invalid'" class="invalid cursor-default">
-          {{ $t('app.admin.blockchain.blockInfo.invalid') }}
+        <button
+          v-else-if="props.status === 'invalid'"
+          class="invalid cursor-default"
+        >
+          {{ $t("app.admin.blockchain.blockInfo.invalid") }}
         </button>
         <button v-else class="pending cursor-default">
-          {{ $t('app.admin.blockchain.blockInfo.pending') }}
+          {{ $t("app.admin.blockchain.blockInfo.pending") }}
         </button>
         <button class="detail" @click="emit('detail')">
-          {{ $t('app.detail') }}
+          {{ $t("app.detail") }}
         </button>
       </div>
     </div>
@@ -25,32 +28,31 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  status?: TxStatus,
+  status?: TxStatus;
 }>();
 
 const emit = defineEmits<{
-  (e: 'detail') : void,
+  (e: "detail"): void;
 }>();
-
 </script>
 
 <style scoped>
 .dga-tx-card {
-  @apply rounded-lg shadow-lg bg-red-800 pl-4 md:pl-6 overflow-hidden
+  @apply overflow-hidden rounded-lg bg-red-800 pl-4 shadow-lg md:pl-6;
 }
 .dga-tx-card.mined {
-  @apply bg-green-700
+  @apply bg-green-700;
 }
 
 .dga-tx-card > .inner {
-  @apply rounded-lg bg-white grid items-center p-2 md:p-4 gap-2 md:gap-y-0 overflow-auto;
+  @apply grid items-center gap-2 overflow-auto rounded-lg bg-white p-2 md:gap-y-0 md:p-4;
   grid-template-areas: "voteid" "tx" "type" "content" "status";
   grid-template-columns: auto;
 }
 
 @media (min-width: 768px) {
   .dga-tx-card > .inner {
-    grid-template-areas: "voteid voteid voteid" "tx tx tx"  "type content status" "type content status";
+    grid-template-areas: "voteid voteid voteid" "tx tx tx" "type content status" "type content status";
     grid-template-columns: 150px auto 120px;
   }
 }
@@ -79,18 +81,18 @@ const emit = defineEmits<{
 
 .dga-tx-card > .inner > .content {
   grid-area: content;
-  @apply flex flex-row flex-wrap gap-y-2 gap-x-4
+  @apply flex flex-row flex-wrap gap-x-4 gap-y-2;
 }
 
 .dga-tx-card > .inner > .status {
   grid-area: status;
-  @apply flex flex-col gap-2
+  @apply flex flex-col gap-2;
 }
 .dga-tx-card > .inner > .status > * {
-  @apply rounded-full w-full max-w-[160px] md:max-w-none mx-auto px-3 py-1 text-center text-sm text-white bg-dga-orange;
+  @apply mx-auto w-full max-w-[160px] rounded-full bg-dga-orange px-3 py-1 text-center text-sm text-white md:max-w-none;
 }
-.dga-tx-card > .inner > .status > .valid  {
-  @apply bg-green-700
+.dga-tx-card > .inner > .status > .valid {
+  @apply bg-green-700;
 }
 .dga-tx-card > .inner > .status > .invalid {
   @apply bg-red-800;

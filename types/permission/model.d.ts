@@ -1,4 +1,4 @@
-import { type Types } from "mongoose"
+import { type Types } from "mongoose";
 
 declare global {
   interface RequestPermissionsModelData {
@@ -11,8 +11,11 @@ declare global {
     createdAt: Date;
     updatedAt: Date;
   }
-  
-  type RequestPermissionsModelDataWithPopulated = Omit<RequestPermissionsModelData, "_id" | "userid"> & {
+
+  type RequestPermissionsModelDataWithPopulated = Omit<
+    RequestPermissionsModelData,
+    "_id" | "userid"
+  > & {
     _id: Types.ObjectId;
     userid: UserModelData & { _id: Types.ObjectId };
     preset: RequestPermissionPreset;
@@ -21,6 +24,5 @@ declare global {
     status: RequestPermissionStatus;
     createdAt: Date;
     updatedAt: Date;
-  }
-
+  };
 }

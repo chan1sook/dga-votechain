@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 
-import TopicModel from "~/src/models/topic"
-import VoterAllowModel from "~/src/models/voters-allow"
-import VoteModel from "~/src/models/vote"
+import TopicModel from "~/src/models/topic";
+import VoterAllowModel from "~/src/models/voters-allow";
+import VoteModel from "~/src/models/vote";
 
 import { votedEventEmitter } from "../event-emitter";
 import mongoose from "mongoose";
@@ -11,21 +11,26 @@ import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { nanoid } from "nanoid";
 import { isBannedUser } from "~/src/services/validations/user";
-import { isAnonymousTopic, isCanVote, isTopicReadyToVote, isUserInMatchInternalTopic } from "~/src/services/validations/topic";
+import {
+  isAnonymousTopic,
+  isCanVote,
+  isTopicReadyToVote,
+  isUserInMatchInternalTopic,
+} from "~/src/services/validations/topic";
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 
 export default defineEventHandler(async (event) => {
-  const voteFormData : VotesFormData = await readBody(event);
+  const voteFormData: VotesFormData = await readBody(event);
 
   const topicDoc = await TopicModel.findById(voteFormData.topicid);
-  if(!topicDoc) {
+  if (!topicDoc) {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not found",
     });
   }
 
-  if(!isTopicReadyToVote(topicDoc)) {
+  if (!isTopicReadyToVote(topicDoc)) {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not ready to vote",
@@ -36,22 +41,25 @@ export default defineEventHandler(async (event) => {
   let remainVotes = 0;
   const userData = event.context.userData;
 
-  if(userData) {
+  if (userData) {
     voterAllowData = await VoterAllowModel.findOne({
       userid: userData._id,
       topicid: topicDoc._id,
     });
-    if(voterAllowData) {
+    if (voterAllowData) {
       remainVotes = voterAllowData.remainVotes;
     } else {
-      const votes = await getVotesByTopicIdAndUserId(topicDoc._id, userData._id);
-      remainVotes =  topicDoc.defaultVotes - votes.length;
+      const votes = await getVotesByTopicIdAndUserId(
+        topicDoc._id,
+        userData._id
+      );
+      remainVotes = topicDoc.defaultVotes - votes.length;
     }
   } else {
     remainVotes = topicDoc.defaultVotes;
   }
 
-  if(!isCanVote(userData, topicDoc, voterAllowData)) {
+  if (!isCanVote(userData, topicDoc, voterAllowData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -60,40 +68,40 @@ export default defineEventHandler(async (event) => {
 
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
-  
+
   const topicPauseFlag = await isTopicPause(topicDoc._id);
 
-  if(topicPauseFlag) {
+  if (topicPauseFlag) {
     throw createError({
       statusCode: 400,
       statusMessage: "Voting Pause",
     });
   }
 
-  if(remainVotes <= 0) {
+  if (remainVotes <= 0) {
     throw createError({
       statusCode: 400,
       statusMessage: "Can't vote anymore",
     });
   }
-  
-  if(topicDoc.multipleVotes) {
-    if(voteFormData.votes.length > remainVotes) {
+
+  if (topicDoc.multipleVotes) {
+    if (voteFormData.votes.length > remainVotes) {
       voteFormData.votes = voteFormData.votes.slice(0, remainVotes);
     }
-    if(voterAllowData) {
+    if (voterAllowData) {
       voterAllowData.remainVotes -= voteFormData.votes.length;
     }
   } else {
     voteFormData.votes = voteFormData.votes.slice(0, 1);
-    if(voterAllowData) {
+    if (voterAllowData) {
       voterAllowData.remainVotes = 0;
     }
   }
 
   const groupid = nanoid();
   const today = new Date();
-  const voteDatas : VoteModelData[] = voteFormData.votes.map((choice) => {
+  const voteDatas: VoteModelData[] = voteFormData.votes.map((choice) => {
     return {
       userid: userData?._id,
       topicid: topicDoc._id,
@@ -102,15 +110,15 @@ export default defineEventHandler(async (event) => {
       createdAt: today,
       updatedAt: today,
       tx: null,
-    }
+    };
   });
 
   const [voteDocs] = await Promise.all([
     VoteModel.insertMany(voteDatas),
     voterAllowData ? voterAllowData.save() : () => {},
   ]);
-  
-  const votes : VoteResponseData[] = voteDocs.map((newVoteDoc) => {
+
+  const votes: VoteResponseData[] = voteDocs.map((newVoteDoc) => {
     return {
       _id: `${newVoteDoc._id}`,
       userid: `${newVoteDoc.userid}`,
@@ -119,27 +127,32 @@ export default defineEventHandler(async (event) => {
       choice: newVoteDoc.choice,
       createdAt: dayjs(newVoteDoc.createdAt).toString(),
       tx: newVoteDoc.tx,
-    }
+    };
   });
-  if(topicDoc.recoredToBlockchain) {
+  if (topicDoc.recoredToBlockchain) {
     await Promise.all(
       voteDocs.map(async (vote) => {
-        return addVoteOnBlockchain(vote._id.toString(), vote.topicid.toString(), vote.userid ? vote.userid.toString() : "", vote.choice)
+        return addVoteOnBlockchain(
+          vote._id.toString(),
+          vote.topicid.toString(),
+          vote.userid ? vote.userid.toString() : "",
+          vote.choice
+        )
           .then((txResponse) => {
             vote.tx = txResponse.transactionHash;
             return vote.save();
-          }
-        ).catch(console.error)
+          })
+          .catch(console.error);
       })
-    )
+    );
   }
 
   await dbSession.commitTransaction();
   await dbSession.endSession();
 
   votedEventEmitter.emit("voted", votes);
-  
+
   return {
     votes,
-  }
-})
+  };
+});

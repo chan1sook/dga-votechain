@@ -3,9 +3,9 @@ import { Server } from "socket.io";
 
 declare module "h3" {
   interface H3EventContext extends Record<string, any> {
-    session: SessionHandler,
-    userData?: UserSessionData,
-    io: Server,
+    session: SessionHandler;
+    userData?: UserSessionData;
+    io: Server;
   }
 }
 

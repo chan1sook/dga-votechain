@@ -2,18 +2,26 @@ import mongoose, { Types } from "mongoose";
 import UserModel from "~/src/models/user";
 import TopicModel from "~/src/models/topic";
 import TopicCtrlPauseModel from "~/src/models/topic-ctrl-pause";
-import VoteAllowsModel from "~/src/models/voters-allow"
-import NotificationModel from "~/src/models/notification"
+import VoteAllowsModel from "~/src/models/voters-allow";
+import NotificationModel from "~/src/models/notification";
 import { checkPermissionNeeds } from "../validations/permission";
 import { isTopicPause } from "../fetch/topic-ctrl-pause";
 import dayjs from "dayjs";
 
-export async function pauseTopic(userid: string, topicid: string, cause: string) { 
+export async function pauseTopic(
+  userid: string,
+  topicid: string,
+  cause: string
+) {
   const [userData, targetTopic] = await Promise.all([
     UserModel.findById(userid),
-    TopicModel.findById(topicid)
+    TopicModel.findById(topicid),
   ]);
-  if(!userData || !targetTopic || !checkPermissionNeeds(userData.permissions, "control-topic")) {
+  if (
+    !userData ||
+    !targetTopic ||
+    !checkPermissionNeeds(userData.permissions, "control-topic")
+  ) {
     return;
   }
 
@@ -23,18 +31,18 @@ export async function pauseTopic(userid: string, topicid: string, cause: string)
   const topicPauseFlag = await isTopicPause(targetTopic._id);
   const pasueAt = new Date();
 
-  if(!topicPauseFlag) {
+  if (!topicPauseFlag) {
     const topicCtrlPauseDoc = new TopicCtrlPauseModel({
       topicid: targetTopic._id,
       pauseAt: pasueAt,
       cause: cause,
     });
-    
-    const voteAllowsDocs = await VoteAllowsModel.find({
-      topicid: targetTopic._id
-    })
 
-    const notifications : NotificationModelData[] = voteAllowsDocs.map((ele) => {
+    const voteAllowsDocs = await VoteAllowsModel.find({
+      topicid: targetTopic._id,
+    });
+
+    const notifications: NotificationModelData[] = voteAllowsDocs.map((ele) => {
       return {
         userid: new Types.ObjectId(ele.userid),
         group: "topic",
@@ -45,13 +53,13 @@ export async function pauseTopic(userid: string, topicid: string, cause: string)
           cause: cause,
         },
         notifyAt: pasueAt,
-      }
+      };
     });
 
     await Promise.all([
       NotificationModel.insertMany(notifications),
-      topicCtrlPauseDoc.save()
-    ])
+      topicCtrlPauseDoc.save(),
+    ]);
 
     await dbSession.commitTransaction();
     await dbSession.endSession();
@@ -62,12 +70,16 @@ export async function pauseTopic(userid: string, topicid: string, cause: string)
   await dbSession.endSession();
 }
 
-export async function resumeTopic(userid: string, topicid: string) { 
+export async function resumeTopic(userid: string, topicid: string) {
   const [userData, targetTopic] = await Promise.all([
     UserModel.findById(userid),
-    TopicModel.findById(topicid)
+    TopicModel.findById(topicid),
   ]);
-  if(!userData || !targetTopic || !checkPermissionNeeds(userData.permissions, "change-topic")) {
+  if (
+    !userData ||
+    !targetTopic ||
+    !checkPermissionNeeds(userData.permissions, "change-topic")
+  ) {
     return;
   }
 
@@ -78,17 +90,19 @@ export async function resumeTopic(userid: string, topicid: string) {
 
   let lastestPauseData = await TopicCtrlPauseModel.findOne({
     topicid: targetTopic._id,
-    resumeAt: { $exists: false }
-  })
-  if(lastestPauseData) {
+    resumeAt: { $exists: false },
+  });
+  if (lastestPauseData) {
     lastestPauseData.resumeAt = resumeAt;
-    targetTopic.voteExpiredAt = dayjs(resumeAt).add(dayjs(targetTopic.voteExpiredAt).diff(lastestPauseData.pauseAt)).toDate()
-    
-    const voteAllowsDocs = await VoteAllowsModel.find({
-      topicid: targetTopic._id
-    })
+    targetTopic.voteExpiredAt = dayjs(resumeAt)
+      .add(dayjs(targetTopic.voteExpiredAt).diff(lastestPauseData.pauseAt))
+      .toDate();
 
-    const notifications : NotificationModelData[] = voteAllowsDocs.map((ele) => {
+    const voteAllowsDocs = await VoteAllowsModel.find({
+      topicid: targetTopic._id,
+    });
+
+    const notifications: NotificationModelData[] = voteAllowsDocs.map((ele) => {
       return {
         userid: new Types.ObjectId(ele.userid),
         group: "topic",
@@ -98,14 +112,14 @@ export async function resumeTopic(userid: string, topicid: string) {
           status: "resume",
         },
         notifyAt: resumeAt,
-      }
+      };
     });
 
     await Promise.all([
       NotificationModel.insertMany(notifications),
       lastestPauseData.save(),
       targetTopic.save(),
-    ])
+    ]);
 
     await dbSession.commitTransaction();
     await dbSession.endSession();
@@ -116,6 +130,6 @@ export async function resumeTopic(userid: string, topicid: string) {
       voteExpiredAt: targetTopic.voteExpiredAt,
     };
   }
-  
+
   await dbSession.endSession();
 }

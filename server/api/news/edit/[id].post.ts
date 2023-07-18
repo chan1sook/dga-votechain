@@ -1,23 +1,27 @@
 import dayjs from "dayjs";
 import { checkPermissionSelections } from "~/src/services/validations/permission";
 
-import NewsModel from "~/server/models/news"
+import NewsModel from "~/server/models/news";
 import { isNewsFormValid } from "~/src/utils/news";
 import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  if(!userData || isBannedUser(userData)|| !checkPermissionSelections(userData.permissions, "change-news")) {
+  if (
+    !userData ||
+    isBannedUser(userData) ||
+    !checkPermissionSelections(userData.permissions, "change-news")
+  ) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
-  
-  const topicFormData: Partial<NewsFormEditBodyData>  = await readBody(event);
+
+  const topicFormData: Partial<NewsFormEditBodyData> = await readBody(event);
 
   const newsData = await NewsModel.findById(event.context.params?.id);
-  if(!newsData) {
+  if (!newsData) {
     throw createError({
       statusCode: 400,
       statusMessage: "News not found",
@@ -26,35 +30,37 @@ export default defineEventHandler(async (event) => {
   newsData.updatedBy = userData._id;
   newsData.updatedAt = new Date();
 
-  if(topicFormData.visibility !== undefined) {
+  if (topicFormData.visibility !== undefined) {
     newsData.visibility = topicFormData.visibility;
   }
 
-  if(topicFormData.title !== undefined) {
+  if (topicFormData.title !== undefined) {
     newsData.title = topicFormData.title;
   }
 
-  if(topicFormData.content !== undefined) {
+  if (topicFormData.content !== undefined) {
     newsData.content = topicFormData.content;
   }
 
-  if(topicFormData.author !== undefined) {
+  if (topicFormData.author !== undefined) {
     newsData.author = topicFormData.author;
   }
 
-  if(topicFormData.references !== undefined) {
+  if (topicFormData.references !== undefined) {
     newsData.references = topicFormData.references;
   }
 
-  if(topicFormData.newsPublishAt !== undefined) {
+  if (topicFormData.newsPublishAt !== undefined) {
     newsData.newsPublishAt = dayjs(topicFormData.newsPublishAt).toDate();
   }
-  
-  if(topicFormData.newsExpiredAt !== undefined) {
-    newsData.newsExpiredAt = topicFormData.newsExpiredAt ? dayjs(topicFormData.newsExpiredAt).toDate() : null;
+
+  if (topicFormData.newsExpiredAt !== undefined) {
+    newsData.newsExpiredAt = topicFormData.newsExpiredAt
+      ? dayjs(topicFormData.newsExpiredAt).toDate()
+      : null;
   }
 
-  if(!isNewsFormValid(newsData)) {
+  if (!isNewsFormValid(newsData)) {
     throw createError({
       statusCode: 400,
       statusMessage: "Input Invalid",
@@ -63,7 +69,7 @@ export default defineEventHandler(async (event) => {
 
   await newsData.save();
 
-  const news : NewsResponseData = {
+  const news: NewsResponseData = {
     _id: `${newsData._id}`,
     visibility: newsData.visibility,
     title: newsData.title,
@@ -73,12 +79,14 @@ export default defineEventHandler(async (event) => {
     createdBy: newsData.createdBy,
     updatedBy: newsData.updatedBy,
     newsPublishAt: dayjs(newsData.newsPublishAt).toString(),
-    newsExpiredAt: newsData.newsExpiredAt ? dayjs(newsData.newsExpiredAt).toString() : null,
+    newsExpiredAt: newsData.newsExpiredAt
+      ? dayjs(newsData.newsExpiredAt).toString()
+      : null,
     createdAt: dayjs(newsData.createdAt).toString(),
     updatedAt: dayjs(newsData.updatedAt).toString(),
   };
 
   return {
     news,
-  }
-})
+  };
+});

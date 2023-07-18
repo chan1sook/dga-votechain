@@ -1,33 +1,33 @@
-import dayjs from "dayjs"
-import { nanoid } from "nanoid"
-import { Storage, prefixStorage } from "unstorage"
+import dayjs from "dayjs";
+import { nanoid } from "nanoid";
+import { Storage, prefixStorage } from "unstorage";
 import { SessionHandler, getSessionData } from "~/server/session-handler";
 
 export default defineEventHandler(async (event) => {
   let sid = getCookie(event, "sid");
-  
-  const storage : Storage = useStorage();
-  const sessionStorage = prefixStorage(storage, "session");
-  const sessionExpired =  dayjs().add(60, "minute").toDate();
 
-  if(!sid) {
+  const storage: Storage = useStorage();
+  const sessionStorage = prefixStorage(storage, "session");
+  const sessionExpired = dayjs().add(60, "minute").toDate();
+
+  if (!sid) {
     sid = nanoid(32);
     await sessionStorage.setItem(sid, {
-      sid
-    })
+      sid,
+    });
   }
 
   setCookie(event, "sid", sid, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
-    expires: sessionExpired
-  })
-  
+    expires: sessionExpired,
+  });
+
   event.context.session = new SessionHandler(sid, sessionStorage);
-  
+
   const userData = await getSessionData(sid);
-  if(userData) {
+  if (userData) {
     event.context.userData = userData;
   }
-})
+});

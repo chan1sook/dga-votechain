@@ -1,35 +1,38 @@
 type TxStatus = "valid" | "invalid" | "pending";
-  
+
 interface VoteDataBlockchainResponseData {
-  voteId: string,
-  topicId: string,
-  userId: string,
-  choice: string,
+  voteId: string;
+  topicId: string;
+  userId: string;
+  choice: string;
 }
 
 type TxResponseData = Omit<VoteDataBlockchainResponseData, "choice"> & {
-  txhash: string | null,
-  groupid: string,
-  choice: ChoiceDataType,
-  createdAt: DateString | undefined,
-  txStatus: TxStatus,
-}
+  txhash: string | null;
+  groupid: string;
+  choice: ChoiceDataType;
+  createdAt: DateString | undefined;
+  txStatus: TxStatus;
+};
 
 type TxResponseDataWithRaw = TxResponseData & {
-  txData?: Object,
-}
+  txData?: Object;
+};
 
-type BlockchainServerDataResponse = Omit<BlockchainServerData, "_id" | "createdAt" | "updatedAt" | "lastActiveAt"> & {
-  _id: string,
-  createdAt: DateString,
-  updatedAt: DateString,
-  lastActiveAt?: DateString,
-}
+type BlockchainServerDataResponse = Omit<
+  BlockchainServerData,
+  "_id" | "createdAt" | "updatedAt" | "lastActiveAt"
+> & {
+  _id: string;
+  createdAt: DateString;
+  updatedAt: DateString;
+  lastActiveAt?: DateString;
+};
 
 interface BlockchainStatsResponseData {
-  servers: BlockchainServerDataResponse[],
+  servers: BlockchainServerDataResponse[];
   blocks: {
-    mined: number,
-    total: number,
-  }
+    mined: number;
+    total: number;
+  };
 }

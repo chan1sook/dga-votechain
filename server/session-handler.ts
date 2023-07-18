@@ -6,7 +6,7 @@ export const USER_SESSION_KEY = "dgaUserData";
 export class SessionHandler {
   #sid: string;
   #storage: UnstorageStorage;
-  
+
   constructor(sid: string, sessionStorage: UnstorageStorage) {
     this.#sid = sid;
     this.#storage = sessionStorage;
@@ -23,14 +23,14 @@ export class SessionHandler {
 
   async getAll() {
     const data = await this.#storage.getItem(this.#sid);
-    if(!data || typeof data !== "object") {
-      return {}
+    if (!data || typeof data !== "object") {
+      return {};
     }
     return data as Record<string, any>;
   }
 
   async set<T>(key: string, value: T) {
-    if(key === "sid") {
+    if (key === "sid") {
       throw new Error("Reserved key");
     }
 
@@ -40,7 +40,7 @@ export class SessionHandler {
   }
 
   async unset(key: string) {
-    if(key === "sid") {
+    if (key === "sid") {
       throw new Error("Reserved key");
     }
 
@@ -56,17 +56,21 @@ export class SessionHandler {
   }
 }
 
-export async function getSessionData(sid: string) : Promise<UserSessionData | null> {  
-  const storage : Storage = useStorage();
+export async function getSessionData(
+  sid: string
+): Promise<UserSessionData | null> {
+  const storage: Storage = useStorage();
   const sessionStorage = prefixStorage(storage, "session");
-  
-  const sessionHandler = new SessionHandler(sid, sessionStorage);
-  const userSessionData = await sessionHandler.get<UserSessionSavedData | undefined>(USER_SESSION_KEY);
 
-  if(userSessionData) {
+  const sessionHandler = new SessionHandler(sid, sessionStorage);
+  const userSessionData = await sessionHandler.get<
+    UserSessionSavedData | undefined
+  >(USER_SESSION_KEY);
+
+  if (userSessionData) {
     try {
       const userData = await UserModel.findById(userSessionData.userid);
-      if(userData) {
+      if (userData) {
         return {
           _id: userData._id,
           hasCitizenId: !!userData.cidHashed,
@@ -85,7 +89,7 @@ export async function getSessionData(sid: string) : Promise<UserSessionData | nu
         };
       }
       return null;
-    } catch(err) {
+    } catch (err) {
       await sessionHandler.unset(USER_SESSION_KEY);
     }
   }

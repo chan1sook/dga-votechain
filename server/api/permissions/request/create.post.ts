@@ -1,4 +1,4 @@
-import RequestPermissionsModel from "~/src/models/request-permission"
+import RequestPermissionsModel from "~/src/models/request-permission";
 import NotificationModel from "~/src/models/notification";
 import { getExistsRequestPermissionsData } from "~/src/services/fetch/permission";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
@@ -7,7 +7,11 @@ import { isBannedUser } from "~/src/services/validations/user";
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData) || !checkPermissionNeeds(userData.permissions, "request-permissions")) {
+  if (
+    !userData ||
+    isBannedUser(userData) ||
+    !checkPermissionNeeds(userData.permissions, "request-permissions")
+  ) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -15,14 +19,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const existsRequests = await getExistsRequestPermissionsData(userData._id);
-  if(existsRequests.length > 0) {
+  if (existsRequests.length > 0) {
     throw createError({
       statusCode: 400,
       statusMessage: "Already requested",
     });
   }
 
-  const reqPermissionsData : RequestPermissionsFormData = await readBody(event);
+  const reqPermissionsData: RequestPermissionsFormData = await readBody(event);
 
   const today = new Date();
   const reqPermissions: RequestPermissionsModelData = {
@@ -33,30 +37,30 @@ export default defineEventHandler(async (event) => {
     preset: reqPermissionsData.preset,
     createdAt: today,
     updatedAt: today,
-  }
-  const reqPermissionsDoc = await new RequestPermissionsModel(reqPermissions).save();
-  
-  await new NotificationModel(
-    {
-      userid: userData._id,
-      group: "request-permission",
-      extra: {
-        id: reqPermissionsDoc._id.toString(),
-        status: "pending",
-      },
-      notifyAt: today,
-    }
+  };
+  const reqPermissionsDoc = await new RequestPermissionsModel(
+    reqPermissions
   ).save();
 
-  const requestPermissions : RequestPermissionsResponseData = {
+  await new NotificationModel({
+    userid: userData._id,
+    group: "request-permission",
+    extra: {
+      id: reqPermissionsDoc._id.toString(),
+      status: "pending",
+    },
+    notifyAt: today,
+  }).save();
+
+  const requestPermissions: RequestPermissionsResponseData = {
     _id: `${reqPermissionsDoc._id}`,
     status: reqPermissionsDoc.status,
     userid: reqPermissionsDoc.userid,
     permissions: reqPermissionsDoc.permissions,
     note: reqPermissionsDoc.note,
     preset: reqPermissionsDoc.preset,
-  }
+  };
   return {
     requestPermissions,
-  }
-})
+  };
+});

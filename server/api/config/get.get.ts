@@ -6,10 +6,12 @@ export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
   const query = getQuery(event);
-  const fields = typeof query.fields === "string" ? JSON.parse(query.fields) : [];
+  const fields =
+    typeof query.fields === "string" ? JSON.parse(query.fields) : [];
 
-  if(fields.length > 0) {
-    const allowProtectedMode = userData && !isBannedUser(userData) && isUserDeveloper(userData);
+  if (fields.length > 0) {
+    const allowProtectedMode =
+      userData && !isBannedUser(userData) && isUserDeveloper(userData);
     const configResponse = getFastConfiguration(fields, allowProtectedMode);
     return configResponse;
   } else {

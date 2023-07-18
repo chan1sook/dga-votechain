@@ -1,52 +1,58 @@
-import { readFiles } from 'h3-formidable'
-import { fileTypeFromBuffer } from "file-type"
-import sharp from 'sharp';
+import { readFiles } from "h3-formidable";
+import { fileTypeFromBuffer } from "file-type";
+import sharp from "sharp";
 import fs from "fs/promises";
-import { nanoid } from 'nanoid';
-import path from 'path';
-import { isBannedUser } from '~/src/services/validations/user';
-import { isUserAdmin } from '~/src/services/validations/role';
+import { nanoid } from "nanoid";
+import path from "path";
+import { isBannedUser } from "~/src/services/validations/user";
+import { isUserAdmin } from "~/src/services/validations/role";
 
-
-const supportMimeTypes = ['image/jpeg', 'image/png'];
+const supportMimeTypes = ["image/jpeg", "image/png"];
 
 export default eventHandler(async (event) => {
   const userData = event.context.userData;
-  
-  if(!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
+
+  if (!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
-  
+
   const { fields, files } = await readFiles(event, {
-    includeFields: true
-  })
+    includeFields: true,
+  });
 
   const file = files.image[0];
-  if(!file) {
+  if (!file) {
     throw createError({
       statusMessage: "No Image File",
       statusCode: 400,
-    })
+    });
   }
 
   const tempFile = await fs.readFile(file.filepath);
   const mineTypeResult = await fileTypeFromBuffer(tempFile);
-  if(!mineTypeResult || !supportMimeTypes.includes(mineTypeResult?.mime) || file.mimetype !== mineTypeResult?.mime) {
+  if (
+    !mineTypeResult ||
+    !supportMimeTypes.includes(mineTypeResult?.mime) ||
+    file.mimetype !== mineTypeResult?.mime
+  ) {
     throw createError({
       statusMessage: "Invalid Image File",
       statusCode: 400,
-    })
+    });
   }
 
-  const buffer = await sharp(tempFile).resize(400, 400, {
-    fit: "inside"
-  }).png().toBuffer()
-  
+  const buffer = await sharp(tempFile)
+    .resize(400, 400, {
+      fit: "inside",
+    })
+    .png()
+    .toBuffer();
+
   // new File name here
-  const newFileName = "img-" + nanoid() + ".png"
+  const newFileName = "img-" + nanoid() + ".png";
   const imgStoragePath = path.resolve(useRuntimeConfig().IMG_STORAGE_PATH);
   const writePath = path.join(imgStoragePath, newFileName);
 
@@ -55,6 +61,6 @@ export default eventHandler(async (event) => {
 
   return {
     fileName: newFileName,
-    status: "OK"
-  }
-})
+    status: "OK",
+  };
+});

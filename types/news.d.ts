@@ -1,45 +1,57 @@
 import { Model, Types, Query, Document } from "mongoose";
 
 declare global {
-  type NewsVisiblity = 'public' | 'private'; 
+  type NewsVisiblity = "public" | "private";
   interface NewsData {
-    _id?: Types.ObjectId,
-    visibility: NewsVisiblity,
-    title: string,
-    author: string,
-    content: string,
-    references: string,
-    createdBy: Types.ObjectId,
-    updatedBy: Types.ObjectId,
-    newsPublishAt: Date,
-    newsExpiredAt: Date | null,
-    createdAt: Date,
-    updatedAt: Date,
+    _id?: Types.ObjectId;
+    visibility: NewsVisiblity;
+    title: string;
+    author: string;
+    content: string;
+    references: string;
+    createdBy: Types.ObjectId;
+    updatedBy: Types.ObjectId;
+    newsPublishAt: Date;
+    newsExpiredAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
   }
 
   interface NewsModel extends Model<NewsData> {
-    getLastestAvaliableNews(pagesize?: number, startid?: string) : Query<NewsData[], NewsData>;
-    getLastestAllNews(pagesize?: number, startid?: string) : Query<NewsData[], NewsData>;
+    getLastestAvaliableNews(
+      pagesize?: number,
+      startid?: string
+    ): Query<NewsData[], NewsData>;
+    getLastestAllNews(
+      pagesize?: number,
+      startid?: string
+    ): Query<NewsData[], NewsData>;
   }
 
-  type NewsFormData = Omit<NewsData, "_id"  | "createdAt" | "updatedAt" | "createdBy" | "updatedBy">;
-  type NewsFormBodyData = Omit<NewsFormData, "newsPublishAt" | "newsExpiredAt"> & {
-    newsPublishAt: DateString,
-    newsExpiredAt: DateString | null,
-  }
+  type NewsFormData = Omit<
+    NewsData,
+    "_id" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy"
+  >;
+  type NewsFormBodyData = Omit<
+    NewsFormData,
+    "newsPublishAt" | "newsExpiredAt"
+  > & {
+    newsPublishAt: DateString;
+    newsExpiredAt: DateString | null;
+  };
 
   type NewsFormEditData = NewsFormData;
   type NewsFormEditBodyData = NewsFormBodyData;
 
-  type NewsResponseData = NewsFormBodyData & Pick<NewsData, "createdBy" | "updatedBy"> & {
-    _id: string,
-    createdAt: DateString,
-    updatedAt: DateString,
-  }
-
+  type NewsResponseData = NewsFormBodyData &
+    Pick<NewsData, "createdBy" | "updatedBy"> & {
+      _id: string;
+      createdAt: DateString;
+      updatedAt: DateString;
+    };
 
   type NewsQueryType = "available" | "all";
   type NewsQueryParams = PaginationParams & {
-    type?: NewsQueryType,
-  }
+    type?: NewsQueryType;
+  };
 }

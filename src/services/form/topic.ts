@@ -1,5 +1,4 @@
-
-export function getDefaultInternalTopicFilter() : InternalTopicVisiblityFilter {
+export function getDefaultInternalTopicFilter(): InternalTopicVisiblityFilter {
   return {
     ministry: "",
     withDepartment: false,
@@ -7,19 +6,19 @@ export function getDefaultInternalTopicFilter() : InternalTopicVisiblityFilter {
   };
 }
 
-export const topicTypes : TopicType[] = ["public", "private", "internal"];
+export const topicTypes: TopicType[] = ["public", "private", "internal"];
 
-export function getDefaultChoices() : ChoicesInfo {
+export function getDefaultChoices(): ChoicesInfo {
   return {
     choices: [],
-    customable: false
+    customable: false,
   };
 }
 
 export function getPresetChoices(name: string) {
-  switch(name) {
+  switch (name) {
     case "yesno":
-      return  {
+      return {
         choices: [
           { name: `app.topic.template.${name}.choice1` },
           { name: `app.topic.template.${name}.choice2` },
@@ -27,7 +26,7 @@ export function getPresetChoices(name: string) {
         customable: false,
       };
     case "option2":
-      return  {
+      return {
         choices: [
           { name: `app.topic.template.${name}.choice1` },
           { name: `app.topic.template.${name}.choice2` },
@@ -35,7 +34,7 @@ export function getPresetChoices(name: string) {
         customable: false,
       };
     case "option3":
-      return  {
+      return {
         choices: [
           { name: `app.topic.template.${name}.choice1` },
           { name: `app.topic.template.${name}.choice2` },
@@ -43,32 +42,32 @@ export function getPresetChoices(name: string) {
         ],
         customable: false,
       };
-    default: 
+    default:
       return getDefaultChoices();
   }
 }
 
-export function getPresetTemplate(name: string) : Partial<TopicFormData> {
-  switch(name) {
+export function getPresetTemplate(name: string): Partial<TopicFormData> {
+  switch (name) {
     case "yesno":
       return {
         name: `app.topic.template.${name}.label`,
         choices: getPresetChoices(name),
-      }
+      };
     case "option2":
       return {
         name: `app.topic.template.${name}.label`,
         choices: getPresetChoices(name),
-      }
+      };
     case "option3":
       return {
         name: `app.topic.template.${name}.label`,
         choices: getPresetChoices(name),
-      }
-    default: 
+      };
+    default:
       return {
         name: "",
         choices: getDefaultChoices(),
-      }
+      };
   }
 }

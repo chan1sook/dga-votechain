@@ -4,41 +4,46 @@ declare global {
   type NotificationGroup = "request-permission" | "topic";
 
   type NotificationRequestGroup = {
-    group: "request-permission",
+    group: "request-permission";
     extra: {
-      id: string,
-      status: RequestPermissionStatus
-    }
-  }
+      id: string;
+      status: RequestPermissionStatus;
+    };
+  };
   type NotificationTopicGroup = {
-    group: "topic",
+    group: "topic";
     extra: {
-      id: string,
-      name: string,
-      status: "voting" | "pause" | "resume" | "finished",
-      cause?: string,
-    }
-  }
+      id: string;
+      name: string;
+      status: "voting" | "pause" | "resume" | "finished";
+      cause?: string;
+    };
+  };
   type NotificationGroups = NotificationRequestGroup | NotificationTopicGroup;
 
   type NotificationModelData = {
-    userid: Types.ObjectId,
-    notifyAt: Date,
-    readAt?: Date,
+    userid: Types.ObjectId;
+    notifyAt: Date;
+    readAt?: Date;
   } & NotificationGroups;
 
-  type NotificationModelDataWithId = NotificationModelData & { _id: Types.ObjectId };
+  type NotificationModelDataWithId = NotificationModelData & {
+    _id: Types.ObjectId;
+  };
 
-  type NotificationUserResponseData = Omit<NotificationModelDataWithId, "_id" | "userid" | "notifyAt" | "readAt"> & {
-    _id: string,
-    notifyAt: DateString,
-    readAt?: DateString,
+  type NotificationUserResponseData = Omit<
+    NotificationModelDataWithId,
+    "_id" | "userid" | "notifyAt" | "readAt"
+  > & {
+    _id: string;
+    notifyAt: DateString;
+    readAt?: DateString;
   };
 
   type NotificationQueryParams = PaginationParams;
 
   interface NotificationStorageData {
-    unread: boolean,
-    lastChecked: number,
+    unread: boolean;
+    lastChecked: number;
   }
 }

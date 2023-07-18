@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 
-import UserModel from "~/src/models/user"
-import TopicModel from "~/src/models/topic"
-import TopicVoterAllowsModel from "~/src/models/voters-allow"
+import UserModel from "~/src/models/user";
+import TopicModel from "~/src/models/topic";
+import TopicVoterAllowsModel from "~/src/models/voters-allow";
 import NotificationModel from "~/src/models/notification";
 import mongoose, { Types } from "mongoose";
 import { isTopicFormValid } from "~/src/services/validations/topic";
@@ -12,17 +12,22 @@ import { isUserAdmin } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  
-  if(!userData || isBannedUser(userData) || !isUserAdmin(userData) || !checkPermissionNeeds(userData.permissions, "create-topic")) {
+
+  if (
+    !userData ||
+    isBannedUser(userData) ||
+    !isUserAdmin(userData) ||
+    !checkPermissionNeeds(userData.permissions, "create-topic")
+  ) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
-  
+
   const topicFormData: TopicFormBodyData = await readBody(event);
-  
-  if(!isTopicFormValid(topicFormData)) {
+
+  if (!isTopicFormValid(topicFormData)) {
     throw createError({
       statusCode: 400,
       statusMessage: "Input Invalid",
@@ -31,15 +36,19 @@ export default defineEventHandler(async (event) => {
 
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
-  
+
   const today = new Date();
 
   const coadminsDocs = await UserModel.find({
     $and: [
       { _id: { $ne: userData._id } },
-      { _id: { $in: topicFormData.coadmins.map((ele) => new Types.ObjectId(ele)) }}
-    ]
-  })
+      {
+        _id: {
+          $in: topicFormData.coadmins.map((ele) => new Types.ObjectId(ele)),
+        },
+      },
+    ],
+  });
 
   const newTopicDoc = new TopicModel({
     name: topicFormData.name,
@@ -65,34 +74,37 @@ export default defineEventHandler(async (event) => {
     notifyVoter: topicFormData.notifyVoter,
     defaultVotes: topicFormData.defaultVotes,
   });
-  
-  const voterAllows : VoterAllowModelData[] = topicFormData.voterAllows.map((ele) => {
-    return {
-      topicid: newTopicDoc._id,
-      userid: new Types.ObjectId(ele.userid),
-      totalVotes: ele.totalVotes,
-      remainVotes: ele.totalVotes,
+
+  const voterAllows: VoterAllowModelData[] = topicFormData.voterAllows.map(
+    (ele) => {
+      return {
+        topicid: newTopicDoc._id,
+        userid: new Types.ObjectId(ele.userid),
+        totalVotes: ele.totalVotes,
+        remainVotes: ele.totalVotes,
+      };
     }
-  });
+  );
 
   await Promise.all([
     newTopicDoc.save(),
     TopicVoterAllowsModel.insertMany(voterAllows),
   ]);
 
-  if(topicFormData.notifyVoter) {
-    const notifications : NotificationModelData[] = topicFormData.voterAllows.map((ele) => {
-      return {
-        userid: new Types.ObjectId(ele.userid),
-        group: "topic",
-        extra: {
-          id: newTopicDoc._id.toString(),
-          name: newTopicDoc.name,
-          status: "voting",
-        },
-        notifyAt: newTopicDoc.voteStartAt,
-      }
-    });
+  if (topicFormData.notifyVoter) {
+    const notifications: NotificationModelData[] =
+      topicFormData.voterAllows.map((ele) => {
+        return {
+          userid: new Types.ObjectId(ele.userid),
+          group: "topic",
+          extra: {
+            id: newTopicDoc._id.toString(),
+            name: newTopicDoc.name,
+            status: "voting",
+          },
+          notifyAt: newTopicDoc.voteStartAt,
+        };
+      });
     await NotificationModel.insertMany(notifications);
   }
 
@@ -101,5 +113,5 @@ export default defineEventHandler(async (event) => {
 
   return {
     status: "OK",
-  }
-})
+  };
+});

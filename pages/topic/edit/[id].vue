@@ -1,51 +1,77 @@
 <template>
   <div v-if="editable">
-    <DgaHead>{{ $t('app.topic.edit.title')  }}</DgaHead>
+    <DgaHead>{{ $t("app.topic.edit.title") }}</DgaHead>
     <template v-if="!useTemplate">
-      <DgaTopicForm v-if="!isTopicStartVote" v-model="topicData" :voter-allows="voterAllows" :coadmins="coadmins" 
+      <DgaTopicForm
+        v-if="!isTopicStartVote"
+        v-model="topicData"
+        :voter-allows="voterAllows"
+        :coadmins="coadmins"
         @template="useTemplate = true"
       ></DgaTopicForm>
-      <DgaTopicFormCoadminOnly v-else v-model="topicData" :coadmins="coadmins"></DgaTopicFormCoadminOnly>
+      <DgaTopicFormCoadminOnly
+        v-else
+        v-model="topicData"
+        :coadmins="coadmins"
+      ></DgaTopicFormCoadminOnly>
       <DgaButtonGroup class="col-span-12 mt-4">
-        <DgaButton class="!flex flex-row gap-x-2 items-center justify-center truncate"
-          color="dga-orange" :title="$t('app.topic.edit.action')" :disabled="!isFormValid" @click="showConfirmModal = true"
+        <DgaButton
+          class="!flex flex-row items-center justify-center gap-x-2 truncate"
+          color="dga-orange"
+          :title="$t('app.topic.edit.action')"
+          :disabled="!isFormValid"
+          @click="showConfirmModal = true"
         >
           <PencilIcon />
-          <span class="truncate">{{ $t('app.topic.edit.action') }}</span>
+          <span class="truncate">{{ $t("app.topic.edit.action") }}</span>
         </DgaButton>
       </DgaButtonGroup>
     </template>
     <template v-else>
-      <DgaTopicTemplate @use-template="applyTemplate" @cancel="useTemplate = false"></DgaTopicTemplate>
+      <DgaTopicTemplate
+        @use-template="applyTemplate"
+        @cancel="useTemplate = false"
+      ></DgaTopicTemplate>
     </template>
-    <DgaModal :show="showConfirmModal" cancel-backdrop
+    <DgaModal
+      :show="showConfirmModal"
+      cancel-backdrop
       @confirm="editTopic"
       @close="showConfirmModal = false"
       @cancel="showConfirmModal = false"
     >
-      {{ $t('app.topic.edit.confirm') }}
+      {{ $t("app.topic.edit.confirm") }}
     </DgaModal>
     <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+import PencilIcon from "vue-material-design-icons/Pencil.vue";
 
 import dayjs from "dayjs";
-import { isTopicReadyToVote, isTopicFormValid } from '~/src/services/validations/topic';
-import { getDefaultChoices, getDefaultInternalTopicFilter, getPresetTemplate } from '~/src/services/form/topic';
-import { GRAY_BASE64_IMAGE } from '~/src/services/formatter/image';
+import {
+  isTopicReadyToVote,
+  isTopicFormValid,
+} from "~/src/services/validations/topic";
+import {
+  getDefaultChoices,
+  getDefaultInternalTopicFilter,
+  getPresetTemplate,
+} from "~/src/services/form/topic";
+import { GRAY_BASE64_IMAGE } from "~/src/services/formatter/image";
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
 
 definePageMeta({
-  middleware: ["auth-admin"]
-})
+  middleware: ["auth-admin"],
+});
 
 useHead({
-  title: `${i18n.t('appName', 'DGA E-Voting')} - ${i18n.t('app.topic.edit.title')}`
+  title: `${i18n.t("appName", "DGA E-Voting")} - ${i18n.t(
+    "app.topic.edit.title"
+  )}`,
 });
 
 const { id: topicid } = useRoute().params;
@@ -55,11 +81,21 @@ const useTemplate = ref(false);
 const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
-const startDate = dayjs(useComputedServerTime()).minute(0).second(0).millisecond(0).add(1, "hour").toDate();
-const expiredDate = dayjs(startDate).add(1, "hour").minute(0).second(0).millisecond(0).toDate();
+const startDate = dayjs(useComputedServerTime())
+  .minute(0)
+  .second(0)
+  .millisecond(0)
+  .add(1, "hour")
+  .toDate();
+const expiredDate = dayjs(startDate)
+  .add(1, "hour")
+  .minute(0)
+  .second(0)
+  .millisecond(0)
+  .toDate();
 
-const voterAllows : Ref<VoterAllowFormData[]> = ref([]);
-const coadmins : Ref<CoadminFormData[]> = ref([]);
+const voterAllows: Ref<VoterAllowFormData[]> = ref([]);
+const coadmins: Ref<CoadminFormData[]> = ref([]);
 
 const topicData = ref<TopicFormData>({
   name: "",
@@ -86,17 +122,25 @@ const isTopicStartVote = ref(false);
 
 const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 if (!data.value) {
-  showError(i18n.t('app.topic.error.notFound'));
+  showError(i18n.t("app.topic.error.notFound"));
 } else {
-  const { topic, voterAllows: _voteAllows, coadmins: _coadmins, pauseData } = data.value;
-  
-  const admins = topic.coadmins.slice()
+  const {
+    topic,
+    voterAllows: _voteAllows,
+    coadmins: _coadmins,
+    pauseData,
+  } = data.value;
+
+  const admins = topic.coadmins.slice();
   admins.push(topic.admin);
 
-  if(admins.findIndex((ele) => useSessionData().value.userid === ele) === -1) {
-    showError(i18n.t('app.topic.error.notEditable'));
-  } else if(pauseData.every((ele) => ele.resumeAt) && dayjs(useComputedServerTime()).diff(topic.voteExpiredAt) > 0) {
-    showError(i18n.t('app.topic.error.notEditable'));
+  if (admins.findIndex((ele) => useSessionData().value.userid === ele) === -1) {
+    showError(i18n.t("app.topic.error.notEditable"));
+  } else if (
+    pauseData.every((ele) => ele.resumeAt) &&
+    dayjs(useComputedServerTime()).diff(topic.voteExpiredAt) > 0
+  ) {
+    showError(i18n.t("app.topic.error.notEditable"));
   } else {
     isTopicStartVote.value = isTopicReadyToVote(topic);
 
@@ -120,41 +164,41 @@ if (!data.value) {
   }
 }
 
-const isFormValid = computed(() => isTopicFormValid(topicData.value))
+const isFormValid = computed(() => isTopicFormValid(topicData.value));
 
 function applyTemplate(name: string) {
   const template = getPresetTemplate(name);
-  if(template.name) {
+  if (template.name) {
     topicData.value.name = i18n.t(template.name, template.name);
   }
-  if(template.choices) {
+  if (template.choices) {
     topicData.value.choices = {
       choices: template.choices.choices.map((ele) => {
         return {
           name: i18n.t(ele.name, ele.name),
           image: ele.image,
-        }
+        };
       }),
       customable: template.choices.customable,
-    } ;
+    };
   }
-  
+
   useTemplate.value = false;
 }
 
 async function editTopic() {
-  if(!isFormValid.value) {
+  if (!isFormValid.value) {
     return;
   }
 
   showConfirmModal.value = false;
   waitEdit.value = true;
 
-  for(const i in topicData.value.images) {
+  for (const i in topicData.value.images) {
     const file = topicData.value.images[i];
-    if(file === undefined) {
+    if (file === undefined) {
       continue;
-    } else if(file === false) {
+    } else if (file === false) {
       topicData.value.choices.choices[i].image = undefined;
       continue;
     }
@@ -165,10 +209,10 @@ async function editTopic() {
     const { data } = await useFetch("/api/image/upload", {
       method: "POST",
       body: formData,
-      headers: {"cache-control": "no-cache"},
+      headers: { "cache-control": "no-cache" },
     });
 
-    if(data.value) {
+    if (data.value) {
       topicData.value.choices.choices[i].image = data.value.fileName;
     }
   }
@@ -178,29 +222,28 @@ async function editTopic() {
     body: topicData.value,
   });
 
-  if(error.value) {
+  if (error.value) {
     useShowToast({
-      title: i18n.t('app.topic.edit.action'),
-      content: i18n.t('app.topic.edit.failed'),
+      title: i18n.t("app.topic.edit.action"),
+      content: i18n.t("app.topic.edit.failed"),
       autoCloseDelay: 5000,
     });
-  
+
     waitEdit.value = false;
   } else {
     useShowToast({
-      title: i18n.t('app.topic.edit.action'),
-      content: i18n.t('app.topic.edit.success') ,
+      title: i18n.t("app.topic.edit.action"),
+      content: i18n.t("app.topic.edit.success"),
       autoCloseDelay: 5000,
     });
-    navigateTo(localePathOf("/topics"))
+    navigateTo(localePathOf("/topics"));
   }
 }
 </script>
 
-
 <style scoped>
 .user-grid {
-  @apply grid w-full items-center gap-x-4 pb-2 gap-y-2 whitespace-nowrap;
+  @apply grid w-full items-center gap-x-4 gap-y-2 whitespace-nowrap pb-2;
   grid-template-columns: 36px 2fr 4fr 3fr 36px;
 }
 .user-grid.multichoice {

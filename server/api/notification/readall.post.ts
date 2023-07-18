@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 
-import NotificationModel from "~/src/models/notification"
+import NotificationModel from "~/src/models/notification";
 import { clearNotifyData } from "~/server/notify-storage";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
-  
-  if(!userData) {
+
+  if (!userData) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
     });
   }
-  
+
   const dbSession = await mongoose.startSession();
   dbSession.startTransaction();
 
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     readAt: { $exists: false },
   });
 
-  for(const doc of notificationDocs) {
+  for (const doc of notificationDocs) {
     doc.readAt = new Date();
   }
 
@@ -32,8 +32,8 @@ export default defineEventHandler(async (event) => {
   clearNotifyData(userData._id.toString());
 
   const counts = notificationDocs.length;
-  
+
   return {
     counts,
-  }
-})
+  };
+});

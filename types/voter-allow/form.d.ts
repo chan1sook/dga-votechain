@@ -1,12 +1,12 @@
 interface CoadminFormData {
-  userid?: string,
-  email?: string,
-  firstName?: string,
-  lastName?: string,
+  userid?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 type VoterAllowFormData = CoadminFormData & {
-  totalVotes: number,
-}
+  totalVotes: number;
+};
 
 type UserSearchTableData = CoadminFormData | VoterAllowFormData;

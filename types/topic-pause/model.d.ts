@@ -4,7 +4,7 @@ declare global {
   interface TopicCtrlPauseModelData {
     topicid: Types.ObjectId;
     pauseAt: Date;
-    cause: string,
+    cause: string;
     resumeAt?: Date;
   }
 }

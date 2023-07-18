@@ -1,9 +1,9 @@
 import dayjs from "dayjs";
-import NewsModel from "~/server/models/news"
+import NewsModel from "~/server/models/news";
 
 export default defineEventHandler(async (event) => {
   const newsDoc = await NewsModel.findById(event.context.params?.id);
-  if(!newsDoc) {
+  if (!newsDoc) {
     throw createError({
       statusCode: 404,
       statusMessage: "News not found",
@@ -20,12 +20,14 @@ export default defineEventHandler(async (event) => {
     createdBy: newsDoc.createdBy,
     updatedBy: newsDoc.updatedBy,
     newsPublishAt: dayjs(newsDoc.newsPublishAt).toString(),
-    newsExpiredAt: newsDoc.newsExpiredAt ? dayjs(newsDoc.newsExpiredAt).toString() : null,
+    newsExpiredAt: newsDoc.newsExpiredAt
+      ? dayjs(newsDoc.newsExpiredAt).toString()
+      : null,
     createdAt: dayjs(newsDoc.createdAt).toString(),
     updatedAt: dayjs(newsDoc.updatedAt).toString(),
-  }
-  
+  };
+
   return {
     news,
-  }
-})
+  };
+});

@@ -1,4 +1,8 @@
-import { getDefaultAdminTopMenus, getDefaultDevTopMenus, getDefaultTopMenus } from "~/src/services/form/preference";
+import {
+  getDefaultAdminTopMenus,
+  getDefaultDevTopMenus,
+  getDefaultTopMenus,
+} from "~/src/services/form/preference";
 import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
@@ -6,16 +10,16 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   const preferences = {
     topMenu: getDefaultTopMenus(),
-  }
+  };
 
-  if(data.value) {
-    if(data.value.preferences) {
-      if(Array.isArray(data.value.preferences.topMenu)) {
+  if (data.value) {
+    if (data.value.preferences) {
+      if (Array.isArray(data.value.preferences.topMenu)) {
         preferences.topMenu = data.value.preferences.topMenu;
-      } else if(data.value.permissions) {
-        if(isUserDeveloper({ permissions: data.value.permissions })) {
+      } else if (data.value.permissions) {
+        if (isUserDeveloper({ permissions: data.value.permissions })) {
           preferences.topMenu = getDefaultDevTopMenus();
-        } else if(isUserAdmin({ permissions: data.value.permissions })) {
+        } else if (isUserAdmin({ permissions: data.value.permissions })) {
           preferences.topMenu = getDefaultAdminTopMenus();
         }
       }
@@ -51,4 +55,4 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       division: undefined,
     };
   }
-})
+});

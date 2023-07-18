@@ -5,7 +5,7 @@ import { isBannedUser } from "~/src/services/validations/user";
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
 
-  if(!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
+  if (!userData || isBannedUser(userData) || !isUserAdmin(userData)) {
     throw createError({
       statusCode: 403,
       statusMessage: "Forbidden",
@@ -13,25 +13,28 @@ export default defineEventHandler(async (event) => {
   }
 
   const query = getQuery(event);
-  
+
   let user = null;
-  const userSearchParam : UserSearchParams = {
+  const userSearchParam: UserSearchParams = {
     keyword: typeof query.keyword === "string" ? query.keyword : "",
     adminOnly: query.adminOnly === "1",
     excludeUserId: query.notSelf === "1" ? userData._id : undefined,
-  }
+  };
 
   user = await searchExactActiveUserByKeyword(userSearchParam);
 
-  if(user) {
-    let role : UserRole | undefined;
-    let authSources : UserAuthSource[] | undefined = undefined;
-    if(isUserDeveloper(userData)) {
-      role = isUserDeveloper(user) ? "developer" :
-        (isUserAdmin(user) ? "admin" : "voter");
+  if (user) {
+    let role: UserRole | undefined;
+    let authSources: UserAuthSource[] | undefined = undefined;
+    if (isUserDeveloper(userData)) {
+      role = isUserDeveloper(user)
+        ? "developer"
+        : isUserAdmin(user)
+        ? "admin"
+        : "voter";
       authSources = [];
-      for(const authSource of user.authSources) {
-        if(!authSources.includes(authSource.authSource)) {
+      for (const authSource of user.authSources) {
+        if (!authSources.includes(authSource.authSource)) {
           authSources.push(authSource.authSource);
         }
       }
@@ -44,9 +47,8 @@ export default defineEventHandler(async (event) => {
       email: user.email,
       authSources,
       role,
-    }
-
+    };
   } else {
     return null;
   }
-})
+});
