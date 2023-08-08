@@ -205,7 +205,7 @@ const pauseCause = ref("");
 const { data } = await useFetch(`/api/topic/info-admin/${topicid}`);
 
 if (!data.value) {
-  showError(i18n.t("voting.cannotVote"));
+  showError(i18n.t("app.voting.cannotCtrlVote"));
 } else {
   const {
     topic: _topic,

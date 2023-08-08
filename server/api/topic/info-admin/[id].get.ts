@@ -6,6 +6,7 @@ import { getTopicCtrlPauseListByTopicId } from "~/src/services/fetch/topic-ctrl-
 import { isUserAdmin } from "~/src/services/validations/role";
 import { getAnonymousVotesByTopicId } from "~/src/services/fetch/vote";
 import { isBannedUser } from "~/src/services/validations/user";
+import { isAdminOrCoadminOfTopic } from "~/src/services/validations/topic";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
@@ -22,6 +23,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 404,
       statusMessage: "Topic not found",
+    });
+  }
+
+  if (!isAdminOrCoadminOfTopic(userData, topicDoc)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
     });
   }
 
@@ -77,31 +85,6 @@ export default defineEventHandler(async (event) => {
       anonyomusVotes.push({
         groupid: vote.groupid,
         count: 1,
-      });
-    }
-  }
-
-  if (topic.type !== "public") {
-    let isAllowed = false;
-
-    // check if is admin
-    if (topicDoc.admin.toString() === userData._id.toString()) {
-      isAllowed = true;
-    }
-
-    // check if is coadmins
-    if (
-      topicDoc.coadmins.find(
-        (ele) => ele.toString() === userData._id.toString()
-      )
-    ) {
-      isAllowed = true;
-    }
-
-    if (!isAllowed) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "Forbidden",
       });
     }
   }

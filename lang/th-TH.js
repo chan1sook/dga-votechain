@@ -12,7 +12,7 @@ export default {
         loadingNews: "รอสักครู่...",
         noMoreNews: "ไม่พบข่าวสาร",
         loadMoreNews: "โหลดข่าวสารเพิ่ม",
-        add: "เพิ่ม"
+        add: "เพิ่ม",
       },
       notification: {
         title: "แจ้งเตือน",
@@ -34,11 +34,11 @@ export default {
       },
       target: "ไปยัง",
       go: "ไป",
-      logout: "ออกจากระบบ"
+      logout: "ออกจากระบบ",
     },
     home: {
       title: "หน้าแรก",
-      header: "บริการ DGA E-Voting บน Blockchain"
+      header: "บริการ DGA E-Voting บน Blockchain",
     },
     about: {
       title: "เกี่ยวกับบริการ",
@@ -70,8 +70,8 @@ export default {
         title: "สร้างโหวต",
         action: "ตั้งโหวต",
         confirm: "ยืนยันการตั้งโหวต",
-        success: 'ตั้งโหวตสำเร็จ',
-        failed: 'ตั้งโหวตล้มเหลว',
+        success: "ตั้งโหวตสำเร็จ",
+        failed: "ตั้งโหวตล้มเหลว",
       },
       recreate: {
         title: "สร้างโหวตใหม่",
@@ -80,15 +80,15 @@ export default {
         title: "แก้ไขโหวต",
         action: "แก้ไขโหวต",
         confirm: "ยืนยันการแก้ไขโหวต",
-        success: 'แก้ไขโหวตสำเร็จ',
-        failed: 'แก้ไขโหวตล้มเหลว',
+        success: "แก้ไขโหวตสำเร็จ",
+        failed: "แก้ไขโหวตล้มเหลว",
       },
       defaultVotes: "จำนวนโหวตตั้งต้น",
       template: {
         yesno: {
           label: "ใช่/ไม่",
           choice1: "ใช่",
-          choice2: "ไม่"
+          choice2: "ไม่",
         },
         option2: {
           label: "สองตัวเลือก",
@@ -100,7 +100,7 @@ export default {
           choice1: "ตัวเลือก 1",
           choice2: "ตัวเลือก 2",
           choice3: "ตัวเลือก 3",
-        }
+        },
       },
       templateTitle: "ต้นแบบการโหวต",
       useTemplate: "ใช้ต้นแบบการโหวต",
@@ -108,7 +108,7 @@ export default {
       withDepartment: "ระบุหน่วยงาน/กรม",
       error: {
         notFound: "ไม่พบกระทู้โหวต",
-        notEditable: "ไม่สามารถแก้ไขกระทู้โหวต"
+        notEditable: "ไม่สามารถแก้ไขกระทู้โหวต",
       },
       accessModifier: "การเข้าถึง",
       voteDuration: {
@@ -133,8 +133,8 @@ export default {
         remove: "ลบตัวเลือก",
         error: {
           empty: "ต้องระบุชื่อตัวเลือก",
-          duplicated: "ชื่อตัวเลือกซ้ำกัน"
-        }
+          duplicated: "ชื่อตัวเลือกซ้ำกัน",
+        },
       },
       coadminList: {
         title: "รายชื่อแอดมินร่วม",
@@ -204,6 +204,7 @@ export default {
       paused: "การโหวตหยุดชั่วคราว",
       adminWarning: "ให้เปลี่ยนสถานะเป็น ผู้โหวต ก่อนการลงคะแนนเสียง",
       cannotVote: "ไม่สามารถโหวตได้",
+      cannotCtrlVote: "ไม่สามารถควบคุมโหวตได้",
       pause: "หยุด",
       resume: "โหวตต่อ",
       clear: "ล้าง",
@@ -241,13 +242,14 @@ export default {
       error: {
         duplicated: "ผู้ใช้ซ้ำ",
         notFound: "ไม่พบผู้ใช้",
-      }
+      },
     },
     contactUs: {
       title: "ติดต่อเรา",
       info: {
         company: "สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.)",
-        address: "ชั้น 17 อาคารบางกอกไทยทาวเวอร์ 108 ถนนรางน้ำ แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400",
+        address:
+          "ชั้น 17 อาคารบางกอกไทยทาวเวอร์ 108 ถนนรางน้ำ แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400",
         tels: "โทรสาร:",
         email: "อีเมล:",
         contactCenter: "DGA Contact Center:",
@@ -277,7 +279,7 @@ export default {
     topicType: {
       public: "โหวตสาธารณะ",
       private: "โหวตทางลับ",
-      internal: "โหวตในองค์กร"
+      internal: "โหวตในองค์กร",
     },
     privateVote: "โหวตทางลับ",
     votersList: "รายชื่อผู้มีสิทธิ์โหวต",
@@ -301,7 +303,7 @@ export default {
         requestTo: {
           title: "ขอสิทธิ์",
           moderator: "ผู้ดูแลระบบ",
-          developer: "นักพัฒนาระบบ"
+          developer: "นักพัฒนาระบบ",
         },
         allowConsent: "อนุมัติส่งข้อมูลส่วนตัวให้ผู้อนุมัติ",
         action: "ส่งคำขอ",
@@ -355,7 +357,7 @@ export default {
         type: {
           title: "ประเภท",
           vote: "โหวต",
-          result: "ผลโหวต"
+          result: "ผลโหวต",
         },
         createdAt: "สร้างเมื่อ",
         status: "สถานะ",
@@ -373,7 +375,7 @@ export default {
         confirm: "ยีนยันการตั้งค่า?",
         success: "ตั้งค่าสำเร็จ",
         failed: "ตั้งค่าล้มเหลว",
-      }
+      },
     },
     privacyPolicy: "นโยบายความเป็นส่วนตัว",
     cookiePolicy: "นโยบายคุกกี้",
@@ -381,7 +383,7 @@ export default {
     sendFeedback: "ส่งข้อเสนอแนะ",
     countable: {
       vote: "โหวต",
-      voter: "คน"
+      voter: "คน",
     },
     timePeriod: {
       nearZeroMinute: "ไม่ถึงนาที",
@@ -393,7 +395,7 @@ export default {
       back: "กลับ",
       close: "ปิด",
       cancel: "ยกเลิก",
-      confirm: "ยืนยัน"
+      confirm: "ยืนยัน",
     },
     anonymous: "ผู้ไม่ทราบนาม",
     role: {
@@ -420,7 +422,7 @@ export default {
     detail: "รายละเอียด",
     error: {
       title: "ผิดพลาด",
-      backToHome: "กลับสู่หน้าหลัก"
+      backToHome: "กลับสู่หน้าหลัก",
     },
   },
   notification: {
@@ -435,8 +437,8 @@ export default {
       title: "การขอสิทธิ์",
       pending: "กำลังดำเนินการ",
       approved: "อนุมัติแล้ว",
-      rejected: "ปฏิเสธ"
-    }
+      rejected: "ปฏิเสธ",
+    },
   },
   news: {
     title: "ข่าว",
@@ -471,7 +473,7 @@ export default {
       date: "วันสิ้นสุด",
       time: "เวลาสิ้นสุด",
     },
-    noReference: "ไม่มีแหล่งอ้างอิง"
+    noReference: "ไม่มีแหล่งอ้างอิง",
   },
   cookieConsent: {
     useCookie: "เว็บไซต์นี้ใช้คุกกี้",
@@ -479,5 +481,5 @@ export default {
     useCookieInfo2: "โปรดศึกษาเพิ่มเติมที่",
     acceptAll: "รับทั้งหมด",
     acceptRequiredOnly: "รับเฉพาะที่จำเป็น",
-  }
-}
+  },
+};

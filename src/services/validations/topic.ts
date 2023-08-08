@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { isBannedUser } from "./user";
+import { Types } from "mongoose";
 
 function isVoteDateTimeValid(
   voteStartAt: Date | DateString,
@@ -83,6 +84,28 @@ export function isAnonymousTopic(topicData: {
   anonymousVotes: boolean;
 }) {
   return topicData.type === "public" && topicData.anonymousVotes;
+}
+
+export function isAdminOrCoadminOfTopic(
+  userData: { _id: string | Types.ObjectId },
+  topicData: {
+    admin: string | Types.ObjectId;
+    coadmins: (string | Types.ObjectId)[];
+  }
+) {
+  // check if is admins
+  if (topicData.admin.toString() === userData._id.toString()) {
+    return true;
+  }
+
+  // check if is coadmins
+  if (
+    topicData.coadmins.find((ele) => ele.toString() === userData._id.toString())
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 export function isUserInMatchInternalTopic(

@@ -7,6 +7,7 @@ import NotificationModel from "~/src/models/notification";
 import { checkPermissionNeeds } from "../validations/permission";
 import { isTopicPause } from "../fetch/topic-ctrl-pause";
 import dayjs from "dayjs";
+import { isAdminOrCoadminOfTopic } from "../validations/topic";
 
 export async function pauseTopic(
   userid: string,
@@ -20,8 +21,29 @@ export async function pauseTopic(
   if (
     !userData ||
     !targetTopic ||
-    !checkPermissionNeeds(userData.permissions, "control-topic")
+    !checkPermissionNeeds(userData.permissions, "control-topic") ||
+    !isAdminOrCoadminOfTopic(userData, targetTopic)
   ) {
+    return;
+  }
+
+  let isAllowedControl = false;
+
+  // check if is admin
+  if (targetTopic.admin.toString() === userData._id.toString()) {
+    isAllowedControl = true;
+  }
+
+  // check if is coadmins
+  if (
+    targetTopic.coadmins.find(
+      (ele) => ele.toString() === userData._id.toString()
+    )
+  ) {
+    isAllowedControl = true;
+  }
+
+  if (!isAllowedControl) {
     return;
   }
 

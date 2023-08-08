@@ -12,7 +12,7 @@ export default {
         loadingNews: "Loading...",
         noMoreNews: "No more news",
         loadMoreNews: "Load more news",
-        add: "Add"
+        add: "Add",
       },
       notification: {
         title: "Notifications",
@@ -34,11 +34,11 @@ export default {
       },
       target: "Target",
       go: "Go",
-      logout: "Logout"
+      logout: "Logout",
     },
     home: {
       title: "Home",
-      header: "DGA E-Voting Service on Blockchain"
+      header: "DGA E-Voting Service on Blockchain",
     },
     about: {
       title: "About",
@@ -70,8 +70,8 @@ export default {
         title: "Create Topic",
         action: "Add topic",
         confirm: "Confirm data to add?",
-        success: 'Add topic successful',
-        failed: 'Add topic failed',
+        success: "Add topic successful",
+        failed: "Add topic failed",
       },
       recreate: {
         title: "Recreate Topic",
@@ -80,8 +80,8 @@ export default {
         title: "Edit Topic",
         action: "Edit topic",
         confirm: "Confirm data to edit?",
-        success: 'Edit topic successful',
-        failed: 'Edit topic failed',
+        success: "Edit topic successful",
+        failed: "Edit topic failed",
       },
       defaultVotes: "Default Vote for Voters",
       template: {
@@ -100,7 +100,7 @@ export default {
           choice1: "Option 1",
           choice2: "Option 2",
           choice3: "Option 3",
-        }
+        },
       },
       templateTitle: "Topic Template",
       useTemplate: "Use Topic Template",
@@ -108,7 +108,7 @@ export default {
       withDepartment: "With Department",
       error: {
         notFound: "Topic not found",
-        notEditable: "Topic not editable"
+        notEditable: "Topic not editable",
       },
       accessModifier: "Access Type",
       voteDuration: {
@@ -133,8 +133,8 @@ export default {
         remove: "Remove Choice",
         error: {
           empty: "Choice must not empty",
-          duplicated: "Choice Duplicated"
-        }
+          duplicated: "Choice Duplicated",
+        },
       },
       coadminList: {
         title: "Co-Admin Lists",
@@ -204,6 +204,7 @@ export default {
       paused: "E-voting is Paused",
       adminWarning: "Please change mode to Voter for voting topic.",
       cannotVote: "Can't vote",
+      cannotCtrlVote: "Can't control vote",
       pause: "Paused",
       resume: "Resume",
       clear: "Clear",
@@ -240,7 +241,7 @@ export default {
       error: {
         duplicated: "Duplicated User",
         notFound: "User Not Found",
-      }
+      },
     },
     admin: {
       user: {
@@ -271,7 +272,7 @@ export default {
         type: {
           title: "Type",
           vote: "Vote",
-          result: "Vote Result"
+          result: "Vote Result",
         },
         createdAt: "Created At",
         status: "Status",
@@ -289,7 +290,7 @@ export default {
         confirm: "Confirm to Edit Configurations?",
         success: "Edit Configurations Successful",
         failed: "Edit Configurations Failed",
-      }
+      },
     },
     help: {
       title: "Help",
@@ -299,12 +300,14 @@ export default {
     contactUs: {
       title: "Contact Us",
       info: {
-        company: "Digital Government Development Agency (Public Organization) (DGA)",
-        address: "17th Floor, Bangkok Thai Tower Building 108 Rangnam Rd. Phayathai, Ratchatewi, Bangkok 10400, Thailand",
+        company:
+          "Digital Government Development Agency (Public Organization) (DGA)",
+        address:
+          "17th Floor, Bangkok Thai Tower Building 108 Rangnam Rd. Phayathai, Ratchatewi, Bangkok 10400, Thailand",
         tels: "Tel:",
         email: "Email:",
         contactCenter: "DGA Contact Center:",
-      }
+      },
     },
     userid: "User ID",
     userName: "Name",
@@ -325,7 +328,7 @@ export default {
     topicType: {
       public: "Public Vote",
       private: "Private Vote",
-      internal: "Internal Vote"
+      internal: "Internal Vote",
     },
     votersList: "Voters List",
     permissions: {
@@ -348,7 +351,7 @@ export default {
         requestTo: {
           title: "Request to",
           moderator: "Moderator",
-          developer: "Developer"
+          developer: "Developer",
         },
         allowConsent: "Allow to use personal Data for approver",
         action: "Add Request",
@@ -379,7 +382,7 @@ export default {
     sendFeedback: "Send Feedback",
     countable: {
       vote: "Vote | Votes",
-      voter: "Voter | Voters"
+      voter: "Voter | Voters",
     },
     timePeriod: {
       nearZeroMinute: "Less than a minute",
@@ -391,7 +394,7 @@ export default {
       back: "Back",
       close: "Close",
       cancel: "Cancel",
-      confirm: "Confirm"
+      confirm: "Confirm",
     },
     anonymous: "Anonymous",
     role: {
@@ -418,14 +421,14 @@ export default {
     detail: "Detail",
     error: {
       title: "Error",
-      backToHome: "Back to Home"
+      backToHome: "Back to Home",
     },
   },
   userPreferences: {
     title: "Preferences",
     confirm: "Confirm to Edit User Preferences?",
     success: "Edit User Preferences Successful",
-    failed: "Edit User Preferences Failed"
+    failed: "Edit User Preferences Failed",
   },
   notification: {
     topic: {
@@ -439,8 +442,8 @@ export default {
       title: "Request Permission",
       pending: "in progress",
       approved: "approved",
-      rejected: "rejected"
-    }
+      rejected: "rejected",
+    },
   },
   news: {
     title: "News",
@@ -465,7 +468,7 @@ export default {
     content: "Content",
     references: "References",
     publishAt: "Publish At",
-    publishTime:  {
+    publishTime: {
       title: "Publish",
       date: "Publish date",
       time: "Publish time",
@@ -475,11 +478,11 @@ export default {
       date: "Expired Date",
       time: "Expired Time",
     },
-    noReference: "No References"
+    noReference: "No References",
   },
   cookieConsent: {
     useCookie: "This website use cookies",
     acceptAll: "Accept All",
     acceptRequiredOnly: "Accept Required-Only",
-  }
-}
+  },
+};
