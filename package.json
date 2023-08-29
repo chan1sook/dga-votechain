@@ -28,6 +28,7 @@
     "tailwindcss": "^3.2.7"
   },
   "dependencies": {
+    "@braintree/sanitize-url": "^6.0.4",
     "@hyperledger/fabric-gateway": "^1.2.2",
     "@nuxt/test-utils": "^3.5.1",
     "@socket.io/redis-adapter": "^8.1.0",

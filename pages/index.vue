@@ -13,7 +13,7 @@
       <div class="flex-1 overflow-hidden">
         <img
           class="mx-auto w-full max-w-none sm:w-[400px]"
-          src="~/assets/images/blockchain.png"
+          :src="homeImageURL"
         />
       </div>
     </div>
@@ -26,10 +26,14 @@
 
 <script setup lang="ts">
 import { sanitizeHtmlCustom } from "~/src/services/formatter/html";
+import { sanitizeUrl } from "@braintree/sanitize-url";
+
 import {
+  getStringConfigField,
   getStringConfigFieldByLocale,
   mapConfigKeysToAllLocales,
 } from "~/src/services/transform/config";
+import { HOME_IMAGE_URL } from "~/src/defaults";
 
 const i18n = useI18n();
 
@@ -38,11 +42,17 @@ useHead({
 });
 
 const serverConfigs = await useServerConfig(
-  mapConfigKeysToAllLocales("homeContent")
+  mapConfigKeysToAllLocales("homeContent").concat(["homeImageURL"])
 );
 
 const indexMessage = computed(() =>
   getStringConfigFieldByLocale("homeContent", i18n.locale.value, serverConfigs)
+);
+
+const homeImageURL = ref(
+  sanitizeUrl(
+    getStringConfigField("homeImageURL", serverConfigs) || HOME_IMAGE_URL
+  )
 );
 
 onMounted(() => {

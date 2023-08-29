@@ -24,6 +24,22 @@
       ></DgaTab>
       <div v-show="contentSubtab === 'home'" class="grid grid-cols-12 gap-4">
         <div class="col-span-12 lg:col-span-3">
+          {{ $t("app.admin.config.homeImageUrl") }}
+        </div>
+        <div class="col-span-12 flex flex-col lg:col-span-9">
+          <DgaInput
+            v-model="configs.homeImageURL"
+            :placeholder="$t('app.admin.config.homeImageUrlPlaceholder')"
+          ></DgaInput>
+          <div class="font-bold">
+            {{ $t("app.admin.config.homeImageUrlPreview") }}:
+          </div>
+          <img
+            :src="configs.homeImageURL || HOME_IMAGE_URL"
+            class="mx-auto max-h-[200px] max-w-[400px] border"
+          />
+        </div>
+        <div class="col-span-12 lg:col-span-3">
           {{ $t("app.admin.config.homeContent") }} (TH)
         </div>
         <DgaRichtextEditor
@@ -139,6 +155,7 @@
 
 <script setup lang="ts">
 import PencilIcon from "vue-material-design-icons/Pencil.vue";
+import { HOME_IMAGE_URL } from "~/src/defaults";
 import { mapConfigKeysToAllLocales } from "~/src/services/transform/config";
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -159,7 +176,7 @@ const serverConfigs = await useServerConfig(
     "contactUs",
     "cookiePolicy",
     "privacyPolicy"
-  )
+  ).concat(["homeImageURL"])
 );
 
 const configs: Ref<Partial<ConfigData>> = ref({
@@ -173,7 +190,9 @@ const configs: Ref<Partial<ConfigData>> = ref({
   cookiePolicyEN: serverConfigs.cookiePolicyEN || "",
   privacyPolicyTH: serverConfigs.privacyPolicyTH || "",
   privacyPolicyEN: serverConfigs.privacyPolicyEN || "",
+  homeImageURL: serverConfigs.homeImageURL || "",
 });
+
 const currentTab = ref("content");
 const contentSubtab = ref("home");
 const showConfirmModal = ref(false);

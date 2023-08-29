@@ -9,6 +9,7 @@ interface ConfigData {
   cookiePolicyTH: string;
   privacyPolicyEN: string;
   privacyPolicyTH: string;
+  homeImageURL: string;
   // termAndServiceEN: string,
   // termAndServiceTH: string,
 }

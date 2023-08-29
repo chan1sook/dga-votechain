@@ -282,6 +282,9 @@ export default {
       config: {
         title: "System Config",
         content: "Content",
+        homeImageUrl: "Home Image URL",
+        homeImageUrlPreview: "Preview Image",
+        homeImageUrlPlaceholder: "URL-like image eg. https://someimage.url",
         homeContent: "Home Content",
         aboutContent: "About Content",
         contactUsContent: "Contact Us Content",

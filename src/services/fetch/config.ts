@@ -17,6 +17,7 @@ const SERVER_CONFIGURATIONS: ConfigData = {
   cookiePolicyEN: "",
   privacyPolicyTH: PRIVACY_POLICY_TH,
   privacyPolicyEN: "",
+  homeImageURL: "",
 };
 
 const protectedKeys: ProtectedKeys[] = [];

@@ -35,3 +35,15 @@ export function getStringConfigFieldByLocale(
 
   return "";
 }
+
+export function getStringConfigField(
+  name: string,
+  serverConfigs: Record<string, any>
+) {
+  const value = serverConfigs[name];
+  if (value !== "") {
+    return `${value}`;
+  }
+
+  return "";
+}

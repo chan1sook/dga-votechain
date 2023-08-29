@@ -367,6 +367,9 @@ export default {
       config: {
         title: "ตั้งค่าระบบ",
         content: "เนื้อหา",
+        homeImageUrl: "URL ภาพหน้าแรก",
+        homeImageUrlPreview: "ตัวอย่างภาพ",
+        homeImageUrlPlaceholder: "ระบุเป็น URL เช่น https://someimage.url",
         homeContent: "เนื้อหาหน้าแรก",
         aboutContent: "เนื้อหาหน้าเกี่ยวกับบริการ",
         contactUsContent: "เนื้อหาหน้าติดต่อเรา",
