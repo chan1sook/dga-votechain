@@ -1,3 +1,13 @@
+export const HOME_TITLE_CONTENT_EN = `<div>
+    <img src='/me_vote_logo.png' class="h-24 sm:h-32">
+    <div class="text-xl font-bold !leading-loose sm:text-3xl lg:w-96 lg:text-4xl">Service on Blockchain</div>
+</div>`;
+
+export const HOME_TITLE_CONTENT_TH = `<div>
+    <img src='/me_vote_logo.png' class="h-24 sm:h-32">
+    <div class="text-xl font-bold !leading-loose sm:text-3xl lg:w-96 lg:text-4xl">E-Voting บน Blockchain</div>
+</div>`;
+
 export const HOME_CONTENT_TH = `<p><span style="text-decoration: underline;">จุดเด่น</span></p>
 <ul>
 <li>ข้อมูลลงคะแนนมติสามารถประมวลผลได้อย่างรวดเร็ว มีความถูกต้อง และปลอดภัย</li>
@@ -175,4 +185,4 @@ export const PRIVACY_POLICY_TH = `<h4 style="text-align: center;">คำปร�
 <p><strong>เจ้าหน้าที่คุ้มครองข้อมูลส่วนบุคคล (Data Protection Officer: DPO)<br>สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน)</strong></p>
 <p style="padding-left: 40px;">สถานที่ติดต่อ : สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.) ชั้น ๑๗ อาคารบางกอกไทยทาวเวอร์ ๑๐๘ ถนนรางน้ำ แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ ๑๐๔๐๐<br>ช่องทางการติดต่อ : DGA_pdpa@dga.or.th<br>เบอร์โทร ๐-๘๐๐๔-๕๓๔๒๑</p>`;
 
-export const HOME_IMAGE_URL = "/me_vote_front.png";
+export const HOME_IMAGE_URL_TH = "/blockchain.png";

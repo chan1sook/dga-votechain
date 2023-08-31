@@ -12,6 +12,17 @@
       v-if="currentTab === 'content'"
       class="mx-auto my-4 flex w-full flex-col gap-4"
     >
+      <div class="mx-auto flex w-full max-w-md flex-row items-center gap-x-2">
+        <div>
+          {{ $t("app.admin.config.language") }}
+        </div>
+        <DgaVueSelect
+          v-model="langFilter"
+          class="flex-1"
+          :options="langOptions"
+          :reduce="(lang) => lang.value"
+        ></DgaVueSelect>
+      </div>
       <DgaTab
         v-model="contentSubtab"
         :tabs="{
@@ -24,48 +35,80 @@
       ></DgaTab>
       <div v-show="contentSubtab === 'home'" class="grid grid-cols-12 gap-4">
         <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.homeImageUrl") }}
+          {{ $t("app.admin.config.homeTitleContent") }} ({{
+            langFilter.toUpperCase()
+          }})
+        </div>
+        <DgaRichtextEditor
+          v-show="langFilter === 'th'"
+          v-model="configs.homeTitleContentTH"
+          class="col-span-12 lg:col-span-9"
+        ></DgaRichtextEditor>
+        <DgaRichtextEditor
+          v-show="langFilter === 'en'"
+          v-model="configs.homeTitleContentEN"
+          class="col-span-12 lg:col-span-9"
+        ></DgaRichtextEditor>
+
+        <div class="col-span-12 lg:col-span-3">
+          {{ $t("app.admin.config.homeImageUrl") }} ({{
+            langFilter.toUpperCase()
+          }})
         </div>
         <div class="col-span-12 flex flex-col lg:col-span-9">
           <DgaInput
-            v-model="configs.homeImageURL"
+            v-show="langFilter === 'th'"
+            v-model="configs.homeImageUrlTH"
+            :placeholder="$t('app.admin.config.homeImageUrlPlaceholder')"
+          ></DgaInput>
+          <DgaInput
+            v-show="langFilter === 'en'"
+            v-model="configs.homeImageUrlEN"
             :placeholder="$t('app.admin.config.homeImageUrlPlaceholder')"
           ></DgaInput>
           <div class="font-bold">
             {{ $t("app.admin.config.homeImageUrlPreview") }}:
           </div>
           <img
-            :src="configs.homeImageURL || HOME_IMAGE_URL"
+            v-show="langFilter === 'th'"
+            :src="configs.homeImageUrlTH || HOME_IMAGE_URL_TH"
+            class="mx-auto max-h-[200px] max-w-[400px] border"
+          />
+          <img
+            v-show="langFilter === 'en'"
+            :src="configs.homeImageUrlEN || HOME_IMAGE_URL_TH"
             class="mx-auto max-h-[200px] max-w-[400px] border"
           />
         </div>
         <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.homeContent") }} (TH)
+          {{ $t("app.admin.config.homeContent") }} ({{
+            langFilter.toUpperCase()
+          }})
         </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'th'"
           v-model="configs.homeContentTH"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
-        <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.homeContent") }} (EN)
-        </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'en'"
           v-model="configs.homeContentEN"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
       </div>
       <div v-show="contentSubtab === 'about'" class="grid grid-cols-12 gap-4">
         <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.aboutContent") }} (TH)
+          {{ $t("app.admin.config.aboutContent") }} ({{
+            langFilter.toUpperCase()
+          }})
         </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'th'"
           v-model="configs.aboutTH"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
-        <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.aboutContent") }} (EN)
-        </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'en'"
           v-model="configs.aboutEN"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
@@ -75,16 +118,17 @@
         class="grid grid-cols-12 gap-4"
       >
         <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.contactUsContent") }} (TH)
+          {{ $t("app.admin.config.contactUsContent") }} ({{
+            langFilter.toUpperCase()
+          }})
         </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'th'"
           v-model="configs.contactUsTH"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
-        <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.contactUsContent") }} (EN)
-        </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'en'"
           v-model="configs.contactUsEN"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
@@ -94,16 +138,17 @@
         class="grid grid-cols-12 gap-4"
       >
         <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.cookiePolicyContent") }} (TH)
+          {{ $t("app.admin.config.cookiePolicyContent") }} ({{
+            langFilter.toUpperCase()
+          }})
         </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'th'"
           v-model="configs.cookiePolicyTH"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
-        <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.cookiePolicyContent") }} (EN)
-        </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'en'"
           v-model="configs.cookiePolicyEN"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
@@ -113,16 +158,17 @@
         class="grid grid-cols-12 gap-4"
       >
         <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.privacyPolicyContent") }} (TH)
+          {{ $t("app.admin.config.privacyPolicyContent") }} ({{
+            langFilter.toUpperCase()
+          }})
         </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'th'"
           v-model="configs.privacyPolicyTH"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
-        <div class="col-span-12 lg:col-span-3">
-          {{ $t("app.admin.config.privacyPolicyContent") }} (EN)
-        </div>
         <DgaRichtextEditor
+          v-show="langFilter === 'en'"
           v-model="configs.privacyPolicyEN"
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
@@ -155,7 +201,7 @@
 
 <script setup lang="ts">
 import PencilIcon from "vue-material-design-icons/Pencil.vue";
-import { HOME_IMAGE_URL } from "~/src/defaults";
+import { HOME_IMAGE_URL_TH } from "~/src/defaults";
 import { mapConfigKeysToAllLocales } from "~/src/services/transform/config";
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -171,6 +217,7 @@ useHead({
 
 const serverConfigs = await useServerConfig(
   mapConfigKeysToAllLocales(
+    "homeTitleContent",
     "homeContent",
     "about",
     "contactUs",
@@ -180,6 +227,10 @@ const serverConfigs = await useServerConfig(
 );
 
 const configs: Ref<Partial<ConfigData>> = ref({
+  homeTitleContentEN: serverConfigs.homeTitleContentEN || "",
+  homeTitleContentTH: serverConfigs.homeTitleContentTH || "",
+  homeImageUrlEN: serverConfigs.homeImageUrlEN || "",
+  homeImageUrlTH: serverConfigs.homeImageUrlTH || "",
   homeContentEN: serverConfigs.homeContentEN || "",
   homeContentTH: serverConfigs.homeContentTH || "",
   aboutEN: serverConfigs.aboutEN || "",
@@ -190,16 +241,22 @@ const configs: Ref<Partial<ConfigData>> = ref({
   cookiePolicyEN: serverConfigs.cookiePolicyEN || "",
   privacyPolicyTH: serverConfigs.privacyPolicyTH || "",
   privacyPolicyEN: serverConfigs.privacyPolicyEN || "",
-  homeImageURL: serverConfigs.homeImageURL || "",
 });
 
 const currentTab = ref("content");
 const contentSubtab = ref("home");
+const langFilter = ref(i18n.locale.value);
 const showConfirmModal = ref(false);
 const waitEdit = ref(false);
 
 const isFormValid = computed(() => true);
 
+const langOptions = computed(() => {
+  return [
+    { label: "ไทย", value: "th" },
+    { label: "English", value: "en" },
+  ];
+});
 async function editConfigs() {
   if (!isFormValid.value) {
     return;

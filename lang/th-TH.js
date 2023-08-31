@@ -38,7 +38,6 @@ export default {
     },
     home: {
       title: "หน้าแรก",
-      header: "บริการ DGA E-Voting บน Blockchain",
     },
     about: {
       title: "เกี่ยวกับบริการ",
@@ -367,9 +366,11 @@ export default {
       config: {
         title: "ตั้งค่าระบบ",
         content: "เนื้อหา",
+        language: "เลือกภาษา",
         homeImageUrl: "URL ภาพหน้าแรก",
         homeImageUrlPreview: "ตัวอย่างภาพ",
         homeImageUrlPlaceholder: "ระบุเป็น URL เช่น https://someimage.url",
+        homeTitleContent: "เนื้อหาไตเติ้ลหน้าแรก",
         homeContent: "เนื้อหาหน้าแรก",
         aboutContent: "เนื้อหาหน้าเกี่ยวกับบริการ",
         contactUsContent: "เนื้อหาหน้าติดต่อเรา",

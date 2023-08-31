@@ -2,13 +2,20 @@ import { FilterQuery } from "mongoose";
 import {
   COOKIE_POLICY_TH,
   HOME_CONTENT_TH,
+  HOME_IMAGE_URL_TH,
+  HOME_TITLE_CONTENT_EN,
+  HOME_TITLE_CONTENT_TH,
   PRIVACY_POLICY_TH,
 } from "~/src/defaults";
 import ConfigModel from "~/src/models/config";
 
 const SERVER_CONFIGURATIONS: ConfigData = {
+  homeTitleContentTH: HOME_TITLE_CONTENT_TH,
+  homeTitleContentEN: HOME_TITLE_CONTENT_EN,
   homeContentTH: HOME_CONTENT_TH,
   homeContentEN: "",
+  homeImageUrlTH: HOME_IMAGE_URL_TH,
+  homeImageUrlEN: "",
   aboutTH: "",
   aboutEN: "",
   contactUsTH: "",
@@ -17,7 +24,6 @@ const SERVER_CONFIGURATIONS: ConfigData = {
   cookiePolicyEN: "",
   privacyPolicyTH: PRIVACY_POLICY_TH,
   privacyPolicyEN: "",
-  homeImageURL: "",
 };
 
 const protectedKeys: ProtectedKeys[] = [];

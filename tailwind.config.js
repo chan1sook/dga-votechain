@@ -6,9 +6,10 @@ module.exports = {
     "./pages/**/*.vue",
     "./plugins/**/*.{js,ts}",
     "./nuxt.config.{js,ts}",
+    "./src/**/*.ts",
     "./app.vue",
   ],
-  darkMode: 'class',
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -16,8 +17,8 @@ module.exports = {
           lighter: "hsl(250, 57%, 45%)",
           DEFAULT: "#1E154C",
         },
-        'dga-orange': "#EE5020",
-      }
+        "dga-orange": "#EE5020",
+      },
     },
   },
 };

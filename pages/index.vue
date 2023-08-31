@@ -4,11 +4,7 @@
       class="flex flex-col gap-x-8 gap-y-4 px-4 py-0 sm:px-16 lg:flex-row lg:py-12"
     >
       <div>
-        <p
-          class="text-xl font-bold !leading-loose sm:pt-4 sm:text-3xl lg:w-96 lg:text-4xl"
-        >
-          {{ $t("app.home.header") }}
-        </p>
+        <div v-html="sanitizeHtmlCustom(indexTitleMessage)"></div>
       </div>
       <div class="flex-1 overflow-hidden">
         <img
@@ -17,10 +13,9 @@
         />
       </div>
     </div>
-    <div
-      v-html="sanitizeHtmlCustom(indexMessage)"
-      class="custom-content-container"
-    ></div>
+    <div class="custom-content-container">
+      <div v-html="sanitizeHtmlCustom(indexMessage)"></div>
+    </div>
   </div>
 </template>
 
@@ -33,7 +28,7 @@ import {
   getStringConfigFieldByLocale,
   mapConfigKeysToAllLocales,
 } from "~/src/services/transform/config";
-import { HOME_IMAGE_URL } from "~/src/defaults";
+import { HOME_IMAGE_URL_TH, HOME_TITLE_CONTENT_TH } from "~/src/defaults";
 
 const i18n = useI18n();
 
@@ -42,7 +37,17 @@ useHead({
 });
 
 const serverConfigs = await useServerConfig(
-  mapConfigKeysToAllLocales("homeContent").concat(["homeImageURL"])
+  mapConfigKeysToAllLocales("homeTitleContent", "homeImageUrl", "homeContent")
+);
+
+const indexTitleMessage = computed(
+  () =>
+    HOME_TITLE_CONTENT_TH ||
+    getStringConfigFieldByLocale(
+      "homeTitleContent",
+      i18n.locale.value,
+      serverConfigs
+    )
 );
 
 const indexMessage = computed(() =>
@@ -51,7 +56,11 @@ const indexMessage = computed(() =>
 
 const homeImageURL = ref(
   sanitizeUrl(
-    getStringConfigField("homeImageURL", serverConfigs) || HOME_IMAGE_URL
+    getStringConfigFieldByLocale(
+      "homeImageUrl",
+      i18n.locale.value,
+      serverConfigs
+    ) || HOME_IMAGE_URL_TH
   )
 );
 

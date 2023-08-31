@@ -1,4 +1,8 @@
 interface ConfigData {
+  homeTitleContentEN: string;
+  homeTitleContentTH: string;
+  homeImageUrlTH: string;
+  homeImageUrlEN: string;
   homeContentEN: string;
   homeContentTH: string;
   aboutEN: string;
@@ -9,7 +13,6 @@ interface ConfigData {
   cookiePolicyTH: string;
   privacyPolicyEN: string;
   privacyPolicyTH: string;
-  homeImageURL: string;
   // termAndServiceEN: string,
   // termAndServiceTH: string,
 }

@@ -10,7 +10,7 @@ export function sanitizeHtmlCustom(html: string) {
     ]),
     allowedAttributes: Object.assign(
       {
-        "*": ["style"],
+        "*": ["style", "class"],
         td: ["colspan", "rowspan"],
         th: ["colspan", "rowspan"],
       },

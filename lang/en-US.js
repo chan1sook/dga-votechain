@@ -38,7 +38,6 @@ export default {
     },
     home: {
       title: "Home",
-      header: "DGA E-Voting Service on Blockchain",
     },
     about: {
       title: "About",
@@ -282,9 +281,11 @@ export default {
       config: {
         title: "System Config",
         content: "Content",
+        language: "Language",
         homeImageUrl: "Home Image URL",
         homeImageUrlPreview: "Preview Image",
         homeImageUrlPlaceholder: "URL-like image eg. https://someimage.url",
+        homeTitleContent: "Home Title Content",
         homeContent: "Home Content",
         aboutContent: "About Content",
         contactUsContent: "Contact Us Content",
