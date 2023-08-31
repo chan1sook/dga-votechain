@@ -3,7 +3,9 @@
     <div
       class="flex flex-col gap-x-8 gap-y-4 px-4 py-0 sm:px-16 lg:flex-row lg:py-12"
     >
-      <div>
+      <div
+        class="text-xl font-bold !leading-loose sm:text-3xl lg:w-96 lg:text-4xl"
+      >
         <div v-html="sanitizeHtmlCustom(indexTitleMessage)"></div>
       </div>
       <div class="flex-1 overflow-hidden">
@@ -24,11 +26,10 @@ import { sanitizeHtmlCustom } from "~/src/services/formatter/html";
 import { sanitizeUrl } from "@braintree/sanitize-url";
 
 import {
-  getStringConfigField,
   getStringConfigFieldByLocale,
   mapConfigKeysToAllLocales,
 } from "~/src/services/transform/config";
-import { HOME_IMAGE_URL_TH, HOME_TITLE_CONTENT_TH } from "~/src/defaults";
+import { HOME_IMAGE_URL_TH } from "~/src/defaults";
 
 const i18n = useI18n();
 
@@ -40,14 +41,12 @@ const serverConfigs = await useServerConfig(
   mapConfigKeysToAllLocales("homeTitleContent", "homeImageUrl", "homeContent")
 );
 
-const indexTitleMessage = computed(
-  () =>
-    HOME_TITLE_CONTENT_TH ||
-    getStringConfigFieldByLocale(
-      "homeTitleContent",
-      i18n.locale.value,
-      serverConfigs
-    )
+const indexTitleMessage = computed(() =>
+  getStringConfigFieldByLocale(
+    "homeTitleContent",
+    i18n.locale.value,
+    serverConfigs
+  )
 );
 
 const indexMessage = computed(() =>

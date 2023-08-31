@@ -1,11 +1,11 @@
 export const HOME_TITLE_CONTENT_EN = `<div>
     <img src='/me_vote_logo.png' class="h-24 sm:h-32">
-    <div class="text-xl font-bold !leading-loose sm:text-3xl lg:w-96 lg:text-4xl">Service on Blockchain</div>
+    <div>Service on Blockchain</div>
 </div>`;
 
 export const HOME_TITLE_CONTENT_TH = `<div>
     <img src='/me_vote_logo.png' class="h-24 sm:h-32">
-    <div class="text-xl font-bold !leading-loose sm:text-3xl lg:w-96 lg:text-4xl">E-Voting บน Blockchain</div>
+    <div>E-Voting บน Blockchain</div>
 </div>`;
 
 export const HOME_CONTENT_TH = `<p><span style="text-decoration: underline;">จุดเด่น</span></p>
