@@ -1,0 +1,23 @@
+version: "3"
+services:
+  besu-node:
+    container_name: besu-node-dga
+    image: hyperledger/besu:latest
+    ports:
+      - 8545:8545
+      - 30303:30303
+      - 30303:30303/udp
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+    volumes:
+      - /var/besu:/ibft-network
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        /opt/besu/bin/besu \
+        --config-file=/ibft-network/nodes/keys/config.toml \
+        --p2p-host="34.133.32.70";
