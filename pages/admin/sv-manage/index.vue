@@ -119,10 +119,11 @@ definePageMeta({
 });
 useHead({
   title: `${i18n.t("appName", "DGA E-Voting")} - ${i18n.t(
-    "app.admin.blockchain.title"
+    "app.admin.blockchain.manageServer.title"
   )}`,
 });
 
+const todayTime = ref(Date.now());
 const blockchainServers: Ref<BlockchainServerDataResponse[]> = ref([]);
 const newServer = ref({
   host: "",
@@ -149,7 +150,7 @@ function isServerOnline(server: BlockchainServerDataResponse) {
   const onlineThershold =
     useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   if (server.lastActiveAt) {
-    const diff = dayjs(useComputedServerTime()).diff(server.lastActiveAt);
+    const diff = dayjs(todayTime.value).diff(server.lastActiveAt);
     if (diff <= onlineThershold) {
       return true;
     }
@@ -196,6 +197,10 @@ async function addBlockchainServer() {
   showConfirmModal.value = false;
 }
 
+function updateTime() {
+  todayTime.value = useComputedServerTime().getTime();
+}
+
 const socket = useSocketIO();
 
 socket.on("blockchainHb", (data: BlockchainServerDataResponse) => {
@@ -208,5 +213,15 @@ socket.on("blockchainHb", (data: BlockchainServerDataResponse) => {
       blockchainServers.value[targetIndex] = data;
     }
   }
+});
+
+let timeId: NodeJS.Timer | undefined;
+onMounted(() => {
+  timeId = setInterval(updateTime, 500);
+  updateTime();
+});
+
+onUnmounted(() => {
+  clearInterval(timeId);
 });
 </script>

@@ -125,6 +125,7 @@ useHead({
   )}`,
 });
 
+const todayTime = ref(Date.now());
 const blockchainStats: Ref<BlockchainStatsResponseData | undefined> =
   ref(undefined);
 const txData: Ref<TxResponseData[]> = ref([]);
@@ -148,7 +149,7 @@ function countServerOnlines(servers: BlockchainServerDataResponse[]) {
     useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if (current.lastActiveAt) {
-      const diff = dayjs(useComputedServerTime()).diff(current.lastActiveAt);
+      const diff = dayjs(todayTime.value).diff(current.lastActiveAt);
       if (diff <= onlineThershold) {
         return prev + 1;
       }
@@ -156,6 +157,10 @@ function countServerOnlines(servers: BlockchainServerDataResponse[]) {
     }
     return prev;
   }, 0);
+}
+
+function updateTime() {
+  todayTime.value = useComputedServerTime().getTime();
 }
 
 const socket = useSocketIO();
@@ -181,5 +186,15 @@ socket.on("blockchainHb", (data: BlockchainServerDataResponse) => {
       blockchainStats.value.servers[targetIndex] = data;
     }
   }
+});
+
+let timeId: NodeJS.Timer | undefined;
+onMounted(() => {
+  timeId = setInterval(updateTime, 500);
+  updateTime();
+});
+
+onUnmounted(() => {
+  clearInterval(timeId);
 });
 </script>
