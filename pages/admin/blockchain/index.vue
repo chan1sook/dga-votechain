@@ -43,6 +43,11 @@
             {{ $t("app.admin.blockchain.serverStatus.offline") }}:
             {{ stats.servers.length - countServerOnlines(stats.servers) }}
           </div>
+          <div class="col-span-6 mb-2 flex items-center justify-center">
+            <DgaButton color="dga-orange" href="/admin/sv-manage">
+              {{ $t("app.admin.blockchain.manageServer.title") }}
+            </DgaButton>
+          </div>
         </div>
 
         <h4 class="border-t-2 border-dga-blue p-2 text-lg font-bold">
@@ -124,7 +129,7 @@ const blockchainStats: Ref<BlockchainStatsResponseData | undefined> =
   ref(undefined);
 const txData: Ref<TxResponseData[]> = ref([]);
 const searchKeyword = ref("");
-const { data: stats } = await useFetch("/api/txinfo");
+const { data: stats } = await useFetch("/api/blockchain/info");
 const { data: tx } = await useFetch("/api/txchain");
 
 if (stats.value && tx.value) {

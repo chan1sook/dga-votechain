@@ -58,14 +58,14 @@ export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
       ? topicData.choices.choices.length
       : undefined;
   let votesValid = true;
-  if (topicData.type === "private") {
-    votesValid = isVoterAllowsValid(topicData.voterAllows, maxChoices);
-  } else if (topicData.type === "internal") {
+  if (isInternalTopic(topicData)) {
     votesValid =
       topicData.internalFilter.ministry !== "" &&
       (topicData.internalFilter.withDepartment
         ? topicData.internalFilter.department !== ""
         : true);
+  } else if (isPrivateTopic(topicData) || !isAnonymousTopic(topicData)) {
+    votesValid = isVoterAllowsValid(topicData.voterAllows, maxChoices);
   }
 
   return (
@@ -79,11 +79,23 @@ export function isTopicFormValid(topicData: TopicFormData | TopicFormBodyData) {
   );
 }
 
+export function isPublicTopic(topicData: { type: TopicType }) {
+  return topicData.type === "public";
+}
+
+export function isPrivateTopic(topicData: { type: TopicType }) {
+  return topicData.type === "private";
+}
+
+export function isInternalTopic(topicData: { type: TopicType }) {
+  return topicData.type === "internal";
+}
+
 export function isAnonymousTopic(topicData: {
   type: TopicType;
   anonymousVotes: boolean;
 }) {
-  return topicData.type === "public" && topicData.anonymousVotes;
+  return isPublicTopic(topicData) && topicData.anonymousVotes;
 }
 
 export function isAdminOrCoadminOfTopic(
@@ -176,12 +188,15 @@ export function isCanVote(
   topicDoc: TopicModelDataWithIdPopulated,
   voterAllow: any
 ) {
-  return (
-    (userData ? !isBannedUser(userData) : true) &&
-    (!!voterAllow ||
-      isAnonymousTopic(topicDoc) ||
-      (!!userData &&
-        topicDoc.type === "internal" &&
-        isUserInMatchInternalTopic(topicDoc.internalFilter, userData)))
-  );
+  if (userData) {
+    return (
+      !isBannedUser(userData) &&
+      (isAnonymousTopic(topicDoc) ||
+        !!voterAllow ||
+        (isInternalTopic(topicDoc) &&
+          isUserInMatchInternalTopic(topicDoc.internalFilter, userData)))
+    );
+  } else {
+    return isAnonymousTopic(topicDoc);
+  }
 }

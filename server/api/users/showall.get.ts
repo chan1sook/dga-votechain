@@ -12,7 +12,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userDocs = await UserModel.find({ removed: { $ne: true } });
+  const userDocs = await UserModel.find({
+    removeAt: { $exists: false },
+  });
 
   const users: UserSearchResponseData[] = userDocs.map((data) => {
     const role: UserRole = isUserDeveloper(data)

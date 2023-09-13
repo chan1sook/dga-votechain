@@ -43,6 +43,7 @@ export default async () => {
       io.emit("blockchainHb", {
         _id: `${svData._id}`,
         host: svData.host,
+        name: svData.name,
         createdAt: dayjs(svData.createdAt).toString(),
         updatedAt: dayjs(svData.updatedAt).toString(),
         lastActiveAt: svData.lastActiveAt

@@ -44,17 +44,21 @@ async function checkBlockchainHBs() {
       );
     }
 
-    return Promise.all(promises).then(() => {
-      resolve(updated);
-    });
+    return Promise.all(promises).then(() => updated);
   });
 
   console.log(`[Blockchain HB Workers] Updated ${updated} Server(s)`);
+
+  return { docs: allServerDocs };
 }
 
 function worker() {
   try {
-    checkBlockchainHBs();
+    checkBlockchainHBs().then(({ docs }) => {
+      docs.forEach((element) => {
+        blockchainHbEventEmitter.emit("blockchainHb", element);
+      });
+    });
   } catch (err) {
     console.log(`[Blockchain HB Workers] Failed`);
     console.error(err);
@@ -62,6 +66,10 @@ function worker() {
 }
 
 export default function initBlockchainHbWorkers() {
-  checkBlockchainHBs();
+  checkBlockchainHBs().then(({ docs }) => {
+    docs.forEach((element) => {
+      blockchainHbEventEmitter.emit("blockchainHb", element);
+    });
+  });
   return nodeCron.schedule("* * * * *", worker);
 }
