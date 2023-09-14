@@ -42,6 +42,8 @@
           <div>{{ $t("app.timePeriod.hour", { count: 2 }) }}</div>
           <div class="timer-counter">{{ getMinutes(remainTime) }}</div>
           <div>{{ $t("app.timePeriod.minute", { count: 2 }) }}</div>
+          <div class="timer-counter">{{ getSecs(remainTime) }}</div>
+          <div>{{ $t("app.timePeriod.sec", { count: 2 }) }}</div>
         </template>
         <template v-else>
           <div>{{ $t("app.voting.yourVote") }}</div>
@@ -438,6 +440,9 @@ async function submitVotes() {
   const votes = noVoteLocked.value
     ? new Array(remainVotes.value).fill(null)
     : currentVotes.value.slice();
+  while (votes.length < totalVotes.value) {
+    votes.push(null);
+  }
 
   const voteFormData: VotesFormData = {
     topicid,
@@ -517,6 +522,12 @@ function getMinutes(d: number) {
 
 function getTotalMinutes(d: number) {
   return Math.floor(d / (60 * 1000));
+}
+function getSecs(d: number) {
+  return d >= 0 ? getTotalSecs(d) % 60 : 0;
+}
+function getTotalSecs(d: number) {
+  return Math.floor(d / 1000);
 }
 
 const socket = useSocketIO();

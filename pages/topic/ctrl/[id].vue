@@ -233,14 +233,6 @@ if (!data.value) {
   }
 }
 
-const durationDiff = computed(() => {
-  if (!topic.value) {
-    return 0;
-  }
-
-  return dayjs(topic.value.voteExpiredAt).diff(useComputedServerTime());
-});
-
 function computeRemainTime() {
   if (!topic.value) {
     remainTime.value = 0;
@@ -282,7 +274,7 @@ function updateTime() {
   computeRemainTime();
   computePauseTime();
 
-  if (topic.value && !isPaused.value && durationDiff.value <= 0) {
+  if (topic.value && !isPaused.value && remainTime.value <= 0) {
     navigateTo(localePathOf(`/topic/result/${topic.value._id}`));
   }
 }

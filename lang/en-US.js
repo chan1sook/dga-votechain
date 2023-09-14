@@ -404,6 +404,7 @@ export default {
     },
     timePeriod: {
       nearZeroMinute: "Less than a minute",
+      sec: "Secs",
       minute: "Mins",
       hour: "Hours",
       day: "Days",

@@ -236,7 +236,7 @@ export default {
       totalVotes: "จำนวนเสียง",
       add: "เพิ่มชื่อ",
       remove: "ลบชื่อ",
-      searchUser: "ค้นหาผุ้ใช้",
+      searchUser: "ค้นหาผู้ใช้",
       addUser: "เพิ่มผู้เข้าโหวต",
       error: {
         duplicated: "ผู้ใช้ซ้ำ",
@@ -405,6 +405,7 @@ export default {
     },
     timePeriod: {
       nearZeroMinute: "ไม่ถึงนาที",
+      sec: "วินาที",
       minute: "นาที",
       hour: "ชั่วโมง",
       day: "วัน",
