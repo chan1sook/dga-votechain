@@ -417,6 +417,7 @@ function lockVotes() {
     return;
   }
   noVoteLocked.value = true;
+  remainVotes.value = totalVotes.value;
 }
 
 function getPauseCause() {
@@ -438,11 +439,8 @@ async function submitVotes() {
   waitVote.value = true;
 
   const votes = noVoteLocked.value
-    ? new Array(remainVotes.value).fill(null)
+    ? new Array(totalVotes.value).fill(null)
     : currentVotes.value.slice();
-  // while (votes.length < totalVotes.value) {
-  //   votes.push(null);
-  // }
 
   const voteFormData: VotesFormData = {
     topicid,
