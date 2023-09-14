@@ -440,9 +440,9 @@ async function submitVotes() {
   const votes = noVoteLocked.value
     ? new Array(remainVotes.value).fill(null)
     : currentVotes.value.slice();
-  while (votes.length < totalVotes.value) {
-    votes.push(null);
-  }
+  // while (votes.length < totalVotes.value) {
+  //   votes.push(null);
+  // }
 
   const voteFormData: VotesFormData = {
     topicid,
