@@ -8,14 +8,10 @@ import { votedEventEmitter } from "../event-emitter";
 import mongoose from "mongoose";
 import { addVoteOnBlockchain } from "../smart-contract";
 import { isTopicPause } from "~/src/services/fetch/topic-ctrl-pause";
-import { checkPermissionNeeds } from "~/src/services/validations/permission";
 import { nanoid } from "nanoid";
-import { isBannedUser } from "~/src/services/validations/user";
 import {
-  isAnonymousTopic,
   isCanVote,
   isTopicReadyToVote,
-  isUserInMatchInternalTopic,
 } from "~/src/services/validations/topic";
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 

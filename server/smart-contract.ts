@@ -2,12 +2,13 @@ import Web3 from "web3";
 import Web3NodejsProvider from "web3-nodejs-provider";
 import DgaEvoteArtifact from "~/blockchain/build/contracts/DgaEvote.json";
 import axios from "axios";
+import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
 
 const isProduction =
   !process.env.IS_DEV && process.env.NODE_ENV === "production";
 const rpcURL = isProduction
   ? "http://127.0.0.1:8545"
-  : "http://209.15.108.160:8545";
+  : `http://${BLOCKCHAIN_SERVERS[0].host}:8545`;
 
 const provider = new Web3NodejsProvider({
   privateKeys: [useRuntimeConfig().BLOCKCHAIN_PRIVATE_KEY],

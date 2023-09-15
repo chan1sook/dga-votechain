@@ -5,6 +5,7 @@ import {
   loadServerConfigurations,
   updateConfigurations,
 } from "~/src/services/fetch/config";
+import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
 
 let migrationSeq = 0;
 
@@ -26,26 +27,12 @@ export async function setPredefinedBlockchainServers() {
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Blockchain Servers`);
 
-  const predefinedData = [
-    {
-      host: "209.15.108.160",
-      name: "DGAServer1",
-    },
-    {
-      host: "164.115.95.57",
-      name: "DGAServer2",
-    },
-    {
-      host: "35.239.20.185",
-      name: "DGAServer3",
-    },
-  ];
   const servers = await BlockchainServerModel.find({
-    host: { $in: predefinedData.map((ele) => ele.host) },
+    host: { $in: BLOCKCHAIN_SERVERS.map((ele) => ele.host) },
   });
 
   const modifiedServers = [];
-  for (const data of predefinedData) {
+  for (const data of BLOCKCHAIN_SERVERS) {
     const serverTarget = servers.find((sv) => sv.host === data.host);
     if (serverTarget) {
       serverTarget.name = data.name;

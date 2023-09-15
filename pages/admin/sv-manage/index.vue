@@ -38,7 +38,7 @@
                 color="dga-orange"
                 :title="$t('app.admin.blockchain.manageServer.add.action')"
                 :disabled="!isNewServerValid"
-                @click="showConfirmModal = true"
+                @click="showConfirmModal = 'createServer'"
               >
                 <PlusIcon />
                 <span class="truncate">
@@ -55,9 +55,14 @@
         <h4 class="p-2 text-lg font-bold">
           {{ $t("app.admin.blockchain.manageServer.serverList") }}
         </h4>
-        <div class="flex-1 overflow-y-auto border-t-2 border-dga-blue p-2">
-          <div class="flex flex-col gap-2">
-            <div v-for="server of blockchainServers">
+        <div
+          class="flex flex-1 flex-col gap-2 overflow-y-auto border-t-2 border-dga-blue p-2"
+        >
+          <div
+            v-for="server of blockchainServers"
+            class="flex flex-row items-center gap-2"
+          >
+            <div class="flex flex-1 flex-col gap-2">
               <div class="flex flex-row items-center gap-x-2">
                 <div
                   class="h-4 w-4 rounded-full"
@@ -89,12 +94,20 @@
                 </div>
               </div>
             </div>
+            <div>
+              <CloseIcon
+                v-if="!isStarterServer(server)"
+                class="cursor-pointer"
+                :title="$t('app.admin.blockchain.manageServer.remove.action')"
+                @click="popupRemoveServer(server)"
+              ></CloseIcon>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <DgaModal
-      :show="showConfirmModal"
+      :show="showConfirmModal === 'createServer'"
       cancel-backdrop
       @confirm="addBlockchainServer"
       @close="showConfirmModal = false"
@@ -102,15 +115,26 @@
     >
       {{ $t("app.admin.blockchain.manageServer.add.confirm") }}
     </DgaModal>
+    <DgaModal
+      :show="showConfirmModal === 'removeServer'"
+      cancel-backdrop
+      @confirm="removeBlockchainServer"
+      @close="showConfirmModal = false"
+      @cancel="showConfirmModal = false"
+    >
+      {{ $t("app.admin.blockchain.manageServer.remove.confirm") }}
+    </DgaModal>
     <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import PlusIcon from "vue-material-design-icons/Plus.vue";
+import CloseIcon from "vue-material-design-icons/Close.vue";
 import { isBlockchainServerDataValid } from "~/src/services/validations/blockchain-server";
 import dayjs from "dayjs";
 import { formatDateTime } from "~/src/services/formatter/datetime";
+import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
 
 const i18n = useI18n();
 
@@ -129,8 +153,9 @@ const newServer = ref({
   host: "",
   name: "",
 });
-const showConfirmModal = ref(false);
+const showConfirmModal: Ref<string | false> = ref(false);
 const waitEdit = ref(false);
+const removeServerId = ref("");
 const isNewServerValid = computed(
   () =>
     isBlockchainServerDataValid(newServer.value) &&
@@ -199,6 +224,50 @@ async function addBlockchainServer() {
 
 function updateTime() {
   todayTime.value = useComputedServerTime().getTime();
+}
+
+function isStarterServer(server: BlockchainServerDataResponse) {
+  return !!BLOCKCHAIN_SERVERS.find((ele) => ele.host === server.host);
+}
+
+function popupRemoveServer(server: BlockchainServerDataResponse) {
+  showConfirmModal.value = "removeServer";
+  removeServerId.value = server._id;
+}
+
+async function removeBlockchainServer() {
+  if (!removeServerId.value || waitEdit.value) {
+    return;
+  }
+
+  showConfirmModal.value = false;
+  waitEdit.value = true;
+
+  const { error } = await useFetch("/api/blockchain/remove", {
+    method: "POST",
+    body: {
+      _id: removeServerId.value,
+    },
+  });
+
+  if (error.value) {
+    useShowToast({
+      title: i18n.t("app.admin.blockchain.manageServer.title"),
+      content: i18n.t("app.admin.blockchain.manageServer.remove.failed"),
+      autoCloseDelay: 5000,
+    });
+  } else {
+    useShowToast({
+      title: i18n.t("app.admin.blockchain.manageServer.title"),
+      content: i18n.t("app.admin.blockchain.manageServer.remove.success"),
+      autoCloseDelay: 5000,
+    });
+
+    reloadNuxtApp();
+  }
+
+  waitEdit.value = false;
+  showConfirmModal.value = false;
 }
 
 const socket = useSocketIO();

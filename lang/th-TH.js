@@ -361,6 +361,12 @@ export default {
             success: "เพิ่ม Server สำเร็จ",
             failed: "เพิ่ม Server ไม่สำเร็จ",
           },
+          remove: {
+            action: "ลบ",
+            confirm: "ยืนยันการลบ Blockchain Server ตัวนี้หรือไม่?",
+            success: "ลบ Server สำเร็จ",
+            failed: "ลบ Server ไม่สำเร็จ",
+          },
         },
         searchTx: "ค้นหา",
         txhash: "TX Hash",

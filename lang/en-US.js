@@ -276,6 +276,12 @@ export default {
             success: "Add Server Successful",
             failed: "Add Server Failed",
           },
+          remove: {
+            action: "Remove",
+            confirm: "Confirm to remove blockchain server?",
+            success: "Remove Server Successful",
+            failed: "Remove Server Failed",
+          },
         },
         searchTx: "Search TX",
         txhash: "TX Hash",
