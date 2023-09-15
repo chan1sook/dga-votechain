@@ -10,10 +10,10 @@
         </h4>
         <div class="flex-1 overflow-y-auto border-t-2 border-dga-blue p-2">
           <div class="grid grid-cols-12 gap-x-4 gap-y-2">
-            <div class="col-span-12 md:col-span-2">
+            <div class="col-span-12">
               {{ $t("app.admin.blockchain.manageServer.host") }}
             </div>
-            <div class="col-span-12 md:col-span-10">
+            <div class="col-span-12">
               <DgaInput
                 v-model="newServer.host"
                 type="text"
@@ -21,10 +21,10 @@
                 :placeholder="$t('app.admin.blockchain.manageServer.host')"
               ></DgaInput>
             </div>
-            <div class="col-span-12 md:col-span-2">
+            <div class="col-span-12">
               {{ $t("app.admin.blockchain.manageServer.name") }}
             </div>
-            <div class="col-span-12 md:col-span-10">
+            <div class="col-span-12">
               <DgaInput
                 v-model="newServer.name"
                 type="text"
