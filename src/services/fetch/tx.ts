@@ -17,7 +17,7 @@ export async function getTxListFilter(pagesize: number, startid: string) {
       choice: tx.choice === "" ? null : tx.choice,
       createdAt: dayjs(tx.createdAt).toString(),
       txhash: tx.tx,
-      txStatus: !tx.tx ? "invalid" : "valid",
+      txStatus: tx.txOptional ? "norecord" : !tx.tx ? "invalid" : "valid",
     });
   }
 

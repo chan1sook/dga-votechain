@@ -89,10 +89,14 @@
         :status="getStatusOf(topic)"
         :with-qrcode="isAdminMode"
         :is-admin="isAdminMode"
+        :is-dev="isDevMode"
         @edit="toEditTopic(topic)"
         @qr="showQr(topic)"
         @recreate="toRecreateTopic(topic)"
         @action="handleStatusAction(topic, $event)"
+        @hide="popupHideTopic(topic)"
+        @show="popupShowTopic(topic)"
+        @remove="popupRemoveTopic(topic)"
       ></DgaTopicCard>
       <template v-if="isLoadMoreTopics">
         <div class="text-center text-xl italic">
@@ -124,8 +128,27 @@
       @close="showImageModal = false"
     >
       <img :src="qrCodeSrc" class="max-h-[77.5vh] object-contain" />
-      <div>{{ currentLink }}</div>
+      <div class="break-all">{{ currentLink }}</div>
     </DgaModal>
+    <DgaModal
+      :show="showConfirmModal === 'hideTopic'"
+      cancel-backdrop
+      @confirm="hideTopic(selectedTopic, true)"
+      @close="showConfirmModal = false"
+      @cancel="showConfirmModal = false"
+    >
+      {{ $t("app.topic.hide.confirm") }}
+    </DgaModal>
+    <DgaModal
+      :show="showConfirmModal === 'showTopic'"
+      cancel-backdrop
+      @confirm="hideTopic(selectedTopic, false)"
+      @close="showConfirmModal = false"
+      @cancel="showConfirmModal = false"
+    >
+      {{ $t("app.topic.show.confirm") }}
+    </DgaModal>
+    <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>
 </template>
 
@@ -153,11 +176,17 @@ useHead({
   title: `${i18n.t("appName", "DGA E-Voting")} - ${i18n.t("app.voting.title")}`,
 });
 
+const isAdminMode = computed(() => roleMode.value === "admin");
+const isDevMode = computed(() => roleMode.value === "developer");
+const isVoterMode = computed(() => roleMode.value === "voter");
+
 const filter = ref({
   type: "all",
   month: dayjs(useComputedServerTime()).month(),
   year: dayjs(useComputedServerTime()).year(),
-  topicType: <"all" | TopicType>"all",
+  topicType: <"all" | "invited" | TopicType>(
+    (isVoterMode.value ? "invited" : "all")
+  ),
   ticketId: "",
   keyword: "",
 });
@@ -171,17 +200,32 @@ const topicFilterOptions = computed(() =>
   })
 );
 
-const topciTypeFilterOptions = computed(() =>
-  ["all", ...topicTypes].map((value) => {
+const topciTypeFilterOptions = computed(() => {
+  let options = ["all", ...topicTypes];
+  if (isVoterMode.value) {
+    options = ["all", "invited", ...topicTypes];
+  }
+
+  return options.map((value) => {
+    if (value === "all") {
+      return {
+        label: i18n.t(`app.voting.filters.all`),
+        value: value,
+      };
+    }
+    if (value === "invited") {
+      return {
+        label: i18n.t(`app.voting.filters.invited`),
+        value: value,
+      };
+    }
+
     return {
-      label:
-        value !== "all"
-          ? i18n.t(`app.topicType.${value}`, value)
-          : i18n.t(`app.voting.filters.${value}`),
+      label: i18n.t(`app.topicType.${value}`, value),
       value: value,
     };
-  })
-);
+  });
+});
 
 const startDate = dayjs("2023-04-03T07:00:00.000");
 
@@ -219,6 +263,9 @@ const isLoadMoreTopics = ref(false);
 const showImageModal = ref(false);
 const currentLink = ref("");
 const qrCodeSrc = ref(GRAY_BASE64_IMAGE);
+const showConfirmModal: Ref<string | false> = ref(false);
+const selectedTopic: Ref<TopicResponseData | undefined> = ref(undefined);
+const waitEdit = ref(false);
 
 function resetTopics() {
   loadedTopics.value = [];
@@ -226,7 +273,6 @@ function resetTopics() {
   loadMoreTopics();
 }
 
-const isAdminMode = computed(() => roleMode.value === "admin");
 function isTopicEditable(topic: TopicResponseDataExtended) {
   return (
     isAdminMode.value &&
@@ -306,6 +352,62 @@ async function showQr(topic: TopicResponseData) {
   currentLink.value = host.protocol + "//" + host.host + "/vote/" + topic._id;
   qrCodeSrc.value = await QRCode.toDataURL(currentLink.value);
   showImageModal.value = true;
+}
+
+function popupHideTopic(topic: TopicResponseData) {
+  selectedTopic.value = topic;
+  showConfirmModal.value = "hideTopic";
+}
+
+function popupShowTopic(topic: TopicResponseData) {
+  selectedTopic.value = topic;
+  showConfirmModal.value = "showTopic";
+}
+
+function popupRemoveTopic(topic: TopicResponseData) {}
+
+async function hideTopic(
+  topic: TopicResponseData | undefined,
+  hideState: boolean
+) {
+  if (!topic) {
+    return;
+  }
+
+  showConfirmModal.value = false;
+  waitEdit.value = true;
+
+  const { error } = await useFetch(`/api/topic/hide/${topic._id}`, {
+    method: "POST",
+    body: {
+      hidden: hideState,
+    },
+  });
+
+  const textState = hideState ? "hide" : "show";
+
+  if (error.value) {
+    useShowToast({
+      title: i18n.t(`app.topic.${textState}.title`),
+      content: i18n.t(`app.topic.${textState}.failed`),
+      autoCloseDelay: 5000,
+    });
+  } else {
+    useShowToast({
+      title: i18n.t(`app.topic.${textState}.title`),
+      content: i18n.t(`app.topic.${textState}.success`),
+      autoCloseDelay: 5000,
+    });
+
+    // apply here
+    const target = loadedTopics.value.find((ele) => ele._id === topic._id);
+    if (target) {
+      target.hidden = hideState;
+    }
+  }
+
+  waitEdit.value = false;
+  showConfirmModal.value = false;
 }
 
 async function fetchTopics(filter: TopicFilterParams) {

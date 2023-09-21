@@ -14,6 +14,9 @@
         <template v-if="txData.txStatus === 'valid'">
           {{ $t("app.admin.blockchain.blockInfo.mined") }}
         </template>
+        <template v-else-if="txData.txStatus === 'norecord'">
+          {{ $t("app.admin.blockchain.blockInfo.norecord") }}
+        </template>
         <template v-else-if="txData.txStatus === 'invalid'">
           {{ $t("app.admin.blockchain.blockInfo.invalid") }}
         </template>

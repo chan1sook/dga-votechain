@@ -43,6 +43,11 @@
             {{ $t("app.admin.blockchain.serverStatus.offline") }}:
             {{ stats.servers.length - countServerOnlines(stats.servers) }}
           </div>
+          <div class="col-span-6 mb-2 flex items-center justify-center">
+            <DgaButton color="dga-orange" href="/admin/sv-manage">
+              {{ $t("app.admin.blockchain.manageServer.title") }}
+            </DgaButton>
+          </div>
         </div>
 
         <h4 class="border-t-2 border-dga-blue p-2 text-lg font-bold">
@@ -120,11 +125,12 @@ useHead({
   )}`,
 });
 
+const todayTime = ref(Date.now());
 const blockchainStats: Ref<BlockchainStatsResponseData | undefined> =
   ref(undefined);
 const txData: Ref<TxResponseData[]> = ref([]);
 const searchKeyword = ref("");
-const { data: stats } = await useFetch("/api/txinfo");
+const { data: stats } = await useFetch("/api/blockchain/info");
 const { data: tx } = await useFetch("/api/txchain");
 
 if (stats.value && tx.value) {
@@ -143,7 +149,7 @@ function countServerOnlines(servers: BlockchainServerDataResponse[]) {
     useRuntimeConfig().public.BLOCKCHAIN_SERVERHB_TIME_THERSOLD;
   return servers.reduce((prev, current) => {
     if (current.lastActiveAt) {
-      const diff = dayjs(useComputedServerTime()).diff(current.lastActiveAt);
+      const diff = dayjs(todayTime.value).diff(current.lastActiveAt);
       if (diff <= onlineThershold) {
         return prev + 1;
       }
@@ -151,6 +157,10 @@ function countServerOnlines(servers: BlockchainServerDataResponse[]) {
     }
     return prev;
   }, 0);
+}
+
+function updateTime() {
+  todayTime.value = useComputedServerTime().getTime();
 }
 
 const socket = useSocketIO();
@@ -176,5 +186,15 @@ socket.on("blockchainHb", (data: BlockchainServerDataResponse) => {
       blockchainStats.value.servers[targetIndex] = data;
     }
   }
+});
+
+let timeId: NodeJS.Timer | undefined;
+onMounted(() => {
+  timeId = setInterval(updateTime, 500);
+  updateTime();
+});
+
+onUnmounted(() => {
+  clearInterval(timeId);
 });
 </script>

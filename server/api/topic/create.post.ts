@@ -73,6 +73,7 @@ export default defineEventHandler(async (event) => {
     recoredToBlockchain: topicFormData.recoredToBlockchain,
     notifyVoter: topicFormData.notifyVoter,
     defaultVotes: topicFormData.defaultVotes,
+    hidden: false,
   });
 
   const voterAllows: VoterAllowModelData[] = topicFormData.voterAllows.map(

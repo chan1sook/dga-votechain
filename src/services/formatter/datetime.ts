@@ -5,7 +5,7 @@ export function formatDateTime(datetime: Date | DateString) {
 }
 
 export function perttyDuration(duration: number) {
-  const secs = duration / 1000;
+  const secs = (duration >= 0 ? duration : 0) / 1000;
   const mins = secs / 60;
   const hours = mins / 60;
   const days = hours / 60;

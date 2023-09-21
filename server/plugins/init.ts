@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 import io from "~/server/socketio";
 import smartContract from "../smart-contract";
-import { initConfigs, setPredefinedBlockchainServers } from "../migrations";
+import {
+  initConfigs,
+  migrateDuplicateUsers,
+  setPredefinedBlockchainServers,
+} from "../migrations";
 import initBlockchainHbWorkers from "../../src/worker/blockchain-hb";
 import initNotificationWorkers from "../../src/worker/notification";
 import initUserWorkers from "~/src/worker/users";
@@ -25,6 +29,7 @@ export default defineNitroPlugin(async (nitroApp) => {
 
   await initConfigs();
   await setPredefinedBlockchainServers();
+  await migrateDuplicateUsers();
 
   initBlockchainHbWorkers();
   console.log("[BlockchainServerHB Workers] Started!");

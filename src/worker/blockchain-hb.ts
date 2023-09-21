@@ -33,6 +33,9 @@ async function checkBlockchainHBs() {
           )
           .then((res) => {
             doc.lastActiveAt = new Date();
+
+            blockchainHbEventEmitter.emit("blockchainHb", doc);
+
             return doc.save();
           })
           .then((res) => {
@@ -44,12 +47,14 @@ async function checkBlockchainHBs() {
       );
     }
 
-    return Promise.all(promises).then(() => {
-      resolve(updated);
-    });
+    return Promise.all(promises)
+      .catch(() => {})
+      .then(() => updated);
   });
 
   console.log(`[Blockchain HB Workers] Updated ${updated} Server(s)`);
+
+  return { docs: allServerDocs };
 }
 
 function worker() {

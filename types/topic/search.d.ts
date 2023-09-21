@@ -14,5 +14,5 @@ type TopicFilterParams = (
       keyword: string;
     }
 ) & {
-  topicType: "all" | TopicType;
+  topicType: "all" | "invited" | TopicType;
 } & PaginationParams;

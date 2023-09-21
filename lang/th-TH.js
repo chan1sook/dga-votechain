@@ -136,7 +136,7 @@ export default {
         },
       },
       coadminList: {
-        title: "รายชื่อแอดมินร่วม",
+        title: "รายชื่อผู้ควบคุมร่วม",
       },
       csvSearch: "เพิ่มจาก CSV",
       csvTemplate: "แบบฟอร์ม CSV",
@@ -149,11 +149,24 @@ export default {
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
       allow: "อนุญาต",
       deny: "ปฏิเสธ",
+      hide: {
+        title: "ซ่อนโหวต",
+        confirm: "ยืนยันการซ่อนโหวต",
+        success: "ซ่อนโหวตสำเร็จ",
+        failed: "ซ่อนโหวตล้มเหลว",
+      },
+      show: {
+        title: "แสดงโหวต",
+        confirm: "ยืนยันการแสดงโหวต",
+        success: "แสดงโหวตสำเร็จ",
+        failed: "แสดงโหวตล้มเหลว",
+      },
     },
     voting: {
       title: "ร่วมโหวต",
       filters: {
         all: "ทั้งหมด",
+        invited: "โหวตที่ถูกเชิญ",
         date: "จากวันที่",
         ticketId: "จาก Ticket Vote",
         topicName: "จากชื่อคำถาม",
@@ -173,6 +186,8 @@ export default {
       avaliableTopic: "โหวตที่เปิดอยู่",
       editTopic: "แก้ไข",
       recreateTopic: "สร้างใหม่",
+      hideTopic: "ซ่อน",
+      showTopic: "เลิกซ่อน",
       status: {
         waiting: "รอเปิดโหวต",
         result: "ผลโหวต",
@@ -236,7 +251,7 @@ export default {
       totalVotes: "จำนวนเสียง",
       add: "เพิ่มชื่อ",
       remove: "ลบชื่อ",
-      searchUser: "ค้นหาผุ้ใช้",
+      searchUser: "ค้นหาผู้ใช้",
       addUser: "เพิ่มผู้เข้าโหวต",
       error: {
         duplicated: "ผู้ใช้ซ้ำ",
@@ -285,7 +300,7 @@ export default {
     permissions: {
       "request-permissions": "ขอสิทธิ์เพิ่มเติม",
       "voter-mode": "เข้าโหมดผู้โหวต",
-      "admin-mode": "เข้าโหมดผู้ดูแล",
+      "admin-mode": "เข้าโหมดผู้สร้างโหวต",
       "dev-mode": "เข้าโหมดผู้พัฒนา",
       "vote-topic": "โหวตคำถาม",
       "create-topic": "สร้างการโหวต",
@@ -301,7 +316,7 @@ export default {
         noteToApprover: "หมายเหตุ",
         requestTo: {
           title: "ขอสิทธิ์",
-          moderator: "ผู้ดูแลระบบ",
+          moderator: "ผู้สร้างโหวต",
           developer: "นักพัฒนาระบบ",
         },
         allowConsent: "อนุมัติส่งข้อมูลส่วนตัวให้ผู้อนุมัติ",
@@ -340,6 +355,7 @@ export default {
           total: "ทั้งหมด",
           mined: "ยืนยันแล้ว",
           pending: "รอดำเนินการ",
+          norecord: "ไม่ถูกบันทึก",
           invalid: "ไม่ถูกต้อง",
         },
         serverStatus: {
@@ -347,6 +363,26 @@ export default {
           total: "ทั้งหมด",
           online: "ออนไลน์",
           offline: "ออฟไลน์",
+        },
+        manageServer: {
+          title: "จัดการ Server",
+          serverList: "รายชื่อ Server",
+          lastActiveAt: "อัพเดทล่าสุดเมื่อ",
+          addServer: "เพิ่ม Server",
+          name: "ชื่อ Server",
+          host: "ที่อยู่ IP Address",
+          add: {
+            action: "เพิ่ม",
+            confirm: "ยืนยันการเพิ่ม Blockchain Server ตัวนี้หรือไม่?",
+            success: "เพิ่ม Server สำเร็จ",
+            failed: "เพิ่ม Server ไม่สำเร็จ",
+          },
+          remove: {
+            action: "ลบ",
+            confirm: "ยืนยันการลบ Blockchain Server ตัวนี้หรือไม่?",
+            success: "ลบ Server สำเร็จ",
+            failed: "ลบ Server ไม่สำเร็จ",
+          },
         },
         searchTx: "ค้นหา",
         txhash: "TX Hash",
@@ -391,6 +427,7 @@ export default {
     },
     timePeriod: {
       nearZeroMinute: "ไม่ถึงนาที",
+      sec: "วินาที",
       minute: "นาที",
       hour: "ชั่วโมง",
       day: "วัน",
@@ -405,7 +442,7 @@ export default {
     role: {
       guest: "นิรนาม",
       voter: "ผู้โหวต",
-      admin: "ผู้ดูแล",
+      admin: "ผู้สร้างโหวต",
       developer: "ผู้พัฒนา",
     },
     required: "จำเป็น",

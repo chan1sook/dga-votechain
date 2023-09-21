@@ -124,8 +124,9 @@ const schema = new Schema<TopicModelData>(
       type: Boolean,
       default: true,
     },
-    publicVote: {
+    hidden: {
       type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

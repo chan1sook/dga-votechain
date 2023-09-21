@@ -1,5 +1,5 @@
 genesis-file="/ibft-network/genesis.json"
-node-private-key-file="/ibft-network/keys/key"
+# node-private-key-file="/ibft-network/"
 host-allowlist=["*"]
 min-gas-price=0
 

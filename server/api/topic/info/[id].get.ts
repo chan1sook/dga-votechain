@@ -132,6 +132,7 @@ export default defineEventHandler(async (event) => {
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     defaultVotes: topicDoc.defaultVotes,
     notifyVoter: topicDoc.notifyVoter,
+    hidden: topicDoc.hidden,
   };
 
   const quota = voterAllow ? voterAllow.totalVotes : topicDoc.defaultVotes;

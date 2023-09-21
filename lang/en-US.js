@@ -136,7 +136,7 @@ export default {
         },
       },
       coadminList: {
-        title: "Co-Admin Lists",
+        title: "Co-Creator Lists",
       },
       csvSearch: "Import CSV",
       csvTemplate: "CSV Form",
@@ -149,11 +149,24 @@ export default {
       scorePublic: "Display voter choice(s) for public",
       allow: "Allow",
       deny: "Deny",
+      hide: {
+        title: "Hide Topic",
+        confirm: "Confirm to hide topic?",
+        success: "Hide topic successful",
+        failed: "Hide topic failed",
+      },
+      show: {
+        title: "Show Topic",
+        confirm: "Confirm to show topic?",
+        success: "Show topic successful",
+        failed: "Show topic failed",
+      },
     },
     voting: {
       title: "Voting",
       filters: {
         all: "All",
+        invited: "Invited",
         date: "From Date",
         ticketId: "From Ticket Vote",
         topicName: "From Topic Question",
@@ -173,6 +186,8 @@ export default {
       avaliableTopic: "All Avaliable",
       editTopic: "Edit",
       recreateTopic: "Recreate",
+      hideTopic: "Hide",
+      showTopic: "Show",
       status: {
         waiting: "Waiting",
         result: "Result",
@@ -255,6 +270,7 @@ export default {
           total: "Total",
           mined: "Confirmed",
           pending: "Pending",
+          norecord: "No Record",
           invalid: "Invalid",
         },
         serverStatus: {
@@ -262,6 +278,26 @@ export default {
           total: "Total",
           online: "Online",
           offline: "Offline",
+        },
+        manageServer: {
+          title: "Manage Servers",
+          serverList: "Server List",
+          lastActiveAt: "Last active at",
+          addServer: "Add Server",
+          name: "Server Name",
+          host: "IP Address",
+          add: {
+            action: "Add",
+            confirm: "Confirm to add blockchain server?",
+            success: "Add Server Successful",
+            failed: "Add Server Failed",
+          },
+          remove: {
+            action: "Remove",
+            confirm: "Confirm to remove blockchain server?",
+            success: "Remove Server Successful",
+            failed: "Remove Server Failed",
+          },
         },
         searchTx: "Search TX",
         txhash: "TX Hash",
@@ -338,7 +374,7 @@ export default {
     permissions: {
       "request-permissions": "Request More Permissions",
       "voter-mode": "Access Voter Mode",
-      "admin-mode": "Access Admin Mode",
+      "admin-mode": "Access Creator Mode",
       "dev-mode": "Access Developer Mode",
       "vote-topic": "Vote Topics",
       "create-topic": "Create New Topics",
@@ -390,6 +426,7 @@ export default {
     },
     timePeriod: {
       nearZeroMinute: "Less than a minute",
+      sec: "Secs",
       minute: "Mins",
       hour: "Hours",
       day: "Days",
@@ -404,7 +441,7 @@ export default {
     role: {
       guest: "Anonymous",
       voter: "Voter",
-      admin: "Admin",
+      admin: "Creator",
       developer: "Developer",
     },
     required: "Required",

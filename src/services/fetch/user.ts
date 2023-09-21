@@ -50,6 +50,20 @@ export async function getActiveUserByCitizenID(citizenId: string) {
   return user;
 }
 
+export async function getActiveUserByNameOld(
+  firstName: string,
+  lastName: string
+) {
+  const user = await UserModel.findOne({
+    firstName: firstName,
+    lastName: lastName,
+    cidHashed: { $exists: false },
+    removeAt: { $exists: false },
+  });
+
+  return user;
+}
+
 async function getCitizenIDSearchQuery(params: UserSearchParams) {
   // Since use fixed salt => hashed value alway same => fast search by hash again
   const cidHashed = await bcrypt.hash(

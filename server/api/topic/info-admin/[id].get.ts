@@ -66,6 +66,7 @@ export default defineEventHandler(async (event) => {
     showCreator: topicDoc.showCreator,
     recoredToBlockchain: topicDoc.recoredToBlockchain,
     notifyVoter: topicDoc.notifyVoter,
+    hidden: topicDoc.hidden,
   };
 
   const [voterAllowDocs, coadminDocs, pauseDataDocs, anonVotes] =

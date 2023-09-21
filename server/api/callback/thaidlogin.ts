@@ -9,6 +9,7 @@ import { USER_SESSION_KEY } from "~/server/session-handler";
 import {
   getActiveUserByAuthSource,
   getActiveUserByCitizenID,
+  getActiveUserByNameOld,
 } from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
@@ -48,6 +49,11 @@ export default defineEventHandler(async (event) => {
 
     if (!userDoc) {
       userDoc = await getActiveUserByCitizenID(data.pid);
+    }
+
+    // Temp fixed
+    if (!userDoc) {
+      userDoc = await getActiveUserByNameOld(data.th_fname, data.th_lname);
     }
 
     if (!userDoc) {

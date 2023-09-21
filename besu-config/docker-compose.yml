@@ -19,5 +19,5 @@ services:
       - -c
       - |
         /opt/besu/bin/besu \
-        --config-file=/ibft-network/nodes/keys/config.toml \
+        --config-file=/ibft-network/config.toml \
         --p2p-host="34.133.32.70";

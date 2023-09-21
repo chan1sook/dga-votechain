@@ -31,7 +31,11 @@ export default async () => {
         choice: tx.choice === "" ? null : tx.choice,
         createdAt: dayjs(tx.createdAt).toString(),
         txhash: tx.tx,
-        txStatus: Boolean(tx.tx) ? "valid" : "invalid",
+        txStatus: tx.txOptional
+          ? "norecord"
+          : Boolean(tx.tx)
+          ? "valid"
+          : "invalid",
       };
     });
     io.emit("tx", txChain);
@@ -43,6 +47,7 @@ export default async () => {
       io.emit("blockchainHb", {
         _id: `${svData._id}`,
         host: svData.host,
+        name: svData.name,
         createdAt: dayjs(svData.createdAt).toString(),
         updatedAt: dayjs(svData.updatedAt).toString(),
         lastActiveAt: svData.lastActiveAt

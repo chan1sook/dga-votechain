@@ -40,6 +40,7 @@ export default defineEventHandler(async (event) => {
     const valid =
       blockchainData.voteId === event.context.params?.id &&
       ObjectId.isValid(blockchainData.voteId);
+
     txData = {
       voteId: blockchainData.voteId,
       topicId: blockchainData.topicId,
@@ -50,7 +51,7 @@ export default defineEventHandler(async (event) => {
         ? new Types.ObjectId(blockchainData.voteId).getTimestamp().toString()
         : undefined,
       txhash: voteDoc.tx,
-      txStatus: valid ? "valid" : "invalid",
+      txStatus: voteDoc.txOptional ? "norecord" : valid ? "valid" : "invalid",
       txData: transactionInfo,
     };
   } catch (_err) {

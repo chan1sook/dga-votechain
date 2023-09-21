@@ -14,6 +14,7 @@ import { USER_SESSION_KEY } from "~/server/session-handler";
 import {
   getActiveUserByAuthSource,
   getActiveUserByCitizenID,
+  getActiveUserByNameOld,
 } from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
 
@@ -47,6 +48,14 @@ export default defineEventHandler(async (event) => {
 
     if (!userDoc) {
       userDoc = await getActiveUserByCitizenID(digitalIdUserInfo.citizen_id);
+    }
+
+    // Temp fixed
+    if (!userDoc) {
+      userDoc = await getActiveUserByNameOld(
+        digitalIdUserInfo.given_name,
+        digitalIdUserInfo.family_name
+      );
     }
 
     if (!userDoc) {

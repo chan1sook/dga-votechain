@@ -29,8 +29,7 @@ declare global {
     updatedAt: Date;
     notifyVoter: boolean;
     notifyFinished?: boolean;
-
-    publicVote?: boolean;
+    hidden?: boolean;
   }
 
   interface ChoicesInfo {
