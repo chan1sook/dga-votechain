@@ -105,6 +105,7 @@ export default defineEventHandler(async (event) => {
       choice: choice,
       createdAt: today,
       updatedAt: today,
+      txOptional: topicDoc.recoredToBlockchain ? undefined : true,
       tx: null,
     };
   });

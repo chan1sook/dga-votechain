@@ -192,7 +192,7 @@ async function addBlockchainServer() {
   showConfirmModal.value = false;
   waitEdit.value = true;
 
-  const { error } = await useFetch("/api/blockchain/register", {
+  const { data, error } = await useFetch("/api/blockchain/register", {
     method: "POST",
     body: newServer.value,
   });
@@ -210,7 +210,9 @@ async function addBlockchainServer() {
       autoCloseDelay: 5000,
     });
 
-    reloadNuxtApp();
+    if (data.value) {
+      blockchainServers.value.push(data.value.server);
+    }
 
     newServer.value = {
       name: "",
@@ -263,7 +265,12 @@ async function removeBlockchainServer() {
       autoCloseDelay: 5000,
     });
 
-    reloadNuxtApp();
+    const i = blockchainServers.value.findIndex(
+      (ele) => ele._id === removeServerId.value
+    );
+    if (i !== -1) {
+      blockchainServers.value.splice(i, 1);
+    }
   }
 
   waitEdit.value = false;

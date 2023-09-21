@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 
 import {
   getLastestAdminTopics,
+  getLastestDevTopics,
   getLastestGuestTopics,
   getLastestVoterTopicsWithIds,
 } from "~/src/services/fetch/topics";
@@ -10,7 +11,7 @@ import { getTopicCtrlPauseListByTopicIds } from "~/src/services/fetch/topic-ctrl
 import { isBannedUser } from "~/src/services/validations/user";
 import { getVotesByTopicIdsAndUserId } from "~/src/services/fetch/vote";
 import { isCanVote } from "~/src/services/validations/topic";
-import { isUserAdmin } from "~/src/services/validations/role";
+import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
 
 export default defineEventHandler(async (event) => {
   const { filter, roleMode } = getQuery(event);
@@ -43,6 +44,8 @@ export default defineEventHandler(async (event) => {
       userData._id,
       filterParams
     ).populate("createdBy");
+  } else if (roleMode === "developer" && isUserDeveloper(userData)) {
+    topicsData = await getLastestDevTopics(filterParams).populate("createdBy");
   } else {
     filterIds = topicVoterAllowsDocs
       .map((ele) => ele.topicid)
@@ -129,6 +132,7 @@ export default defineEventHandler(async (event) => {
       }),
       notifyVoter: topicData.notifyVoter,
       defaultVotes: topicData.defaultVotes,
+      hidden: topicData.hidden,
     };
   });
 

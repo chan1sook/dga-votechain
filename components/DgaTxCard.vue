@@ -15,6 +15,12 @@
         >
           {{ $t("app.admin.blockchain.blockInfo.invalid") }}
         </button>
+        <button
+          v-else-if="props.status === 'norecord'"
+          class="norecord cursor-default"
+        >
+          {{ $t("app.admin.blockchain.blockInfo.norecord") }}
+        </button>
         <button v-else class="pending cursor-default">
           {{ $t("app.admin.blockchain.blockInfo.pending") }}
         </button>
@@ -98,6 +104,9 @@ const emit = defineEmits<{
   @apply bg-red-800;
 }
 .dga-tx-card > .inner > .status > .pending {
+  @apply bg-gray-400;
+}
+.dga-tx-card > .inner > .status > .norecord {
   @apply bg-gray-400;
 }
 </style>

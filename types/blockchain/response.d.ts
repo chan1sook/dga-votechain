@@ -1,4 +1,4 @@
-type TxStatus = "valid" | "invalid" | "pending";
+type TxStatus = "valid" | "invalid" | "pending" | "norecord";
 
 interface VoteDataBlockchainResponseData {
   voteId: string;

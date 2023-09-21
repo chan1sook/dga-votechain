@@ -30,6 +30,7 @@
           {{ $t("app.voting.editTopic") }}
         </button>
         <button
+          v-if="!props.isDev"
           :class="[props.status]"
           class="flex flex-row items-center justify-center gap-1"
           :title="actualStatusStr"
@@ -47,6 +48,26 @@
           <span>{{ $t("app.voting.recreateTopic") }}</span>
           <RefreshIcon />
         </button>
+        <template v-if="props.isDev">
+          <button
+            v-if="props.topic.hidden"
+            :title="$t('app.topic.show.title')"
+            class="show flex flex-row items-center justify-center gap-1"
+            @click="emit('show')"
+          >
+            <span>{{ $t("app.topic.show.title") }}</span>
+            <EyeIcon />
+          </button>
+          <button
+            v-else
+            :title="$t('app.topic.hide.title')"
+            class="hide flex flex-row items-center justify-center gap-1"
+            @click="emit('hide')"
+          >
+            <span>{{ $t("app.topic.hide.title") }}</span>
+            <EyeRemoveIcon />
+          </button>
+        </template>
       </div>
 
       <div v-if="status === 'result'" class="duration expired">
@@ -62,6 +83,8 @@
 <script setup lang="ts">
 import QrcodeIcon from "vue-material-design-icons/Qrcode.vue";
 import MagnifyIcon from "vue-material-design-icons/Magnify.vue";
+import EyeIcon from "vue-material-design-icons/Eye.vue";
+import EyeRemoveIcon from "vue-material-design-icons/EyeRemove.vue";
 import RefreshIcon from "vue-material-design-icons/Refresh.vue";
 import { formatCreatedByName } from "~/src/services/formatter/user";
 import dayjs from "dayjs";
@@ -73,6 +96,7 @@ const props = withDefaults(
     topic: TopicResponseData;
     editable?: boolean;
     isAdmin?: boolean;
+    isDev?: boolean;
     withQrcode?: boolean;
     status?: TopicCardStatus;
   }>(),
@@ -84,6 +108,9 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: "edit"): void;
   (e: "recreate"): void;
+  (e: "hide"): void;
+  (e: "show"): void;
+  (e: "remove"): void;
   (e: "qr"): void;
   (e: "action", v: TopicCardStatus): void;
   (e: "approve", v: boolean): void;

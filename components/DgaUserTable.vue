@@ -6,7 +6,6 @@
         :class="[props.multipleVotes && !props.coadmin ? 'multichoice' : '']"
       >
         <div class="font-bold"></div>
-        <div class="font-bold">{{ $t("app.userid") }}</div>
         <div class="font-bold">{{ $t("app.userName") }}</div>
         <div class="font-bold">{{ $t("app.email") }}</div>
         <div v-if="props.multipleVotes && !props.coadmin" class="font-bold">
@@ -22,7 +21,6 @@
               :title="getErrorReason(user)"
             />
           </div>
-          <div>{{ user.userid }}</div>
           <div>{{ user.firstName ? getFullName(user) : "-" }}</div>
           <div>{{ user.email || "-" }}</div>
           <div v-if="props.multipleVotes && !props.coadmin">
@@ -158,9 +156,9 @@ async function uploadUsersSearchCsv(ev: Event) {
 <style scoped>
 .user-grid {
   @apply grid w-full items-center gap-x-4 gap-y-2 whitespace-nowrap pb-2;
-  grid-template-columns: 36px 2fr 4fr 3fr 36px;
+  grid-template-columns: 36px 4fr 3fr 36px;
 }
 .user-grid.multichoice {
-  grid-template-columns: 36px 2fr 4fr 3fr 2fr 36px;
+  grid-template-columns: 36px 4fr 3fr 2fr 36px;
 }
 </style>

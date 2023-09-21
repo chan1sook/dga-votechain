@@ -9,6 +9,7 @@ declare global {
     groupid: string;
     choice: ChoiceDataType;
     createdAt: Date;
+    txOptional?: boolean;
     tx: string | null;
   }
 

@@ -18,6 +18,10 @@ const schema = new Schema<VoteModelData>(
     choice: {
       type: String,
     },
+    txOptional: {
+      type: Boolean,
+      default: false,
+    },
     tx: {
       type: String,
     },
