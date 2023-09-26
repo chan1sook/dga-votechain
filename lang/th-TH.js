@@ -2,6 +2,9 @@ export default {
   appName: "DGA E-Voting",
   app: {
     loading: "รอสักครู่",
+    share: "แชร์",
+    shareTopic: "แชร์กระทู้โหวต",
+    linkCopied: "คัดลอกลิงก์แล้ว",
     offlineMode: "ปิดปรับปรุงระบบชั่วคราว ตั้งแต่",
     navbar: {
       adminShowUsers: "รายชื่อผู้ใช้",
@@ -291,6 +294,7 @@ export default {
       show: "แสดงรายละเอียด",
     },
     topicType: {
+      title: "ประเภท",
       public: "โหวตสาธารณะ",
       private: "โหวตทางลับ",
       internal: "โหวตในองค์กร",

@@ -127,8 +127,11 @@
       close-only
       @close="showImageModal = false"
     >
-      <img :src="qrCodeSrc" class="max-h-[77.5vh] object-contain" />
-      <div class="break-all">{{ currentLink }}</div>
+      <img :src="qrCodeSrc" class="h-[65vh] object-contain" />
+      <DgaButton color="green" @click="shareLink">
+        <template v-if="linkCopied">{{ $t("app.linkCopied") }}</template>
+        <template v-else>{{ $t("app.share") }}</template>
+      </DgaButton>
     </DgaModal>
     <DgaModal
       :show="showConfirmModal === 'hideTopic'"
@@ -166,6 +169,10 @@ import {
 } from "~/src/services/validations/topic";
 import { GRAY_BASE64_IMAGE } from "~/src/services/formatter/image";
 import { topicTypes } from "~/src/services/form/topic";
+import {
+  formatDateTime,
+  perttyDuration,
+} from "~/src/services/formatter/datetime";
 
 const localePathOf = useLocalePath();
 const i18n = useI18n();
@@ -262,6 +269,9 @@ const hasMoreTopics = ref(false);
 const isLoadMoreTopics = ref(false);
 const showImageModal = ref(false);
 const currentLink = ref("");
+const canShare = computed(() => !!navigator.share);
+const linkCopied = ref(false);
+let linkCopyId: NodeJS.Timer | undefined;
 const qrCodeSrc = ref(GRAY_BASE64_IMAGE);
 const showConfirmModal: Ref<string | false> = ref(false);
 const selectedTopic: Ref<TopicResponseData | undefined> = ref(undefined);
@@ -350,8 +360,64 @@ function handleStatusAction(
 async function showQr(topic: TopicResponseData) {
   const host = window.location;
   currentLink.value = host.protocol + "//" + host.host + "/vote/" + topic._id;
+  selectedTopic.value = topic;
   qrCodeSrc.value = await QRCode.toDataURL(currentLink.value);
   showImageModal.value = true;
+}
+
+async function shareLink() {
+  if (!selectedTopic.value) {
+    return;
+  }
+
+  try {
+    if (!canShare.value) {
+      console.warn("Can't use navigator.share fallback to clipboard");
+      // use copy clipbard instend
+      await navigator.clipboard.writeText(currentLink.value);
+
+      clearTimeout(linkCopyId);
+      linkCopied.value = true;
+      linkCopyId = setTimeout(() => {
+        linkCopied.value = false;
+      }, 3000);
+      return;
+    }
+
+    const titleHeader = i18n.t("appName", "DGA E-Voting");
+    const titleTopicName = selectedTopic.value.name || i18n.t("app.shareTopic");
+    const titleStr = i18n.t("app.topic.topicQuestion");
+    const title = `${titleHeader}: ${titleTopicName}`;
+
+    const topicTypeHeader = i18n.t(`app.topicType.title`, "Type");
+    const topicType = i18n.t(
+      `app.topicType.${selectedTopic.value.type}`,
+      selectedTopic.value.type
+    );
+    const startTime = dayjs(selectedTopic.value.voteStartAt);
+    const endTime = dayjs(selectedTopic.value.voteExpiredAt);
+    const startTimeStr = formatDateTime(startTime.toDate());
+    const startHeader = i18n.t("app.topic.voteDuration.start", "Start Vote");
+    const duration = perttyDuration(endTime.diff(startTime));
+    const durationHeader = i18n.t(
+      "app.topic.voteDuration.title",
+      "Vote Duration"
+    );
+    const content =
+      `${titleStr}:${titleTopicName}\n` +
+      `${topicTypeHeader}:${topicType}\n` +
+      `${startHeader}:${startTimeStr}\n` +
+      `${durationHeader}:${duration}`;
+    // console.log(content);
+
+    await navigator.share({
+      url: currentLink.value,
+      title: title,
+      text: content,
+    });
+  } catch (err) {
+    console.error("Sharing Failed");
+  }
 }
 
 function popupHideTopic(topic: TopicResponseData) {
