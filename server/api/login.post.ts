@@ -11,7 +11,6 @@ export default defineEventHandler(async (event) => {
   const voteCallbackId = param.voteCallbackId?.toString();
   const EXTRA_DATA: LoginExtraParams = {
     voteCallbackId: voteCallbackId,
-    extra: true,
   };
 
   if (param.source === "digitalId") {
