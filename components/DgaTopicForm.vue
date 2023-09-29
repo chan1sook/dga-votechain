@@ -26,6 +26,13 @@
       >
         <DgaCheckbox v-model="topicData.anonymousVotes"></DgaCheckbox>
         <label class="flex-none">{{ $t("app.topic.anonymousVotes") }}</label>
+        <button
+          type="button"
+          @click="showInputHintModal = 'anonymousVotes'"
+          :title="$t('app.detail')"
+        >
+          <InformationIcon />
+        </button>
       </div>
       <template v-else-if="topicData.type === 'internal'">
         <div class="flex flex-row items-center gap-2">
@@ -330,14 +337,7 @@
       @close="showInputHintModal = false"
     >
       <template v-if="showInputHintModal === 'multipleVotes'">
-        <p>
-          <b>{{ $t("app.topic.multipleVotes") }}</b> คือ การลงสิทธิ์คะแนน
-          (Ballot) ได้หลายตัวเลือกตามสิทธิ์คะแนนจำกัดสูงสุดที่ได้รับสิทธิ์
-          ตัวอย่างเช่น ในกระทู้โหวต มีตัวเลือก A.) , B.) , C.) , D.)
-          ผู้โหวตมีสิทธิ์ลงคะแนนเสียง 2 สิทธิ์
-          ผู้โหวตจะสามารถเลือกลงคะแนนให้ตัวเลือก A.) , B.) อย่างละ 1 สิทธิ์
-          หรืออาจเลือกเป็นตัวเลือก D.) ทั้ง 2 คะแนนสิทธิ์ก็ได้
-        </p>
+        <p>การลงคะแนนใน 1 กระทู้ได้มากกว่า 1 ตัวเลือก</p>
       </template>
       <template v-else-if="showInputHintModal === 'distinctVotes'">
         <p>
@@ -354,9 +354,14 @@
       <template v-else-if="showInputHintModal === 'showCreator'">
         <p>
           <b>{{ $t("app.topic.showCreator") }}</b>
-          เนื่องจากกฎหมายคุ้มครองข้อมูลส่วนบุคคคล หากผู้ตั้งโหวต เลือก
-          “แสดงชื่อผู้ตั้งโหวตสู่สาธารณะ”
+          เนื่องจากกฎหมายคุ้มครองข้อมูลส่วนบุคคคล หากผู้สร้างโหวต เลือก
+          “แสดงรายชื่อผู้สร้างโหวตสู่สาธารณะ”
           ชื่อของท่านจะถูกแสดงสู่สาธารณะทั้งในระบบและตัวรายงาน
+        </p>
+      </template>
+      <template v-else-if="showInputHintModal === 'anonymousVotes'">
+        <p>
+          การลงคะแนนดิจิทัลที่ผู้ลงคะแนนทั้งภาครัฐและประชาชนทุกคนสามารถลงคะแนนทั้งนี้กระทู้โหวตและผลลัพธ์หลังจากปิดโหวตจะถูกแสดงต่อสาธารณะ
         </p>
       </template>
     </DgaModal>

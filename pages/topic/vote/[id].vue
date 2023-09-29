@@ -315,10 +315,21 @@ function getBtnThemeOfChoice(choice: { name: string }) {
   return voteCounts > 0 && !noVoteLocked.value ? "default" : "hollow2";
 }
 
-const { data } = await useFetch(`/api/topic/info/${topicid}`);
+const { data, error } = await useFetch(`/api/topic/info/${topicid}`);
 
-if (!data.value) {
-  showError(i18n.t("app.voting.cannotVote"));
+if (!data.value || error.value) {
+  console.log(error.value?.data);
+  switch(error.value?.data) {
+    case "Topic not found":
+      showError(i18n.t("app.voting.notExists"));
+      break;
+    case "Forbidden":
+      showError(i18n.t("app.voting.forbidden"));
+      break;
+    default:
+      showError(i18n.t("app.voting.cannotVote"));
+      break;
+  }
 } else {
   const {
     topic: _topic,
@@ -331,7 +342,7 @@ if (!data.value) {
 
   if (!canVote) {
     showError({
-      message: i18n.t("app.voting.cannotVote"),
+      message: i18n.t("app.voting.forbidden"),
       statusCode: 403,
     });
   } else if (!isTopicReadyToVote(_topic, useComputedServerTime().getTime())) {
@@ -342,6 +353,7 @@ if (!data.value) {
   } else if (
     isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())
   ) {
+    // showError(i18n.t("app.voting.voteFinished"));
     navigateTo(`/topic/result/${_topic._id}`);
   } else {
     topic.value = _topic;

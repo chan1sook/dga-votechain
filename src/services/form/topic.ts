@@ -6,7 +6,7 @@ export function getDefaultInternalTopicFilter(): InternalTopicVisiblityFilter {
   };
 }
 
-export const topicTypes: TopicType[] = ["public", "private", "internal"];
+export const topicTypes: TopicType[] = ["public", "private"];
 
 export function getDefaultChoices(): ChoicesInfo {
   return {

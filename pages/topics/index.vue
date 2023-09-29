@@ -191,9 +191,7 @@ const filter = ref({
   type: "all",
   month: dayjs(useComputedServerTime()).month(),
   year: dayjs(useComputedServerTime()).year(),
-  topicType: <"all" | "invited" | TopicType>(
-    (isVoterMode.value ? "invited" : "all")
-  ),
+  topicType: <"all" | "invited" | TopicType>"public",
   ticketId: "",
   keyword: "",
 });
@@ -208,24 +206,24 @@ const topicFilterOptions = computed(() =>
 );
 
 const topciTypeFilterOptions = computed(() => {
-  let options = ["all", ...topicTypes];
+  let options = [...topicTypes];
   if (isVoterMode.value) {
-    options = ["all", "invited", ...topicTypes];
+    options = [...topicTypes];
   }
 
   return options.map((value) => {
-    if (value === "all") {
-      return {
-        label: i18n.t(`app.voting.filters.all`),
-        value: value,
-      };
-    }
-    if (value === "invited") {
-      return {
-        label: i18n.t(`app.voting.filters.invited`),
-        value: value,
-      };
-    }
+    // if (value === "all") {
+    //   return {
+    //     label: i18n.t(`app.voting.filters.all`),
+    //     value: value,
+    //   };
+    // }
+    // if (value === "invited") {
+    //   return {
+    //     label: i18n.t(`app.voting.filters.invited`),
+    //     value: value,
+    //   };
+    // }
 
     return {
       label: i18n.t(`app.topicType.${value}`, value),

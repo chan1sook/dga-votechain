@@ -5,7 +5,6 @@ import TopicPauseData from "~/src/models/topic-ctrl-pause";
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 import { isBannedUser } from "~/src/services/validations/user";
 import {
-  isAnonymousTopic,
   isCanVote,
   isUserInMatchInternalTopic,
 } from "~/src/services/validations/topic";
