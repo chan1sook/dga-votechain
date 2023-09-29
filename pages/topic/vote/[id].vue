@@ -208,8 +208,8 @@
       :show="anonyomousPopup"
       :confirm-text="$t('app.login.title')"
       @confirm="toLoginPage"
-      @close="showConfirmModal = false"
-      @cancel="showConfirmModal = false"
+      @close="anonyomousPopup = false"
+      @cancel="anonyomousPopup = false"
     >
       {{ $t("app.voting.anonyomousLogin") }}
     </DgaModal>
@@ -262,6 +262,9 @@ const {
 
 const { id } = useRoute().params;
 const topicid = Array.isArray(id) ? id[id.length - 1] : id;
+
+const { anonLoginPopup } = useRoute().query;
+const requiredAnonLoginPopup = anonLoginPopup === "1";
 
 useHead({
   title: `${i18n.t("appName", "DGA E-Voting")} - ${i18n.t(
@@ -382,7 +385,11 @@ if (!data.value || error.value) {
 
     confirmVoting.value = true;
 
-    if (isAnonymousTopic(_topic) && useSessionData().value.roleMode === "guest") {
+    if (
+      isAnonymousTopic(_topic) &&
+      useSessionData().value.roleMode === "guest" &&
+      requiredAnonLoginPopup
+    ) {
       anonyomousPopup.value = true;
     }
   }

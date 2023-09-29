@@ -357,7 +357,13 @@ function handleStatusAction(
 
 async function showQr(topic: TopicResponseData) {
   const host = window.location;
-  currentLink.value = host.protocol + "//" + host.host + "/vote/" + topic._id;
+  currentLink.value =
+    host.protocol +
+    "//" +
+    host.host +
+    "/vote/" +
+    topic._id +
+    "?anonLoginPopup=1";
   selectedTopic.value = topic;
   qrCodeSrc.value = await QRCode.toDataURL(currentLink.value);
   showImageModal.value = true;
