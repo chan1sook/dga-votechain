@@ -17,9 +17,11 @@ import {
   getActiveUserByNameOld,
 } from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
+import { getAfterRedirectUrlbyParam } from "~/src/services/transform/url";
 
 export default defineEventHandler(async (event) => {
-  const { code } = getQuery(event);
+  const { code, state } = getQuery(event);
+  const EXTRA_DATA: LoginExtraParams = JSON.parse(state?.toString() || "{}");
   const {
     DID_CLIENT_KEY,
     DID_LOGIN_CALLBACK,
@@ -28,12 +30,15 @@ export default defineEventHandler(async (event) => {
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
 
+  console.log("EXTRA_DATA", EXTRA_DATA);
+
   if (typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, {
       DID_API_URL,
       DID_CLIENT_KEY,
       DID_LOGIN_CALLBACK,
       DID_VERIFY_CODE: DID_VERIFY_CODE,
+      EXTRA_DATA,
     });
 
     const digitalIdUserInfo = await getUserInfoDigitalID(access_token, {
@@ -115,7 +120,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return sendRedirect(event, "/topics");
+    return sendRedirect(event, getAfterRedirectUrlbyParam(EXTRA_DATA));
   }
 
   return sendRedirect(event, "/login");

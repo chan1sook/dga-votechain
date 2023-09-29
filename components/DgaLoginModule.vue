@@ -6,6 +6,7 @@
     <DgaButtonGroup larger class="mt-6">
       <form action="/api/login" method="POST" class="w-full">
         <input type="hidden" name="source" value="digitalId" />
+        <input v-if="voteCallbackId" type="hidden" name="voteCallbackId" />
         <DgaButton
           type="submit"
           class="flex w-full flex-row items-center justify-center gap-x-2 truncate"
@@ -39,6 +40,7 @@
       <form action="/api/login" method="POST" class="w-full">
         <input type="hidden" name="source" value="digitalId" />
         <input type="hidden" name="register" value="1" />
+        <input v-if="voteCallbackId" type="hidden" name="voteCallbackId" />
         <DgaButton
           type="submit"
           theme="hollow"
@@ -58,4 +60,8 @@
 <script setup lang="ts">
 import FingerprintIcon from "vue-material-design-icons/Fingerprint.vue";
 import AccountPlusOutlineIcon from "vue-material-design-icons/AccountPlusOutline.vue";
+
+const props = defineProps<{
+  voteCallbackId?: string;
+}>();
 </script>

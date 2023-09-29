@@ -233,6 +233,7 @@ export default {
       confirm: "Confirm voting choices?",
       pauseCause: "Reason",
       pauseCauseTitle: "Enter Reason of Pause",
+      anonyomousLogin: "Please Login for Voting Topic",
     },
     result: {
       title: "Voting Result",

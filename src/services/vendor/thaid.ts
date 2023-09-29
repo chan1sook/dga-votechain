@@ -6,12 +6,14 @@ export const THAID_STATE = crypto.randomBytes(24).toString("hex");
 export function generatThaIDLoginUrl({
   THAID_CLIENT_ID,
   THAID_LOGIN_CALLBACK,
+  EXTRA_DATA,
 }: ThaIDAuthorizationCodeParam) {
   const urlParams = new URLSearchParams();
   urlParams.set("response_type", "code");
   urlParams.set("state", THAID_STATE);
   urlParams.set("client_id", THAID_CLIENT_ID);
   urlParams.set("redirect_uri", THAID_LOGIN_CALLBACK);
+  urlParams.set("state", JSON.stringify(EXTRA_DATA));
 
   const scopes: ThaIDScope[] = ["pid", "th_fname", "th_lname", "th_mname"];
 

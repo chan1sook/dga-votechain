@@ -205,6 +205,15 @@
       </div>
     </template>
     <DgaModal
+      :show="anonyomousPopup"
+      :confirm-text="$t('app.login.title')"
+      @confirm="toLoginPage"
+      @close="showConfirmModal = false"
+      @cancel="showConfirmModal = false"
+    >
+      {{ $t("app.voting.anonyomousLogin") }}
+    </DgaModal>
+    <DgaModal
       :show="showConfirmModal"
       cancel-backdrop
       @confirm="submitVotes"
@@ -234,6 +243,7 @@ import ArrowLeftIcon from "vue-material-design-icons/ArrowLeft.vue";
 
 import dayjs from "dayjs";
 import {
+  isAnonymousTopic,
   isTopicExpired,
   isTopicReadyToVote,
 } from "~/src/services/validations/topic";
@@ -279,6 +289,7 @@ const showImageModal = ref(false);
 const waitVote = ref(false);
 const remainVotes = ref(0);
 const totalVotes = ref(0);
+const anonyomousPopup = ref(false);
 const canVote = computed(() => {
   if (topic.value) {
     return totalVotes.value > 0;
@@ -319,7 +330,7 @@ const { data, error } = await useFetch(`/api/topic/info/${topicid}`);
 
 if (!data.value || error.value) {
   console.log(error.value?.data);
-  switch(error.value?.data) {
+  switch (error.value?.data) {
     case "Topic not found":
       showError(i18n.t("app.voting.notExists"));
       break;
@@ -370,7 +381,15 @@ if (!data.value || error.value) {
     }
 
     confirmVoting.value = true;
+
+    if (isAnonymousTopic(_topic) && useSessionData().value.roleMode === "guest") {
+      anonyomousPopup.value = true;
+    }
   }
+}
+
+function toLoginPage() {
+  navigateTo(localePathOf("/login") + `?voteCallbackId=${topicid}`);
 }
 
 function voteCount(choice: ChoiceDataType) {

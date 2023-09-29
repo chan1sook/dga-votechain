@@ -233,6 +233,7 @@ export default {
       confirm: "ยืนยันการเลือกโหวตนี้?",
       pauseCause: "เหตุผล",
       pauseCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
+      anonyomousLogin: "กรุณาเข้าสู่ระบบเพื่อโหวต",
     },
     result: {
       title: "ผลการโหวต",

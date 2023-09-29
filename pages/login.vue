@@ -1,10 +1,13 @@
 <template>
-  <DgaLoginModule></DgaLoginModule>
+  <DgaLoginModule
+    :vote-callback-id="voteCallbackId?.toString()"
+  ></DgaLoginModule>
 </template>
 
 <script setup lang="ts">
 const i18n = useI18n();
 
+const { voteCallbackId } = useRoute().query;
 definePageMeta({
   middleware: ["auth-guest"],
 });

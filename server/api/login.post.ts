@@ -8,6 +8,12 @@ import { generatThaIDLoginUrl } from "~/src/services/vendor/thaid";
 export default defineEventHandler(async (event) => {
   const param = await readBody(event);
 
+  const voteCallbackId = param.voteCallbackId?.toString();
+  const EXTRA_DATA: LoginExtraParams = {
+    voteCallbackId: voteCallbackId,
+    extra: true,
+  };
+
   if (param.source === "digitalId") {
     const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_API_URL } =
       useRuntimeConfig();
@@ -18,6 +24,7 @@ export default defineEventHandler(async (event) => {
         DID_CLIENT_KEY,
         DID_LOGIN_CALLBACK,
         DID_VERIFY_CODE,
+        EXTRA_DATA,
       });
       return sendRedirect(event, url);
     } else {
@@ -26,6 +33,7 @@ export default defineEventHandler(async (event) => {
         DID_CLIENT_KEY,
         DID_LOGIN_CALLBACK,
         DID_VERIFY_CODE,
+        EXTRA_DATA,
       });
       return sendRedirect(event, url);
     }
@@ -41,6 +49,7 @@ export default defineEventHandler(async (event) => {
       THAID_CLIENT_ID,
       THAID_CLIENT_SECRET,
       THAID_LOGIN_CALLBACK,
+      EXTRA_DATA,
     });
 
     setHeader(event, "Content-type", "application/x-www-form-urlencoded");

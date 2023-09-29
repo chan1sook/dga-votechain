@@ -2,6 +2,66 @@
   <div
     class="mx-auto my-4 grid max-w-4xl grid-cols-12 items-center gap-x-4 gap-y-2"
   >
+    <h3 class="col-span-12 mt-2 font-bold">
+      {{ $t("app.topic.topicQuestion") }}
+    </h3>
+    <div class="col-span-12">
+      <DgaInput
+        v-model="topicData.name"
+        type="text"
+        class="dga-evote-input w-full"
+        :placeholder="$t('app.topic.topicQuestion')"
+        required
+      >
+      </DgaInput>
+    </div>
+    <h3 class="col-span-12 mt-2 font-bold">
+      {{ $t("app.topic.addChoice.title") }}
+    </h3>
+    <div
+      v-for="(choice, i) of topicData.choices.choices"
+      class="col-span-12 flex items-center justify-center"
+    >
+      <div
+        class="flex w-full max-w-xl flex-col items-center justify-center gap-2 sm:flex-row"
+      >
+        <div class="flex flex-row gap-2">
+          <span
+            class="border-[3px] border-red-500"
+            :class="[isChoiceValid(choice.name) ? 'invisible' : '']"
+            :title="getChoiceErrorReason(choice.name)"
+          >
+            <ExclamationIcon class="text-red-500" />
+          </span>
+          <DgaInput
+            v-model="choice.name"
+            type="text"
+            class="w-full flex-1"
+          ></DgaInput>
+          <button
+            class="inline-flex items-center rounded-full border-[3px] border-dga-blue px-1 py-1"
+            :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"
+            @click="removeOption(i)"
+          >
+            <MinusIcon />
+          </button>
+        </div>
+        <DgaImagePicker
+          v-model="topicData.images[i]"
+          :exists-image="getExistsImage(i)"
+        />
+      </div>
+    </div>
+    <div class="col-span-12 flex items-center justify-center">
+      <DgaButton
+        color="dga-orange"
+        class="flex flex-row items-center gap-2"
+        :title="$t('app.topic.addChoice.add')"
+        @click="addOption"
+      >
+        {{ $t("app.topic.addChoice.add") }} <PlusIcon />
+      </DgaButton>
+    </div>
     <div class="col-span-12 md:col-span-2">
       {{ $t("app.topic.templateTitle") }}
     </div>
@@ -101,6 +161,33 @@
         </div>
       </template>
     </div>
+    <h3 class="col-span-12 mt-2 font-bold">{{ $t("app.voterList.title") }}</h3>
+    <DgaUserTable
+      class="col-span-12"
+      :users="voterAllows"
+      :multiple-votes="topicData.multipleVotes"
+      :is-user-valid="isVoterValid"
+      :get-error-reason="getVoterErrorReason"
+      @add="addVoter"
+      @remove="removeVoter"
+      @users="addVoters"
+    >
+      <template #multipleVotes="{ user }">
+        <DgaInput
+          v-model.number="(user as VoterAllowFormData).totalVotes"
+          type="number"
+          min="1"
+          :max="
+            topicData.distinctVotes
+              ? topicData.choices.choices.length
+              : undefined
+          "
+          class="w-full min-w-[100px]"
+          :placeholder="$t('app.voterList.totalVotes')"
+        >
+        </DgaInput>
+      </template>
+    </DgaUserTable>
     <h3 class="col-span-12 mt-2 font-bold">
       {{ $t("app.topic.voteDuration.title") }}
     </h3>
@@ -208,93 +295,6 @@
         </div>
       </div>
     </template>
-    <h3 class="col-span-12 mt-2 font-bold">
-      {{ $t("app.topic.topicQuestion") }}
-    </h3>
-    <div class="col-span-12">
-      <DgaInput
-        v-model="topicData.name"
-        type="text"
-        class="dga-evote-input w-full"
-        :placeholder="$t('app.topic.topicQuestion')"
-        required
-      >
-      </DgaInput>
-    </div>
-    <h3 class="col-span-12 mt-2 font-bold">
-      {{ $t("app.topic.addChoice.title") }}
-    </h3>
-    <div
-      v-for="(choice, i) of topicData.choices.choices"
-      class="col-span-12 flex items-center justify-center"
-    >
-      <div
-        class="flex w-full max-w-xl flex-col items-center justify-center gap-2 sm:flex-row"
-      >
-        <div class="flex flex-row gap-2">
-          <span
-            class="border-[3px] border-red-500"
-            :class="[isChoiceValid(choice.name) ? 'invisible' : '']"
-            :title="getChoiceErrorReason(choice.name)"
-          >
-            <ExclamationIcon class="text-red-500" />
-          </span>
-          <DgaInput
-            v-model="choice.name"
-            type="text"
-            class="w-full flex-1"
-          ></DgaInput>
-          <button
-            class="inline-flex items-center rounded-full border-[3px] border-dga-blue px-1 py-1"
-            :title="`${$t('app.topic.addChoice.remove')} [${choice.name}]`"
-            @click="removeOption(i)"
-          >
-            <MinusIcon />
-          </button>
-        </div>
-        <DgaImagePicker
-          v-model="topicData.images[i]"
-          :exists-image="getExistsImage(i)"
-        />
-      </div>
-    </div>
-    <div class="col-span-12 flex items-center justify-center">
-      <DgaButton
-        color="dga-orange"
-        class="flex flex-row items-center gap-2"
-        :title="$t('app.topic.addChoice.add')"
-        @click="addOption"
-      >
-        {{ $t("app.topic.addChoice.add") }} <PlusIcon />
-      </DgaButton>
-    </div>
-    <h3 class="col-span-12 mt-2 font-bold">{{ $t("app.voterList.title") }}</h3>
-    <DgaUserTable
-      class="col-span-12"
-      :users="voterAllows"
-      :multiple-votes="topicData.multipleVotes"
-      :is-user-valid="isVoterValid"
-      :get-error-reason="getVoterErrorReason"
-      @add="addVoter"
-      @remove="removeVoter"
-      @users="addVoters"
-    >
-      <template #multipleVotes="{ user }">
-        <DgaInput
-          v-model.number="(user as VoterAllowFormData).totalVotes"
-          type="number"
-          min="1"
-          :max="
-            topicData.distinctVotes
-              ? topicData.choices.choices.length
-              : undefined
-          "
-          class="w-full min-w-[100px]"
-          :placeholder="$t('app.voterList.totalVotes')"
-        >
-        </DgaInput>
-      </template>
-    </DgaUserTable>
     <template v-if="!noCoadmin">
       <h3 class="col-span-12 mt-2 font-bold">
         {{ $t("app.topic.coadminList.title") }}
