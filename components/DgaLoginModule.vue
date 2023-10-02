@@ -23,6 +23,7 @@
     <DgaButtonGroup larger class="mt-2">
       <form action="/api/login" method="POST" class="w-full">
         <input type="hidden" name="source" value="thaID" />
+        <input v-if="props.cbtid" type="hidden" name="cbtid" :value="cbtid" />
         <DgaButton
           type="submit"
           class="flex w-full flex-row items-center justify-center gap-x-2 truncate"
