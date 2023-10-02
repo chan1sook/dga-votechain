@@ -26,12 +26,14 @@ export default defineEventHandler(async (event) => {
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
 
+  // sometime extraData is undefined
   const extraData: LoginExtraParams | undefined =
     await event.context.session.get<LoginExtraParams | undefined>(
       EXTRA_LOGIN_KEY
     );
 
-  console.log("EXTRA_DATA", extraData, state);
+  console.log("extra_get", extraData);
+  console.log("state", state);
 
   if (extraData && extraData.state !== state?.toString()) {
     // throw createError({
@@ -119,7 +121,7 @@ export default defineEventHandler(async (event) => {
         ...authSource,
       },
     });
-    await event.context.session.unset<LoginExtraParams>(EXTRA_LOGIN_KEY);
+    await event.context.session.unset(EXTRA_LOGIN_KEY);
 
     return sendRedirect(event, getAfterRedirectUrlbyParam(extraData || {}));
   }

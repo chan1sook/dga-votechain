@@ -17,11 +17,16 @@ export default defineEventHandler(async (event) => {
     state,
   };
 
-  console.log(EXTRA_DATA);
+  console.log("extra_set", EXTRA_DATA);
 
   await event.context.session.set<LoginExtraParams>(
     EXTRA_LOGIN_KEY,
     EXTRA_DATA
+  );
+
+  console.log(
+    "extra_get",
+    await event.context.session.get<LoginExtraParams>(EXTRA_LOGIN_KEY)
   );
 
   if (param.source === "digitalId") {

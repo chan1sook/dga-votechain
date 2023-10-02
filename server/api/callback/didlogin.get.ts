@@ -35,7 +35,9 @@ export default defineEventHandler(async (event) => {
       EXTRA_LOGIN_KEY
     );
 
-  console.log("EXTRA_DATA", extraData, state);
+  // sometime extraData is undefined
+  console.log("extra_get", extraData);
+  console.log("state", state);
 
   if (extraData && extraData.state !== state?.toString()) {
     // throw createError({
@@ -131,7 +133,7 @@ export default defineEventHandler(async (event) => {
         userToken: id_token,
       },
     });
-    await event.context.session.unset<LoginExtraParams>(EXTRA_LOGIN_KEY);
+    await event.context.session.unset(EXTRA_LOGIN_KEY);
 
     return sendRedirect(event, getAfterRedirectUrlbyParam(extraData || {}));
   }
