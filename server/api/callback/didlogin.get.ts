@@ -30,16 +30,21 @@ export default defineEventHandler(async (event) => {
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
 
-  const extraData: LoginExtraParams =
-    await event.context.session.get<LoginExtraParams>(EXTRA_LOGIN_KEY);
+  const extraData: LoginExtraParams | undefined =
+    await event.context.session.get<LoginExtraParams | undefined>(
+      EXTRA_LOGIN_KEY
+    );
 
-  if (extraData.state !== state?.toString()) {
+  console.log("EXTRA_DATA", extraData, state);
+
+  if (extraData && extraData.state !== state?.toString()) {
     // throw createError({
     //   statusCode: 400,
     //   statusMessage: "State Invalid",
     // });
     return sendRedirect(event, "/login");
   }
+
   if (typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, {
       DID_API_URL,
@@ -128,7 +133,7 @@ export default defineEventHandler(async (event) => {
     });
     await event.context.session.unset<LoginExtraParams>(EXTRA_LOGIN_KEY);
 
-    return sendRedirect(event, getAfterRedirectUrlbyParam(extraData));
+    return sendRedirect(event, getAfterRedirectUrlbyParam(extraData || {}));
   }
 
   return sendRedirect(event, "/login");
