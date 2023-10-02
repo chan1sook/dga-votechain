@@ -396,7 +396,7 @@ if (!data.value || error.value) {
 }
 
 function toLoginPage() {
-  navigateTo(localePathOf("/login") + `?voteCallbackId=${topicid}`);
+  navigateTo(localePathOf("/login") + `?cbtid=${topicid}`);
 }
 
 function voteCount(choice: ChoiceDataType) {

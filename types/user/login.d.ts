@@ -1,3 +1,4 @@
 interface LoginExtraParams {
-  voteCallbackId?: string;
+  cbtid?: string;
+  state?: string;
 }

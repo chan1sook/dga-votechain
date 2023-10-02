@@ -1,17 +1,28 @@
+import crypto from "crypto";
 import {
   DID_VERIFY_CODE,
   generateDigitalIDLoginUrl,
   generateDigitalIDRegisterUrl,
 } from "~/src/services/vendor/digital-id";
 import { generatThaIDLoginUrl } from "~/src/services/vendor/thaid";
+import { EXTRA_LOGIN_KEY } from "../session-handler";
 
 export default defineEventHandler(async (event) => {
   const param = await readBody(event);
 
-  const voteCallbackId = param.voteCallbackId?.toString();
+  const cbtid = param.cbtid?.toString();
+  const state = crypto.randomBytes(24).toString("hex");
   const EXTRA_DATA: LoginExtraParams = {
-    voteCallbackId: voteCallbackId,
+    cbtid,
+    state,
   };
+
+  console.log(EXTRA_DATA);
+
+  await event.context.session.set<LoginExtraParams>(
+    EXTRA_LOGIN_KEY,
+    EXTRA_DATA
+  );
 
   if (param.source === "digitalId") {
     const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_API_URL } =
@@ -23,7 +34,7 @@ export default defineEventHandler(async (event) => {
         DID_CLIENT_KEY,
         DID_LOGIN_CALLBACK,
         DID_VERIFY_CODE,
-        EXTRA_DATA,
+        STATE: state,
       });
       return sendRedirect(event, url);
     } else {
@@ -32,7 +43,7 @@ export default defineEventHandler(async (event) => {
         DID_CLIENT_KEY,
         DID_LOGIN_CALLBACK,
         DID_VERIFY_CODE,
-        EXTRA_DATA,
+        STATE: state,
       });
       return sendRedirect(event, url);
     }
@@ -48,7 +59,7 @@ export default defineEventHandler(async (event) => {
       THAID_CLIENT_ID,
       THAID_CLIENT_SECRET,
       THAID_LOGIN_CALLBACK,
-      EXTRA_DATA,
+      STATE: state,
     });
 
     setHeader(event, "Content-type", "application/x-www-form-urlencoded");

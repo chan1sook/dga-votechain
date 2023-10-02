@@ -2,6 +2,7 @@ import { Storage, prefixStorage } from "unstorage";
 import UserModel from "~/src/models/user";
 
 export const USER_SESSION_KEY = "dgaUserData";
+export const EXTRA_LOGIN_KEY = "state";
 
 export class SessionHandler {
   #sid: string;

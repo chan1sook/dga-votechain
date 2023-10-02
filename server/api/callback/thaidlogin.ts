@@ -5,7 +5,7 @@ import {
   combinePermissions,
   legacyRoleToPermissions,
 } from "~/src/services/transform/permission";
-import { USER_SESSION_KEY } from "~/server/session-handler";
+import { EXTRA_LOGIN_KEY, USER_SESSION_KEY } from "~/server/session-handler";
 import {
   getActiveUserByAuthSource,
   getActiveUserByCitizenID,
@@ -25,9 +25,19 @@ export default defineEventHandler(async (event) => {
     CITIZENID_FIXED_SALT,
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
-  const EXTRA_DATA: LoginExtraParams = JSON.parse(state?.toString() || "{}");
 
-  console.log("EXTRA_DATA", EXTRA_DATA);
+  const extraData: LoginExtraParams =
+    await event.context.session.get<LoginExtraParams>(EXTRA_LOGIN_KEY);
+
+  if (extraData.state !== state?.toString()) {
+    // throw createError({
+    //   statusCode: 400,
+    //   statusMessage: "State Invalid",
+    // });
+    return sendRedirect(event, "/login");
+  }
+
+  console.log("EXTRA_DATA", extraData, state);
 
   if (typeof code === "string") {
     const data = await authorizationThaID(code, {
@@ -35,7 +45,6 @@ export default defineEventHandler(async (event) => {
       THAID_CLIENT_ID,
       THAID_CLIENT_SECRET,
       THAID_LOGIN_CALLBACK,
-      EXTRA_DATA,
     });
 
     const modifiedPID = Buffer.from(
@@ -108,8 +117,9 @@ export default defineEventHandler(async (event) => {
         ...authSource,
       },
     });
+    await event.context.session.unset<LoginExtraParams>(EXTRA_LOGIN_KEY);
 
-    return sendRedirect(event, getAfterRedirectUrlbyParam(EXTRA_DATA));
+    return sendRedirect(event, getAfterRedirectUrlbyParam(extraData));
   }
 
   return sendRedirect(event, "/login");

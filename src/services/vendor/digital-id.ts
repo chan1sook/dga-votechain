@@ -8,7 +8,7 @@ export function generateDigitalIDLoginUrl({
   DID_CLIENT_KEY,
   DID_LOGIN_CALLBACK,
   DID_VERIFY_CODE,
-  EXTRA_DATA,
+  STATE,
 }: DigitalIdAuthorizationCodeParam) {
   const urlParams = new URLSearchParams();
   urlParams.set("response_type", "code");
@@ -28,7 +28,7 @@ export function generateDigitalIDLoginUrl({
 
   urlParams.set("scope", scopes.join(" "));
   urlParams.set("code_challenge_method", "S256");
-  urlParams.set("state", JSON.stringify(EXTRA_DATA));
+  urlParams.set("state", STATE);
 
   const hash = crypto.createHash("sha256").update(DID_VERIFY_CODE).digest();
   const challengeCode = hash.toString("base64url");
@@ -45,7 +45,7 @@ export function generateDigitalIDRegisterUrl({
   DID_CLIENT_KEY,
   DID_LOGIN_CALLBACK,
   DID_VERIFY_CODE,
-  EXTRA_DATA,
+  STATE,
 }: DigitalIdAuthorizationCodeParam) {
   const urlParams = new URLSearchParams();
   urlParams.set("response_type", "code");
@@ -65,7 +65,7 @@ export function generateDigitalIDRegisterUrl({
 
   urlParams.set("scope", scopes.join(" "));
   urlParams.set("code_challenge_method", "S256");
-  urlParams.set("state", JSON.stringify(EXTRA_DATA));
+  urlParams.set("state", STATE);
 
   const hash = crypto.createHash("sha256").update(DID_VERIFY_CODE).digest();
   const challengeCode = hash.toString("base64url");
@@ -90,7 +90,7 @@ export async function authorizationCodeDigitalID(
     DID_CLIENT_KEY,
     DID_LOGIN_CALLBACK,
     DID_VERIFY_CODE,
-  }: DigitalIdAuthorizationCodeParam
+  }: Omit<DigitalIdAuthorizationCodeParam, "STATE">
 ) {
   const urlParams = new URLSearchParams();
   urlParams.set("grant_type", "authorization_code");

@@ -10,7 +10,7 @@ import {
   combinePermissions,
   legacyRoleToPermissions,
 } from "~/src/services/transform/permission";
-import { USER_SESSION_KEY } from "~/server/session-handler";
+import { EXTRA_LOGIN_KEY, USER_SESSION_KEY } from "~/server/session-handler";
 import {
   getActiveUserByAuthSource,
   getActiveUserByCitizenID,
@@ -21,7 +21,7 @@ import { getAfterRedirectUrlbyParam } from "~/src/services/transform/url";
 
 export default defineEventHandler(async (event) => {
   const { code, state } = getQuery(event);
-  const EXTRA_DATA: LoginExtraParams = JSON.parse(state?.toString() || "{}");
+
   const {
     DID_CLIENT_KEY,
     DID_LOGIN_CALLBACK,
@@ -30,15 +30,22 @@ export default defineEventHandler(async (event) => {
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
 
-  console.log("EXTRA_DATA", EXTRA_DATA);
+  const extraData: LoginExtraParams =
+    await event.context.session.get<LoginExtraParams>(EXTRA_LOGIN_KEY);
 
+  if (extraData.state !== state?.toString()) {
+    // throw createError({
+    //   statusCode: 400,
+    //   statusMessage: "State Invalid",
+    // });
+    return sendRedirect(event, "/login");
+  }
   if (typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, {
       DID_API_URL,
       DID_CLIENT_KEY,
       DID_LOGIN_CALLBACK,
-      DID_VERIFY_CODE: DID_VERIFY_CODE,
-      EXTRA_DATA,
+      DID_VERIFY_CODE,
     });
 
     const digitalIdUserInfo = await getUserInfoDigitalID(access_token, {
@@ -119,8 +126,9 @@ export default defineEventHandler(async (event) => {
         userToken: id_token,
       },
     });
+    await event.context.session.unset<LoginExtraParams>(EXTRA_LOGIN_KEY);
 
-    return sendRedirect(event, getAfterRedirectUrlbyParam(EXTRA_DATA));
+    return sendRedirect(event, getAfterRedirectUrlbyParam(extraData));
   }
 
   return sendRedirect(event, "/login");
