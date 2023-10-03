@@ -604,15 +604,17 @@ socket.on(
 );
 
 let tickerId: NodeJS.Timer | undefined;
-onMounted(() => {
-  if (!useSessionData().value.userid) {
-    return;
-  }
-
-  tickerId = setInterval(() => {
+onMounted(async () => {
+  if (useSessionData().value.userid) {
+    tickerId = setInterval(() => {
+      updateTime();
+    }, 100);
     updateTime();
-  }, 100);
-  updateTime();
+    
+    await fetchTopic();
+  } else {
+    anonyomousPopup.value = true;
+  }
 });
 
 onUnmounted(() => {
@@ -620,12 +622,6 @@ onUnmounted(() => {
   socket.off(`pauseVote/${topicid}`);
   socket.off(`resumeVote/${topicid}`);
 });
-
-if (useSessionData().value.userid) {
-  await fetchTopic();
-} else {
-  anonyomousPopup.value = true;
-}
 </script>
 
 <style scoped>
