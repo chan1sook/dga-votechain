@@ -328,7 +328,7 @@ function getBtnThemeOfChoice(choice: { name: string }) {
 const { data, error } = await useFetch(`/api/topic/info/${topicid}`);
 
 if (!data.value || error.value) {
-  console.log(error.value?.statusMessage);
+  // console.log(error.value?.statusMessage);
   switch (error.value?.statusMessage) {
     case "Topic not found":
       showError(i18n.t("app.voting.notExists"));

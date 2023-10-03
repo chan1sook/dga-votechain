@@ -4,22 +4,19 @@ import {
   generateDigitalIDRegisterUrl,
 } from "~/src/services/vendor/digital-id";
 import { generatThaIDLoginUrl } from "~/src/services/vendor/thaid";
-import { EXTRA_LOGIN_KEY } from "../session-handler";
 import { encodeLoginState } from "~/src/services/transform/login";
 
 export default defineEventHandler(async (event) => {
   const param = await readBody(event);
 
   const cbtid = param.cbtid?.toString();
-  const EXTRA_DATA: LoginExtraParams = {
+  const extraData: LoginExtraParams = {
     cbtid,
   };
-  const state = encodeLoginState(EXTRA_DATA);
+  const state = encodeLoginState(extraData);
 
-  await event.context.session.set<LoginExtraParams>(
-    EXTRA_LOGIN_KEY,
-    EXTRA_DATA
-  );
+  // console.log("original", extraData);
+  // console.log("parsed_state", state);
 
   if (param.source === "digitalId") {
     const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_API_URL } =

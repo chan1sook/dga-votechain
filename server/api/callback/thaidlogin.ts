@@ -5,7 +5,7 @@ import {
   combinePermissions,
   legacyRoleToPermissions,
 } from "~/src/services/transform/permission";
-import { EXTRA_LOGIN_KEY, USER_SESSION_KEY } from "~/server/session-handler";
+import { USER_SESSION_KEY } from "~/server/session-handler";
 import {
   getActiveUserByAuthSource,
   getActiveUserByCitizenID,
@@ -29,11 +29,10 @@ export default defineEventHandler(async (event) => {
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
 
-  // sometime extraData is undefined
   const extraData: LoginExtraParams = decodeLoginState(state?.toString());
 
-  console.log("extra_get", extraData);
-  console.log("state", state);
+  // console.log("state", state);
+  // console.log("parsed", extraData);
 
   if (typeof code === "string") {
     const data = await authorizationThaID(code, {
@@ -113,7 +112,6 @@ export default defineEventHandler(async (event) => {
         ...authSource,
       },
     });
-    await event.context.session.unset(EXTRA_LOGIN_KEY);
 
     return sendRedirect(event, getAfterRedirectUrlbyParam(extraData || {}));
   }
