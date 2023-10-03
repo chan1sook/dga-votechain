@@ -80,26 +80,23 @@
               :class="[haveImage ? 'max-w-lg' : 'max-w-md']"
               :theme="getBtnThemeOfChoice(choice)"
               :color="
-                noVoteLocked ||
-                (canVote &&
-                  prevVotes.map((ele) => ele.choice).includes(choice.name))
+                noVoteLocked || (canVote && containPrevVote(choice))
                   ? 'gray2'
                   : 'dga-blue'
               "
               :disabled="
                 !canVote ||
                 noVoteLocked ||
-                prevVotes.map((ele) => ele.choice).includes(choice.name)
+                containPrevVote(choice) ||
+                remainVotes === 0
               "
-              :disabled-vivid="!canVote && !noVoteLocked"
+              :disabled-vivid="!canVote || (!noVoteLocked && remainVotes === 0)"
               @click="addVote(choice.name)"
             >
               <div class="flex h-8 w-8 flex-row justify-center sm:w-24">
                 <template v-if="canVote">
                   <div
-                    v-if="
-                      prevVotes.map((ele) => ele.choice).includes(choice.name)
-                    "
+                    v-if="containPrevVote(choice)"
                     class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-gray-300 px-4 py-1 text-sm text-gray-500 sm:px-8"
                   >
                     <CheckIcon /> <span class="hidden sm:block">VOTED</span>
@@ -422,6 +419,14 @@ function getImgUrlChoice(choice: ChoiceData | undefined) {
 function showBigImage(choice: ChoiceData) {
   selectedImageChoice.value = choice;
   showImageModal.value = true;
+}
+
+function containVote(choice: ChoiceData) {
+  return currentVotes.value.includes(choice.name);
+}
+
+function containPrevVote(choice: ChoiceData) {
+  return prevVotes.value.map((ele) => ele.choice).includes(choice.name);
 }
 
 function addVote(choice: ChoiceDataType) {
