@@ -17,7 +17,10 @@ import {
   getActiveUserByNameOld,
 } from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
-import { getAfterRedirectUrlbyParam } from "~/src/services/transform/url";
+import {
+  decodeLoginState,
+  getAfterRedirectUrlbyParam,
+} from "~/src/services/transform/login";
 
 export default defineEventHandler(async (event) => {
   const { code, state } = getQuery(event);
@@ -30,22 +33,11 @@ export default defineEventHandler(async (event) => {
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
 
-  const extraData: LoginExtraParams | undefined =
-    await event.context.session.get<LoginExtraParams | undefined>(
-      EXTRA_LOGIN_KEY
-    );
+  const extraData: LoginExtraParams = decodeLoginState(state?.toString());
 
   // sometime extraData is undefined
   console.log("extra_get", extraData);
   console.log("state", state);
-
-  if (extraData && extraData.state !== state?.toString()) {
-    // throw createError({
-    //   statusCode: 400,
-    //   statusMessage: "State Invalid",
-    // });
-    return sendRedirect(event, "/login");
-  }
 
   if (typeof code === "string") {
     const { access_token, id_token } = await authorizationCodeDigitalID(code, {

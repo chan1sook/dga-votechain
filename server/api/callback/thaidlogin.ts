@@ -13,7 +13,10 @@ import {
 } from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
-import { getAfterRedirectUrlbyParam } from "~/src/services/transform/url";
+import {
+  decodeLoginState,
+  getAfterRedirectUrlbyParam,
+} from "~/src/services/transform/login";
 
 export default defineEventHandler(async (event) => {
   const { code, state } = getQuery(event);
@@ -27,21 +30,10 @@ export default defineEventHandler(async (event) => {
   } = useRuntimeConfig();
 
   // sometime extraData is undefined
-  const extraData: LoginExtraParams | undefined =
-    await event.context.session.get<LoginExtraParams | undefined>(
-      EXTRA_LOGIN_KEY
-    );
+  const extraData: LoginExtraParams = decodeLoginState(state?.toString());
 
   console.log("extra_get", extraData);
   console.log("state", state);
-
-  if (extraData && extraData.state !== state?.toString()) {
-    // throw createError({
-    //   statusCode: 400,
-    //   statusMessage: "State Invalid",
-    // });
-    return sendRedirect(event, "/login");
-  }
 
   if (typeof code === "string") {
     const data = await authorizationThaID(code, {
