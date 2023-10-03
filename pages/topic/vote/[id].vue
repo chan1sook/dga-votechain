@@ -328,64 +328,62 @@ function getBtnThemeOfChoice(choice: { name: string }) {
   return voteCounts > 0 && !noVoteLocked.value ? "default" : "hollow2";
 }
 
-async function fetchTopic() {
-  const { data, error } = await useFetch(`/api/topic/info/${topicid}`);
+const { data, error } = await useFetch(`/api/topic/info/${topicid}`);
 
-  if (!data.value || error.value) {
-    console.log(error.value?.statusMessage);
-    switch (error.value?.statusMessage) {
-      case "Topic not found":
-        showError(i18n.t("app.voting.notExists"));
-        break;
-      case "Forbidden":
-        anonyomousPopup.value = true;
-        // showError(i18n.t("app.voting.forbidden"));
-        break;
-      default:
-        showError(i18n.t("app.voting.cannotVote"));
-        break;
-    }
+if (!data.value || error.value) {
+  console.log(error.value?.statusMessage);
+  switch (error.value?.statusMessage) {
+    case "Topic not found":
+      showError(i18n.t("app.voting.notExists"));
+      break;
+    case "Forbidden":
+      anonyomousPopup.value = true;
+      // showError(i18n.t("app.voting.forbidden"));
+      break;
+    default:
+      showError(i18n.t("app.voting.cannotVote"));
+      break;
+  }
+} else {
+  const {
+    topic: _topic,
+    pauseData: _pauseData,
+    votes,
+    canVote,
+    quota,
+    voted,
+  } = data.value;
+
+  if (!canVote) {
+    showError({
+      message: i18n.t("app.voting.forbidden"),
+      statusCode: 403,
+    });
+  } else if (!isTopicReadyToVote(_topic, useComputedServerTime().getTime())) {
+    showError({
+      message: i18n.t("app.voting.error.waiting"),
+      statusCode: 403,
+    });
+  } else if (
+    isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())
+  ) {
+    // showError(i18n.t("app.voting.voteFinished"));
+    navigateTo(`/topic/result/${_topic._id}`);
   } else {
-    const {
-      topic: _topic,
-      pauseData: _pauseData,
-      votes,
-      canVote,
-      quota,
-      voted,
-    } = data.value;
-
-    if (!canVote) {
-      showError({
-        message: i18n.t("app.voting.forbidden"),
-        statusCode: 403,
-      });
-    } else if (!isTopicReadyToVote(_topic, useComputedServerTime().getTime())) {
-      showError({
-        message: i18n.t("app.voting.error.waiting"),
-        statusCode: 403,
-      });
-    } else if (
-      isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())
+    topic.value = _topic;
+    prevVotes.value = votes;
+    pauseData.value = _pauseData;
+    const _remainVotes = Math.max(quota - voted, 0);
+    remainVotes.value = _remainVotes;
+    totalVotes.value = _remainVotes;
+    if (
+      _remainVotes === 0 &&
+      prevVotes.value.every((ele) => ele.choice === null)
     ) {
-      // showError(i18n.t("app.voting.voteFinished"));
-      navigateTo(`/topic/result/${_topic._id}`);
-    } else {
-      topic.value = _topic;
-      prevVotes.value = votes;
-      pauseData.value = _pauseData;
-      const _remainVotes = Math.max(quota - voted, 0);
-      remainVotes.value = _remainVotes;
-      totalVotes.value = _remainVotes;
-      if (
-        _remainVotes === 0 &&
-        prevVotes.value.every((ele) => ele.choice === null)
-      ) {
-        noVoteLocked.value = true;
-      }
-
-      confirmVoting.value = true;
+      noVoteLocked.value = true;
     }
+
+    confirmVoting.value = true;
   }
 }
 
@@ -604,17 +602,11 @@ socket.on(
 );
 
 let tickerId: NodeJS.Timer | undefined;
-onMounted(async () => {
-  if (useSessionData().value.userid) {
-    tickerId = setInterval(() => {
-      updateTime();
-    }, 100);
+onMounted(() => {
+  tickerId = setInterval(() => {
     updateTime();
-    
-    await fetchTopic();
-  } else {
-    anonyomousPopup.value = true;
-  }
+  }, 100);
+  updateTime();
 });
 
 onUnmounted(() => {
@@ -622,6 +614,10 @@ onUnmounted(() => {
   socket.off(`pauseVote/${topicid}`);
   socket.off(`resumeVote/${topicid}`);
 });
+
+if (!useSessionData().value.userid) {
+  anonyomousPopup.value = true;
+}
 </script>
 
 <style scoped>
