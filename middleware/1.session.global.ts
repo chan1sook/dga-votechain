@@ -2,8 +2,13 @@ import {
   getDefaultAdminTopMenus,
   getDefaultDevTopMenus,
   getDefaultTopMenus,
+  getDefaultVoterTopMenus,
 } from "~/src/services/form/preference";
-import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
+import {
+  isUserAdmin,
+  isUserDeveloper,
+  isUserVoter,
+} from "~/src/services/validations/role";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { data } = await useFetch("/api/session/get");
@@ -21,6 +26,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
           preferences.topMenu = getDefaultDevTopMenus();
         } else if (isUserAdmin({ permissions: data.value.permissions })) {
           preferences.topMenu = getDefaultAdminTopMenus();
+        } else if (isUserVoter({ permissions: data.value.permissions })) {
+          preferences.topMenu = getDefaultVoterTopMenus();
         }
       }
     }

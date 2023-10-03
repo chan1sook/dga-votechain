@@ -6,6 +6,8 @@ import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
 import { isBannedUser } from "~/src/services/validations/user";
 import {
   isCanVote,
+  isInternalTopic,
+  isPublicTopic,
   isUserInMatchInternalTopic,
 } from "~/src/services/validations/topic";
 
@@ -28,38 +30,44 @@ export default defineEventHandler(async (event) => {
     topicid: topicDoc._id,
   });
 
-  if (userData && !isBannedUser(userData)) {
-    const [_voterAllow, _votes] = await Promise.all([
-      TopicVoterAllowsModel.findOne({
-        topicid: topicDoc._id,
-        userid: userData._id,
-      }),
-      getVotesByTopicIdAndUserId(topicDoc._id, userData._id),
-    ]);
-
-    if (_voterAllow) {
-      voterAllow = {
-        userid: userData._id.toString(),
-        topicid: topicDoc._id.toString(),
-        remainVotes: _voterAllow.remainVotes,
-        totalVotes: _voterAllow.totalVotes,
-      };
-    }
-
-    votes = _votes.map((vote) => {
-      return {
-        _id: `${vote._id}`,
-        userid: `${vote.userid}`,
-        topicid: `${vote.topicid}`,
-        groupid: vote.groupid,
-        choice: vote.choice,
-        createdAt: dayjs(vote.createdAt).toISOString(),
-        tx: vote.tx,
-      };
+  // No more Guest Access
+  if (!userData || isBannedUser(userData)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
     });
   }
 
-  if (topicDoc.type !== "public") {
+  const [_voterAllow, _votes] = await Promise.all([
+    TopicVoterAllowsModel.findOne({
+      topicid: topicDoc._id,
+      userid: userData._id,
+    }),
+    getVotesByTopicIdAndUserId(topicDoc._id, userData._id),
+  ]);
+
+  if (_voterAllow) {
+    voterAllow = {
+      userid: userData._id.toString(),
+      topicid: topicDoc._id.toString(),
+      remainVotes: _voterAllow.remainVotes,
+      totalVotes: _voterAllow.totalVotes,
+    };
+  }
+
+  votes = _votes.map((vote) => {
+    return {
+      _id: `${vote._id}`,
+      userid: `${vote.userid}`,
+      topicid: `${vote.topicid}`,
+      groupid: vote.groupid,
+      choice: vote.choice,
+      createdAt: dayjs(vote.createdAt).toISOString(),
+      tx: vote.tx,
+    };
+  });
+
+  if (!isPublicTopic(topicDoc)) {
     let isAllowed = false;
 
     if (userData) {
@@ -68,8 +76,7 @@ export default defineEventHandler(async (event) => {
       }
 
       if (
-        topicDoc.type === "internal" &&
-        userData &&
+        isInternalTopic(topicDoc) &&
         isUserInMatchInternalTopic(topicDoc.internalFilter, userData)
       ) {
         isAllowed = true;

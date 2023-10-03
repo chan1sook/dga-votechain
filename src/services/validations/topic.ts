@@ -91,12 +91,15 @@ export function isInternalTopic(topicData: { type: TopicType }) {
   return topicData.type === "internal";
 }
 
+// Unused
 export function isAnonymousTopic(topicData: {
   type: TopicType;
   anonymousVotes: boolean;
 }) {
   return isPublicTopic(topicData) && topicData.anonymousVotes;
 }
+
+// Now Login only
 
 export function isAdminOrCoadminOfTopic(
   userData: { _id: string | Types.ObjectId },

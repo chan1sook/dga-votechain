@@ -159,6 +159,7 @@ import MenuIcon from "vue-material-design-icons/Menu.vue";
 import {
   getDefaultAdminTopMenus,
   getDefaultDevTopMenus,
+  getDefaultVoterTopMenus,
   getDefaultTopMenus,
 } from "~/src/services/form/preference";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
@@ -189,6 +190,8 @@ const currentTopMenus = computed(() => {
     return getDefaultDevTopMenus();
   } else if (checkPermissionNeeds(_permissions, "admin-mode")) {
     return getDefaultAdminTopMenus();
+  } else if (checkPermissionNeeds(_permissions, "voter-mode")) {
+    return getDefaultVoterTopMenus();
   }
   return getDefaultTopMenus();
 });

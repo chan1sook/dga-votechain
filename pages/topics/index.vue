@@ -1,157 +1,165 @@
 <template>
   <div>
-    <div
-      class="mx-auto flex max-w-6xl flex-row flex-wrap items-center gap-x-4 gap-y-2"
-    >
+    <div v-if="roleMode !== 'guest'">
       <div
-        v-if="roleMode !== 'guest'"
-        class="flex w-full flex-row items-center gap-2 lg:w-60"
+        class="mx-auto flex max-w-6xl flex-row flex-wrap items-center gap-x-4 gap-y-2"
       >
-        <div class="whitespace-nowrap">
-          {{ $t("app.voting.filters.accessModifier") }}
+        <div class="flex w-full flex-row items-center gap-2 lg:w-60">
+          <div class="whitespace-nowrap">
+            {{ $t("app.voting.filters.accessModifier") }}
+          </div>
+          <DgaVueSelect
+            v-model="filter.topicType"
+            :options="topciTypeFilterOptions"
+            class="flex-1"
+            :reduce="(val) => val.value"
+          ></DgaVueSelect>
         </div>
         <DgaVueSelect
-          v-model="filter.topicType"
-          :options="topciTypeFilterOptions"
-          class="flex-1"
+          v-model="filter.type"
+          :options="topicFilterOptions"
+          class="w-full lg:w-52"
           :reduce="(val) => val.value"
         ></DgaVueSelect>
-      </div>
-      <DgaVueSelect
-        v-model="filter.type"
-        :options="topicFilterOptions"
-        class="w-full lg:w-52"
-        :reduce="(val) => val.value"
-      ></DgaVueSelect>
-      <template v-if="filter.type === 'date'">
-        <DgaVueSelect
-          v-model="filter.year"
-          :options="yearOptions"
-          class="w-full flex-none sm:flex-1 lg:w-32 lg:flex-none"
-          :reduce="(val) => val.value"
-        ></DgaVueSelect>
-        <DgaVueSelect
-          v-model="filter.month"
-          :options="monthOptions"
-          class="w-full flex-none sm:flex-1 lg:w-32 lg:flex-none"
-          :reduce="(val) => val.value"
-        ></DgaVueSelect>
-      </template>
-      <template v-else-if="filter.type === 'ticketId'">
-        <DgaInput
-          v-model="filter.ticketId"
-          :placeholder="$t('app.voting.filters.ticketIdPlaceholder')"
-          class="w-60 flex-1 lg:flex-none"
-        ></DgaInput>
-      </template>
-      <template v-else-if="filter.type === 'topicName'">
-        <DgaInput
-          v-model="filter.keyword"
-          :placeholder="$t('app.voting.filters.topicNamePlaceholder')"
-          class="w-60 flex-1 lg:flex-none"
-        ></DgaInput>
-      </template>
-      <DgaButton
-        color="dga-orange"
-        class="flex-0"
-        :title="$t('app.voting.filters.search')"
-        @click="resetTopics"
-      >
-        {{ $t("app.voting.filters.search") }}
-      </DgaButton>
-      <div
-        v-if="isAdminMode"
-        class="ml-auto flex w-full flex-col justify-center gap-2 sm:w-auto sm:flex-row"
-      >
+        <template v-if="filter.type === 'date'">
+          <DgaVueSelect
+            v-model="filter.year"
+            :options="yearOptions"
+            class="w-full flex-none sm:flex-1 lg:w-32 lg:flex-none"
+            :reduce="(val) => val.value"
+          ></DgaVueSelect>
+          <DgaVueSelect
+            v-model="filter.month"
+            :options="monthOptions"
+            class="w-full flex-none sm:flex-1 lg:w-32 lg:flex-none"
+            :reduce="(val) => val.value"
+          ></DgaVueSelect>
+        </template>
+        <template v-else-if="filter.type === 'ticketId'">
+          <DgaInput
+            v-model="filter.ticketId"
+            :placeholder="$t('app.voting.filters.ticketIdPlaceholder')"
+            class="w-60 flex-1 lg:flex-none"
+          ></DgaInput>
+        </template>
+        <template v-else-if="filter.type === 'topicName'">
+          <DgaInput
+            v-model="filter.keyword"
+            :placeholder="$t('app.voting.filters.topicNamePlaceholder')"
+            class="w-60 flex-1 lg:flex-none"
+          ></DgaInput>
+        </template>
         <DgaButton
-          class="mx-auto flex w-full max-w-[200px] flex-row items-center gap-2 !px-6 !py-2 sm:w-auto"
-          :title="$t('app.voting.createTopic')"
-          :href="localePathOf('/topic/create')"
-        >
-          <PlusCircleOutlineIcon />
-          {{ $t("app.voting.createTopic") }}
-        </DgaButton>
-      </div>
-    </div>
-    <div class="mx-auto my-4 flex max-w-6xl flex-col gap-4">
-      <DgaTopicCard
-        v-for="topic of loadedTopics"
-        :topic="topic"
-        :mode="roleMode"
-        :editable="
-          isAdminMode &&
-          !isTopicExpired(
-            topic,
-            topic.pauseData,
-            useComputedServerTime().getTime()
-          )
-        "
-        :status="getStatusOf(topic)"
-        :with-qrcode="isAdminMode"
-        :is-admin="isAdminMode"
-        :is-dev="isDevMode"
-        @edit="toEditTopic(topic)"
-        @qr="showQr(topic)"
-        @recreate="toRecreateTopic(topic)"
-        @action="handleStatusAction(topic, $event)"
-        @hide="popupHideTopic(topic)"
-        @show="popupShowTopic(topic)"
-        @remove="popupRemoveTopic(topic)"
-      ></DgaTopicCard>
-      <template v-if="isLoadMoreTopics">
-        <div class="text-center text-xl italic">
-          {{ $t("app.loading") }}
-        </div>
-      </template>
-      <template v-else>
-        <div
-          v-if="loadedTopics.length === 0 && !hasMoreTopics"
-          class="text-center text-xl italic"
-        >
-          {{ $t("app.voting.noMoreTopic") }}
-        </div>
-        <DgaButton
-          v-if="hasMoreTopics && isLoadMoreTopics"
           color="dga-orange"
-          class="mx-auto"
-          :title="$t('app.voting.loadMoreTopic')"
-          @click="loadMoreTopics"
+          class="flex-0"
+          :title="$t('app.voting.filters.search')"
+          @click="resetTopics"
         >
-          {{ $t("app.voting.loadMoreTopic") }}
+          {{ $t("app.voting.filters.search") }}
         </DgaButton>
-      </template>
+        <div
+          v-if="isAdminMode"
+          class="ml-auto flex w-full flex-col justify-center gap-2 sm:w-auto sm:flex-row"
+        >
+          <DgaButton
+            class="mx-auto flex w-full max-w-[200px] flex-row items-center gap-2 !px-6 !py-2 sm:w-auto"
+            :title="$t('app.voting.createTopic')"
+            :href="localePathOf('/topic/create')"
+          >
+            <PlusCircleOutlineIcon />
+            {{ $t("app.voting.createTopic") }}
+          </DgaButton>
+        </div>
+      </div>
+      <div class="mx-auto my-4 flex max-w-6xl flex-col gap-4">
+        <DgaTopicCard
+          v-for="topic of loadedTopics"
+          :topic="topic"
+          :mode="roleMode"
+          :editable="
+            isAdminMode &&
+            !isTopicExpired(
+              topic,
+              topic.pauseData,
+              useComputedServerTime().getTime()
+            )
+          "
+          :status="getStatusOf(topic)"
+          :with-qrcode="isAdminMode"
+          :is-admin="isAdminMode"
+          :is-dev="isDevMode"
+          @edit="toEditTopic(topic)"
+          @qr="showQr(topic)"
+          @recreate="toRecreateTopic(topic)"
+          @action="handleStatusAction(topic, $event)"
+          @hide="popupHideTopic(topic)"
+          @show="popupShowTopic(topic)"
+          @remove="popupRemoveTopic(topic)"
+        ></DgaTopicCard>
+        <template v-if="isLoadMoreTopics">
+          <div class="text-center text-xl italic">
+            {{ $t("app.loading") }}
+          </div>
+        </template>
+        <template v-else>
+          <div
+            v-if="loadedTopics.length === 0 && !hasMoreTopics"
+            class="text-center text-xl italic"
+          >
+            {{ $t("app.voting.noMoreTopic") }}
+          </div>
+          <DgaButton
+            v-if="hasMoreTopics && isLoadMoreTopics"
+            color="dga-orange"
+            class="mx-auto"
+            :title="$t('app.voting.loadMoreTopic')"
+            @click="loadMoreTopics"
+          >
+            {{ $t("app.voting.loadMoreTopic") }}
+          </DgaButton>
+        </template>
+      </div>
+      <DgaModal
+        :show="showImageModal"
+        cancel-backdrop
+        close-only
+        @close="showImageModal = false"
+      >
+        <img :src="qrCodeSrc" class="h-[65vh] object-contain" />
+        <DgaButton color="green" @click="shareLink">
+          <template v-if="linkCopied">{{ $t("app.linkCopied") }}</template>
+          <template v-else>{{ $t("app.share") }}</template>
+        </DgaButton>
+      </DgaModal>
+      <DgaModal
+        :show="showConfirmModal === 'hideTopic'"
+        cancel-backdrop
+        @confirm="hideTopic(selectedTopic, true)"
+        @close="showConfirmModal = false"
+        @cancel="showConfirmModal = false"
+      >
+        {{ $t("app.topic.hide.confirm") }}
+      </DgaModal>
+      <DgaModal
+        :show="showConfirmModal === 'showTopic'"
+        cancel-backdrop
+        @confirm="hideTopic(selectedTopic, false)"
+        @close="showConfirmModal = false"
+        @cancel="showConfirmModal = false"
+      >
+        {{ $t("app.topic.show.confirm") }}
+      </DgaModal>
+      <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
     </div>
     <DgaModal
-      :show="showImageModal"
-      cancel-backdrop
-      close-only
-      @close="showImageModal = false"
+      :show="anonyomousPopup"
+      :confirm-text="$t('app.login.title')"
+      @confirm="toLoginPage"
+      @close="backToHomePage"
+      @cancel="backToHomePage"
     >
-      <img :src="qrCodeSrc" class="h-[65vh] object-contain" />
-      <DgaButton color="green" @click="shareLink">
-        <template v-if="linkCopied">{{ $t("app.linkCopied") }}</template>
-        <template v-else>{{ $t("app.share") }}</template>
-      </DgaButton>
+      {{ $t("app.voting.anonyomousLogin") }}
     </DgaModal>
-    <DgaModal
-      :show="showConfirmModal === 'hideTopic'"
-      cancel-backdrop
-      @confirm="hideTopic(selectedTopic, true)"
-      @close="showConfirmModal = false"
-      @cancel="showConfirmModal = false"
-    >
-      {{ $t("app.topic.hide.confirm") }}
-    </DgaModal>
-    <DgaModal
-      :show="showConfirmModal === 'showTopic'"
-      cancel-backdrop
-      @confirm="hideTopic(selectedTopic, false)"
-      @close="showConfirmModal = false"
-      @cancel="showConfirmModal = false"
-    >
-      {{ $t("app.topic.show.confirm") }}
-    </DgaModal>
-    <DgaLoadingModal :show="waitEdit"></DgaLoadingModal>
   </div>
 </template>
 
@@ -186,6 +194,7 @@ useHead({
 const isAdminMode = computed(() => roleMode.value === "admin");
 const isDevMode = computed(() => roleMode.value === "developer");
 const isVoterMode = computed(() => roleMode.value === "voter");
+const anonyomousPopup = ref(false);
 
 const filter = ref({
   type: "all",
@@ -357,13 +366,7 @@ function handleStatusAction(
 
 async function showQr(topic: TopicResponseData) {
   const host = window.location;
-  currentLink.value =
-    host.protocol +
-    "//" +
-    host.host +
-    "/vote/" +
-    topic._id +
-    "?anonLoginPopup=1";
+  currentLink.value = host.protocol + "//" + host.host + "/vote/" + topic._id;
   selectedTopic.value = topic;
   qrCodeSrc.value = await QRCode.toDataURL(currentLink.value);
   showImageModal.value = true;
@@ -480,6 +483,14 @@ async function hideTopic(
   showConfirmModal.value = false;
 }
 
+function toLoginPage() {
+  navigateTo(localePathOf("/login"));
+}
+
+function backToHomePage() {
+  navigateTo(localePathOf("/"));
+}
+
 async function fetchTopics(filter: TopicFilterParams) {
   const fetchResult = await Promise.all([
     useFetch("/api/topics/avaliable", {
@@ -533,5 +544,9 @@ async function loadMoreTopics() {
   isLoadMoreTopics.value = false;
 }
 
-await loadMoreTopics();
+if (useSessionData().value.userid) {
+  await loadMoreTopics();
+} else {
+  anonyomousPopup.value = true;
+}
 </script>
