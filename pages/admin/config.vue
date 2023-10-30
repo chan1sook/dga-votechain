@@ -31,6 +31,7 @@
           contactUs: $t('app.contactUs.title'),
           cookiePolicy: $t('app.cookiePolicy'),
           privacyPolicy: $t('app.privacyPolicy'),
+          help: $t('app.help.title'),
         }"
       ></DgaTab>
       <div v-show="contentSubtab === 'home'" class="grid grid-cols-12 gap-4">
@@ -173,6 +174,35 @@
           class="col-span-12 lg:col-span-9"
         ></DgaRichtextEditor>
       </div>
+      <div v-show="contentSubtab === 'help'" class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 lg:col-span-3">
+          {{ $t("app.admin.config.helpPdfContent") }} ({{
+            langFilter.toUpperCase()
+          }})
+        </div>
+
+        <div
+          v-show="langFilter === 'th'"
+          class="col-span-12 flex flex-row gap-2 lg:col-span-9"
+        >
+          <DgaInput
+            class="flex-1"
+            readonly
+            :value="helpPdfFileTH ? helpPdfFileTH.name : configs.helpPdfTH"
+          ></DgaInput>
+          <DgaPdfPicker v-model="helpPdfFileTH"></DgaPdfPicker>
+        </div>
+        <div
+          v-show="langFilter === 'en'"
+          class="col-span-12 flex flex-row gap-2 lg:col-span-9"
+        >
+          <DgaInput
+            readonly
+            :value="helpPdfFileEN ? helpPdfFileEN.name : configs.helpPdfEN"
+          ></DgaInput>
+          <DgaPdfPicker v-model="helpPdfFileEN"></DgaPdfPicker>
+        </div>
+      </div>
     </div>
     <DgaButtonGroup class="mt-4">
       <DgaButton
@@ -222,7 +252,8 @@ const serverConfigs = await useServerConfig(
     "about",
     "contactUs",
     "cookiePolicy",
-    "privacyPolicy"
+    "privacyPolicy",
+    "helpPdf"
   ).concat(["homeImageURL"])
 );
 
@@ -241,7 +272,12 @@ const configs: Ref<Partial<ConfigData>> = ref({
   cookiePolicyEN: serverConfigs.cookiePolicyEN || "",
   privacyPolicyTH: serverConfigs.privacyPolicyTH || "",
   privacyPolicyEN: serverConfigs.privacyPolicyEN || "",
+  helpPdfTH: serverConfigs.helpPdfTH || "",
+  helpPdfEN: serverConfigs.helpPdfEN || "",
 });
+
+const helpPdfFileTH: Ref<File | undefined> = ref(undefined);
+const helpPdfFileEN: Ref<File | undefined> = ref(undefined);
 
 const currentTab = ref("content");
 const contentSubtab = ref("home");
@@ -264,6 +300,36 @@ async function editConfigs() {
 
   showConfirmModal.value = false;
   waitEdit.value = true;
+
+  if (helpPdfFileTH.value != null) {
+    const formData = new FormData();
+    formData.append("pdf", helpPdfFileTH.value);
+
+    const { data } = await useFetch("/api/help-manual/upload", {
+      method: "POST",
+      body: formData,
+      headers: { "cache-control": "no-cache" },
+    });
+
+    if (data.value) {
+      configs.value.helpPdfTH = "/api/help-manual/" + data.value.fileName;
+    }
+  }
+
+  if (helpPdfFileEN.value != null) {
+    const formData = new FormData();
+    formData.append("pdf", helpPdfFileEN.value);
+
+    const { data } = await useFetch("/api/help-manual/upload", {
+      method: "POST",
+      body: formData,
+      headers: { "cache-control": "no-cache" },
+    });
+
+    if (data.value) {
+      configs.value.helpPdfEN = "/api/help-manual/" + data.value.fileName;
+    }
+  }
 
   const { error } = await useFetch("/api/config/update", {
     method: "POST",

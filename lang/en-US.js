@@ -334,6 +334,7 @@ export default {
         contactUsContent: "Contact Us Content",
         cookiePolicyContent: "Cookie Policy Content",
         privacyPolicyContent: "Privacy Policy Content",
+        helpPdfContent: "Help PDF File",
         confirm: "Confirm to Edit Configurations?",
         success: "Edit Configurations Successful",
         failed: "Edit Configurations Failed",

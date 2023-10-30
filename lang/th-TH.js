@@ -420,6 +420,7 @@ export default {
         contactUsContent: "เนื้อหาหน้าติดต่อเรา",
         cookiePolicyContent: "เนื้อหาหน้านโยบายคุกกี้",
         privacyPolicyContent: "เนื้อหาหน้านโยบายความเป็นส่วนตัว",
+        helpPdfContent: "ไฟล์ PDF",
         confirm: "ยีนยันการตั้งค่า?",
         success: "ตั้งค่าสำเร็จ",
         failed: "ตั้งค่าล้มเหลว",

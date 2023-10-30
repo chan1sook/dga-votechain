@@ -12,4 +12,5 @@ dist
 etc/
 .config/
 .img-upload/
+.help-manual/
 firebase-admin-config.json
