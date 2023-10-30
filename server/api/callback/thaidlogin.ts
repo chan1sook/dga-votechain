@@ -13,9 +13,13 @@ import {
 } from "~/src/services/fetch/user";
 import { compareAuthSourceFn } from "~/src/services/validations/user";
 import { authorizationThaID } from "~/src/services/vendor/thaid";
+import {
+  decodeLoginState,
+  getAfterRedirectUrlbyParam,
+} from "~/src/services/transform/login";
 
 export default defineEventHandler(async (event) => {
-  const { code } = getQuery(event);
+  const { code, state } = getQuery(event);
   const {
     THAID_API_KEY,
     THAID_CLIENT_ID,
@@ -24,6 +28,11 @@ export default defineEventHandler(async (event) => {
     CITIZENID_FIXED_SALT,
     ACCOUNT_DEV_CIDS,
   } = useRuntimeConfig();
+
+  const extraData: LoginExtraParams = decodeLoginState(state?.toString());
+
+  // console.log("state", state);
+  // console.log("parsed", extraData);
 
   if (typeof code === "string") {
     const data = await authorizationThaID(code, {
@@ -104,7 +113,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return sendRedirect(event, "/topics");
+    return sendRedirect(event, getAfterRedirectUrlbyParam(extraData || {}));
   }
 
   return sendRedirect(event, "/login");

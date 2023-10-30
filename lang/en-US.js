@@ -2,6 +2,9 @@ export default {
   appName: "DGA E-Voting",
   app: {
     loading: "Loading",
+    share: "Share",
+    shareTopic: "Share Voting Topic",
+    linkCopied: "Link Copied",
     offlineMode: "Maintenance Closed From",
     navbar: {
       adminShowUsers: "User Lists",
@@ -218,6 +221,9 @@ export default {
       paused: "E-voting is Paused",
       adminWarning: "Please change mode to Voter for voting topic.",
       cannotVote: "Can't vote",
+      notExists: "Topic not exists",
+      forbidden: "Unauthorized",
+      voteFinished: "Topic Expired",
       cannotCtrlVote: "Can't control vote",
       pause: "Paused",
       resume: "Resume",
@@ -227,6 +233,7 @@ export default {
       confirm: "Confirm voting choices?",
       pauseCause: "Reason",
       pauseCauseTitle: "Enter Reason of Pause",
+      anonyomousLogin: "Please Login for Voting Topic",
     },
     result: {
       title: "Voting Result",
@@ -327,6 +334,7 @@ export default {
         contactUsContent: "Contact Us Content",
         cookiePolicyContent: "Cookie Policy Content",
         privacyPolicyContent: "Privacy Policy Content",
+        helpPdfContent: "Help PDF File",
         confirm: "Confirm to Edit Configurations?",
         success: "Edit Configurations Successful",
         failed: "Edit Configurations Failed",
@@ -366,6 +374,7 @@ export default {
       show: "Show Description",
     },
     topicType: {
+      title: "Type",
       public: "Public Vote",
       private: "Private Vote",
       internal: "Internal Vote",

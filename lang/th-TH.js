@@ -2,6 +2,9 @@ export default {
   appName: "DGA E-Voting",
   app: {
     loading: "รอสักครู่",
+    share: "แชร์",
+    shareTopic: "แชร์กระทู้โหวต",
+    linkCopied: "คัดลอกลิงก์แล้ว",
     offlineMode: "ปิดปรับปรุงระบบชั่วคราว ตั้งแต่",
     navbar: {
       adminShowUsers: "รายชื่อผู้ใช้",
@@ -67,10 +70,10 @@ export default {
     topic: {
       create: {
         title: "สร้างโหวต",
-        action: "ตั้งโหวต",
-        confirm: "ยืนยันการตั้งโหวต",
-        success: "ตั้งโหวตสำเร็จ",
-        failed: "ตั้งโหวตล้มเหลว",
+        action: "สร้างโหวต",
+        confirm: "ยืนยันการสร้างโหวต",
+        success: "สร้างโหวตสำเร็จ",
+        failed: "สร้างโหวตล้มเหลว",
       },
       recreate: {
         title: "สร้างโหวตใหม่",
@@ -82,7 +85,7 @@ export default {
         success: "แก้ไขโหวตสำเร็จ",
         failed: "แก้ไขโหวตล้มเหลว",
       },
-      defaultVotes: "จำนวนโหวตตั้งต้น",
+      defaultVotes: "จำนวนสิทธิ์ในการโหวตของแต่ละผู้โหวต",
       template: {
         yesno: {
           label: "ใช่/ไม่",
@@ -144,7 +147,7 @@ export default {
       distinctVotes: "โหวตแต่ละตัวเลือกสูงสุดหนึ่งสิทธิ์",
       anonymousVotes: "อนุญาตให้คนทั่วไปโหวตได้",
       notifyUsers: "ส่งแจ้งเตือนให้ผู้ใช้",
-      showCreator: "แสดงชื่อผู้ตั้งโหวตสู่สาธารณะ",
+      showCreator: "แสดงรายชื่อผู้สร้างโหวตสู่สาธารณะ",
       recordBlockchain: "บันทึกลง Blockchain",
       voterScorePublic: "แสดงการโหวตของทุกคนสู่สาธารณะ",
       allow: "อนุญาต",
@@ -182,7 +185,7 @@ export default {
       loadMoreTopic: "โหลดคำถามเพิ่มเติม",
       noMoreTopic: "ไม่พบคำถาม",
       qrcode: "QR Code",
-      createTopic: "ตั้งโหวต",
+      createTopic: "สร้างโหวต",
       avaliableTopic: "โหวตที่เปิดอยู่",
       editTopic: "แก้ไข",
       recreateTopic: "สร้างใหม่",
@@ -218,6 +221,9 @@ export default {
       paused: "การโหวตหยุดชั่วคราว",
       adminWarning: "ให้เปลี่ยนสถานะเป็น ผู้โหวต ก่อนการลงคะแนนเสียง",
       cannotVote: "ไม่สามารถโหวตได้",
+      notExists: "ไม่มีข้อมูลโหวตในระบบ หรือ URL ไม่ถูกต้อง",
+      forbidden: "ท่านไม่มีสิทธิ์",
+      voteFinished: "กระทู้สิ้นสุดการโหวต",
       cannotCtrlVote: "ไม่สามารถควบคุมโหวตได้",
       pause: "หยุด",
       resume: "โหวตต่อ",
@@ -227,6 +233,7 @@ export default {
       confirm: "ยืนยันการเลือกโหวตนี้?",
       pauseCause: "เหตุผล",
       pauseCauseTitle: "ระบุเหตุผลหยุดโหวตชั่วคราว",
+      anonyomousLogin: "กรุณาเข้าสู่ระบบเพื่อโหวต",
     },
     result: {
       title: "ผลการโหวต",
@@ -246,7 +253,7 @@ export default {
       export: "ส่งออกผลโหวต",
     },
     voterList: {
-      title: "รายชื่อโหวต",
+      title: "ระบุรายชื่อผู้มีสิทธิ์โหวต",
       multipleVotes: "โหวตได้หลายตัวเลือก",
       totalVotes: "จำนวนเสียง",
       add: "เพิ่มชื่อ",
@@ -291,11 +298,12 @@ export default {
       show: "แสดงรายละเอียด",
     },
     topicType: {
+      title: "ประเภท",
       public: "โหวตสาธารณะ",
-      private: "โหวตทางลับ",
+      private: "โหวตเฉพาะสิทธิ์",
       internal: "โหวตในองค์กร",
     },
-    privateVote: "โหวตทางลับ",
+    privateVote: "โหวตเฉพาะสิทธิ์",
     votersList: "รายชื่อผู้มีสิทธิ์โหวต",
     permissions: {
       "request-permissions": "ขอสิทธิ์เพิ่มเติม",
@@ -412,6 +420,7 @@ export default {
         contactUsContent: "เนื้อหาหน้าติดต่อเรา",
         cookiePolicyContent: "เนื้อหาหน้านโยบายคุกกี้",
         privacyPolicyContent: "เนื้อหาหน้านโยบายความเป็นส่วนตัว",
+        helpPdfContent: "ไฟล์ PDF",
         confirm: "ยีนยันการตั้งค่า?",
         success: "ตั้งค่าสำเร็จ",
         failed: "ตั้งค่าล้มเหลว",

@@ -15,6 +15,8 @@ interface ConfigData {
   privacyPolicyTH: string;
   // termAndServiceEN: string,
   // termAndServiceTH: string,
+  helpPdfTH: string;
+  helpPdfEN: string;
 }
 
 type ProtectedKeys = string;

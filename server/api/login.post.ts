@@ -4,9 +4,19 @@ import {
   generateDigitalIDRegisterUrl,
 } from "~/src/services/vendor/digital-id";
 import { generatThaIDLoginUrl } from "~/src/services/vendor/thaid";
+import { encodeLoginState } from "~/src/services/transform/login";
 
 export default defineEventHandler(async (event) => {
   const param = await readBody(event);
+
+  const cbtid = param.cbtid?.toString();
+  const extraData: LoginExtraParams = {
+    cbtid,
+  };
+  const state = encodeLoginState(extraData);
+
+  // console.log("original", extraData);
+  // console.log("parsed_state", state);
 
   if (param.source === "digitalId") {
     const { DID_CLIENT_KEY, DID_LOGIN_CALLBACK, DID_API_URL } =
@@ -18,6 +28,7 @@ export default defineEventHandler(async (event) => {
         DID_CLIENT_KEY,
         DID_LOGIN_CALLBACK,
         DID_VERIFY_CODE,
+        STATE: state,
       });
       return sendRedirect(event, url);
     } else {
@@ -26,6 +37,7 @@ export default defineEventHandler(async (event) => {
         DID_CLIENT_KEY,
         DID_LOGIN_CALLBACK,
         DID_VERIFY_CODE,
+        STATE: state,
       });
       return sendRedirect(event, url);
     }
@@ -41,6 +53,7 @@ export default defineEventHandler(async (event) => {
       THAID_CLIENT_ID,
       THAID_CLIENT_SECRET,
       THAID_LOGIN_CALLBACK,
+      STATE: state,
     });
 
     setHeader(event, "Content-type", "application/x-www-form-urlencoded");

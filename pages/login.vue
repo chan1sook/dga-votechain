@@ -1,10 +1,11 @@
 <template>
-  <DgaLoginModule></DgaLoginModule>
+  <DgaLoginModule :cbtid="cbtid?.toString()"></DgaLoginModule>
 </template>
 
 <script setup lang="ts">
 const i18n = useI18n();
 
+const { cbtid } = useRoute().query;
 definePageMeta({
   middleware: ["auth-guest"],
 });

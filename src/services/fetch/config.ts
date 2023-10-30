@@ -24,6 +24,8 @@ const SERVER_CONFIGURATIONS: ConfigData = {
   cookiePolicyEN: "",
   privacyPolicyTH: PRIVACY_POLICY_TH,
   privacyPolicyEN: "",
+  helpPdfTH: "/pdf/help_1_0_1.pdf",
+  helpPdfEN: "",
 };
 
 const protectedKeys: ProtectedKeys[] = [];

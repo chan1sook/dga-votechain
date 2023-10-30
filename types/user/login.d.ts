@@ -1,0 +1,3 @@
+interface LoginExtraParams {
+  cbtid?: string;
+}

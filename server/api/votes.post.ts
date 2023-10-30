@@ -14,6 +14,7 @@ import {
   isTopicReadyToVote,
 } from "~/src/services/validations/topic";
 import { getVotesByTopicIdAndUserId } from "~/src/services/fetch/vote";
+import { isBannedUser } from "~/src/services/validations/user";
 
 export default defineEventHandler(async (event) => {
   const voteFormData: VotesFormData = await readBody(event);
@@ -37,22 +38,23 @@ export default defineEventHandler(async (event) => {
   let remainVotes = 0;
   const userData = event.context.userData;
 
-  if (userData) {
-    voterAllowData = await VoterAllowModel.findOne({
-      userid: userData._id,
-      topicid: topicDoc._id,
+  // No more Guest Access
+  if (!userData || isBannedUser(userData)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Forbidden",
     });
-    if (voterAllowData) {
-      remainVotes = voterAllowData.remainVotes;
-    } else {
-      const votes = await getVotesByTopicIdAndUserId(
-        topicDoc._id,
-        userData._id
-      );
-      remainVotes = topicDoc.defaultVotes - votes.length;
-    }
+  }
+
+  voterAllowData = await VoterAllowModel.findOne({
+    userid: userData._id,
+    topicid: topicDoc._id,
+  });
+  if (voterAllowData) {
+    remainVotes = voterAllowData.remainVotes;
   } else {
-    remainVotes = topicDoc.defaultVotes;
+    const votes = await getVotesByTopicIdAndUserId(topicDoc._id, userData._id);
+    remainVotes = topicDoc.defaultVotes - votes.length;
   }
 
   if (!isCanVote(userData, topicDoc, voterAllowData)) {

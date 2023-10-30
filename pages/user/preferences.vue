@@ -53,9 +53,14 @@ import PencilIcon from "vue-material-design-icons/Pencil.vue";
 import {
   getDefaultAdminTopMenus,
   getDefaultDevTopMenus,
+  getDefaultVoterTopMenus,
   getDefaultTopMenus,
 } from "~/src/services/form/preference";
-import { isUserAdmin, isUserDeveloper } from "~/src/services/validations/role";
+import {
+  isUserAdmin,
+  isUserDeveloper,
+  isUserVoter,
+} from "~/src/services/validations/role";
 
 const i18n = useI18n();
 const localePathOf = useLocalePath();
@@ -90,6 +95,8 @@ if (Array.isArray(useSessionData().value.preferences.topMenu)) {
     userPreferences.value.topMenu = getDefaultDevTopMenus();
   } else if (isUserAdmin({ permissions: _permissions })) {
     userPreferences.value.topMenu = getDefaultAdminTopMenus();
+  } else if (isUserVoter({ permissions: _permissions })) {
+    userPreferences.value.topMenu = getDefaultVoterTopMenus();
   }
 }
 

@@ -24,21 +24,23 @@
               color="dga-orange"
               :title="$t('app.modal.close')"
               @click="emit('close')"
-              >{{ $t("app.modal.close") }}</DgaButton
             >
+              {{ props.closeText || $t("app.modal.close") }}
+            </DgaButton>
           </template>
           <template v-else>
             <DgaButton
               color="dga-orange"
               :title="$t('app.modal.cancel')"
               @click="emit('cancel')"
-              >{{ $t("app.modal.cancel") }}</DgaButton
             >
+              {{ props.cancelText || $t("app.modal.cancel") }}
+            </DgaButton>
             <DgaButton
               color="green"
               :title="$t('app.modal.confirm')"
               @click="emit('confirm')"
-              >{{ $t("app.modal.confirm") }}</DgaButton
+              >{{ props.confirmText || $t("app.modal.confirm") }}</DgaButton
             >
           </template>
         </div>
@@ -53,6 +55,9 @@ const props = defineProps<{
   hideButtons?: boolean;
   closeOnly?: boolean;
   show?: boolean;
+  confirmText?: string;
+  closeText?: string;
+  cancelText?: string;
 }>();
 
 const emit = defineEmits<{

@@ -62,7 +62,13 @@ export default defineEventHandler(async (event) => {
   }
 
   // preferences part
-  userDoc.preferences.topMenu = prefData.topMenu;
+  if (!userDoc.preferences) {
+    userDoc.preferences = {
+      topMenu: prefData.topMenu,
+    };
+  } else {
+    userDoc.preferences.topMenu = prefData.topMenu;
+  }
 
   await userDoc.save();
 

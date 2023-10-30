@@ -36,9 +36,10 @@ export default defineEventHandler(async (event) => {
       : [];
   let filterIds;
   if (!userData || isBannedUser(userData)) {
-    topicsData = await getLastestGuestTopics(filterParams).populate(
-      "createdBy"
-    );
+    // No more Guest Access
+    // topicsData = await getLastestGuestTopics(filterParams).populate(
+    //   "createdBy"
+    // );
   } else if (roleMode === "admin" && isUserAdmin(userData)) {
     topicsData = await getLastestAdminTopics(
       userData._id,

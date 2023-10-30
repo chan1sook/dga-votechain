@@ -1,230 +1,239 @@
 <template>
-  <div v-if="topic && confirmVoting">
-    <div
-      class="relative flex flex-col items-center justify-center gap-x-2 gap-y-1 md:flex-row"
-    >
-      <NuxtLink
-        :href="localePathOf('/topics')"
-        class="flex flex-row items-center font-bold text-dga-orange md:absolute md:left-0"
-      >
-        <ArrowLeftIcon /> {{ $t("app.modal.back") }}
-      </NuxtLink>
+  <div>
+    <div v-if="topic && confirmVoting">
       <div
-        class="text-xl font-bold md:text-2xl"
-        @click="showLocaltime = !showLocaltime"
+        class="relative flex flex-col items-center justify-center gap-x-2 gap-y-1 md:flex-row"
       >
-        <div
-          class="flex flex-row items-center justify-center gap-2 text-center"
+        <NuxtLink
+          :href="localePathOf('/topics')"
+          class="flex flex-row items-center font-bold text-dga-orange md:absolute md:left-0"
         >
-          {{ $t("app.voting.now") }}:
-          {{ $d(dayjs(todayTime).toDate(), "long") }}
-        </div>
+          <ArrowLeftIcon /> {{ $t("app.modal.back") }}
+        </NuxtLink>
         <div
-          v-if="showLocaltime"
-          class="flex flex-row items-center justify-center gap-2 text-center text-sm"
+          class="text-xl font-bold md:text-2xl"
+          @click="showLocaltime = !showLocaltime"
         >
-          {{ $t("app.voting.localtime") }}:
-          {{ $d(dayjs(localTime).toDate(), "long") }}
-        </div>
-      </div>
-    </div>
-    <div class="my-4 flex flex-col gap-2 md:flex-row">
-      <div
-        class="flex flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-lg bg-dga-blue px-4 py-2 text-base text-white md:flex-nowrap md:px-8 md:py-4 md:text-xl"
-      >
-        <template v-if="canVote">
-          <div class="w-full text-center md:w-auto">
-            {{ $t("app.voting.remainTimeVoting") }}
-          </div>
-          <div class="timer-counter">{{ getDays(remainTime) }}</div>
-          <div>{{ $t("app.timePeriod.day", { count: 2 }) }}</div>
-          <div class="timer-counter">{{ getHours(remainTime) }}</div>
-          <div>{{ $t("app.timePeriod.hour", { count: 2 }) }}</div>
-          <div class="timer-counter">{{ getMinutes(remainTime) }}</div>
-          <div>{{ $t("app.timePeriod.minute", { count: 2 }) }}</div>
-          <div class="timer-counter">{{ getSecs(remainTime) }}</div>
-          <div>{{ $t("app.timePeriod.sec", { count: 2 }) }}</div>
-        </template>
-        <template v-else>
-          <div>{{ $t("app.voting.yourVote") }}</div>
-        </template>
-      </div>
-      <div
-        class="flex w-full flex-row gap-2 rounded-lg bg-dga-orange px-4 py-2 text-center text-white md:w-48 md:flex-col md:px-8 md:py-4"
-      >
-        <template v-if="canVote">
-          <div>{{ $t("app.voting.remainVotes") }}:</div>
-          <div class="ml-auto md:ml-0 md:text-xl">
-            {{ noVoteLocked ? 0 : remainVotes || 0 }}
-            {{ $t("app.voting.vote", { count: remainVotes || 0 }) }}
-          </div>
-        </template>
-        <template v-else>
-          <div>{{ $t("app.voting.totalVotes") }}:</div>
-          <div class="ml-auto md:ml-0 md:text-xl">
-            {{ totalVotes || 0 }}
-            {{ $t("app.voting.vote", { count: totalVotes }) }}
-          </div>
-        </template>
-      </div>
-    </div>
-    <h2 class="my-4 text-center text-2xl font-bold md:text-4xl">
-      {{ topic.name }}
-    </h2>
-    <template v-if="!isPaused">
-      <div class="flex flex-col flex-wrap justify-center gap-2">
-        <template v-for="choice of topic.choices.choices">
-          <DgaButton
-            class="relative mx-auto flex w-full max-w-md flex-row items-center justify-center gap-x-4 !rounded-3xl !px-4"
-            :class="[haveImage ? 'max-w-lg' : 'max-w-md']"
-            :theme="getBtnThemeOfChoice(choice)"
-            :color="
-              noVoteLocked ||
-              (canVote &&
-                prevVotes.map((ele) => ele.choice).includes(choice.name))
-                ? 'gray2'
-                : 'dga-blue'
-            "
-            :disabled="
-              !canVote ||
-              noVoteLocked ||
-              prevVotes.map((ele) => ele.choice).includes(choice.name)
-            "
-            :disabled-vivid="!canVote && !noVoteLocked"
-            @click="addVote(choice.name)"
+          <div
+            class="flex flex-row items-center justify-center gap-2 text-center"
           >
-            <div class="flex h-8 w-8 flex-row justify-center sm:w-24">
-              <template v-if="canVote">
-                <div
-                  v-if="
-                    prevVotes.map((ele) => ele.choice).includes(choice.name)
-                  "
-                  class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-gray-300 px-4 py-1 text-sm text-gray-500 sm:px-8"
-                >
-                  <CheckIcon /> <span class="hidden sm:block">VOTED</span>
-                </div>
-                <div
-                  v-else-if="noVoteLocked"
-                  class="w-full rounded-full bg-gray-300 px-4 py-1 text-sm text-gray-500 sm:px-8"
-                >
-                  <span class="hidden sm:block">VOTE</span>
-                </div>
-                <div
-                  v-else-if="voteCount(choice.name) === 0"
-                  class="w-full rounded-full bg-dga-orange px-4 py-1 text-sm text-white sm:px-8"
-                >
-                  <span class="hidden sm:block">VOTE</span>
-                </div>
-                <div
-                  v-else
-                  class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-green-700 px-4 py-1 text-sm text-white sm:px-8"
-                >
-                  <CheckIcon /> <span class="hidden sm:block">VOTED</span>
-                </div>
-              </template>
-              <template v-else>
-                <div
-                  v-if="noVoteLocked"
-                  class="w-full rounded-full bg-gray-500 px-4 py-1 text-sm text-white sm:px-8"
-                >
-                  <span class="hidden sm:block">VOTE</span>
-                </div>
-                <div
-                  v-else-if="votedCount(choice.name) === 0"
-                  class="w-full rounded-full bg-dga-orange px-4 py-1 text-sm text-white sm:px-8"
-                >
-                  <span class="hidden sm:block">VOTE</span>
-                </div>
-                <div
-                  v-else
-                  class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-green-700 px-4 py-1 text-sm text-white sm:px-8"
-                >
-                  <CheckIcon /> <span class="hidden sm:block">VOTED</span>
-                </div>
-              </template>
+            {{ $t("app.voting.now") }}:
+            {{ $d(dayjs(todayTime).toDate(), "long") }}
+          </div>
+          <div
+            v-if="showLocaltime"
+            class="flex flex-row items-center justify-center gap-2 text-center text-sm"
+          >
+            {{ $t("app.voting.localtime") }}:
+            {{ $d(dayjs(localTime).toDate(), "long") }}
+          </div>
+        </div>
+      </div>
+      <div class="my-4 flex flex-col gap-2 md:flex-row">
+        <div
+          class="flex flex-1 flex-row flex-wrap items-center justify-center gap-2 rounded-lg bg-dga-blue px-4 py-2 text-base text-white md:flex-nowrap md:px-8 md:py-4 md:text-xl"
+        >
+          <template v-if="canVote">
+            <div class="w-full text-center md:w-auto">
+              {{ $t("app.voting.remainTimeVoting") }}
             </div>
-            <div class="flex-1 text-left">{{ choice.name }}</div>
-            <img
-              v-if="haveImage"
-              :src="getImgUrlChoice(choice)"
-              class="hidden max-h-16 w-[4rem] sm:block"
-              @click.stop="showBigImage(choice)"
-            />
-            <div class="relative w-12">
-              <template v-if="canVote">
-                <div
-                  v-if="
-                    !noVoteLocked &&
-                    voteCount(choice.name) > 0 &&
-                    !isDistinctVotes
-                  "
-                >
-                  x{{ voteCount(choice.name) }}
-                </div>
-              </template>
-              <template v-else>
-                <div v-if="votedCount(choice.name) > 0 && !isDistinctVotes">
-                  x{{ votedCount(choice.name) }}
-                </div>
-              </template>
+            <div class="timer-counter">{{ getDays(remainTime) }}</div>
+            <div>{{ $t("app.timePeriod.day", { count: 2 }) }}</div>
+            <div class="timer-counter">{{ getHours(remainTime) }}</div>
+            <div>{{ $t("app.timePeriod.hour", { count: 2 }) }}</div>
+            <div class="timer-counter">{{ getMinutes(remainTime) }}</div>
+            <div>{{ $t("app.timePeriod.minute", { count: 2 }) }}</div>
+            <div class="timer-counter">{{ getSecs(remainTime) }}</div>
+            <div>{{ $t("app.timePeriod.sec", { count: 2 }) }}</div>
+          </template>
+          <template v-else>
+            <div>{{ $t("app.voting.yourVote") }}</div>
+          </template>
+        </div>
+        <div
+          class="flex w-full flex-row gap-2 rounded-lg bg-dga-orange px-4 py-2 text-center text-white md:w-48 md:flex-col md:px-8 md:py-4"
+        >
+          <template v-if="canVote">
+            <div>{{ $t("app.voting.remainVotes") }}:</div>
+            <div class="ml-auto md:ml-0 md:text-xl">
+              {{ noVoteLocked ? 0 : remainVotes || 0 }}
+              {{ $t("app.voting.vote", { count: remainVotes || 0 }) }}
             </div>
+          </template>
+          <template v-else>
+            <div>{{ $t("app.voting.totalVotes") }}:</div>
+            <div class="ml-auto md:ml-0 md:text-xl">
+              {{ totalVotes || 0 }}
+              {{ $t("app.voting.vote", { count: totalVotes }) }}
+            </div>
+          </template>
+        </div>
+      </div>
+      <h2 class="my-4 text-center text-2xl font-bold md:text-4xl">
+        {{ topic.name }}
+      </h2>
+      <template v-if="!isPaused">
+        <div class="flex flex-col flex-wrap justify-center gap-2">
+          <template v-for="choice of topic.choices.choices">
+            <DgaButton
+              class="relative mx-auto flex w-full max-w-md flex-row items-center justify-center gap-x-4 !rounded-3xl !px-4"
+              :class="[haveImage ? 'max-w-lg' : 'max-w-md']"
+              :theme="getBtnThemeOfChoice(choice)"
+              :color="
+                noVoteLocked || (canVote && containPrevVote(choice))
+                  ? 'gray2'
+                  : 'dga-blue'
+              "
+              :disabled="
+                !canVote ||
+                noVoteLocked ||
+                containPrevVote(choice) ||
+                remainVotes === 0
+              "
+              :disabled-vivid="!canVote || (!noVoteLocked && remainVotes === 0)"
+              @click="addVote(choice.name)"
+            >
+              <div class="flex h-8 w-8 flex-row justify-center sm:w-24">
+                <template v-if="canVote">
+                  <div
+                    v-if="containPrevVote(choice)"
+                    class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-gray-300 px-4 py-1 text-sm text-gray-500 sm:px-8"
+                  >
+                    <CheckIcon /> <span class="hidden sm:block">VOTED</span>
+                  </div>
+                  <div
+                    v-else-if="noVoteLocked"
+                    class="w-full rounded-full bg-gray-300 px-4 py-1 text-sm text-gray-500 sm:px-8"
+                  >
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div
+                    v-else-if="voteCount(choice.name) === 0"
+                    class="w-full rounded-full bg-dga-orange px-4 py-1 text-sm text-white sm:px-8"
+                  >
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div
+                    v-else
+                    class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-green-700 px-4 py-1 text-sm text-white sm:px-8"
+                  >
+                    <CheckIcon /> <span class="hidden sm:block">VOTED</span>
+                  </div>
+                </template>
+                <template v-else>
+                  <div
+                    v-if="noVoteLocked"
+                    class="w-full rounded-full bg-gray-500 px-4 py-1 text-sm text-white sm:px-8"
+                  >
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div
+                    v-else-if="votedCount(choice.name) === 0"
+                    class="w-full rounded-full bg-dga-orange px-4 py-1 text-sm text-white sm:px-8"
+                  >
+                    <span class="hidden sm:block">VOTE</span>
+                  </div>
+                  <div
+                    v-else
+                    class="flex w-full flex-row items-center justify-center gap-1 rounded-full bg-green-700 px-4 py-1 text-sm text-white sm:px-8"
+                  >
+                    <CheckIcon /> <span class="hidden sm:block">VOTED</span>
+                  </div>
+                </template>
+              </div>
+              <div class="flex-1 text-left">{{ choice.name }}</div>
+              <img
+                v-if="haveImage"
+                :src="getImgUrlChoice(choice)"
+                class="hidden max-h-16 w-[4rem] sm:block"
+                @click.stop="showBigImage(choice)"
+              />
+              <div class="relative w-12">
+                <template v-if="canVote">
+                  <div
+                    v-if="
+                      !noVoteLocked &&
+                      voteCount(choice.name) > 0 &&
+                      !isDistinctVotes
+                    "
+                  >
+                    x{{ voteCount(choice.name) }}
+                  </div>
+                </template>
+                <template v-else>
+                  <div v-if="votedCount(choice.name) > 0 && !isDistinctVotes">
+                    x{{ votedCount(choice.name) }}
+                  </div>
+                </template>
+              </div>
+            </DgaButton>
+          </template>
+        </div>
+        <div
+          v-if="canVote"
+          class="my-4 flex flex-col justify-center gap-x-4 gap-y-2 text-sm md:flex-row"
+        >
+          <DgaButton
+            color="dga-orange"
+            class="mx-auto w-48 md:mx-0 md:w-auto"
+            @click="clearVotes"
+          >
+            {{ $t("app.voting.clear") }}
           </DgaButton>
-        </template>
-      </div>
-      <div
-        v-if="canVote"
-        class="my-4 flex flex-col justify-center gap-x-4 gap-y-2 text-sm md:flex-row"
+          <DgaButton
+            color="gray"
+            class="mx-auto w-48 md:mx-0 md:w-auto"
+            @click="lockVotes"
+          >
+            {{ $t("app.voting.noVote") }}
+          </DgaButton>
+          <DgaButton
+            class="mx-auto w-48 md:mx-0 md:w-auto"
+            :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused"
+            @click="showConfirmModal = true"
+          >
+            {{ $t("app.voting.submit") }}
+          </DgaButton>
+        </div>
+      </template>
+      <template v-else>
+        <div class="text-center text-2xl">{{ $t("app.voting.paused") }}</div>
+        <div v-if="getPauseCause()">
+          <b>{{ $t("app.voting.pauseCause") }}:</b> {{ getPauseCause() }}
+        </div>
+      </template>
+
+      <DgaModal
+        :show="showConfirmModal"
+        cancel-backdrop
+        @confirm="submitVotes"
+        @close="showConfirmModal = false"
+        @cancel="showConfirmModal = false"
       >
-        <DgaButton
-          color="dga-orange"
-          class="mx-auto w-48 md:mx-0 md:w-auto"
-          @click="clearVotes"
-        >
-          {{ $t("app.voting.clear") }}
-        </DgaButton>
-        <DgaButton
-          color="gray"
-          class="mx-auto w-48 md:mx-0 md:w-auto"
-          @click="lockVotes"
-        >
-          {{ $t("app.voting.noVote") }}
-        </DgaButton>
-        <DgaButton
-          class="mx-auto w-48 md:mx-0 md:w-auto"
-          :disabled="(currentVotes.length === 0 && !noVoteLocked) || isPaused"
-          @click="showConfirmModal = true"
-        >
-          {{ $t("app.voting.submit") }}
-        </DgaButton>
-      </div>
-    </template>
-    <template v-else>
-      <div class="text-center text-2xl">{{ $t("app.voting.paused") }}</div>
-      <div v-if="getPauseCause()">
-        <b>{{ $t("app.voting.pauseCause") }}:</b> {{ getPauseCause() }}
-      </div>
-    </template>
+        {{ $t("app.voting.confirm") }}
+      </DgaModal>
+      <DgaModal
+        :show="showImageModal"
+        cancel-backdrop
+        close-only
+        @close="showImageModal = false"
+      >
+        <img
+          :src="getImgUrlChoice(selectedImageChoice)"
+          class="max-h-[77.5vh] object-contain"
+        />
+      </DgaModal>
+      <DgaLoadingModal :show="waitVote"></DgaLoadingModal>
+    </div>
     <DgaModal
-      :show="showConfirmModal"
-      cancel-backdrop
-      @confirm="submitVotes"
-      @close="showConfirmModal = false"
-      @cancel="showConfirmModal = false"
+      :show="anonyomousPopup"
+      :confirm-text="$t('app.login.title')"
+      @confirm="toLoginPage"
+      @close="backToHomePage"
+      @cancel="backToHomePage"
     >
-      {{ $t("app.voting.confirm") }}
+      {{ $t("app.voting.anonyomousLogin") }}
     </DgaModal>
-    <DgaModal
-      :show="showImageModal"
-      cancel-backdrop
-      close-only
-      @close="showImageModal = false"
-    >
-      <img
-        :src="getImgUrlChoice(selectedImageChoice)"
-        class="max-h-[77.5vh] object-contain"
-      />
-    </DgaModal>
-    <DgaLoadingModal :show="waitVote"></DgaLoadingModal>
   </div>
 </template>
 
@@ -279,6 +288,7 @@ const showImageModal = ref(false);
 const waitVote = ref(false);
 const remainVotes = ref(0);
 const totalVotes = ref(0);
+const anonyomousPopup = ref(false);
 const canVote = computed(() => {
   if (topic.value) {
     return totalVotes.value > 0;
@@ -315,10 +325,22 @@ function getBtnThemeOfChoice(choice: { name: string }) {
   return voteCounts > 0 && !noVoteLocked.value ? "default" : "hollow2";
 }
 
-const { data } = await useFetch(`/api/topic/info/${topicid}`);
+const { data, error } = await useFetch(`/api/topic/info/${topicid}`);
 
-if (!data.value) {
-  showError(i18n.t("app.voting.cannotVote"));
+if (!data.value || error.value) {
+  // console.log(error.value?.statusMessage);
+  switch (error.value?.statusMessage) {
+    case "Topic not found":
+      showError(i18n.t("app.voting.notExists"));
+      break;
+    case "Forbidden":
+      anonyomousPopup.value = true;
+      // showError(i18n.t("app.voting.forbidden"));
+      break;
+    default:
+      showError(i18n.t("app.voting.cannotVote"));
+      break;
+  }
 } else {
   const {
     topic: _topic,
@@ -331,7 +353,7 @@ if (!data.value) {
 
   if (!canVote) {
     showError({
-      message: i18n.t("app.voting.cannotVote"),
+      message: i18n.t("app.voting.forbidden"),
       statusCode: 403,
     });
   } else if (!isTopicReadyToVote(_topic, useComputedServerTime().getTime())) {
@@ -342,6 +364,7 @@ if (!data.value) {
   } else if (
     isTopicExpired(_topic, _pauseData, useComputedServerTime().getTime())
   ) {
+    // showError(i18n.t("app.voting.voteFinished"));
     navigateTo(`/topic/result/${_topic._id}`);
   } else {
     topic.value = _topic;
@@ -359,6 +382,14 @@ if (!data.value) {
 
     confirmVoting.value = true;
   }
+}
+
+function toLoginPage() {
+  navigateTo(localePathOf("/login") + `?cbtid=${topicid}`);
+}
+
+function backToHomePage() {
+  navigateTo(localePathOf("/"));
 }
 
 function voteCount(choice: ChoiceDataType) {
@@ -388,6 +419,14 @@ function getImgUrlChoice(choice: ChoiceData | undefined) {
 function showBigImage(choice: ChoiceData) {
   selectedImageChoice.value = choice;
   showImageModal.value = true;
+}
+
+function containVote(choice: ChoiceData) {
+  return currentVotes.value.includes(choice.name);
+}
+
+function containPrevVote(choice: ChoiceData) {
+  return prevVotes.value.map((ele) => ele.choice).includes(choice.name);
 }
 
 function addVote(choice: ChoiceDataType) {
@@ -580,6 +619,10 @@ onUnmounted(() => {
   socket.off(`pauseVote/${topicid}`);
   socket.off(`resumeVote/${topicid}`);
 });
+
+if (!useSessionData().value.userid) {
+  anonyomousPopup.value = true;
+}
 </script>
 
 <style scoped>

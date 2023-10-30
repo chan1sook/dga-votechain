@@ -17,8 +17,10 @@ import {
   getDefaultAdminTopMenus,
   getDefaultAllAdminTopMenus,
   getDefaultAllDevTopMenus,
+  getDefaultAllVoterTopMenus,
   getDefaultAllTopMenus,
   getDefaultDevTopMenus,
+  getDefaultVoterTopMenus,
   getDefaultTopMenus,
 } from "~/src/services/form/preference";
 import { checkPermissionNeeds } from "~/src/services/validations/permission";
@@ -38,6 +40,8 @@ if (checkPermissionNeeds(_permissions, "dev-mode")) {
   userEditFormData.value = getDefaultDevTopMenus();
 } else if (checkPermissionNeeds(_permissions, "admin-mode")) {
   userEditFormData.value = getDefaultAdminTopMenus();
+} else if (checkPermissionNeeds(_permissions, "voter-mode")) {
+  userEditFormData.value = getDefaultVoterTopMenus();
 }
 
 const allMenuOptions = computed(() => {
@@ -46,6 +50,8 @@ const allMenuOptions = computed(() => {
     return getDefaultAllDevTopMenus();
   } else if (checkPermissionNeeds(_permissions, "admin-mode")) {
     return getDefaultAllAdminTopMenus();
+  } else if (checkPermissionNeeds(_permissions, "voter-mode")) {
+    return getDefaultAllVoterTopMenus();
   }
   return getDefaultAllTopMenus();
 });
