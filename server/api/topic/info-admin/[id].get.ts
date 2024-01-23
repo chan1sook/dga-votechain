@@ -69,13 +69,16 @@ export default defineEventHandler(async (event) => {
     hidden: topicDoc.hidden,
   };
 
-  const [voterAllowDocs, coadminDocs, pauseDataDocs, anonVotes] =
-    await Promise.all([
-      TopicVoterAllowsModel.find({ topicid: topicDoc._id }).populate("userid"),
-      UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) } }),
-      getTopicCtrlPauseListByTopicId(topicDoc._id),
-      getAnonymousVotesByTopicId(topicDoc._id),
-    ]);
+  const [voterAllowDocs, coadminDocs, pauseDataDocs] = await Promise.all([
+    TopicVoterAllowsModel.find({ topicid: topicDoc._id }).populate("userid"),
+    UserModel.find({ _id: { $in: topicDoc.coadmins.map((ele) => ele._id) } }),
+    getTopicCtrlPauseListByTopicId(topicDoc._id),
+  ]);
+
+  const anonVotes = await getAnonymousVotesByTopicId(
+    topicDoc._id,
+    voterAllowDocs.map((ele) => ele.userid._id)
+  );
 
   const anonyomusVotes: AnonymousVoteResponseData[] = [];
   for (const vote of anonVotes) {

@@ -293,7 +293,7 @@ socket.on("voted", (votes: VoteResponseData[]) => {
         target.remainVotes -= 1;
       }
 
-      if (!vote.userid) {
+      if (!target) {
         const anonVoteTarget = anonVotes.value.find(
           (ele) => ele.groupid === vote.groupid
         );

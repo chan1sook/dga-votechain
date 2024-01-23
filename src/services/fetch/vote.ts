@@ -7,10 +7,13 @@ export function getVotesByTopicId(topicid: Types.ObjectId) {
   });
 }
 
-export function getAnonymousVotesByTopicId(topicid: Types.ObjectId) {
+export function getAnonymousVotesByTopicId(
+  topicid: Types.ObjectId,
+  excludeUserIds: Types.ObjectId[]
+) {
   return VoteModel.find({
     topicid,
-    userid: { $exists: false },
+    userid: { $nin: excludeUserIds },
   });
 }
 
