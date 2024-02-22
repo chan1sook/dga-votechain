@@ -1,4 +1,8 @@
 import { model, Schema } from "mongoose";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 
 const schema = new Schema<ServerMetrics>(
   {
@@ -34,5 +38,9 @@ const schema = new Schema<ServerMetrics>(
 );
 
 schema.index({ source: 1, createdAt: 1 });
+schema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: dayjs.duration({ years: 1 }).asSeconds() }
+);
 
 export default model("server-metrics", schema);
