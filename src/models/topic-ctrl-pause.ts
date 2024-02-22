@@ -18,4 +18,9 @@ const schema = new Schema<TopicCtrlPauseModelData>({
   },
 });
 
+schema.index({
+  topicid: 1,
+  resumeAt: 1,
+});
+
 export default model<TopicCtrlPauseModelData>("topic-pause", schema);

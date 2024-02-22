@@ -22,4 +22,10 @@ const schema = new Schema<RequestPermissionsModelData>(
   { timestamps: true }
 );
 
+schema.index({
+  _id: 1,
+  userid: 1,
+  status: 1,
+});
+
 export default model<RequestPermissionsModelData>("request-permission", schema);

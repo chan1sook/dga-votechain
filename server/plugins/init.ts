@@ -9,6 +9,7 @@ import {
 import initBlockchainHbWorkers from "../../src/worker/blockchain-hb";
 import initNotificationWorkers from "../../src/worker/notification";
 import initUserWorkers from "~/src/worker/users";
+import initMonitoring from "~/src/worker/monitoring";
 
 export default defineNitroPlugin(async (nitroApp) => {
   console.log("[Config] View Config");
@@ -31,6 +32,8 @@ export default defineNitroPlugin(async (nitroApp) => {
   await setPredefinedBlockchainServers();
   await migrateDuplicateUsers();
 
+  initMonitoring();
+  console.log("[Monitoring Workers] Started!");
   initBlockchainHbWorkers();
   console.log("[BlockchainServerHB Workers] Started!");
   initNotificationWorkers();

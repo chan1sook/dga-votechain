@@ -22,4 +22,6 @@ const schema = new Schema<VoterAllowModelData>(
   { timestamps: true }
 );
 
+schema.index({ userid: 1, topicid: 1 });
+
 export default model<VoterAllowModelData>("topic-voter-allow", schema);

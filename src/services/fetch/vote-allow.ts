@@ -1,4 +1,4 @@
-import { FilterQuery, Types } from "mongoose";
+import { type FilterQuery, Types } from "mongoose";
 import VoterAllowModel from "~/src/models/voters-allow";
 
 export function getVoterAllowByTopicId(topicid: Types.ObjectId) {

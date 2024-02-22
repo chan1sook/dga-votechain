@@ -1,4 +1,4 @@
-import { FilterQuery, Types } from "mongoose";
+import { type FilterQuery, Types } from "mongoose";
 import RequestPermissionsModel from "~/src/models/request-permission";
 
 export function getPendingRequestPermissionsData(

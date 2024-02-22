@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
-import { FilterQuery, Types } from "mongoose";
+import { type FilterQuery, Types } from "mongoose";
 import TopicModel from "~/src/models/topic";
 import { escapeRegExp } from "../formatter/regexp";
 

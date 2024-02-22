@@ -48,4 +48,15 @@ declare global {
     digitalIdUserId?: DigitalIdUserId;
     thaIDUserId?: ThaIDUserId;
   }
+
+  interface ServerMetrics {
+    source: string;
+    cpuUsagePercent: number;
+    ramUsage: number;
+    ramTotal: number;
+    ramUsagePercent: number;
+    diskUsage: number;
+    diskTotal: number;
+    diskUsagePercent: number;
+  }
 }

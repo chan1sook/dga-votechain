@@ -4,6 +4,7 @@ const schema = new Schema<BlockchainServerData>(
   {
     name: {
       type: String,
+      index: true,
     },
     host: {
       type: String,

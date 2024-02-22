@@ -18,4 +18,9 @@ const schema = new Schema<ConfigModelData>(
   { timestamps: true }
 );
 
+schema.index({
+  key: 1,
+  withProtected: 1,
+});
+
 export default model<ConfigModelData>("config", schema);

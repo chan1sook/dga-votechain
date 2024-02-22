@@ -24,9 +24,12 @@ const schema = new Schema<VoteModelData>(
     },
     tx: {
       type: String,
+      index: true,
     },
   },
   { timestamps: true }
 );
+
+schema.index({ _id: 1, userid: 1, topicid: 1 });
 
 export default model<VoteModelData>("vote", schema);
