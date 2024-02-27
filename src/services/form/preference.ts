@@ -36,5 +36,6 @@ export function getDefaultAllDevTopMenus(): PreferenceTopMenuOption[] {
     "users-management",
     "blockchain",
     "server-config",
+    "monitor",
   ];
 }

@@ -339,6 +339,28 @@ export default {
         success: "Edit Configurations Successful",
         failed: "Edit Configurations Failed",
       },
+      monitor: {
+        title: "System Monitoring",
+        refresh: "Refresh Data",
+        graph: "Graph",
+        timeframe: {
+          title: "Timeframe",
+          mins10: "10 Mins",
+          hour1: "1 Hour",
+          day1: "1 Day",
+          days7: "7 Days",
+          month1: "1 Month",
+        },
+        metrics: {
+          cpuUsagePercent: "CPU Usage (%)",
+          ramUsagePercent: "RAM Usage (%)",
+          ramUsage: "RAM Usage (bytes)",
+          ramTotal: "RAM Capacity (bytes)",
+          diskUsagePercent: "Disk Usage (%)",
+          diskUsage: "Disk Usage (bytes)",
+          diskTotal: "Disk Capacity (bytes)",
+        },
+      },
     },
     help: {
       title: "Help",

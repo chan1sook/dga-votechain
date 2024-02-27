@@ -35,7 +35,8 @@ declare global {
     | "contact-us"
     | "users-management"
     | "blockchain"
-    | "server-config";
+    | "server-config"
+    | "monitor";
 
   interface UserPreferencesModel {
     topMenu: UserPreferencesTopMenu;
@@ -47,16 +48,5 @@ declare global {
     authSource: UserAuthSource;
     digitalIdUserId?: DigitalIdUserId;
     thaIDUserId?: ThaIDUserId;
-  }
-
-  interface ServerMetrics {
-    source: string;
-    cpuUsagePercent: number;
-    ramUsage: number;
-    ramTotal: number;
-    ramUsagePercent: number;
-    diskUsage: number;
-    diskTotal: number;
-    diskUsagePercent: number;
   }
 }

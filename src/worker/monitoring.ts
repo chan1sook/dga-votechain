@@ -2,9 +2,7 @@ import nodeCron from "node-cron";
 import systeminformation from "systeminformation";
 import ServerMetricsModel from "~/src/models/server-metrics";
 
-const isProduction =
-  !process.env.IS_DEV && process.env.NODE_ENV === "production";
-
+const cachedMetrics: ServerMetrics[] = [];
 async function getSystemInfo() {
   const [mem, currentLoad, dockerAll, fsSize] = await Promise.all([
     systeminformation.mem(),
@@ -35,9 +33,17 @@ async function getSystemInfo() {
     diskUsage: fsSizeAll.used,
     diskTotal: fsSizeAll.size,
     diskUsagePercent: (fsSizeAll.used * 100) / fsSizeAll.size,
+    createdAt: new Date(),
   };
 
-  await new ServerMetricsModel(metrics).save();
+  cachedMetrics.push(metrics);
+
+  if (cachedMetrics.length >= 10) {
+    console.log(`[Monitoring Workers] Save 10 Metrics`);
+
+    await ServerMetricsModel.insertMany(cachedMetrics);
+    cachedMetrics.splice(0, cachedMetrics.length);
+  }
 }
 
 function worker() {
@@ -51,5 +57,5 @@ function worker() {
 
 export default function initMonitoring() {
   worker();
-  return nodeCron.schedule("*/10 * * * * *", worker);
+  return nodeCron.schedule("* * * * * *", worker);
 }
