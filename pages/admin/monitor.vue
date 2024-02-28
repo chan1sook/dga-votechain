@@ -310,6 +310,8 @@ async function fetchMetricValue() {
     },
   });
 
+  console.log(_rawMetrics);
+
   if (_rawMetrics.value) {
     metrics.value = _rawMetrics.value.metrics as ServerMetricsResponse;
   } else {
@@ -336,11 +338,9 @@ async function softFetchMetricValue() {
 
 let fetchId: NodeJS.Timer | undefined;
 
-onMounted(() => {
-  fetchMetricValue();
-});
-
 onUnmounted(() => {
   clearTimeout(fetchId);
 });
+
+fetchMetricValue();
 </script>
