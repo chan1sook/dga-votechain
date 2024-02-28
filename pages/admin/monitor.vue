@@ -1,22 +1,37 @@
 <template>
   <div>
     <DgaHead>{{ $t("app.admin.monitor.title") }}</DgaHead>
-    <div class="mx-auto max-w-5xl py-2 flex flex-col gap-y-2">
+    <div class="mx-auto flex max-w-5xl flex-col gap-y-2 py-2">
       <div>{{ $t("app.admin.monitor.timeframe.title") }}</div>
-      <div class="flex flex-row gap-x-2 items-center">
-        <DgaVueSelect v-model="timeframeDuration" :options="timeframeOptions" :reduce="(val) => val.value" class="flex-1">
+      <div class="flex flex-row items-center gap-x-2">
+        <DgaVueSelect
+          v-model="timeframeDuration"
+          :options="timeframeOptions"
+          :reduce="(val) => val.value"
+          class="flex-1"
+        >
         </DgaVueSelect>
-        <DgaButton class="inline-flex flex-row items-center justify-center gap-x-2 truncate !p-2" color="dga-orange"
-          :title="$t('app.admin.monitor.refresh')" :disabled="loading" @click="fetchMetricValue">
+        <DgaButton
+          class="inline-flex flex-row items-center justify-center gap-x-2 truncate !p-2"
+          color="dga-orange"
+          :title="$t('app.admin.monitor.refresh')"
+          :disabled="loading"
+          @click="fetchMetricValue"
+        >
           <RefreshIcon />
         </DgaButton>
       </div>
-      <div v-if="loading" class="text-center text-xl italic">{{ $t("app.loading", "Loading") }}...</div>
+      <div v-if="loading" class="text-center text-xl italic">
+        {{ $t("app.loading", "Loading") }}...
+      </div>
       <template v-else>
         <div class="mb-2">{{ $t("app.admin.monitor.graph") }}</div>
         <div class="flex flex-col gap-2">
           <div class="h-[300px]">
-            <LineChart :data="chartPercentData" :options="chartPercentOptions" />
+            <LineChart
+              :data="chartPercentData"
+              :options="chartPercentOptions"
+            />
           </div>
           <div class="h-[300px]">
             <LineChart :data="chartRamData" :options="chartByteOptions" />
@@ -32,7 +47,7 @@
 
 <script setup lang="ts">
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
+import duration from "dayjs/plugin/duration.js";
 
 import {
   Chart as ChartJS,
@@ -46,7 +61,7 @@ import {
 } from "chart.js";
 import { Line as LineChart } from "vue-chartjs";
 import "chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm";
-import prettyBytes from 'pretty-bytes';
+import prettyBytes from "pretty-bytes";
 
 import RefreshIcon from "vue-material-design-icons/Refresh.vue";
 
@@ -250,7 +265,9 @@ const chartByteOptions = computed(() => {
               label += ": ";
             }
             if (context.parsed.y !== null) {
-              label += prettyBytes(context.parsed.y, { locale: i18n.locale.value || 'en' });
+              label += prettyBytes(context.parsed.y, {
+                locale: i18n.locale.value || "en",
+              });
             }
             return label;
           },
@@ -271,9 +288,9 @@ const chartByteOptions = computed(() => {
       y: {
         ticks: {
           callback(val: number) {
-            return prettyBytes(val, { locale: i18n.locale.value || 'en' })
+            return prettyBytes(val, { locale: i18n.locale.value || "en" });
           },
-        }
+        },
       },
     },
   };
@@ -305,7 +322,6 @@ async function fetchMetricValue() {
   loading.value = false;
 }
 
-
 async function softFetchMetricValue() {
   const { data: _rawMetrics } = await useFetch("/api/metrics/logs", {
     query: {
@@ -315,9 +331,8 @@ async function softFetchMetricValue() {
 
   if (_rawMetrics.value) {
     metrics.value = _rawMetrics.value.metrics as ServerMetricsResponse;
-  } 
+  }
 }
-
 
 let fetchId: NodeJS.Timer | undefined;
 
