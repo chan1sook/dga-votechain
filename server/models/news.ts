@@ -1,4 +1,4 @@
-import { FilterQuery, model, Schema, Types } from "mongoose";
+import { type FilterQuery, model, Schema, Types } from "mongoose";
 
 const schema = new Schema<NewsData, NewsModel>(
   {

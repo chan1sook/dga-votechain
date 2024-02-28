@@ -160,6 +160,8 @@ function topMenuPretty(menu: PreferenceTopMenuOption) {
       return i18n.t("app.navbar.blockchain");
     case "server-config":
       return i18n.t("app.admin.config.title");
+    case "monitor":
+      return i18n.t("app.admin.monitor.title");
     default:
       return menu;
   }

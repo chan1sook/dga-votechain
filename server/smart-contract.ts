@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import Web3NodejsProvider from "web3-nodejs-provider";
+import HDWalletProvider from "@truffle/hdwallet-provider";
 import DgaEvoteArtifact from "~/blockchain/build/contracts/DgaEvote.json";
 import axios from "axios";
 import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
@@ -10,7 +10,7 @@ const rpcURL = isProduction
   ? "http://127.0.0.1:8545"
   : `http://${BLOCKCHAIN_SERVERS[0].host}:8545`;
 
-const provider = new Web3NodejsProvider({
+const provider = new HDWalletProvider({
   privateKeys: [useRuntimeConfig().BLOCKCHAIN_PRIVATE_KEY],
   providerOrUrl: rpcURL,
 });

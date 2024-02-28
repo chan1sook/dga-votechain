@@ -60,4 +60,13 @@ const schema = new Schema<UserModelData>(
   }
 );
 
+schema.index({
+  firstName: 1,
+  lastName: 1,
+  authSources: 1,
+  email: 1,
+  cidHashed: 1,
+  removeAt: 1,
+});
+
 export default model("dga-user", schema);

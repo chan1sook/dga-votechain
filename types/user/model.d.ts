@@ -35,7 +35,8 @@ declare global {
     | "contact-us"
     | "users-management"
     | "blockchain"
-    | "server-config";
+    | "server-config"
+    | "monitor";
 
   interface UserPreferencesModel {
     topMenu: UserPreferencesTopMenu;

@@ -132,4 +132,19 @@ const schema = new Schema<TopicModelData>(
   { timestamps: true }
 );
 
+schema.index({
+  _id: 1,
+  name: 1,
+  status: 1,
+  type: 1,
+  hidden: 1,
+  admin: 1,
+  coadmins: 1,
+  voteStartAt: 1,
+});
+schema.index({
+  voteExpiredAt: 1,
+  notifyFinished: 1,
+});
+
 export default model<TopicModelData>("topic", schema);

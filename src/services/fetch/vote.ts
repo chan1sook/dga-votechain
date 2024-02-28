@@ -1,4 +1,4 @@
-import { FilterQuery, Types } from "mongoose";
+import { Types, type FilterQuery } from "mongoose";
 import VoteModel from "~/src/models/vote";
 
 export function getVotesByTopicId(topicid: Types.ObjectId) {

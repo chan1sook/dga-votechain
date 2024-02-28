@@ -24,4 +24,11 @@ const schema = new Schema<NotificationModelData>(
   { timestamps: true }
 );
 
+schema.index({
+  _id: 1,
+  userid: 1,
+  readAt: 1,
+  notifyAt: 1,
+});
+
 export default model<NotificationModelData>("notification", schema);

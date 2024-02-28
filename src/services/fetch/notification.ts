@@ -1,4 +1,4 @@
-import { FilterQuery, Types } from "mongoose";
+import { type FilterQuery, Types } from "mongoose";
 import NotificationModel from "~/src/models/notification";
 
 export async function getUnreadNotificationByUser(

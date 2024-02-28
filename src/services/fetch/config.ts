@@ -1,4 +1,4 @@
-import { FilterQuery } from "mongoose";
+import { type FilterQuery } from "mongoose";
 import {
   COOKIE_POLICY_TH,
   HOME_CONTENT_TH,

@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import {
   getLastestAdminTopics,
   getLastestDevTopics,
-  getLastestGuestTopics,
   getLastestVoterTopicsWithIds,
 } from "~/src/services/fetch/topics";
 import { getVoterAllowByUserId } from "~/src/services/fetch/vote-allow";
