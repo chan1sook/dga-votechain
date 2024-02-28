@@ -310,8 +310,6 @@ async function fetchMetricValue() {
     },
   });
 
-  console.log(_rawMetrics);
-
   if (_rawMetrics.value) {
     metrics.value = _rawMetrics.value.metrics as ServerMetricsResponse;
   } else {
