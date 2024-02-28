@@ -42,8 +42,6 @@ async function getSystemInfo() {
 
     await ServerMetricsModel.insertMany(cachedMetrics);
     cachedMetrics.splice(0, cachedMetrics.length);
-  } else {
-    console.log(`[Monitoring Workers] Cached Metrics`);
   }
 }
 

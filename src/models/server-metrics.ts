@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration.js";
+import duration from "dayjs/plugin/duration";
 
 dayjs.extend(duration);
 

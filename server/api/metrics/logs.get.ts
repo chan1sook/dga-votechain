@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration.js";
+import duration from "dayjs/plugin/duration";
 import { getLastestMetricsByDuration } from "~/src/services/fetch/monitor";
 import { downsamplingMonitorLogs } from "~/src/services/transform/monitor";
 import { isUserDeveloper } from "~/src/services/validations/role";
