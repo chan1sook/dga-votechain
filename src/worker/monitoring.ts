@@ -4,10 +4,9 @@ import ServerMetricsModel from "~/src/models/server-metrics";
 
 const cachedMetrics: ServerMetrics[] = [];
 async function getSystemInfo() {
-  const [mem, currentLoad, dockerAll, fsSize] = await Promise.all([
+  const [mem, currentLoad, fsSize] = await Promise.all([
     systeminformation.mem(),
     systeminformation.currentLoad(),
-    systeminformation.dockerAll(),
     systeminformation.fsSize(),
   ]);
 
@@ -43,12 +42,14 @@ async function getSystemInfo() {
 
     await ServerMetricsModel.insertMany(cachedMetrics);
     cachedMetrics.splice(0, cachedMetrics.length);
+  } else {
+    console.log(`[Monitoring Workers] Cached Metrics`);
   }
 }
 
-function worker() {
+async function worker() {
   try {
-    getSystemInfo();
+    await getSystemInfo();
   } catch (err) {
     console.log(`[Monitoring Workers] Failed`);
     console.error(err);
