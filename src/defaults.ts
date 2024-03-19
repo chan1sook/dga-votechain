@@ -197,7 +197,7 @@ export const BLOCKCHAIN_SERVERS = [
     name: "DGAServer2",
   },
   {
-    host: "35.239.20.185",
+    host: "164.115.50.21",
     name: "DGAServer3",
   },
 ];

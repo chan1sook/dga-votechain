@@ -266,6 +266,7 @@ const chartByteOptions = computed(() => {
             }
             if (context.parsed.y !== null) {
               label += prettyBytes(context.parsed.y, {
+                binary: true,
                 locale: i18n.locale.value || "en",
               });
             }
@@ -288,7 +289,10 @@ const chartByteOptions = computed(() => {
       y: {
         ticks: {
           callback(val: number) {
-            return prettyBytes(val, { locale: i18n.locale.value || "en" });
+            return prettyBytes(val, {
+              binary: true,
+              locale: i18n.locale.value || "en",
+            });
           },
         },
       },

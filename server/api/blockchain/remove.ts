@@ -1,7 +1,6 @@
 import BlockchainServerModel from "~/src/models/blockchain-server";
 import { isBannedUser } from "~/src/services/validations/user";
 import { isUserDeveloper } from "~/src/services/validations/role";
-import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
 
 export default defineEventHandler(async (event) => {
   const userData = event.context.userData;
