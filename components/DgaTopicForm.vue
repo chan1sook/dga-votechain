@@ -547,7 +547,8 @@ watch(
 watch(
   voteStart,
   (value) => {
-    topicData.value.voteStartAt = dayjs(value, "YYYY-MM-DD HH:mm").toDate();
+    topicData.value.voteStartAt =
+      value instanceof Date ? value : dayjs(value, "YYYY-MM-DD HH:mm").toDate();
 
     if (topicData.value.durationMode === "startDuration") {
       topicData.value.voteExpiredAt = dayjs(topicData.value.voteStartAt)
@@ -580,7 +581,10 @@ watch(
         .add(voteDuration.value.durationMinutes, "minutes")
         .toDate();
     } else {
-      topicData.value.voteExpiredAt = dayjs(value, "YYYY-MM-DD HH:mm").toDate();
+      topicData.value.voteExpiredAt =
+        value instanceof Date
+          ? value
+          : dayjs(value, "YYYY-MM-DD HH:mm").toDate();
     }
   },
   { deep: true }

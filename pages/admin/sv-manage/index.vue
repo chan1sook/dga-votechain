@@ -134,7 +134,6 @@ import CloseIcon from "vue-material-design-icons/Close.vue";
 import { isBlockchainServerDataValid } from "~/src/services/validations/blockchain-server";
 import dayjs from "dayjs";
 import { formatDateTime } from "~/src/services/formatter/datetime";
-import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
 
 const i18n = useI18n();
 
@@ -229,7 +228,7 @@ function updateTime() {
 }
 
 function isStarterServer(server: BlockchainServerDataResponse) {
-  return !!BLOCKCHAIN_SERVERS.find((ele) => ele.host === server.host);
+  return server.isStarter;
 }
 
 function popupRemoveServer(server: BlockchainServerDataResponse) {

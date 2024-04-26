@@ -50,6 +50,7 @@ export default async () => {
         name: svData.name,
         createdAt: dayjs(svData.createdAt).toString(),
         updatedAt: dayjs(svData.updatedAt).toString(),
+        isStarter: svData.isStarter || false,
         lastActiveAt: svData.lastActiveAt
           ? dayjs(svData.lastActiveAt).toString()
           : undefined,

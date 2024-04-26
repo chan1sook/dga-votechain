@@ -11,6 +11,10 @@ const schema = new Schema<BlockchainServerData>(
       unique: true,
       required: true,
     },
+    isStarter: {
+      type: Boolean,
+      default: false,
+    },
     lastActiveAt: {
       type: Date,
     },

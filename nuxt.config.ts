@@ -6,6 +6,7 @@ console.log("isProduction:", isProduction);
 export default defineNuxtConfig({
   modules: ["@nuxtjs/i18n"],
   runtimeConfig: {
+    IS_PRODUCTION: isProduction ? "true" : "false",
     MONGODB_URI: isProduction
       ? process.env.MONGODB_URI
       : process.env.DEV_MONGODB_URI,
@@ -50,6 +51,14 @@ export default defineNuxtConfig({
     HELP_MANUAL_STORAGE_PATH: isProduction
       ? process.env.HELP_MANUAL_STORAGE_PATH
       : process.env.DEV_HELP_MANUAL_STORAGE_PATH,
+
+    BLOCKCHAIN_HOST: isProduction
+      ? process.env.BLOCKCHAIN_HOST
+      : process.env.DEV_BLOCKCHAIN_HOST,
+    BLOCKCHAIN_HOST_CONFIG_PATH: isProduction
+      ? process.env.BLOCKCHAIN_HOST_CONFIG_PATH
+      : process.env.DEV_BLOCKCHAIN_HOST_CONFIG_PATH,
+
     BLOCKCHAIN_PRIVATE_KEY: process.env.BLOCKCHAIN_PRIVATE_KEY,
     CITIZENID_FIXED_SALT: isProduction
       ? process.env.DEV_CITIZENID_FIXED_SALT

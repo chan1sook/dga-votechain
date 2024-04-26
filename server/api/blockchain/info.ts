@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
         name: ele.name,
         createdAt: dayjs(ele.createdAt).toString(),
         updatedAt: dayjs(ele.updatedAt).toString(),
+        isStarter: ele.isStarter || false,
         lastActiveAt: ele.lastActiveAt
           ? dayjs(ele.lastActiveAt).toString()
           : undefined,

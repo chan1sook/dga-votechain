@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
   const blockchainServerData = new BlockchainServerModel({
     host: param.host,
     name: param.name,
+    isStarter: false,
   });
 
   await blockchainServerData.save();
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event) => {
       name: blockchainServerData.name,
       createdAt: dayjs(blockchainServerData.createdAt).toString(),
       updatedAt: dayjs(blockchainServerData.updatedAt).toString(),
+      isStarter: blockchainServerData.isStarter || false,
       lastActiveAt: blockchainServerData.lastActiveAt
         ? dayjs(blockchainServerData.lastActiveAt).toString()
         : undefined,

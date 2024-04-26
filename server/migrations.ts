@@ -1,3 +1,4 @@
+import fs from "fs/promises";
 import UserModel from "~/src/models/user";
 import BlockchainServerModel from "~/src/models/blockchain-server";
 import {
@@ -5,7 +6,6 @@ import {
   loadServerConfigurations,
   updateConfigurations,
 } from "~/src/services/fetch/config";
-import { BLOCKCHAIN_SERVERS } from "~/src/defaults";
 
 let migrationSeq = 0;
 
@@ -27,24 +27,43 @@ export async function setPredefinedBlockchainServers() {
 
   console.log(`[Migration] ${migrationSeq}. Add Predefined Blockchain Servers`);
 
-  const servers = await BlockchainServerModel.find({
-    host: { $in: BLOCKCHAIN_SERVERS.map((ele) => ele.host) },
-  });
+  const configPath = useRuntimeConfig().BLOCKCHAIN_HOST_CONFIG_PATH;
 
-  const modifiedServers = [];
-  for (const data of BLOCKCHAIN_SERVERS) {
-    const serverTarget = servers.find((sv) => sv.host === data.host);
-    if (serverTarget) {
-      serverTarget.name = data.name;
-      modifiedServers.push(serverTarget);
-    } else {
-      modifiedServers.push(new BlockchainServerModel(data));
+  try {
+    console.log(`[Migration] Read Server config file`, configPath);
+
+    const fileContent = (await fs.readFile(configPath)).toString();
+    const starterServers = JSON.parse(fileContent) as {
+      host: string;
+      name: string;
+    }[];
+    const oldServers = await BlockchainServerModel.find({});
+
+    const modifiedServers = oldServers;
+    for (const server of oldServers) {
+      server.isStarter = false;
     }
+
+    for (const data of starterServers) {
+      const serverTarget = oldServers.find((sv) => sv.host === data.host);
+      if (serverTarget) {
+        serverTarget.name = data.name;
+        serverTarget.isStarter = true;
+      } else {
+        modifiedServers.push(
+          new BlockchainServerModel({ ...data, isStarter: true })
+        );
+      }
+    }
+
+    const result = await BlockchainServerModel.bulkSave(modifiedServers);
+    console.log(
+      `[Migration] Add Predefined Blockchain Servers (Inserted: ${result.insertedCount}, Updated: ${result.modifiedCount})`
+    );
+  } catch (err) {
+    console.error(err);
+    console.log(`[Migration] Config file not found`);
   }
-  const result = await BlockchainServerModel.bulkSave(modifiedServers);
-  console.log(
-    `[Migration] Add Predefined Blockchain Servers (Inserted: ${result.insertedCount}, Updated: ${result.modifiedCount})`
-  );
 }
 
 export async function migrateDuplicateUsers() {
@@ -65,7 +84,7 @@ export async function migrateDuplicateUsers() {
 
   // 2. Fix 1
   const editUsers = [];
-  const removeUsers = [];
+  const removeUsers: any[] = [];
   const remainUsers = newUsers.slice();
 
   for (const user of problemUsers) {
