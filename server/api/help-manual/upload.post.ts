@@ -1,6 +1,5 @@
 import { readFiles } from "h3-formidable";
 import { fileTypeFromBuffer } from "file-type";
-import sharp from "sharp";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import path from "path";

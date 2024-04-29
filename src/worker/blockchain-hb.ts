@@ -23,7 +23,7 @@ async function checkBlockchainHBs() {
             urlWithPort.toString(),
             {
               jsonrpc: "2.0",
-              method: "admin_nodeInfo",
+              method: "net_enode",
               params: [],
               id: 1,
             },
