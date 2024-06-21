@@ -13,5 +13,6 @@ etc/
 .config/
 .img-upload/
 .help-manual/
-firebase-admin-config.json
-blockchain-hosts.json
+
+deploy-scripts/blockchain-hosts.json
+deploy-scripts/vm-secret.txt
