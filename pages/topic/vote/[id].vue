@@ -63,8 +63,8 @@
           <template v-else>
             <div>{{ $t("app.voting.totalVotes") }}:</div>
             <div class="ml-auto md:ml-0 md:text-xl">
-              {{ totalVotes || 0 }}
-              {{ $t("app.voting.vote", { count: totalVotes }) }}
+              {{ prevVotes.length || 0 }}
+              {{ $t("app.voting.vote", { count: prevVotes.length }) }}
             </div>
           </template>
         </div>
