@@ -3,7 +3,7 @@
 # path /home/logisense/dgafr-script.sh
 
 rm -r dga-votechain/
-git clone -b main https://github.com/dgaEvoteAdmin/dga-votechain
+git clone https://github.com/dgaEvoteAdmin/dga-votechain
 cp .env dga-votechain/
 cd dga-votechain/
 npm i && npm run build

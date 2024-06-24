@@ -16,3 +16,5 @@ etc/
 
 deploy-scripts/blockchain-hosts.json
 deploy-scripts/vm-secret.txt
+deploy-scripts/Readme.txt
+dga-evote-key-setting-file.zip
